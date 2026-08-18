@@ -1,0 +1,157 @@
+---
+title: "Logistics"
+description: "How the course works"
+toc: true
+toc-title: "On this page"
+---
+
+:::{.logistics-lead}
+This course combines conceptual understanding with sustained practical work. Every week, we study the ideas together and then use them to build, test, and discuss real systems.
+:::
+
+## Weekly rhythm
+
+We meet for **two 90-minute sessions each week**. The two sessions have different but complementary roles.
+
+:::{.session-grid}
+:::{.session-card .lecture-session}
+<span class="session-time">Session 01 · 1h30</span>
+
+### Lecture
+
+- Concepts and mathematical foundations
+- Visual explanations and demonstrations
+- Guided examples
+- Discussion of common misconceptions
+:::
+
+:::{.session-card .studio-session}
+<span class="session-time">Session 02 · 1h30</span>
+
+### Project Studio
+
+- Programming exercises and experiments
+- Weekly project milestones
+- Debugging and instructor feedback
+- Occasional peer review and presentations
+:::
+:::
+
+Students should arrive at the Project Studio having reviewed the week's notes and prepared the required code and development environment. The studio is working time: participation, experimentation, and questions are expected.
+
+## Communication and discussion
+
+:::{.communication-card}
+:::{.communication-mark aria-hidden="true"}
+ED
+:::
+:::{.communication-copy}
+### ED Discussion
+
+ED Discussion will be our main communication space for questions, announcements, technical problems, useful resources, and conversations that continue beyond the classroom.
+
+<span class="status-chip">Course link available soon</span>
+:::
+:::
+
+Students are encouraged to answer questions as well as ask them. Explaining an idea clearly is an important part of learning it.
+
+Meaningful participation can include:
+
+- Asking a precise question after making an initial attempt
+- Giving a clear and constructive explanation
+- Sharing a useful experiment, visualization, or reference
+- Identifying and correcting an error
+- Summarizing the conclusion of a discussion
+- Helping a classmate debug without posting a complete solution
+
+ED participation is assessed by **usefulness, regularity, and intellectual contribution—not by message count**. Short, superficial, or repetitive posts do not improve the participation grade.
+
+## Assessment
+
+:::{.grade-strip aria-label="Assessment weights"}
+:::{.grade-segment .coursework}
+<span class="grade-value">40%</span>
+
+**Weekly projects and homework**
+:::
+:::{.grade-segment .engagement}
+<span class="grade-value">20%</span>
+
+**Engagement and participation**
+:::
+:::{.grade-segment .final-assessment}
+<span class="grade-value">40%</span>
+
+**Final assessment**
+:::
+:::
+
+### Weekly projects and homework · 40%
+
+Practical work is distributed across the semester. Most projects develop over several weeks and follow the thematic parts shown on the [course schedule](schedule.qmd).
+
+This component evaluates:
+
+- Correct and thoughtful implementation
+- Experimental method and interpretation
+- Understanding of the underlying ideas
+- Clear communication of results
+- Steady progress across project milestones
+
+### Engagement and participation · 20%
+
+:::{.engagement-split}
+:::{.engagement-item}
+<span>10%</span>
+
+**Attendance and studio participation**
+
+Regular presence, preparation, active project work, and constructive collaboration.
+:::
+:::{.engagement-item}
+<span>10%</span>
+
+**Discussion and course engagement**
+
+Meaningful ED contributions, questions, explanations, and shared learning.
+:::
+:::
+
+Participation is about consistent engagement, not simply occupying a seat or accumulating posts. The detailed attendance and justified-absence policy will be announced before classes begin.
+
+### Final assessment · 40%
+
+:::{.decision-note}
+**Format to be confirmed:** this component will be either a substantial group project or a final examination. The final format and evaluation rubric will be announced before the course begins.
+:::
+
+If a group project is selected, assessment will include both the quality of the group's work and each student's individual understanding and contribution.
+
+## Course policies
+
+The following details will be finalized before the first graded activity:
+
+:::{.policy-grid}
+:::{.policy-item}
+### Submission and late work
+
+Where work is submitted, deadlines, grace periods, and late penalties.
+:::
+:::{.policy-item}
+### Collaboration
+
+What may be discussed with classmates and what must remain individual work.
+:::
+:::{.policy-item}
+### Generative AI
+
+When AI tools are permitted and how their use must be acknowledged.
+:::
+:::{.policy-item}
+### Tools and environment
+
+Required software, Python environment, hardware, and reproducibility expectations.
+:::
+:::
+

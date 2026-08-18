@@ -1,0 +1,10 @@
+---
+title: "Projects"
+description: "Build, investigate, and communicate"
+toc: false
+---
+
+:::{.placeholder-panel}
+Assignments and student projects will live here.
+:::
+

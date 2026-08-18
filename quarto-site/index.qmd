@@ -1,0 +1,72 @@
+---
+title: "Deep Learning"
+page-layout: full
+toc: false
+---
+
+:::{.hero}
+:::{.hero-copy}
+<p class="eyebrow">Deep Learning · Academic Year 2026–2027</p>
+
+# Learn the ideas. Build the <em>systems.</em>
+
+<p class="hero-lead">A visual, mathematical, and practical journey through modern deep learning.</p>
+
+:::{.button-row}
+[Explore the schedule](schedule.qmd){.course-button .primary}
+[Read the notes](notes.qmd){.course-button}
+:::
+:::
+
+:::{.hero-art aria-hidden="true"}
+:::{.network-mark}
+<span></span>
+:::
+:::
+:::
+
+## The learning journey
+
+<p class="section-intro">Seven thematic parts create a visible progression from learning fundamentals to generative models.</p>
+
+:::{.journey-strip}
+<span class="journey-step foundations"><b>01</b> Foundations</span>
+<span class="journey-step scratch"><b>02</b> From scratch</span>
+<span class="journey-step optimization"><b>03</b> Optimization</span>
+<span class="journey-step pytorch"><b>04</b> PyTorch</span>
+<span class="journey-step vision"><b>05</b> Vision</span>
+<span class="journey-step sequences"><b>06</b> Sequences</span>
+<span class="journey-step generative"><b>07</b> Generative</span>
+:::
+
+[View the complete 14-week roadmap →](schedule.qmd){.journey-link}
+
+## Course structure
+
+<p class="section-intro">This first prototype establishes the visual language and navigation. Course material will be added after the theme is approved.</p>
+
+:::{.card-grid}
+:::{.course-card}
+<span class="number">01 · UNDERSTAND</span>
+
+### Concepts
+
+Visual explanations supported by precise mathematics.
+:::
+
+:::{.course-card}
+<span class="number">02 · IMPLEMENT</span>
+
+### Practice
+
+Small experiments that expose how the machinery works.
+:::
+
+:::{.course-card}
+<span class="number">03 · CREATE</span>
+
+### Projects
+
+Open-ended work connecting foundations to modern systems.
+:::
+:::

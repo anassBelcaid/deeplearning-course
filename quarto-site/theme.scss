@@ -1,0 +1,88 @@
+/*-- scss:defaults --*/
+
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap");
+
+$paper: #f5f1e8;
+$paper-raised: #fffdf7;
+$ink: #17212b;
+$muted: #657079;
+$signal: #ef5b45;
+$electric: #2b7fff;
+$line: rgba(23, 33, 43, 0.14);
+
+$body-bg: $paper;
+$body-color: $ink;
+$primary: $signal;
+$secondary: $electric;
+$link-color: #be3e2f;
+$link-hover-color: #81291f;
+$navbar-bg: rgba(245, 241, 232, 0.93);
+$navbar-fg: $ink;
+$footer-bg: $ink;
+$footer-fg: #edf2f4;
+$font-family-sans-serif: "Manrope", system-ui, sans-serif;
+$font-family-monospace: "DM Mono", monospace;
+$headings-font-family: "Newsreader", Georgia, serif;
+$headings-font-weight: 600;
+$border-radius: 0.35rem;
+$code-bg: #eae5da;
+$code-color: #263846;
+$toc-color: $signal;
+
+/*-- scss:rules --*/
+
+body {
+  letter-spacing: -0.008em;
+}
+
+h1, h2, h3 {
+  letter-spacing: -0.025em;
+}
+
+h1 {
+  font-size: clamp(2.6rem, 6vw, 5.25rem);
+  line-height: 0.95;
+}
+
+h2 {
+  margin-top: 2.8rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid $line;
+}
+
+.navbar {
+  border-bottom: 1px solid $line;
+  backdrop-filter: blur(14px);
+}
+
+.navbar-brand img {
+  max-height: 30px;
+}
+
+.nav-link {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.nav-link.active {
+  color: $signal !important;
+}
+
+code {
+  border-radius: 0.2rem;
+}
+
+pre.sourceCode {
+  border: 1px solid $line;
+  border-left: 3px solid $electric;
+  border-radius: 0.35rem;
+}
+
+.page-footer {
+  border-top: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+}
+

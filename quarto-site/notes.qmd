@@ -1,0 +1,10 @@
+---
+title: "Lecture Notes"
+description: "A connected, visual deep learning textbook"
+toc: false
+---
+
+:::{.placeholder-panel}
+Lecture chapters and reading paths will live here.
+:::
+

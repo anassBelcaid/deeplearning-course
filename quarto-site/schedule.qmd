@@ -1,0 +1,353 @@
+---
+title: "Schedule"
+description: "Fourteen weeks, seven connected parts"
+toc: false
+page-layout: full
+---
+
+:::{.schedule-intro}
+The course moves from first principles to complete learning systems. Color marks a change of theme; project tracks show how practical work develops across several weeks.
+
+<span class="status-chip">Provisional roadmap</span>
+:::
+
+:::{.schedule-legend}
+<span class="legend-item"><i class="dot foundations"></i> Foundations</span>
+<span class="legend-item"><i class="dot scratch"></i> From scratch</span>
+<span class="legend-item"><i class="dot optimization"></i> Optimization</span>
+<span class="legend-item"><i class="dot pytorch"></i> PyTorch</span>
+<span class="legend-item"><i class="dot vision"></i> Vision</span>
+<span class="legend-item"><i class="dot sequences"></i> Sequences</span>
+<span class="legend-item"><i class="dot generative"></i> Generative models</span>
+:::
+
+:::{.schedule-table}
+:::{.schedule-head}
+<span>Week & topic</span><span>Course material</span><span>Useful links</span><span>Project track</span>
+:::
+
+:::{.part-banner .foundations}
+<span>Part I</span>
+
+## Foundations
+
+What does it mean for a model to learn?
+:::
+
+:::{.week-row .foundations}
+:::{.week-topic}
+<span class="week-number">Week 01</span>
+
+### What Does It Mean to Learn?
+
+Learning problems, data splits, losses, generalization, and linear models.
+:::
+:::{.material-cell}
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+:::
+:::{.links-cell}
+<span class="coming-soon">Readings to be selected</span>
+:::
+:::{.project-cell}
+<span class="project-label">Orientation</span>
+
+Environment and baseline diagnostic.
+:::
+:::
+
+:::{.part-banner .scratch}
+<span>Part II</span>
+
+## Neural Networks from Scratch
+
+Open the black box before using a framework.
+:::
+
+:::{.week-row .scratch}
+:::{.week-topic}
+<span class="week-number">Week 02</span>
+
+### Neurons and Multilayer Networks
+
+Activations, MLPs, forward propagation, and representation capacity.
+:::
+:::{.material-cell}
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Code</span>
+:::
+:::{.links-cell}
+<span class="coming-soon">Visual explanations · Exercises</span>
+:::
+:::{.project-cell .track-start}
+<span class="project-label">Project 1 · From scratch</span><br>Build the forward pass.
+:::
+:::
+
+:::{.week-row .scratch}
+:::{.week-topic}
+<span class="week-number">Week 03</span>
+
+### Backpropagation and Autodiff
+
+Computational graphs, chain rule, autograd, and gradient checking.
+:::
+:::{.material-cell}
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Code</span>
+:::
+:::{.links-cell}
+<span class="coming-soon">Karpathy · Autodiff resources</span>
+:::
+:::{.project-cell .track-middle}
+<span class="project-label">Project 1</span><br>Add backward propagation.
+:::
+:::
+
+:::{.part-banner .optimization}
+<span>Part III</span>
+
+## Optimization and Generalization
+
+Make neural networks learn reliably.
+:::
+
+:::{.week-row .optimization}
+:::{.week-topic}
+<span class="week-number">Week 04</span>
+
+### Optimizing Neural Networks
+
+SGD, momentum, Adam, learning rates, schedules, and failure diagnosis.
+:::
+:::{.material-cell}
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Lab</span>
+:::
+:::{.links-cell}
+<span class="coming-soon">Optimizer visualizations · Readings</span>
+:::
+:::{.project-cell .track-middle}
+<span class="project-label">Project 1</span><br>Compare optimizers.
+:::
+:::
+
+:::{.week-row .optimization}
+:::{.week-topic}
+<span class="week-number">Week 05</span>
+
+### Making Networks Train Reliably
+
+Initialization, normalization, regularization, dropout, and tracking.
+:::
+:::{.material-cell}
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Lab</span>
+:::
+:::{.links-cell}
+<span class="coming-soon">Experiments · Practical checklist</span>
+:::
+:::{.project-cell .track-end}
+<span class="project-label">Project 1 · Due</span><br>Report and reflection.
+:::
+:::
+
+:::{.part-banner .pytorch}
+<span>Part IV</span>
+
+## PyTorch Fundamentals
+
+Turn the mechanics into a reusable training system.
+:::
+
+:::{.week-row .pytorch}
+:::{.week-topic}
+<span class="week-number">Week 06</span>
+
+### Building Training Systems with PyTorch
+
+Tensors, autograd, modules, data loaders, devices, and training loops.
+:::
+:::{.material-cell}
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+:::
+:::{.links-cell}
+<span class="coming-soon">PyTorch documentation · Exercises</span>
+:::
+:::{.project-cell .track-start}
+<span class="project-label">Project 2 · Vision system</span><br>Training pipeline checkpoint.
+:::
+:::
+
+:::{.part-banner .vision}
+<span>Part V</span>
+
+## Learning from Images
+
+From spatial structure to modern visual systems.
+:::
+
+:::{.week-row .vision}
+:::{.week-topic}
+<span class="week-number">Week 07</span>
+
+### Convolutional Neural Networks
+
+Convolution, padding, stride, receptive fields, pooling, and features.
+:::
+:::{.material-cell}
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+:::
+:::{.links-cell}
+<span class="coming-soon">Interactive convolution demo</span>
+:::
+:::{.project-cell .track-middle}
+<span class="project-label">Project 2</span><br>Implement and train a CNN.
+:::
+:::
+
+:::{.week-row .vision}
+:::{.week-topic}
+<span class="week-number">Week 08</span>
+
+### Modern Vision Architectures
+
+VGG, residual learning, efficient models, augmentation, and transfer.
+:::
+:::{.material-cell}
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+:::
+:::{.links-cell}
+<span class="coming-soon">Architecture papers · Model explorer</span>
+:::
+:::{.project-cell .track-middle}
+<span class="project-label">Project 2</span><br>Architecture study.
+:::
+:::
+
+:::{.week-row .vision}
+:::{.week-topic}
+<span class="week-number">Week 09</span>
+
+### Segmentation and Object Detection
+
+Dense prediction, U-Net, bounding boxes, IoU, NMS, and detectors.
+:::
+:::{.material-cell}
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+:::
+:::{.links-cell}
+<span class="coming-soon">U-Net · Detection resources</span>
+:::
+:::{.project-cell .track-end}
+<span class="project-label">Project 2 · Due</span><br>Evaluation and model card.
+:::
+:::
+
+:::{.part-banner .sequences}
+<span>Part VI</span>
+
+## Learning from Sequences
+
+Memory, recurrence, and temporally structured data.
+:::
+
+:::{.week-row .sequences}
+:::{.week-topic}
+<span class="week-number">Week 10</span>
+
+### Recurrent Neural Networks
+
+Hidden states, recurrence, unrolling, BPTT, and unstable gradients.
+:::
+:::{.material-cell}
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+:::
+:::{.links-cell}
+<span class="coming-soon">Sequence visualizations · Readings</span>
+:::
+:::{.project-cell .track-start}
+<span class="project-label">Project 3 · Sequences</span><br>Baseline recurrent model.
+:::
+:::
+
+:::{.week-row .sequences}
+:::{.week-topic}
+<span class="week-number">Week 11</span>
+
+### Gated Recurrent Networks
+
+GRU and LSTM gates, memory, and comparative behavior.
+:::
+:::{.material-cell}
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+:::
+:::{.links-cell}
+<span class="coming-soon">Gate diagrams · GRU/LSTM readings</span>
+:::
+:::{.project-cell .track-middle}
+<span class="project-label">Project 3</span><br>Compare RNN, GRU, and LSTM.
+:::
+:::
+
+:::{.week-row .sequences}
+:::{.week-topic}
+<span class="week-number">Week 12</span>
+
+### Sequence Learning in Practice
+
+Padding, masking, bidirectionality, and variable-length batches.
+:::
+:::{.material-cell}
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+:::
+:::{.links-cell}
+<span class="coming-soon">PyTorch sequence utilities</span>
+:::
+:::{.project-cell .track-end}
+<span class="project-label">Project 3 · Due</span><br>Analysis and error study.
+:::
+:::
+
+:::{.part-banner .generative}
+<span>Part VII</span>
+
+## Generative Representation Learning
+
+Learn a latent space and use it to create.
+:::
+
+:::{.week-row .generative}
+:::{.week-topic}
+<span class="week-number">Week 13</span>
+
+### Autoencoders
+
+Bottlenecks, reconstruction, denoising, and latent representations.
+:::
+:::{.material-cell}
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+:::
+:::{.links-cell}
+<span class="coming-soon">Latent-space explorer · Readings</span>
+:::
+:::{.project-cell .track-start}
+<span class="project-label">Generative mini-project</span><br>Learn and inspect a latent space.
+:::
+:::
+
+:::{.week-row .generative}
+:::{.week-topic}
+<span class="week-number">Week 14</span>
+
+### Variational Autoencoders
+
+Latent distributions, reparameterization, KL divergence, and sampling.
+:::
+:::{.material-cell}
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+:::
+:::{.links-cell}
+<span class="coming-soon">VAE paper · Interactive explanation</span>
+:::
+:::{.project-cell .track-end}
+<span class="project-label">Mini-project · Due</span><br>Interpolation and reflection.
+:::
+:::
+:::
+

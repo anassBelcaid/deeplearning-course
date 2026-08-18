@@ -1,0 +1,42 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "Deep Learning"
+  site-url: "https://anassbelcaid.github.io/deeplearning/"
+  navbar:
+    pinned: true
+    logo: assets/mark.svg
+    left:
+      - href: index.qmd
+        text: Home
+      - href: schedule.qmd
+        text: Schedule
+      - href: notes.qmd
+        text: Notes
+      - href: projects.qmd
+        text: Projects
+      - href: logistics.qmd
+        text: Logistics
+    right:
+      - icon: github
+        href: https://github.com/anassBelcaid/deeplearning
+        aria-label: Course repository
+  page-footer:
+    left: "Deep Learning · ENSA Tétouan"
+    right: "Built with Quarto"
+
+format:
+  html:
+    theme: theme.scss
+    css: styles.css
+    toc: true
+    smooth-scroll: true
+    code-copy: true
+    anchor-sections: true
+    link-external-newwindow: true
+
+execute:
+  freeze: auto
+
