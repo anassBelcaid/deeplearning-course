@@ -75,7 +75,7 @@ Open the black box before using a framework.
 Activations, MLPs, forward propagation, and representation capacity.
 :::
 :::{.material-cell}
-[Notes](notes/02-neurons-mlps/index.qmd){.material-pill .available}[PDF](notes/02-neurons-mlps/index.pdf){.material-pill .available}[Slides](lectures/02-neurons-mlps/index.qmd){.material-pill .available}<span class="material-pill muted">Code</span>
+[Notes](notes/02-neurons-mlps/index.qmd){.material-pill .available}[PDF](notes/02-neurons-mlps/index.pdf){.material-pill .available}[Slides](lectures/02-neurons-mlps/index.qmd){.material-pill .available}[Project](projects/02-neural-boundaries/index.qmd){.material-pill .available}
 :::
 :::{.links-cell}
 <a class="resource-mini read required" href="https://cs231n.github.io/neural-networks-1/"><i>◫</i><span>CS231n · Neural Networks I</span></a>

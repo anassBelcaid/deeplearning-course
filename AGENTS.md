@@ -33,6 +33,10 @@ Every in-class exercise should follow this sequence:
 
 In HTML notes, use a prompt followed by a `<details>` solution so readers choose when to reveal it. In PDF notes, keep the prompt before the worked solution and preserve enough visual separation to allow an honest pause.
 
+## Project scope
+
+- Assess only concepts that students have already encountered in the course sequence. A project may use machinery from a future chapter, but that machinery must be provided as clearly labeled infrastructure, treated as a temporary black box, and revisited when it is formally taught. Do not turn an upcoming topic such as backpropagation or optimization into a student TODO merely because the project needs it to run.
+
 ## Images and attribution
 
 - Use as many pedagogically useful images as the explanation benefits from; do not add decorative images that carry no teaching information.

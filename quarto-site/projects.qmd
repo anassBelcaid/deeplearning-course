@@ -59,3 +59,23 @@ Implement vectorized margins, derive the active-violation gradient, verify it nu
 :::
 :::
 :::
+
+## Neural networks from scratch
+
+:::{.chapter-list}
+:::{.chapter-entry .available .neural-networks}
+<span class="chapter-number">02</span>
+
+:::{.chapter-copy}
+### [Neural Decision Boundaries](projects/02-neural-boundaries/index.qmd)
+
+Turn a one-hidden-layer classifier into a modular NumPy network, then compare nine activation–depth combinations on concentric circles.
+
+`Two sessions`{.topic-tag} `NumPy`{.topic-tag} `Forward pass`{.topic-tag} `3×3 experiment`{.topic-tag}
+:::
+
+:::{.chapter-state}
+[View assignment](projects/02-neural-boundaries/index.qmd) · [Open notebook](projects/02-neural-boundaries/starter/neural_boundaries.ipynb)
+:::
+:::
+:::

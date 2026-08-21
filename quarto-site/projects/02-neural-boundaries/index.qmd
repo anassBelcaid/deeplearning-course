@@ -1,0 +1,66 @@
+---
+title: "Project 02 · Neural Decision Boundaries"
+subtitle: "From one hidden layer to a modular NumPy network"
+description: "Discover how activation and depth reshape a nonlinear classification boundary."
+toc: true
+toc-depth: 2
+page-layout: article
+---
+
+:::{.project-brief}
+<span><strong>Duration:</strong> Two sessions × 1h30</span>
+<span><strong>Mode:</strong> Individual</span>
+<span><strong>Format:</strong> One self-contained Jupyter notebook</span>
+<span><strong>Deliverable:</strong> Passing checks, 3×3 experiment, and evidence-based conclusions</span>
+:::
+
+## The challenge
+
+Concentric circles defeat a linear classifier but are easy for a suitable neural network. You will first build one hidden layer explicitly, then turn its components into a tiny modular framework and compare nine networks:
+
+| | **1 hidden layer** | **3 hidden layers** | **5 hidden layers** |
+|---|---:|---:|---:|
+| **Sigmoid** | model 1 | model 2 | model 3 |
+| **Tanh** | model 4 | model 5 | model 6 |
+| **ReLU** | model 7 | model 8 | model 9 |
+
+For every model, you will record training time, validation accuracy, and the learned decision region. The objective is not to declare one activation universally best; it is to explain what happened under one controlled experimental protocol.
+
+## Open or download
+
+[Open notebook](starter/neural_boundaries.ipynb){.btn .btn-primary}
+
+<a class="btn btn-secondary" href="https://raw.githubusercontent.com/anassBelcaid/deeplearning/redesign/quarto-2026/quarto-site/projects/02-neural-boundaries/starter/neural_boundaries.ipynb" download="neural_boundaries.ipynb">Download the notebook</a>
+
+[Open in Google Colab](https://colab.research.google.com/github/anassBelcaid/deeplearning/blob/redesign/quarto-2026/quarto-site/projects/02-neural-boundaries/starter/neural_boundaries.ipynb){.btn .btn-secondary}
+
+## What you implement
+
+1. A one-hidden-layer network with initialization, cached forward pass, and prediction.
+2. Numerically stable binary cross-entropy.
+3. Modular `Sigmoid`, `Tanh`, and `ReLU` forward transformations.
+4. A reusable `Linear` layer with initialization and a cached forward pass.
+5. Nine architectures expressed only as lists of layers.
+
+The notebook provides data generation, plotting, every backward operation, parameter updates, `Sequential`, the training harness, experiment table, and the final 3×3 decision-region visualization. Backpropagation and optimization are deliberately treated as infrastructure; we will open that black box in later chapters.
+
+## Two-session rhythm
+
+| Session | Work | Checkpoint |
+|---|---|---|
+| **A · Make nonlinearity explicit** | circles, explicit MLP, BCE, three activation forward modules | Checks 1–5 pass |
+| **B · Compose and compare** | `Linear.forward`, architecture lists, provided training, nine-model experiment, interpretation | Checks 6–7 pass; comparison figure complete |
+
+## Experimental discipline
+
+All nine models use the same data split, width, learning rate, number of epochs, and reproducible initialization policy. Only activation and depth change. Compare validation—not test—performance while developing the models.
+
+:::{.callout-important}
+Visible checks are learning aids, not secure grading. Restart the kernel and run every cell before submission. A result without the code and reasoning that produced it is incomplete.
+:::
+
+## References and inspiration
+
+- [TensorFlow Playground](https://playground.tensorflow.org/) — interactive nonlinear datasets and hidden-unit visualizations.
+- [CS231n minimal neural-network case study](https://cs231n.github.io/neural-networks-case-study/) — a from-scratch NumPy classifier and decision regions.
+- [NumPy broadcasting](https://numpy.org/doc/stable/user/basics.broadcasting.html) — batch operations and bias addition.
