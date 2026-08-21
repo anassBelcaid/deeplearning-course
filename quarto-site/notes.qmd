@@ -17,9 +17,23 @@ These notes are written as a connected textbook rather than lecture transcripts.
 :::{.chapter-copy}
 ### [What Does It Mean to Learn?](notes/01-what-is-learning/index.qmd)
 
-From examples to a prediction rule—and from training performance to evidence that the rule will work on new data.
+[![](notes/01-what-is-learning/assets/chapter-cover.png){fig-alt="Preview of Chapter 1: examples, learned class regions, and prediction."}](notes/01-what-is-learning/index.qmd)
+:::
 
-`Supervised learning`{.topic-tag} `Loss`{.topic-tag} `Generalization`{.topic-tag} `Experimental protocol`{.topic-tag}
+<span class="chapter-state">Read chapter →</span>
+:::
+:::
+
+## Part II · Neural Networks from Scratch
+
+:::{.chapter-list}
+:::{.chapter-entry .available .neural-networks}
+<span class="chapter-number">02</span>
+
+:::{.chapter-copy}
+### [From Linear Classifiers to Neural Networks](notes/02-neurons-mlps/index.qmd)
+
+[![](notes/02-neurons-mlps/assets/chapter-cover.png){fig-alt="Preview of Chapter 2: nonlinear layers transforming data into separable features."}](notes/02-neurons-mlps/index.qmd)
 :::
 
 <span class="chapter-state">Read chapter →</span>
@@ -27,6 +41,5 @@ From examples to a prediction rule—and from training performance to evidence t
 :::
 
 :::{.notes-coming}
-The remaining chapters will appear here as the course develops.
+More chapters will appear here as the course develops.
 :::
-

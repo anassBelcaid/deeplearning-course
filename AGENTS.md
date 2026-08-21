@@ -8,6 +8,7 @@ These instructions apply to the whole repository. Use them whenever creating or 
 - Make formulas answer a question raised by an example. Do not present long sequences of equations without interpretation, a visual, or a decision for the student.
 - Keep the five-part frame visible where useful: data, hypothesis, loss, optimization, and evaluation.
 - Notes are the durable technical reference; slides are the visual, conversational teaching path. They should agree, but the notes should not merely transcribe the slides.
+- Give every notes chapter an original, purpose-made visual cover that previews its central idea without embedded text. Use that cover as the opening visual and as the dominant entry on the Notes index; keep only the title and navigation label as supporting index text.
 
 ## Slides
 

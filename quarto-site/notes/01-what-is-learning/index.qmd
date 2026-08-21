@@ -16,8 +16,8 @@ link-citations: true
 PART I · FOUNDATIONS
 :::
 
-:::{.chapter-question}
-An image is only a grid of numbers. How can a machine decide whether those numbers describe a cat, a truck, or a bird?
+:::{.chapter-cover}
+![Examples flow through a learned representation into geometric class regions and a prediction for a previously unseen image. Original course illustration generated for this chapter.](assets/chapter-cover.png){fig-alt="A visual overview of supervised learning, from labeled examples through learned class regions to a prediction on an unseen image."}
 :::
 
 We will solve the same classification problem twice in this course: first with classical machine learning, then with deep learning. The tools will change; the five ingredients of learning will not.
