@@ -16,6 +16,9 @@ These instructions apply to the whole repository. Use them whenever creating or 
 - Keep one principal idea per slide. Use large visuals and text readable at 1440×900.
 - Use Mermaid for workflows and relationships, but size diagrams to use the available canvas. If a diagram remains thin, use taller nodes, line breaks, or a more suitable layout.
 - Reuse the established visual language and assets in `quarto-site/lectures/01-what-is-learning/` when appropriate.
+- When a diagram is the principal content of a slide, scale it to occupy most of the available canvas. Override thin default Mermaid sizing or redesign the layout rather than leaving large unused areas.
+- On a student's first exposure to an abstract claim, pair the formula or geometric statement with a concrete visual and walk through the mechanism before summarizing it.
+- Introduce an activation function with its formula, output curve, derivative curve, principal strengths, and principal weaknesses. Follow the definition immediately with any exercise that directly practices it, then compare activations through a controlled interactive experiment when useful.
 
 ## Exercise convention
 
@@ -72,3 +75,11 @@ When a lecture section is approved:
 2. Add the deeper derivation and caveats that do not fit on slides.
 3. Confirm schedule links still point to the rendered notes, PDF, and lecture.
 4. Render and verify both formats before declaring the section complete.
+
+## Learning from review feedback
+
+- Treat every instructor correction as either a local edit or a reusable course-authoring rule.
+- Before applying a correction broadly, state the generalized rule in plain language so its intended scope is clear.
+- When a correction expresses a reusable preference about pedagogy, sequencing, visual design, exercises, citations, navigation, or technical presentation, add the generalized rule to this file and apply it to future material.
+- Do not turn a correction tied to one specific slide, example, or exceptional circumstance into a global constraint.
+- Preserve previously accepted rules unless the instructor explicitly revises or replaces them.

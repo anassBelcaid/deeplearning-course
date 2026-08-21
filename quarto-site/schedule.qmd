@@ -75,10 +75,12 @@ Open the black box before using a framework.
 Activations, MLPs, forward propagation, and representation capacity.
 :::
 :::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Code</span>
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span>[Slides](lectures/02-neurons-mlps/index.qmd){.material-pill .available}<span class="material-pill muted">Code</span>
 :::
 :::{.links-cell}
-<span class="coming-soon">Visual explanations · Exercises</span>
+<a class="resource-mini read required" href="https://cs231n.github.io/neural-networks-1/"><i>◫</i><span>CS231n · Neural Networks I</span></a>
+<a class="resource-mini read" href="https://www.deeplearningbook.org/contents/mlp.html"><i>◫</i><span>DL Book · Ch. 6</span></a>
+<a class="resource-mini practice" href="https://cs231n.github.io/neural-networks-case-study/"><i>✎</i><span>Spiral case study</span></a>
 :::
 :::{.project-cell .track-start}
 <span class="project-label">Project 1 · From scratch</span><br>Build the forward pass.
