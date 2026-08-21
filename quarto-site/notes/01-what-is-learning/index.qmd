@@ -1,0 +1,892 @@
+---
+title: "What Does It Mean to Learn?"
+subtitle: "Chapter 1 · Foundations"
+description: "From examples to a rule that works on data we have not seen"
+author: "Dr. A. Belcaid"
+toc: true
+toc-depth: 3
+number-sections: true
+code-fold: false
+bibliography: ../../references.bib
+link-citations: true
+---
+
+:::{.chapter-opening}
+:::{.chapter-kicker}
+PART I · FOUNDATIONS
+:::
+
+:::{.chapter-question}
+An image is only a grid of numbers. How can a machine decide whether those numbers describe a cat, a truck, or a bird?
+:::
+
+We will solve the same classification problem twice in this course: first with classical machine learning, then with deep learning. The tools will change; the five ingredients of learning will not.
+:::
+
+:::{.learning-objectives}
+### By the end of this chapter, you should be able to {.unnumbered .unlisted}
+
+1. Formulate image classification as a supervised-learning problem.
+2. Compare nearest-neighbor, linear, and neural-network hypothesis classes.
+3. Compute multiclass SVM and softmax cross-entropy losses from class scores.
+4. Separate the training objective from the metrics used to evaluate a classifier.
+5. Explain why training performance is not evidence of generalization.
+:::
+
+## One image, one label
+
+Consider a tiny color image with width $W$, height $H$, and three color channels. To us it may be a cat. To a computer it begins as a tensor
+
+$$
+x \in \mathbb{R}^{H\times W\times 3}.
+$$
+
+For a $32\times32$ RGB image, $x$ contains $32\cdot32\cdot3=3072$ numbers. The classification task is to map those numbers to one label from a finite set:
+
+$$
+y \in \{1,\ldots,K\}.
+$$
+
+![A computer receives pixel intensities rather than the semantic object we perceive. The enlarged patch makes the input representation explicit; the values on the right illustrate a classifier's output. Source: Stanford CS231n course notes [@cs231nnotes].](../../lectures/01-what-is-learning/assets/cs231n-classify.png){#fig-pixels width=72%}
+
+:::{.content-visible when-format="html"}
+:::{.class-gallery aria-label="Example image classes"}
+<span><i>01</i>airplane</span><span><i>02</i>car</span><span><i>03</i>bird</span><span><i>04</i>cat</span><span><i>05</i>deer</span><span><i>06</i>dog</span><span><i>07</i>frog</span><span><i>08</i>horse</span><span><i>09</i>ship</span><span><i>10</i>truck</span>
+:::
+:::
+
+:::{.content-visible when-format="pdf"}
+| 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
+|---|---|---|---|---|---|---|---|---|---|
+| airplane | car | bird | cat | deer | dog | frog | horse | ship | truck |
+:::
+
+The label is simple. The rule is not. A cat may occupy five pixels or the whole image; face left or right; appear in sunlight or shadow; be partly hidden; and share colors and textures with a dog. Meanwhile, changing many pixel values can leave the class completely unchanged. These nuisance variations are central to visual recognition: the desired prediction should be insensitive to within-class changes while remaining sensitive to differences between classes [@deng2009imagenet].
+
+![Common sources of visual variation: viewpoint, scale, deformation, occlusion, illumination, background clutter, and within-class diversity. Source: Stanford CS231n course notes [@cs231nnotes].](../../lectures/01-what-is-learning/assets/cs231n-challenges.jpeg){#fig-vision-challenges width=96%}
+
+:::{.paradigm-compare}
+:::{.paradigm-card}
+<span>Handwritten vision program</span>
+
+**Pixels + rules about edges, colors, and shapes → class**
+
+We must anticipate every relevant variation.
+:::
+:::{.paradigm-card .accent}
+<span>Image classifier</span>
+
+**Labeled images + learning algorithm → classifier**
+
+The data helps determine the rule.
+:::
+:::
+
+This does not remove the programmer. We still define the labels, collect the images, choose the possible classifiers, define what errors cost, decide how to search, and design the evaluation. Learning replaces one difficult act—writing the final rule—with five explicit design problems. The history of ImageNet illustrates how dataset scale and label organization can reshape the kinds of visual systems researchers can build [@deng2009imagenet], while AlexNet demonstrated how a sufficiently expressive learned model could exploit that scale [@krizhevsky2012imagenet].
+
+:::{.key-idea}
+**Image classification is a useful laboratory for machine learning.** The input is concrete, mistakes are visible, and the same five-part formulation supports both a classical linear classifier and a modern deep network.
+:::
+
+## The five ingredients of learning
+
+Let one example be a pair
+
+$$
+(x, y),
+$$
+
+where $x$ is an image and $y$ is its class label.
+
+A dataset of $n$ examples is
+
+$$
+\mathcal{D} = \{(x^{(i)}, y^{(i)})\}_{i=1}^{n}.
+$$
+
+The superscript $(i)$ identifies an example; it is not an exponent.
+
+:::{.content-visible when-format="html"}
+:::{.five-objects}
+:::{.object-card}
+<b>01</b><span>Data</span>
+
+$\mathcal{D}$ records past examples.
+:::
+:::{.object-card}
+<b>02</b><span>Hypothesis</span>
+
+$f_\theta$ maps an input to a prediction.
+:::
+:::{.object-card}
+<b>03</b><span>Loss</span>
+
+$\ell$ scores each mistake.
+:::
+:::{.object-card}
+<b>04</b><span>Optimization</span>
+
+An algorithm searches for $\theta$.
+:::
+:::{.object-card}
+<b>05</b><span>Evaluation</span>
+
+Metrics test useful behavior.
+:::
+:::
+:::
+
+:::{.content-visible when-format="pdf"}
+| Ingredient | Question |
+|---|---|
+| **Data** | What experience do we provide? |
+| **Hypothesis** | What prediction rules are possible? |
+| **Loss** | How costly is each prediction? |
+| **Optimization** | How do we search for useful parameters? |
+| **Evaluation** | What evidence would convince us? |
+:::
+
+### Ingredient 1 — Data: what counts as experience?
+
+For a $K$-class image problem, the training data is a collection
+
+$$
+\mathcal D = \{(x^{(i)},y^{(i)})\}_{i=1}^{n},
+\qquad x^{(i)}\in\mathbb R^{H\times W\times3},
+\quad y^{(i)}\in\{1,\ldots,K\}.
+$$
+
+But “an image and its label” hides important choices.
+
+![A labeled CIFAR-10 sample: ten small natural-image classes with substantial variation inside each row. CIFAR-10 contains 60,000 $32\times32$ RGB images and is useful here because both the inputs and labels can be inspected directly [@krizhevsky2009cifar]. Image arrangement: Stanford CS231n course notes [@cs231nnotes].](../../lectures/01-what-is-learning/assets/cs231n-cifar10-classes.jpg){#fig-cifar-batch width=82%}
+
+:::{.content-visible when-format="html"}
+:::{.data-questions}
+<span><b>Sampling</b>Which cameras, locations, objects, and conditions produced the images?</span>
+<span><b>Labels</b>Who decided the class, and what happens when the image is ambiguous?</span>
+<span><b>Balance</b>Do common classes dominate rare but important ones?</span>
+<span><b>Representation</b>Raw pixels, resized pixels, or handcrafted features?</span>
+:::
+:::
+
+:::{.content-visible when-format="pdf"}
+| Audit | Ask |
+|---|---|
+| **Sampling** | Which cameras, locations, objects, and conditions produced the images? |
+| **Labels** | Who decided the class, and what happens when an image is ambiguous? |
+| **Balance** | Do common classes dominate rare but important ones? |
+| **Representation** | Raw pixels, resized pixels, or handcrafted features? |
+:::
+
+Classical computer vision often transforms the pixels into handcrafted features $\phi(x)$—color histograms, edges, or local descriptors—before learning a classifier. Canny edges [@canny1986computational] and histograms of oriented gradients [@dalal2005histograms] are canonical examples: the designer decides in advance which measurements should survive. Deep learning instead learns useful features together with the classifier, an idea usually called **representation learning** [@bengio2013representation].
+
+:::{.content-visible when-format="html"}
+:::{.feature-pipeline}
+<div><b>Classical ML</b><span>image</span><i>→</i><span>handcrafted $\phi(x)$</span><i>→</i><span>classifier</span></div>
+<div><b>Deep learning</b><span>image</span><i>→</i><span>learned features</span><i>→</i><span>classifier</span></div>
+:::
+:::
+
+:::{.content-visible when-format="pdf"}
+$$
+\begin{aligned}
+\text{Classical ML:}\quad &x \longrightarrow \text{handcrafted }\phi(x) \longrightarrow \text{classifier},\\
+\text{Deep learning:}\quad &x \longrightarrow \text{learned features} \longrightarrow \text{classifier}.
+\end{aligned}
+$$
+:::
+
+#### A concrete classical representation: Canny edges {.unnumbered .unlisted}
+
+The Canny detector makes the idea of a handcrafted representation tangible. Starting from an image, it applies a sequence chosen by the algorithm designer:
+
+1. convert intensities to grayscale;
+2. suppress noise with a Gaussian filter;
+3. compute gradient magnitude and orientation;
+4. thin candidate edges with non-maximum suppression;
+5. distinguish strong and weak responses using two thresholds;
+6. retain weak responses only when hysteresis connects them to strong edges.
+
+![Six stages of the Canny edge detector. The figure was generated for this course with the standard OpenCV sample image; the procedure follows Canny's original formulation [@canny1986computational].](../../lectures/01-what-is-learning/assets/canny-six-stages.png){#fig-canny width=100%}
+
+A classical pipeline might now train an SVM on this edge map. The Canny parameters and the decision to privilege edges are not learned from the classification labels—they are part of our representation design.
+
+#### A learned representation: VGG-16 {.unnumbered .unlisted}
+
+In a convolutional network, the transformation itself contains learned parameters. VGG-16 stacks small $3\times3$ convolutions into five blocks; spatial resolution decreases while the number and abstraction of feature maps increase [@simonyan2015vgg]. The final layers turn the learned representation into class scores.
+
+![A course schematic of VGG-16. The architecture contains 13 convolutional layers followed by three learned classifiers and was trained for large-scale ImageNet recognition [@simonyan2015vgg]. We will derive convolution, pooling, and every block later in the course.](../../lectures/01-what-is-learning/assets/vgg16-course-diagram.svg){#fig-vgg width=100%}
+
+The contrast is not “simple versus magical.” Both pipelines encode assumptions. In the classical case, many assumptions live in $\phi$; in the deep case, the architecture specifies a family of representations and optimization selects one from data.
+
+If every ship is photographed against blue water while cars appear on gray roads, “blue background” may become a highly predictive shortcut. The model can score well without learning the object we intended. Shortcut learning is not limited to deep networks, but expressive networks are particularly capable of exploiting any stable predictive cue in the training distribution [@geirhos2020shortcut].
+
+### Ingredient 2 — Hypothesis: what rules may the learner choose?
+
+A hypothesis is a candidate prediction rule. A hypothesis class $\mathcal H$ is the collection of rules the algorithm is allowed to choose from.
+
+$$
+f_\theta : \mathbb R^{H\times W\times3} \rightarrow \mathbb R^K.
+$$
+
+The model produces one **score** for each class:
+
+$$
+s=f_\theta(x)=[s_1,\ldots,s_K]^\top,
+\qquad \widehat y=\arg\max_j s_j.
+$$
+
+The largest score wins. Scores need not be probabilities; they are simply the model's preferences before a loss interprets them.
+
+:::{.approach-ladder}
+:::{.approach-card}
+<span>MEMORY-BASED</span>
+
+#### $k$-nearest neighbors {.unnumbered .unlisted}
+
+Store the training images. Predict using the labels of visually nearby examples.
+
+**Strength:** almost no training.
+**Weakness:** distance between raw pixels is fragile.
+:::
+:::{.approach-card .linear}
+<span>PARAMETRIC</span>
+
+#### Linear classifier {.unnumbered .unlisted}
+
+Compute class scores with $s=Wx+b$.
+
+**Strength:** fast and interpretable.
+**Weakness:** one linear template per class.
+:::
+:::{.approach-card .neural}
+<span>REPRESENTATION LEARNING</span>
+
+#### Neural network {.unnumbered .unlisted}
+
+Compose nonlinear layers and learn the features used by the classifier.
+
+**Strength:** expressive.
+**Weakness:** more data, computation, and design choices.
+:::
+:::
+
+These three choices differ in what they can express and in where they store information. Nearest neighbor retains examples and compares a query at prediction time [@cover1967nearest]. A linear classifier compresses training information into one weight vector per class. A neural network composes linear maps with nonlinearities and can learn intermediate features [@rumelhart1986backprop; @bengio2013representation].
+
+| $k$-nearest neighbors | Linear classifier | Neural network |
+|---|---|---|
+| ![A query followed by raw-pixel nearest neighbors.](../../lectures/01-what-is-learning/assets/cs231n-knn-neighbors.jpg) | ![Images and three linear decision boundaries.](../../lectures/01-what-is-learning/assets/cs231n-linear-regions.jpeg) | ![Nonlinear regions learned for a spiral dataset.](../../lectures/01-what-is-learning/assets/cs231n-neural-boundary.png) |
+
+The nearest-neighbor and linear illustrations come from the Stanford CS231n notes; the neural boundary comes from its minimal neural-network case study [@cs231nnotes]. The point is not that the most complex hypothesis always wins. The point is that choosing $\mathcal H$ decides which regularities can possibly be learned.
+
+#### The linear classifier in detail {.unnumbered .unlisted}
+
+Flatten the image into a vector $x\in\mathbb R^D$, where $D=H\times W\times3$. A multiclass linear classifier uses
+
+$$
+s=Wx+b,
+\qquad W\in\mathbb R^{K\times D},
+\quad b\in\mathbb R^K.
+$$
+
+Row $W_j$ acts like a learned template for class $j$. Its score is
+
+$$
+s_j=W_jx+b_j.
+$$
+
+The geometry is visible even after projecting images into two dimensions: each row of $W$ defines a linear score surface, and class boundaries occur where two scores are equal. A single linear classifier therefore cannot carve arbitrary disconnected regions. Neural networks overcome this restriction by composing several learned transformations, not by changing the definition of a class score.
+
+:::{.content-visible when-format="html"}
+:::{.score-demo}
+<div class="score-input"><span>one image</span><b>$x\in\mathbb R^{3072}$</b></div>
+<i>×</i>
+<div class="score-input"><span>class templates</span><b>$W\in\mathbb R^{10\times3072}$</b></div>
+<i>+</i>
+<div class="score-input"><span>bias</span><b>$b\in\mathbb R^{10}$</b></div>
+<i>→</i>
+<div class="score-output"><span>10 scores</span><b>$s\in\mathbb R^{10}$</b></div>
+:::
+:::
+
+:::{.margin-question}
+**Check your understanding**
+
+Two students train the same linear-classifier code but obtain different matrices $W$. Did they choose different hypothesis classes or different hypotheses?
+
+<details><summary>Reveal the answer</summary>They use the same hypothesis class but learned different hypotheses—different members of that class.</details>
+:::
+
+### Ingredient 3 — Loss: how wrong is a score vector?
+
+A hard error—right or wrong—is useful for reporting accuracy but poor for learning. It does not distinguish “barely wrong” from “confidently wrong,” and small parameter changes usually do not change it. A training loss provides a graded signal.
+
+We will compare two iconic multiclass losses using the same example. Suppose the scores for an image are
+
+$$
+s=[3.2,\ 5.1,\ -1.7],
+\qquad y=1.
+$$
+
+Class 1 is correct, but class 2 has the largest score. How should we express this mistake?
+
+:::{.content-visible when-format="html"}
+:::{.score-bars}
+<div><span>class 1 · correct</span><i style="--score:53%"></i><b>3.2</b></div>
+<div class="winner"><span>class 2 · predicted</span><i style="--score:85%"></i><b>5.1</b></div>
+<div><span>class 3</span><i style="--score:8%"></i><b>-1.7</b></div>
+:::
+:::
+
+:::{.content-visible when-format="pdf"}
+| Class | Role | Score |
+|---|---|---:|
+| 1 | Correct label | 3.2 |
+| 2 | Model prediction | **5.1** |
+| 3 | Other | $-1.7$ |
+:::
+
+#### Multiclass SVM loss: demand a margin {.unnumbered .unlisted}
+
+The SVM family formalizes classification through separating surfaces and margins [@cortes1995support]. In the multiclass form used here, the loss requires the correct score $s_y$ to exceed every incorrect score by at least a margin $\Delta$:
+
+$$
+L_i^{\text{SVM}}
+=\sum_{j\ne y}\max\left(0,\ s_j-s_y+\Delta\right).
+$$
+
+:::{.margin-question}
+**Practice before reading the solution**
+
+For $s=[3.2,5.1,-1.7]$, correct class $y=1$, and $\Delta=1$, write one hinge term for each incorrect class and compute their sum. Pause for 90 seconds.
+
+<details><summary>Reveal the worked solution</summary>
+
+$$
+L_i^{\text{SVM}}
+=\max(0,5.1-3.2+1)
++\max(0,-1.7-3.2+1)
+=2.9.
+$$
+
+The dog score contributes $2.9$ because it exceeds the correct score instead of trailing by one. The third class contributes zero because it is already safely below the required margin.
+</details>
+:::
+
+The loss becomes zero only when the correct class wins by a sufficient margin. Once that margin is satisfied, pushing the score farther gives no additional reward.
+
+#### Softmax cross-entropy: demand probability {.unnumbered .unlisted}
+
+Softmax converts scores into a normalized positive vector that can be interpreted as a class distribution for the loss:
+
+$$
+p_j=\frac{e^{s_j}}{\sum_{k=1}^{K}e^{s_k}}.
+$$
+
+For numerical stability, implementations subtract $\max_k s_k$ before exponentiating. This changes none of the probabilities. For our scores,
+
+$$
+p\approx[0.130,\ 0.869,\ 0.001].
+$$
+
+Cross-entropy is the negative log-probability of the correct class:
+
+$$
+L_i^{\text{CE}}=-\log p_y\approx-\log(0.130)=2.04.
+$$
+
+The logarithm makes confident errors expensive: assigning $p_y=0.9$ costs about $0.11$, while $p_y=0.01$ costs about $4.61$. The resulting softmax values should not automatically be treated as trustworthy real-world probabilities; modern networks can be systematically miscalibrated even when their accuracy is high [@guo2017calibration].
+
+:::{.loss-compare}
+:::{.loss-card}
+<span>SVM · margin view</span>
+
+“Is the correct score ahead of every rival by enough?”
+
+Zero loss after the margin is satisfied.
+:::
+:::{.loss-card .softmax}
+<span>Softmax · probability view</span>
+
+“How much probability did the model assign to the correct class?”
+
+Continues rewarding greater confidence.
+:::
+:::
+
+Both losses prefer the correct class. They differ in the geometry of the pressure they apply to scores. Modern classification networks most often use softmax cross-entropy, but the SVM loss makes the idea of a classification margin especially visible.
+
+Over the complete dataset, we minimize the empirical risk, often with a regularization penalty:
+
+$$
+J(\theta)
+=\frac1n\sum_{i=1}^{n}L_i(\theta)
++\lambda R(\theta).
+$$
+
+The data loss rewards correct predictions. The regularizer expresses a preference among solutions—for example, smaller weights.
+
+:::{.warning-note}
+**Loss is not the same as the final metric.** We choose a differentiable loss to train the model and use application-relevant metrics to judge the resulting behavior.
+:::
+
+### Ingredient 4 — Optimization: how do scores improve?
+
+The loss converts learning into a search problem. We start with some parameters, measure the loss, estimate how each parameter should change, and update the parameters. Mini-batch training belongs to the broad stochastic-approximation tradition initiated by Robbins and Monro [@robbins1951stochastic]; backpropagation supplies gradients efficiently for layered networks [@rumelhart1986backprop]. Schematically:
+
+:::{.content-visible when-format="html"}
+:::{.learning-loop}
+<span>sample data</span><i>→</i><span>predict</span><i>→</i><span>measure loss</span><i>→</i><span>compute change</span><i>→</i><span>update $\theta$</span>
+:::
+:::
+
+:::{.content-visible when-format="pdf"}
+$$
+\text{sample data}\ \longrightarrow\ \text{predict}\ \longrightarrow\
+\text{measure loss}\ \longrightarrow\ \text{compute change}\ \longrightarrow\
+\text{update }\theta.
+$$
+:::
+
+For a linear classifier, optimization changes the class templates $W$ and biases $b$. For a neural network, it may change millions of weights. In either case, one gradient-based step has the form
+
+$$
+\theta\leftarrow\theta-\eta\nabla_\theta J(\theta),
+$$
+
+where $\eta$ is the learning rate. Later chapters will explain why this direction is useful, how backpropagation computes the gradient, and why the choice of optimizer matters. For now, keep the conceptual distinction clear:
+
+![A two-parameter picture of optimization. Each point is a new parameter vector; the trajectory seeks progressively lower contours of the objective. Real networks live in vastly higher-dimensional spaces, so this is an explanatory projection rather than a literal landscape.](../../lectures/01-what-is-learning/assets/parameter-convergence.svg){#fig-parameter-convergence width=76%}
+
+> The **loss** defines where we want to go. The **optimizer** is the procedure used to move there.
+
+### Ingredient 5 — Evaluation: did we solve the task?
+
+Training loss answers a narrow question:
+
+> How well does this model fit the examples used to adjust its parameters?
+
+The question we actually care about is broader:
+
+> How well will this model perform on a new example drawn from the situation where it will be used?
+
+The gap between those questions is the central difficulty of machine learning. Evaluation needs both **held-out data** and **metrics that expose the mistakes we care about**.
+
+:::{.content-visible when-format="html"}
+:::{.metric-gallery}
+<span><b>Accuracy</b>How often is the top prediction correct?</span>
+<span><b>Top-$k$ accuracy</b>Is the correct label among the $k$ highest scores?</span>
+<span><b>Confusion matrix</b>Which classes are confused with which?</span>
+<span><b>Per-class recall</b>Which classes does the model systematically miss?</span>
+:::
+:::
+
+:::{.content-visible when-format="pdf"}
+| View | Question answered |
+|---|---|
+| **Accuracy** | How often is the top prediction correct? |
+| **Top-$k$ accuracy** | Is the correct label among the $k$ highest scores? |
+| **Confusion matrix** | Which classes are confused with which? |
+| **Per-class recall** | Which classes does the model systematically miss? |
+:::
+
+For a balanced ten-class benchmark, accuracy is a useful headline. It is not a complete diagnosis. A confusion matrix might reveal that cats are repeatedly classified as dogs, while trucks are nearly perfect. Looking at erroneous images may reveal blur, occlusion, unusual viewpoints—or a faulty label.
+
+## Fitting is not learning
+
+Suppose we give a model the labels of 1,000 training images. A sufficiently expressive model might memorize every image-label pair. It could achieve zero training error while having learned nothing useful about new images.
+
+:::{.fit-generalize}
+:::{.fit-panel .memorize}
+<span class="panel-label">Memorization</span>
+
+Training examples → stored answers
+
+**Seen data:** excellent
+**New data:** uncertain
+:::
+:::{.fit-panel .generalize}
+<span class="panel-label">Generalization</span>
+
+Training examples → reusable structure
+
+**Seen data:** good
+**New data:** good
+:::
+:::
+
+The distinction becomes clearer with numbers. Imagine that two candidate models are evaluated on the same representative held-out set:
+
+| Model | Training accuracy | Test accuracy | Interpretation |
+|---|---:|---:|---|
+| A · memorizer | **99%** | 54% | Excellent fit, large generalization gap |
+| B · generalizer | 92% | **89%** | Slightly worse fit, much stronger unseen behavior |
+
+If deployment resembles the test distribution, Model B is the stronger learning result. Choosing Model A because its training number is larger would confuse optimization success with task success. This example also shows why a single statement such as “the model achieved 99%” is meaningless unless the dataset split is named.
+
+We say a model **generalizes** when it performs well on relevant examples that were not used to fit it.
+
+The ideal quantity is the expected risk over the unknown data-generating distribution $P$:
+
+$$
+R(\theta)
+= \mathbb{E}_{(x,y)\sim P}
+\left[\ell\big(f_\theta(x),y\big)\right].
+$$
+
+We cannot calculate this expectation exactly because $P$ is unknown. We estimate performance using held-out data that imitates future use. This empirical-risk view is a central organizing idea in statistical learning and modern deep-learning treatments [@goodfellow2016deep].
+
+:::{.key-idea}
+Low training loss is an optimization result. Low loss on genuinely unseen, representative data is evidence of learning.
+:::
+
+## Train, validation, and test are different jobs
+
+A useful experimental protocol divides available data into three disjoint subsets.
+
+:::{.split-diagram}
+:::{.split-block .train}
+<span>TRAIN</span><b>Fit parameters</b>
+
+Used repeatedly by the optimizer.
+:::
+:::{.split-block .validation}
+<span>VALIDATION</span><b>Make design choices</b>
+
+Used to compare models and settings.
+:::
+:::{.split-block .test}
+<span>TEST</span><b>Estimate final performance</b>
+
+Used after decisions are complete.
+:::
+:::
+
+### The training set
+
+The optimizer uses training examples to update $\theta$. Seeing this data many times is expected.
+
+### The validation set
+
+The validation set guides decisions that are not learned directly by the optimizer: architecture size, regularization strength, learning rate, preprocessing, and when to stop training. These choices are called **hyperparameters**.
+
+Because we repeatedly inspect validation results, we gradually adapt to the validation set. It is not a perfectly unbiased final evaluation.
+
+### The test set
+
+The test set is reserved for the end. It estimates how the completed procedure may behave on new data. If we repeatedly use test results to redesign the model, the test set quietly becomes another validation set.
+
+:::{.definition-box}
+**Data leakage** occurs when information unavailable at prediction time influences training or model selection. Leakage makes evaluation look better than real deployment [@kaufman2012leakage].
+:::
+
+### Split by the unit that must generalize
+
+Randomly splitting individual rows is not always valid. Imagine ten photographs of each physical object. If photographs of the same object appear in both training and test sets, the model may recognize that object rather than learn its class.
+
+The split should follow the unit of independence required by the application:
+
+- split by **patient**, not medical image;
+- split by **speaker**, not audio clip;
+- split by **object or scene**, not photograph;
+- split by **time** when predicting the future;
+- sometimes split by **location** when deploying elsewhere.
+
+:::{.margin-question}
+**Design checkpoint**
+
+A company wants to predict machine failure next month using five years of sensor logs. Why might a random row-level split be misleading?
+
+<details><summary>Reveal the answer</summary>Training could contain observations recorded after validation or test observations, leaking future operating conditions into the past. A chronological split better represents forecasting.</details>
+:::
+
+## Classical machine learning and deep learning
+
+We will revisit image classification later with convolutional neural networks. It is important to see what changes and what remains invariant.
+
+:::{.classical-deep}
+:::{.system-column .classical}
+<span>CLASSICAL PIPELINE</span>
+
+### Engineer, then learn {.unnumbered .unlisted}
+
+1. Resize and normalize the image.
+2. Design features such as color or edge histograms.
+3. Train an SVM or linear classifier.
+4. Evaluate on held-out images.
+
+The representation $\phi(x)$ is largely designed by a human.
+:::
+:::{.system-column .deep}
+<span>DEEP-LEARNING PIPELINE</span>
+
+### Learn the representation {.unnumbered .unlisted}
+
+1. Resize and normalize the image.
+2. Pass pixels through several learned layers.
+3. Produce class scores and optimize end-to-end.
+4. Evaluate on held-out images.
+
+The representation is learned jointly with the classifier.
+:::
+:::
+
+The deep model is not a different definition of learning. It is a richer hypothesis class with many more parameters and a learned feature extractor. We still need data, a loss, optimization, and honest evaluation.
+
+## Parameters are learned; hyperparameters are chosen
+
+:::{.comparison-table}
+| Learned parameters | Chosen hyperparameters |
+|---|---|
+| Weights and biases | Network depth and width |
+| Updated using training data | Learning rate |
+| Part of the fitted prediction rule | Batch size |
+| Often millions or billions | Regularization strength |
+| Denoted here by $\theta$ | Selected using validation evidence |
+:::
+
+The boundary is conceptual, not universal. A quantity is a parameter if the learning procedure adjusts it from training data; it is a hyperparameter if it is controlled by the practitioner or an outer selection process.
+
+## Baselines make improvement meaningful
+
+A score has no meaning without comparison. On a balanced ten-class dataset, random guessing averages 10% accuracy. On an imbalanced dataset, always predicting the largest class can score surprisingly well while ignoring every rare class.
+
+Before building a complex model, establish simple baselines:
+
+- majority-class prediction;
+- random prediction with the observed class frequencies;
+- $1$-nearest neighbor on raw pixels;
+- a linear classifier on pixels or handcrafted features;
+- the previous production system, if one exists;
+- human performance, when it can be measured responsibly.
+
+A baseline tests whether the pipeline and metric behave sensibly. It also tells us whether complexity buys anything.
+
+## Read the errors, not only the score
+
+Suppose two classifiers both achieve 72% accuracy. They may still behave very differently.
+
+:::{.error-comparison}
+:::{.error-model}
+<span>MODEL A</span>
+
+Good on vehicles, weak on animals. Often confuses cats with dogs and deer with horses.
+:::
+:::{.error-model}
+<span>MODEL B</span>
+
+Moderate on every class. Most failures occur on dark, cropped, or blurry images.
+:::
+:::
+
+A confusion matrix $C\in\mathbb N^{K\times K}$ records how often true class $i$ is predicted as class $j$. Its diagonal contains correct decisions; off-diagonal cells expose systematic confusions.
+
+For class $k$, we can also treat “class $k$” as positive and all other classes as negative:
+
+$$
+\operatorname{precision}_k=\frac{TP_k}{TP_k+FP_k},
+\qquad
+\operatorname{recall}_k=\frac{TP_k}{TP_k+FN_k}.
+$$
+
+The most informative evaluation combines aggregate metrics, per-class metrics, and a gallery of representative mistakes. Numbers tell us **how much** the system fails; examples help us ask **why**.
+
+## The complete learning protocol
+
+```{mermaid}
+%%| fig-cap: "The smallest complete experimental argument: define the decision, audit the data, protect the split, establish a baseline, fit parameters, make choices with validation data, and evaluate the completed procedure once."
+%%| fig-width: 12
+flowchart LR
+  Q[define<br/>decision] --> A[audit<br/>data]
+  A --> S[design<br/>split]
+  S --> B[establish<br/>baseline]
+  B --> T[train<br/>model]
+  T --> V[choose with<br/>validation]
+  V --> E[evaluate<br/>once]
+
+  classDef start fill:#17212b,color:#fff,stroke:#17212b
+  classDef process fill:#fffdf7,color:#17212b,stroke:#657079
+  classDef finish fill:#ef5b45,color:#fff,stroke:#ef5b45
+  class Q start
+  class A,S,B,T,V process
+  class E finish
+```
+
+:::{.protocol}
+:::{.protocol-step}
+<b>1</b><span>Define the decision</span><p>State the input, output, user, and cost of mistakes.</p>
+:::
+:::{.protocol-step}
+<b>2</b><span>Audit the data</span><p>Understand collection, labels, missing cases, and possible shortcuts.</p>
+:::
+:::{.protocol-step}
+<b>3</b><span>Choose the split</span><p>Protect the unit—person, plant, time, or location—that must generalize.</p>
+:::
+:::{.protocol-step}
+<b>4</b><span>Establish baselines</span><p>Make sure the task and metric demand real learning.</p>
+:::
+:::{.protocol-step}
+<b>5</b><span>Fit on training data</span><p>Use the optimizer to adjust model parameters.</p>
+:::
+:::{.protocol-step}
+<b>6</b><span>Decide with validation data</span><p>Compare designs without touching the test set.</p>
+:::
+:::{.protocol-step}
+<b>7</b><span>Evaluate once</span><p>Report test performance and important failure modes.</p>
+:::
+:::
+
+This is not merely a classroom ritual. It is the smallest credible argument that a learned system may work outside its training file.
+
+## What can still go wrong?
+
+Even a clean experimental split cannot guarantee success after deployment.
+
+**Distribution shift.** The future may differ from the dataset: another camera, region, season, population, or policy. A random split from one dataset cannot by itself certify behavior under such changes.
+
+**Shortcut learning.** The model may exploit a predictive artifact that does not represent the intended phenomenon [@geirhos2020shortcut].
+
+**Label limitations.** Targets may be noisy, subjective, delayed, or encode historical bias.
+
+**Metric mismatch.** A numerical score may ignore the real cost borne by users.
+
+**Feedback loops.** Once deployed, model decisions can change the data later collected.
+
+:::{.warning-note}
+A model does not “understand the task” in the human sense. It discovers statistical structure that helps optimize the objective on the data it receives. Whether that structure is useful, robust, and acceptable remains an empirical and human question.
+:::
+
+## Reading and practice
+
+The purpose of these resources is not to repeat the chapter. Each one adds a different perspective: a formal reference, a practitioner's argument, a visual explanation, or an opportunity to make a decision yourself.
+
+:::{.resource-list}
+:::{.resource-card .read .required}
+:::{.resource-icon aria-hidden="true"}
+◫
+:::
+:::{.resource-body}
+<span class="resource-meta">READ · REQUIRED</span>
+
+### [Image Classification: Data-driven Approach](https://cs231n.github.io/classification/)
+
+**Stanford CS231n course notes**
+
+Read through the nearest-neighbor classifier and validation-set discussion. Focus on why raw-pixel distance is a weak visual similarity measure and how the train/validation/test protocol shapes model selection.
+:::
+:::
+
+:::{.resource-card .read .required}
+:::{.resource-icon aria-hidden="true"}
+◫
+:::
+:::{.resource-body}
+<span class="resource-meta">READ · REFERENCE</span>
+
+### [Machine Learning Basics](https://www.deeplearningbook.org/contents/ml.html)
+
+**Deep Learning, Chapter 5 · Ian Goodfellow, Yoshua Bengio, and Aaron Courville**
+
+Read Sections 5.1–5.3 for a more formal treatment of learning algorithms, capacity, overfitting, hyperparameters, and estimators. Concentrate on the concepts; detailed derivations can wait.
+:::
+:::
+
+:::{.resource-card .paper}
+:::{.resource-icon aria-hidden="true"}
+▤
+:::
+:::{.resource-body}
+<span class="resource-meta">PAPER · RECOMMENDED</span>
+
+### [A Few Useful Things to Know About Machine Learning](https://homes.cs.washington.edu/~pedrod/papers/cacm12.pdf)
+
+**Pedro Domingos · Communications of the ACM, 2012**
+
+A compact practitioner's essay about generalization, representation, overfitting, data, and the traps hidden inside apparently successful experiments. After reading, select one claim you disagree with or would qualify.
+:::
+:::
+
+:::{.resource-card .watch}
+:::{.resource-icon aria-hidden="true"}
+▶
+:::
+:::{.resource-body}
+<span class="resource-meta">WATCH · OPTIONAL</span>
+
+### [But what is a neural network?](https://www.3blue1brown.com/lessons/neural-networks)
+
+**3Blue1Brown · Neural Networks, Chapter 1**
+
+A visual preview of the model family we begin constructing next week. Watch for the distinction between the architecture we choose and the parameters learned from examples.
+:::
+:::
+
+:::{.resource-card .practice}
+:::{.resource-icon aria-hidden="true"}
+✎
+:::
+:::{.resource-body}
+<span class="resource-meta">PRACTICE · REQUIRED</span>
+
+### [Accuracy, precision, and recall](https://developers.google.com/machine-learning/crash-course/classification/accuracy-precision-recall)
+
+**Google Machine Learning Crash Course**
+
+Work through the classification-metric checks. Before revealing each answer, decide which error matters and compute the quantity by hand.
+:::
+:::
+:::
+
+:::{.reading-prompt}
+### Bring one thought to class {.unnumbered .unlisted}
+
+Choose one resource and write down either a claim that changed your view, a claim you question, or an example where the evaluation protocol could fail. We will begin the next discussion from these observations.
+:::
+
+## Chapter summary
+
+:::{.summary-box}
+- Image classification maps a tensor of pixel values to one of $K$ labels and is a concrete supervised-learning problem.
+- Nearest-neighbor, linear, and neural models define increasingly expressive hypothesis classes.
+- SVM loss demands a score margin; softmax cross-entropy rewards probability assigned to the correct class.
+- A differentiable loss trains the model; accuracy, confusion matrices, and per-class metrics evaluate its behavior.
+- Fitting the training data is not the goal. The goal is useful performance on relevant unseen data.
+- Training data fits parameters, validation data guides design, and test data supports final evaluation.
+- Deep learning learns the representation jointly with the classifier, but the five ingredients do not change.
+:::
+
+## Exercises
+
+### Conceptual
+
+1. A model obtains 100% training accuracy and 62% test accuracy. Give three distinct explanations for the gap.
+2. Explain why selecting the best of 200 models using test accuracy makes that accuracy optimistic.
+3. Explain why Euclidean distance between raw image pixels can change dramatically after translating an object by one pixel.
+4. Two image classifiers have equal accuracy. List three analyses that could still make one preferable.
+
+### Design
+
+5. Choose one image-classification application—plant disease, traffic signs, waste sorting, or medical imaging—and write a one-page learning specification containing:
+   - input and target;
+   - data-collection process;
+   - unit of splitting;
+   - baseline;
+   - primary metric;
+   - two possible sources of leakage;
+   - one likely distribution shift.
+
+### Mathematical
+
+6. A three-class model produces $s=[-1.2,2.4,1.7]$ and the correct class is 3. Compute the multiclass SVM loss using $\Delta=1$.
+7. For the same scores, compute the softmax probabilities and cross-entropy loss. Use the stable form obtained by first subtracting the largest score.
+8. An image classifier produces $TP=36$, $TN=50$, $FP=10$, and $FN=4$ for the class “pedestrian.” Compute accuracy, precision, and recall. Which number best communicates its ability to find pedestrians?
+
+## References {.unnumbered}
+
+:::{.next-chapter}
+<span>Next · Chapter 2</span>
+
+## From a linear score to a neural network {.unnumbered .unlisted}
+
+We will build neurons and multilayer networks from elementary operations, then ask what additional functions depth allows us to represent.
+:::

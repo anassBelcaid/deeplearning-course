@@ -28,11 +28,15 @@ $border-radius: 0.35rem;
 $code-bg: #eae5da;
 $code-color: #263846;
 $toc-color: $signal;
+$grid-body-width: 1100px;
+$grid-sidebar-width: 150px;
+$grid-margin-width: 120px;
 
 /*-- scss:rules --*/
 
 body {
   letter-spacing: -0.008em;
+  --quarto-sidebar-width: 140px;
 }
 
 h1, h2, h3 {
@@ -70,6 +74,39 @@ h2 {
   color: $signal !important;
 }
 
+#TOC {
+  max-width: 132px;
+  font-size: 0.64rem;
+  line-height: 1.25;
+}
+
+#TOC .toc-title {
+  margin-bottom: 0.7rem;
+  color: $muted;
+  font-family: "DM Mono", monospace;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+#TOC .nav-link {
+  padding-top: 0.13rem;
+  padding-bottom: 0.13rem;
+  color: $muted;
+  font-size: 0.64rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.25;
+  text-transform: none;
+}
+
+#TOC .nav-link.active {
+  color: $ink !important;
+  border-left-color: $signal;
+  font-weight: 700;
+}
+
 code {
   border-radius: 0.2rem;
 }
@@ -85,4 +122,3 @@ pre.sourceCode {
   font-size: 0.8rem;
   letter-spacing: 0.03em;
 }
-

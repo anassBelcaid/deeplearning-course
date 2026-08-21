@@ -1,3 +1,6 @@
 .sass-cache
 _site
 .jekyll-cache
+_quarto_internal_scss_error.scss
+**/index_files/
+quarto-site/notes/*/lectures/

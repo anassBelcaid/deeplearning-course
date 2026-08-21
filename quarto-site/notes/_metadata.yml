@@ -1,0 +1,46 @@
+lang: en
+number-sections: true
+callout-appearance: simple
+fig-cap-location: bottom
+tbl-cap-location: top
+code-overflow: wrap
+format-links:
+  - pdf
+crossref:
+  fig-title: "Figure"
+  tbl-title: "Table"
+  eq-prefix: "Equation"
+
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-location: left
+    smooth-scroll: true
+    code-copy: true
+    anchor-sections: true
+
+  pdf:
+    documentclass: scrartcl
+    pdf-engine: lualatex
+    papersize: a4
+    fontsize: 11pt
+    toc: true
+    toc-depth: 3
+    colorlinks: true
+    linkcolor: DlInk
+    urlcolor: DlBlue
+    citecolor: DlGreen
+    mainfont: "Noto Serif"
+    sansfont: "Noto Sans"
+    monofont: "JetBrains Mono"
+    linestretch: 1.08
+    geometry:
+      - top=25mm
+      - bottom=27mm
+      - inner=27mm
+      - outer=23mm
+      - headsep=8mm
+    include-in-header:
+      - pdf-preamble.tex
+    keep-tex: false

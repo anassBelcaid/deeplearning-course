@@ -1,0 +1,92 @@
+% Shared print identity for the Deep Learning lecture notes.
+% This file is inherited by every chapter below notes/ via _metadata.yml.
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{scrlayer-scrpage}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{fvextra}
+\usepackage{enumitem}
+
+\definecolor{DlInk}{HTML}{17212B}
+\definecolor{DlBlue}{HTML}{2878C8}
+\definecolor{DlCoral}{HTML}{EF5B45}
+\definecolor{DlGreen}{HTML}{38865A}
+\definecolor{DlMuted}{HTML}{657079}
+\definecolor{DlRule}{HTML}{D8D4CA}
+\definecolor{DlPaper}{HTML}{F5F1E8}
+
+% A compact title page that shares the website's editorial identity.
+\makeatletter
+\providecommand{\@subtitle}{}
+\renewcommand{\subtitle}[1]{\gdef\@subtitle{#1}}
+\renewcommand{\maketitle}{%
+  \thispagestyle{plain}%
+  \noindent
+  \begin{minipage}[c]{0.18\textwidth}
+    \colorbox{DlInk}{%
+      \parbox[c][13mm][c]{13mm}{\centering\sffamily\bfseries\color{white}DL}%
+    }
+  \end{minipage}%
+  \hfill
+  \begin{minipage}[c]{0.76\textwidth}
+    \raggedleft\sffamily\small\color{DlMuted}
+    Deep Learning · Lecture Notes\\
+    ENSA Tétouan · 2026--2027
+  \end{minipage}
+  \par\vspace{0.8em}
+  {\color{DlCoral}\hrule height 1.4pt}
+  \vspace{2.0em}
+  {\sffamily\bfseries\fontsize{25}{29}\selectfont\color{DlInk}\@title\par}
+  \vspace{0.55em}
+  {\sffamily\large\color{DlMuted}\@subtitle\par}
+  \vspace{1em}
+  {\small\@author\par}
+  \vspace{2.0em}
+}
+\makeatother
+
+% KOMA-Script typography and hierarchy.
+\addtokomafont{disposition}{\color{DlInk}\sffamily\bfseries}
+\addtokomafont{section}{\Large}
+\addtokomafont{subsection}{\large}
+\addtokomafont{subsubsection}{\normalsize}
+\addtokomafont{caption}{\small}
+\addtokomafont{captionlabel}{\bfseries\color{DlBlue}}
+\setkomafont{pageheadfoot}{\small\sffamily\color{DlMuted}}
+\setkomafont{descriptionlabel}{\sffamily\bfseries\color{DlInk}}
+
+% Running course identity.
+\clearpairofpagestyles
+\ihead{Deep Learning}
+\ohead{Lecture Notes · 2026--2027}
+\ifoot{ENSA Tétouan}
+\ofoot{\pagemark}
+\setheadsepline{0.4pt}[\color{DlRule}]
+\pagestyle{scrheadings}
+
+% Comfortable lists and tables for long-form reading.
+\setlist{itemsep=0.25em,topsep=0.45em}
+\renewcommand{\arraystretch}{1.16}
+\captionsetup{labelfont=bf}
+
+% Long code and URLs should wrap rather than overflow the page.
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{
+  commandchars=\\\{\},
+  breaklines,
+  breakanywhere=true
+}
+\setlength{\emergencystretch}{3em}
+
+% Keep link colors restrained on screen and legible when printed.
+\AtBeginDocument{
+  \urlstyle{same}
+  \hypersetup{
+    colorlinks=true,
+    linkcolor=DlInk,
+    urlcolor=DlBlue,
+    citecolor=DlGreen,
+    pdfborder={0 0 0}
+  }
+}

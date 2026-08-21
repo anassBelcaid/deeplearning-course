@@ -43,10 +43,13 @@ What does it mean for a model to learn?
 Learning problems, data splits, losses, generalization, and linear models.
 :::
 :::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+[Notes](notes/01-what-is-learning/index.qmd){.material-pill .available}[PDF](notes/01-what-is-learning/index.pdf){.material-pill .available}[Slides](lectures/01-what-is-learning/index.qmd){.material-pill .available}<span class="material-pill muted">Notebook</span>
 :::
 :::{.links-cell}
-<span class="coming-soon">Readings to be selected</span>
+<a class="resource-mini read required" href="https://cs231n.github.io/classification/"><i>◫</i><span>CS231n · Classification</span></a>
+<a class="resource-mini read" href="https://www.deeplearningbook.org/contents/ml.html"><i>◫</i><span>DL Book · Ch. 5</span></a>
+<a class="resource-mini paper" href="https://homes.cs.washington.edu/~pedrod/papers/cacm12.pdf"><i>▤</i><span>Domingos · 2012</span></a>
+<a class="resource-mini practice" href="https://developers.google.com/machine-learning/crash-course/classification/accuracy-precision-recall"><i>✎</i><span>Metrics exercise</span></a>
 :::
 :::{.project-cell}
 <span class="project-label">Orientation</span>
@@ -350,4 +353,3 @@ Latent distributions, reparameterization, KL divergence, and sampling.
 :::
 :::
 :::
-

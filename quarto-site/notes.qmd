@@ -4,7 +4,29 @@ description: "A connected, visual deep learning textbook"
 toc: false
 ---
 
-:::{.placeholder-panel}
-Lecture chapters and reading paths will live here.
+:::{.notes-index-lead}
+These notes are written as a connected textbook rather than lecture transcripts. Each chapter develops one central idea through intuition, mathematics, small experiments, and questions you should be able to answer yourself.
+:::
+
+## Part I · Foundations
+
+:::{.chapter-list}
+:::{.chapter-entry .available .foundations}
+<span class="chapter-number">01</span>
+
+:::{.chapter-copy}
+### [What Does It Mean to Learn?](notes/01-what-is-learning/index.qmd)
+
+From examples to a prediction rule—and from training performance to evidence that the rule will work on new data.
+
+`Supervised learning`{.topic-tag} `Loss`{.topic-tag} `Generalization`{.topic-tag} `Experimental protocol`{.topic-tag}
+:::
+
+<span class="chapter-state">Read chapter →</span>
+:::
+:::
+
+:::{.notes-coming}
+The remaining chapters will appear here as the course develops.
 :::
 
