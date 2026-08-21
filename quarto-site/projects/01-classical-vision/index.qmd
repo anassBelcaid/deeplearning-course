@@ -1,0 +1,89 @@
+---
+title: "Homework 01 · Classical Vision"
+subtitle: "Part A — k-Nearest Neighbors from scratch"
+description: "Build, validate, and diagnose an image classifier using only NumPy."
+toc: true
+toc-depth: 2
+page-layout: article
+---
+
+:::{.project-brief}
+<span><strong>Duration:</strong> Two sessions × 1h30</span>
+<span><strong>Mode:</strong> Individual</span>
+<span><strong>Format:</strong> One self-contained Jupyter notebook</span>
+<span><strong>Deliverable:</strong> Completed notebook with passing checks, plots, and short answers</span>
+:::
+
+## The challenge
+
+You will build a complete **k-nearest-neighbor image classifier** for CIFAR-10 without using a machine-learning implementation. The notebook gives you data loading, visualization, plotting, and small autograder helpers. You write the numerical and experimental core.
+
+```{mermaid}
+flowchart LR
+    A[CIFAR-10 images] --> B[Broadcasted L2 distances]
+    B --> C[k nearest labels]
+    C --> D[Validation accuracy]
+    D --> E[Choose k]
+    E --> F[One final test]
+```
+
+This is the first part of a three-model sequence inspired by Stanford CS231n: **kNN**, a **linear Softmax classifier**, and a **linear SVM**. Each model will be implemented from scratch and evaluated under the same experimental discipline.
+
+## Open or download
+
+[Open notebook](starter/knn_cifar10.ipynb){.btn .btn-primary}
+
+<a class="btn btn-secondary" href="https://raw.githubusercontent.com/anassBelcaid/deeplearning/redesign/quarto-2026/quarto-site/projects/01-classical-vision/starter/knn_cifar10.ipynb" download="knn_cifar10.ipynb">Download the notebook</a>
+
+[Open in Google Colab](https://colab.research.google.com/github/anassBelcaid/deeplearning/blob/redesign/quarto-2026/quarto-site/projects/01-classical-vision/starter/knn_cifar10.ipynb){.btn .btn-secondary}
+
+The course-site version is for reading. Download it or open it in Colab to write and execute your solutions.
+
+## What you implement
+
+1. Pairwise squared L2 distances using NumPy broadcasting.
+2. A `KNearestNeighbor` class whose `fit` method memorizes the training set.
+3. Majority-vote prediction from the closest examples.
+4. A reproducible train/validation split.
+5. One validation experiment for a chosen value of `k`.
+
+The notebook then provides the repeated cross-validation loop, uncertainty plot, final test evaluation, and nearest-neighbor visualization. You must interpret those results and justify your choice of `k`.
+
+## Two-session rhythm
+
+| Session | Work | Checkpoint |
+|---|---|---|
+| **A · Build the classifier** | inspect CIFAR-10, broadcasting, distance matrix, `fit`, nearest-neighbor voting | Checks 1–3 pass |
+| **B · Choose rather than guess** | split data, run one validation experiment, cross-validation, choose `k`, inspect errors | Checks 4–5 pass; final plots and responses complete |
+
+## Autograding
+
+Every TODO is followed by an immediate check with tiny synthetic inputs, shape checks, edge cases, and comparison against a trusted reference. A green message means that the function satisfies the public contract.
+
+:::{.callout-important}
+Visible notebook checks support learning; they are not secure grading. The submitted notebook can later be evaluated with a separate instructor test file that imports the same functions and tests additional cases.
+:::
+
+## Submission standard
+
+Restart the kernel and run the notebook from top to bottom. Submit the notebook with:
+
+- all five checks passing;
+- the cross-validation and final-test plots visible;
+- a justified choice of `k` based only on validation evidence;
+- at least three inspected successes or failures; and
+- every reflection prompt answered in your own words.
+
+## References
+
+- [CS231n image classification notes](https://cs231n.github.io/classification/) — nearest neighbors, CIFAR-10, validation, and the original assignment context.
+- [NumPy broadcasting guide](https://numpy.org/doc/stable/user/basics.broadcasting.html) — mandatory support for the distance computation.
+- [NumPy indexing guide](https://numpy.org/doc/stable/user/basics.indexing.html) — useful for folds and nearest-image retrieval.
+
+:::{.next-chapter}
+<span>Continue the classical vision sequence</span>
+
+## [Part B · Softmax and gradients from scratch](softmax.qmd)
+
+Replace stored neighbors with learned class weights, then derive and verify the gradient that makes learning possible.
+:::

@@ -4,7 +4,58 @@ description: "Build, investigate, and communicate"
 toc: false
 ---
 
-:::{.placeholder-panel}
-Assignments and student projects will live here.
+:::{.notes-index-lead}
+Projects turn each course idea into an experiment you can inspect. Every starter is self-contained, readable on the course site, and downloadable for local work or Google Colab.
 :::
 
+## Classical image classification
+
+:::{.chapter-list}
+:::{.chapter-entry .available .foundations}
+<span class="chapter-number">01A</span>
+
+:::{.chapter-copy}
+### [k-Nearest Neighbors from Scratch](projects/01-classical-vision/index.qmd)
+
+Build a raw-pixel CIFAR-10 classifier with NumPy broadcasting, validation, cross-validation, and error analysis.
+
+`Two sessions`{.topic-tag} `CIFAR-10`{.topic-tag} `NumPy`{.topic-tag} `Autograded`{.topic-tag}
+:::
+
+:::{.chapter-state}
+[View assignment](projects/01-classical-vision/index.qmd) · [Open notebook](projects/01-classical-vision/starter/knn_cifar10.ipynb)
+:::
+:::
+
+:::{.chapter-entry .available .foundations}
+<span class="chapter-number">01B</span>
+
+:::{.chapter-copy}
+### [Softmax and Gradients from Scratch](projects/01-classical-vision/softmax.qmd)
+
+Learn a linear CIFAR-10 classifier through stable probabilities, cross-entropy, numerical gradient checking, SGD, and hyperparameter search.
+
+`Two sessions`{.topic-tag} `Softmax`{.topic-tag} `Gradient check`{.topic-tag} `SGD`{.topic-tag}
+:::
+
+:::{.chapter-state}
+[View assignment](projects/01-classical-vision/softmax.qmd) · [Open notebook](projects/01-classical-vision/starter/softmax_cifar10.ipynb)
+:::
+:::
+
+:::{.chapter-entry .available .foundations}
+<span class="chapter-number">01C</span>
+
+:::{.chapter-copy}
+### [Multiclass SVM and Hinge Loss](projects/01-classical-vision/svm.qmd)
+
+Implement vectorized margins, derive the active-violation gradient, verify it numerically, and compare the learned templates with Softmax.
+
+`Two sessions`{.topic-tag} `Hinge loss`{.topic-tag} `Vectorization`{.topic-tag} `Gradient check`{.topic-tag}
+:::
+
+:::{.chapter-state}
+[View assignment](projects/01-classical-vision/svm.qmd) · [Open notebook](projects/01-classical-vision/starter/svm_cifar10.ipynb)
+:::
+:::
+:::

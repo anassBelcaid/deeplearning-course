@@ -1,0 +1,93 @@
+---
+title: "Homework 01 · Classical Vision"
+subtitle: "Part B — Softmax and gradients from scratch"
+description: "Turn pixels into class scores, derive gradients by hand, and optimize a linear classifier."
+toc: true
+toc-depth: 2
+page-layout: article
+---
+
+:::{.project-brief}
+<span><strong>Duration:</strong> Two sessions × 1h30</span>
+<span><strong>Mode:</strong> Individual</span>
+<span><strong>Format:</strong> One self-contained Jupyter notebook</span>
+<span><strong>Deliverable:</strong> Completed notebook with passing checks, plots, and analysis</span>
+:::
+
+## The challenge
+
+A kNN classifier compares a new image with stored images. This time you will learn parameters that turn pixels directly into ten class scores:
+
+$$S = XW + b.$$
+
+You will convert scores into probabilities, derive the Softmax cross-entropy gradient, verify it with finite differences, and train the classifier using mini-batch stochastic gradient descent.
+
+```{mermaid}
+flowchart LR
+    A[Image batch X] --> B[Scores XW + b]
+    B --> C[Stable Softmax]
+    C --> D[Cross-entropy + L2]
+    D --> E[Manual gradients]
+    E --> F[SGD update]
+    F --> B
+```
+
+This is deliberately a manual exercise. The amount of careful calculus and checking needed for one linear layer motivates the computational graphs and backpropagation machinery introduced next.
+
+## Open or download
+
+[Open notebook](starter/softmax_cifar10.ipynb){.btn .btn-primary}
+
+<a class="btn btn-secondary" href="https://raw.githubusercontent.com/anassBelcaid/deeplearning/redesign/quarto-2026/quarto-site/projects/01-classical-vision/starter/softmax_cifar10.ipynb" download="softmax_cifar10.ipynb">Download the notebook</a>
+
+[Open in Google Colab](https://colab.research.google.com/github/anassBelcaid/deeplearning/blob/redesign/quarto-2026/quarto-site/projects/01-classical-vision/starter/softmax_cifar10.ipynb){.btn .btn-secondary}
+
+## What you implement
+
+1. The affine forward pass $XW+b$.
+2. Numerically stable Softmax probabilities, after investigating shift invariance.
+3. Cross-entropy loss and analytical gradients for $W$ and $b$.
+4. One SGD parameter update.
+
+Prediction, mini-batch sampling, epoch training, hyperparameter search, final evaluation, and weight visualization are supplied. Students therefore focus on the mathematical core while still seeing a complete learning system.
+
+## Two-session rhythm
+
+| Session | Work | Checkpoint |
+|---|---|---|
+| **A · From scores to gradients** | affine scores, max trick, probabilities, cross-entropy, manual derivatives, numerical checking | Checks 1–3 pass |
+| **B · From gradients to learning** | SGD update, two-epoch diagnostic, learning-rate/L2 search, final evaluation, learned class templates | Check 4 passes; search and analysis complete |
+
+## Why gradient checking matters
+
+Finite differences provide an independent estimate of a derivative:
+
+$$\frac{\partial L}{\partial w_i}\approx\frac{L(w_i+h)-L(w_i-h)}{2h}.$$
+
+They are far too expensive for training, but extremely useful for detecting an incorrect analytical gradient on a tiny problem. The notebook compares randomly selected entries using relative error.
+
+## Submission standard
+
+Submit the notebook after restarting and running all cells. It must contain:
+
+- four green implementation checks;
+- a passing numerical gradient report;
+- the two-epoch loss diagnostic;
+- the complete validation grid and chosen hyperparameters;
+- final train, validation, and test accuracies;
+- visualized class weight templates; and
+- all reflection prompts answered.
+
+## References
+
+- [CS231n linear classification](https://cs231n.github.io/linear-classify/) — scores, bias trick, SVM and Softmax losses.
+- [CS231n optimization](https://cs231n.github.io/optimization-1/) — analytical and numerical gradients.
+- [CS231n assignment 1](https://cs231n.github.io/assignments2024/assignment1/) — original implementation context.
+
+:::{.next-chapter}
+<span>Complete the classical vision sequence</span>
+
+## [Part C · Multiclass SVM and hinge loss](svm.qmd)
+
+Keep the linear score function, replace probabilities with margins, and discover how a different objective changes the gradient.
+:::

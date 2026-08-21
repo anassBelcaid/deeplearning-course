@@ -1,6 +1,8 @@
 project:
   type: website
   output-dir: _site
+  resources:
+    - "projects/**/*.ipynb"
 
 website:
   title: "Deep Learning"

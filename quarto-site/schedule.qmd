@@ -43,7 +43,7 @@ What does it mean for a model to learn?
 Learning problems, data splits, losses, generalization, and linear models.
 :::
 :::{.material-cell}
-[Notes](notes/01-what-is-learning/index.qmd){.material-pill .available}[PDF](notes/01-what-is-learning/index.pdf){.material-pill .available}[Slides](lectures/01-what-is-learning/index.qmd){.material-pill .available}<span class="material-pill muted">Notebook</span>
+[Notes](notes/01-what-is-learning/index.qmd){.material-pill .available}[PDF](notes/01-what-is-learning/index.pdf){.material-pill .available}[Slides](lectures/01-what-is-learning/index.qmd){.material-pill .available}[Assignment](projects/01-classical-vision/index.qmd){.material-pill .available}
 :::
 :::{.links-cell}
 <a class="resource-mini read required" href="https://cs231n.github.io/classification/"><i>◫</i><span>CS231n · Classification</span></a>
@@ -52,9 +52,9 @@ Learning problems, data splits, losses, generalization, and linear models.
 <a class="resource-mini practice" href="https://developers.google.com/machine-learning/crash-course/classification/accuracy-precision-recall"><i>✎</i><span>Metrics exercise</span></a>
 :::
 :::{.project-cell}
-<span class="project-label">Orientation</span>
+<span class="project-label">Homework 01 · Classical vision</span>
 
-Environment and baseline diagnostic.
+[kNN notebook](projects/01-classical-vision/starter/knn_cifar10.ipynb) · [Softmax notebook](projects/01-classical-vision/starter/softmax_cifar10.ipynb) · [SVM notebook](projects/01-classical-vision/starter/svm_cifar10.ipynb)
 :::
 :::
 
