@@ -14,10 +14,17 @@ These instructions apply to the whole repository. Use them whenever creating or 
 
 - Prefer illustrations, real image examples, diagrams, score bars, decision regions, and error galleries over prose-heavy slides.
 - Use progressive Reveal.js fragments when introducing alternatives, model families, calculations, or conclusions. Do not reveal the conclusion before students have seen the evidence.
+- Build explanations as an ascending sequence of evidence, student prediction or interpretation, and then revealed conclusion. Prefer moments where students actively judge a result before the slide names the principle.
+- Use each lecture's section-divider bar as semantic progress through that lecture. Span the available slide width, divide it visibly into one segment per section so completed and remaining sections are countable, fill it according to the current section number, and show the section fraction rather than using a short decorative underline beneath the title.
 - Keep one principal idea per slide. Use large visuals and text readable at 1440×900.
+- Keep text inside boxes and callouts at a stable, readable font size. Let copy wrap across two or more balanced lines when needed; never force it onto one long line or shrink the type merely to keep it on one line.
+- Scale arrowheads and line weights to the diagram, and leave enough clearance at node boundaries for both a visible shaft and the complete arrowhead between adjacent nodes. Never let an edge appear stuck inside its source or merged into its destination. Arrows should clarify flow without competing with the nodes.
+- Keep node labels moderate in size relative to the node's width and height. When a full technical term would crowd a node, use a standard acronym in the node and expand it nearby or in the narration.
+- For computation graphs, distinguish identity from operation semantics: keep short mathematical identifiers such as $x$, $W_1$, and $h$, but represent recurring operations with consistent shape-and-icon symbols explained once in a legend. Do not repeat operation names or full formulas inside every node when the graph may grow.
 - Use Mermaid for workflows and relationships, but size diagrams to use the available canvas. If a diagram remains thin, use taller nodes, line breaks, or a more suitable layout.
 - Reuse the established visual language and assets in `quarto-site/lectures/01-what-is-learning/` when appropriate.
 - When a diagram is the principal content of a slide, scale it to occupy most of the available canvas. Override thin default Mermaid sizing or redesign the layout rather than leaving large unused areas.
+- When nodes or small multiples are the principal evidence, distribute them evenly across the available width and height with consistent sizing and non-overlapping labels; do not leave large unused regions while compressing the diagram into one corner.
 - On a student's first exposure to an abstract claim, pair the formula or geometric statement with a concrete visual and walk through the mechanism before summarizing it.
 - Introduce an activation function with its formula, output curve, derivative curve, principal strengths, and principal weaknesses. Follow the definition immediately with any exercise that directly practices it, then compare activations through a controlled interactive experiment when useful.
 
@@ -36,6 +43,7 @@ In HTML notes, use a prompt followed by a `<details>` solution so readers choose
 ## Project scope
 
 - Assess only concepts that students have already encountered in the course sequence. A project may use machinery from a future chapter, but that machinery must be provided as clearly labeled infrastructure, treated as a temporary black box, and revisited when it is formally taught. Do not turn an upcoming topic such as backpropagation or optimization into a student TODO merely because the project needs it to run.
+- When a project or homework becomes available, link it in both places on the schedule: the course-material button and the corresponding fourth-column project-track entry. The project-track title and description should form one clear clickable target; never leave an available project represented there as plain text.
 
 ## Images and attribution
 

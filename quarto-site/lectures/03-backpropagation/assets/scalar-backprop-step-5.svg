@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 580" role="img">
+<defs>
+<marker id="f" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#9aa1a6"/></marker>
+<marker id="b" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#ef5b45"/></marker>
+<filter id="s" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#0f2a37" flood-opacity=".12"/></filter>
+<style>.forward{fill:none;stroke:#9aa1a6;stroke-width:3;marker-end:url(#f)}.backward{fill:none;stroke:#ef5b45;stroke-width:7;marker-end:url(#b)}.value{fill:#eaf3fb;stroke:#2878c8;stroke-width:4}.op{fill:#fffdf7;stroke:#17212b;stroke-width:4;filter:url(#s)}.loss{fill:#ef5b45;stroke:#bd3e2d;stroke-width:4;filter:url(#s)}.id{fill:#17212b;font:italic 700 31px Georgia,serif;text-anchor:middle}.sym{fill:#17212b;font:700 34px Georgia,serif;text-anchor:middle;dominant-baseline:middle}.white{fill:#fff;font:italic 700 32px Georgia,serif;text-anchor:middle}.panel{fill:#fffdf7;stroke:#ef5b45;stroke-width:4;filter:url(#s)}.panel-kicker{fill:#657079;font:700 17px 'Courier New',monospace;letter-spacing:1px;text-anchor:middle}.panel-main{fill:#17212b;font:700 29px Arial,sans-serif;text-anchor:middle}.op.top_left{stroke:#ef5b45;stroke-width:6}</style>
+</defs>
+<rect width="1280" height="580" fill="#f4f0e7"/>
+<path class="forward" d="M155 135H250 M360 135H455"/><path class="backward" d="M455 160H360 M250 160H155"/><path class="forward" d="M565 135H660 M770 135H865"/><path class="forward" d="M975 135H1070 M1125 190V295"/><path class="forward" d="M1070 350H975 M865 350H770"/><path class="forward" d="M660 350H565 M455 350H365"/>
+
+<circle class="value" cx="100" cy="135" r="55"/><text class="id" x="100" y="143">x</text>
+<rect class="op top_left" x="250" y="80" width="110" height="110" rx="20"/><text class="sym" x="305" y="140">(·)²</text>
+<circle class="value" cx="510" cy="135" r="55"/><text class="id" x="510" y="143">a</text>
+<rect class="op top_middle" x="660" y="80" width="110" height="110" rx="20"/><text class="sym" x="715" y="140">+1</text>
+<circle class="value" cx="920" cy="135" r="55"/><text class="id" x="920" y="143">b</text>
+<rect class="op top_right" x="1070" y="80" width="110" height="110" rx="20"/><text class="sym" x="1125" y="140">(·)³</text>
+<circle class="value" cx="1125" cy="350" r="55"/><text class="id" x="1125" y="358">c</text>
+<rect class="op bottom_right" x="865" y="295" width="110" height="110" rx="20"/><text class="sym" x="920" y="355">−2</text>
+<circle class="value" cx="715" cy="350" r="55"/><text class="id" x="715" y="358">d</text>
+<rect class="op bottom_left" x="455" y="295" width="110" height="110" rx="20"/><text class="sym" x="510" y="355">(·)²</text>
+<circle class="loss" cx="310" cy="350" r="55"/><text class="white" x="310" y="358">𝓛</text>
+
+
+<rect class="panel" x="230" y="445" width="820" height="110" rx="16"/>
+<text class="panel-kicker" x="640" y="480">STEP 5 · SQUARE AT X</text>
+<text class="panel-main" x="640" y="525">144 × (2x = 2)  →  d𝓛/dx = 288</text>
+</svg>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 600" role="img">
+<defs>
+<marker id="f" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#2878c8"/></marker>
+<marker id="b" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#ef5b45"/></marker>
+<filter id="s" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#0f2a37" flood-opacity=".12"/></filter>
+<style>.forward{fill:none;stroke:#2878c8;stroke-width:4;marker-end:url(#f)}.back{fill:none;stroke:#ef5b45;stroke-width:7;marker-end:url(#b)}.value{fill:#2878c8;stroke:#145a96;stroke-width:3}.parameter{fill:#fffdf7;stroke:#7b61a8;stroke-width:4}.affine{fill:#fffdf7;stroke:#17212b;stroke-width:4;filter:url(#s)}.sigmoid{fill:#f1ecf8;stroke:#7b61a8;stroke-width:4;filter:url(#s)}.loss{fill:#ef5b45;stroke:#bd3e2d;stroke-width:4;filter:url(#s)}.light{fill:#fff;font:italic 700 28px Georgia,serif;text-anchor:middle;dominant-baseline:middle}.purple{fill:#60468d;font:italic 700 27px Georgia,serif;text-anchor:middle;dominant-baseline:middle}.label{fill:#17212b;font:italic 700 25px Georgia,serif;text-anchor:middle}.icon{fill:none;stroke:#17212b;stroke-width:4;stroke-linecap:round}.curve{fill:none;stroke:#7b61a8;stroke-width:5;stroke-linecap:round}.panel{fill:#fffdf7;stroke:#ef5b45;stroke-width:4;filter:url(#s)}.panel-kicker{fill:#657079;font:700 15px 'Courier New',monospace;letter-spacing:1px;text-anchor:middle}.panel-main{fill:#17212b;font:700 23px Arial,sans-serif;text-anchor:middle}.panel-small{fill:#17212b;font:700 18px Arial,sans-serif;text-anchor:middle}.loss{stroke:#ef5b45;stroke-width:6}</style>
+</defs>
+<rect width="1280" height="600" fill="#f4f0e7"/>
+<path class="forward" d="M225 125C285 125 310 230 365 265 M225 290H365 M225 455C285 455 310 350 365 315 M475 290H620 M730 290H860 M970 290H1090 M1140 180V230"/>
+<path class="back" d="M1090 290H970 M1140 180V230"/>
+<circle class="value" cx="175" cy="125" r="50"/><text class="light" x="175" y="125">x</text>
+<rect class="parameter" x="125" y="250" width="100" height="80" rx="20"/><text class="purple" x="175" y="290">w</text>
+<rect class="parameter" x="125" y="415" width="100" height="80" rx="20"/><text class="purple" x="175" y="455">b</text>
+<rect class="affine" x="365" y="235" width="110" height="110" rx="20"/><path class="icon" d="M394 264H437M394 281H437M394 298H437M409 257V305M423 257V305M394 320H430"/><circle cx="447" cy="313" r="6" fill="#ef5b45"/>
+<text class="label" x="548" y="270">z</text>
+<circle class="sigmoid" cx="675" cy="290" r="55"/><path class="curve" d="M642 321C653 321 654 302 662 298C671 292 679 290 688 281C696 272 697 258 708 258"/>
+<text class="label" x="795" y="270">ŷ</text>
+<path class="loss" d="M915 230L975 290L915 350L855 290Z"/><text class="light" x="915" y="290">½(·)²</text>
+<circle class="value" cx="1140" cy="130" r="50"/><text class="light" x="1140" y="130">y</text>
+<circle class="loss" cx="1140" cy="290" r="50"/><text class="light" x="1140" y="290">𝓛</text>
+<rect class="panel" x="165" y="500" width="950" height="78" rx="16"/>
+<text class="panel-kicker" x="640" y="526">STEP 1 · LOSS</text>
+<text class="panel-main" x="640" y="558">1 × (ŷ − y) = −0.269  →  ∂𝓛/∂ŷ = −0.269</text>
+</svg>

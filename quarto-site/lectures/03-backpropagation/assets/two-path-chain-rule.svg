@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 620" role="img" aria-labelledby="title desc">
+  <title id="title">Two paths from t to f</title>
+  <desc id="desc">The variable t affects x of t and y of t. Both x and y feed f, creating two derivative paths that must be added.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#2878c8"/></marker>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="150%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#0f2a37" flood-opacity=".13"/></filter>
+    <style>
+      .edge{fill:none;stroke:#2878c8;stroke-width:5;marker-end:url(#arrow)}
+      .value{fill:#eaf3fb;stroke:#2878c8;stroke-width:5;filter:url(#shadow)}
+      .source{fill:#2878c8;stroke:#145a96;stroke-width:4;filter:url(#shadow)}
+      .output{fill:#ef5b45;stroke:#bd3e2d;stroke-width:5;filter:url(#shadow)}
+      .dark{fill:#17212b;font:italic 700 37px Georgia,serif;text-anchor:middle;dominant-baseline:middle}
+      .light{fill:#fff;font:italic 700 37px Georgia,serif;text-anchor:middle;dominant-baseline:middle}
+      .label{fill:#657079;font:italic 700 24px Georgia,serif;text-anchor:middle}
+      .path-label{fill:#2878c8;font:700 17px 'Courier New',monospace;letter-spacing:1px;text-anchor:middle}
+    </style>
+  </defs>
+  <rect width="500" height="620" rx="28" fill="#fffdf7" stroke="#d9d5cc" stroke-width="3"/>
+  <path class="edge" d="M250 493C190 458 154 424 145 350"/>
+  <path class="edge" d="M250 493C310 458 346 424 355 350"/>
+  <path class="edge" d="M145 230C154 156 190 125 225 105"/>
+  <path class="edge" d="M355 230C346 156 310 125 275 105"/>
+  <circle class="source" cx="250" cy="525" r="58"/><text class="light" x="250" y="525">t</text>
+  <circle class="value" cx="145" cy="290" r="58"/><text class="dark" x="145" y="290">x</text>
+  <circle class="value" cx="355" cy="290" r="58"/><text class="dark" x="355" y="290">y</text>
+  <circle class="output" cx="250" cy="75" r="58"/><text class="light" x="250" y="75">f</text>
+  <text class="label" x="134" y="438">dx/dt</text>
+  <text class="label" x="366" y="438">dy/dt</text>
+  <text class="label" x="132" y="170">∂f/∂x</text>
+  <text class="label" x="368" y="170">∂f/∂y</text>
+  <text class="path-label" x="250" y="600">TWO PATHS · ADD THEIR CONTRIBUTIONS</text>
+</svg>

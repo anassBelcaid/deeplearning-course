@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 430" role="img" aria-labelledby="title desc">
+  <title id="title">One neuron with weight regularization</title>
+  <desc id="desc">The weight w reaches the total loss through the neuron data-loss path and through a second L2 regularization path. The two losses are added.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#2878c8"/></marker>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="150%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#0f2a37" flood-opacity=".12"/></filter>
+    <style>
+      .edge{fill:none;stroke:#2878c8;stroke-width:4;marker-end:url(#arrow)}.branch{stroke:#ef5b45;stroke-width:6}
+      .value{fill:#2878c8;stroke:#145a96;stroke-width:3}.parameter{fill:#fffdf7;stroke:#7b61a8;stroke-width:4}.op{fill:#fffdf7;stroke:#17212b;stroke-width:4;filter:url(#shadow)}.activation{fill:#f1ecf8;stroke:#7b61a8;stroke-width:4;filter:url(#shadow)}.loss{fill:#ef5b45;stroke:#bd3e2d;stroke-width:4;filter:url(#shadow)}.sum{fill:#eaf3fb;stroke:#2878c8;stroke-width:4;filter:url(#shadow)}
+      .light{fill:#fff;font:italic 700 25px Georgia,serif;text-anchor:middle;dominant-baseline:middle}.purple{fill:#60468d;font:italic 700 25px Georgia,serif;text-anchor:middle;dominant-baseline:middle}.dark{fill:#17212b;font:italic 700 25px Georgia,serif;text-anchor:middle;dominant-baseline:middle}.label{fill:#657079;font:italic 700 20px Georgia,serif;text-anchor:middle}.caption{fill:#ef5b45;font:700 16px 'Courier New',monospace;letter-spacing:1px;text-anchor:middle}.icon{fill:none;stroke:#17212b;stroke-width:4;stroke-linecap:round}.curve{fill:none;stroke:#7b61a8;stroke-width:5;stroke-linecap:round}
+    </style>
+  </defs>
+  <rect width="1280" height="430" fill="#f4f0e7"/>
+  <path class="edge" d="M105 215H235 M185 80C205 80 220 145 235 170 M185 350C205 350 220 285 235 260 M345 215H440 M550 215H835 M890 310V270 M945 215H1040 M1130 215H1180"/>
+  <path class="edge branch" d="M145 50V18H1085V32 M1085 132V170"/>
+  <circle class="value" cx="65" cy="215" r="40"/><text class="light" x="65" y="215">x</text>
+  <rect class="parameter" x="105" y="50" width="80" height="60" rx="18"/><text class="purple" x="145" y="80">w</text>
+  <rect class="parameter" x="105" y="320" width="80" height="60" rx="18"/><text class="purple" x="145" y="350">b</text>
+  <rect class="op" x="235" y="160" width="110" height="110" rx="20"/><path class="icon" d="M264 187H307M264 204H307M264 221H307M279 180V228M293 180V228M264 243H300"/><circle cx="317" cy="236" r="6" fill="#ef5b45"/>
+  <text class="label" x="392" y="195">z</text>
+  <circle class="activation" cx="495" cy="215" r="55"/><path class="curve" d="M462 246C473 246 474 227 482 223C491 217 499 215 508 206C516 197 517 183 528 183"/>
+  <text class="label" x="690" y="195">ŷ</text>
+  <circle class="value" cx="890" cy="350" r="40"/><text class="light" x="890" y="350">y</text>
+  <path class="loss" d="M890 160L945 215L890 270L835 215Z"/><text class="light" x="890" y="215">½(·)²</text>
+  <text class="label" x="990" y="195">L_data</text>
+  <rect class="op" x="1030" y="32" width="110" height="100" rx="20"/><text class="dark" x="1085" y="82">λw²/2</text>
+  <text class="label" x="1158" y="154">L_reg</text>
+  <circle class="sum" cx="1085" cy="215" r="45"/><text class="dark" x="1085" y="215">+</text>
+  <circle class="loss" cx="1220" cy="215" r="45"/><text class="light" x="1220" y="215">L</text>
+  <text class="caption" x="425" y="405">w NOW REACHES THE LOSS THROUGH TWO PATHS</text>
+</svg>
