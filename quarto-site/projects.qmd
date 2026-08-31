@@ -78,4 +78,20 @@ Turn a one-hidden-layer classifier into a modular NumPy network, then compare ni
 [View assignment](projects/02-neural-boundaries/index.qmd) · [Open notebook](projects/02-neural-boundaries/starter/neural_boundaries.ipynb)
 :::
 :::
+
+:::{.chapter-entry .available .neural-networks}
+<span class="chapter-number">03</span>
+
+:::{.chapter-copy}
+### [Build Your Own Autograd Engine](projects/03-autograd/index.html)
+
+Grow a scalar `Value` class into reverse-mode autodiff, compose an MLP, and learn a nonlinear two-moons boundary.
+
+`Two sessions`{.topic-tag} `Autodiff`{.topic-tag} `Backpropagation`{.topic-tag} `From scratch`{.topic-tag}
+:::
+
+:::{.chapter-state}
+[View assignment](projects/03-autograd/index.html) · [Open notebook](projects/03-autograd/starter/autograd_from_scratch.html)
+:::
+:::
 :::

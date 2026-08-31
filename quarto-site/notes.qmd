@@ -38,6 +38,18 @@ These notes are written as a connected textbook rather than lecture transcripts.
 
 <span class="chapter-state">Read chapter →</span>
 :::
+
+:::{.chapter-entry .available .backpropagation}
+<span class="chapter-number">03</span>
+
+:::{.chapter-copy}
+### [Backpropagation: From Error to Credit](notes/03-backpropagation/index.qmd)
+
+[![](lectures/03-backpropagation/assets/backpropagation-hero.png){fig-alt="Preview of Chapter 3: forward signals and backward credit messages flowing through a neural network."}](notes/03-backpropagation/index.qmd)
+:::
+
+<span class="chapter-state">Read chapter →</span>
+:::
 :::
 
 :::{.notes-coming}

@@ -43,7 +43,12 @@ In HTML notes, use a prompt followed by a `<details>` solution so readers choose
 ## Project scope
 
 - Assess only concepts that students have already encountered in the course sequence. A project may use machinery from a future chapter, but that machinery must be provided as clearly labeled infrastructure, treated as a temporary black box, and revisited when it is formally taught. Do not turn an upcoming topic such as backpropagation or optimization into a student TODO merely because the project needs it to run.
+- When a project introduces a nontrivial class, object hierarchy, or hidden data structure, precede the implementation task with a diagram that makes object ownership, stored state, graph relationships, and information flow concrete. In particular, distinguish references to other objects from copied numerical values.
 - When a project or homework becomes available, link it in both places on the schedule: the course-material button and the corresponding fourth-column project-track entry. The project-track title and description should form one clear clickable target; never leave an available project represented there as plain text.
+
+## Publishing course material
+
+- When a lecture, notes chapter, PDF, code session, project, or homework becomes available, update the corresponding schedule material button in the same change. Replace the muted placeholder with a working link, render the schedule, and verify that the generated HTML points to the rendered resource. Do not consider the material published or the task complete while its schedule entry still says that it is unavailable.
 
 ## Images and attribution
 

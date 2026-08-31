@@ -83,7 +83,7 @@ Activations, MLPs, forward propagation, and representation capacity.
 <a class="resource-mini practice" href="https://cs231n.github.io/neural-networks-case-study/"><i>✎</i><span>Spiral case study</span></a>
 :::
 :::{.project-cell .track-start}
-<span class="project-label">Project 1 · From scratch</span><br>Build the forward pass.
+<a class="project-track-link" href="projects/02-neural-boundaries/index.qmd"><span class="project-label">Project 1 · From scratch</span><br>Build the forward pass.</a>
 :::
 :::
 
@@ -96,13 +96,16 @@ Activations, MLPs, forward propagation, and representation capacity.
 Computational graphs, chain rule, autograd, and gradient checking.
 :::
 :::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Code</span>
+[Notes](notes/03-backpropagation/index.qmd){.material-pill .available}[PDF](notes/03-backpropagation/index.pdf){.material-pill .available}[Slides](lectures/03-backpropagation/index.qmd){.material-pill .available}[Project](projects/03-autograd/index.html){.material-pill .available}
 :::
 :::{.links-cell}
-<span class="coming-soon">Karpathy · Autodiff resources</span>
+<a class="resource-mini read required" href="https://www.cs.toronto.edu/~rgrosse/courses/csc321_2017/slides/lec6.pdf"><i>◫</i><span>CSC321 · Backpropagation</span></a>
+<a class="resource-mini read" href="https://www.nature.com/articles/323533a0"><i>◫</i><span>Rumelhart et al. · 1986</span></a>
+<a class="resource-mini read" href="https://cs231n.github.io/optimization-2/"><i>◫</i><span>CS231n · Backprop intuitions</span></a>
+<a class="resource-mini practice" href="https://github.com/karpathy/micrograd"><i>⌘</i><span>Karpathy · micrograd</span></a>
 :::
 :::{.project-cell .track-middle}
-<span class="project-label">Project 1</span><br>Add backward propagation.
+<a class="project-track-link" href="projects/03-autograd/index.html"><span class="project-label">Project 1 · Autodiff</span><br>Add backward propagation.</a>
 :::
 :::
 

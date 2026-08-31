@@ -124,6 +124,8 @@
 .resource-mini.practice { --resource-color: var(--vision); }
 .project-cell { position: relative; font-size: .8rem; }
 .project-label { color: var(--part-color); font-weight: 700; }
+.project-track-link { position: relative; z-index: 1; display: block; color: var(--muted); text-decoration: none; }
+.project-track-link:hover { color: var(--ink); text-decoration: underline; text-decoration-color: var(--part-color); text-underline-offset: .2em; }
 .project-cell.track-start::before, .project-cell.track-middle::before, .project-cell.track-end::before {
   content: "";
   position: absolute;
