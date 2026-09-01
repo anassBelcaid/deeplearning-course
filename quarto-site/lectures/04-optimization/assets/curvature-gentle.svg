@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 320">
+  <defs>
+    <marker id="g" markerWidth="6" markerHeight="6" refX="5.4" refY="3" orient="auto">
+      <path d="M0 0L6 3L0 6Z" fill="#29845a"/>
+    </marker>
+  </defs>
+  <rect width="560" height="320" rx="18" fill="#f8fbfd"/>
+  <path d="M48 265H520" stroke="#8ba0b2" stroke-width="2"/>
+  <path d="M72 65C161 186 216 249 281 252C349 254 407 187 491 65" fill="none" stroke="#17212b" stroke-width="6"/>
+  <circle cx="430" cy="157" r="11" fill="#2377c9"/>
+  <path d="M421 166L330 227" stroke="#29845a" stroke-width="6" marker-end="url(#g)"/>
+  <circle cx="321" cy="233" r="10" fill="#29845a"/>
+  <text x="358" y="128" font-family="Arial,sans-serif" font-size="17" fill="#657687">same start</text>
+</svg>

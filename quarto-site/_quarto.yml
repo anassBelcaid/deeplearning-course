@@ -3,6 +3,7 @@ project:
   output-dir: _site
   resources:
     - "projects/**/*.ipynb"
+    - "labs/**/*.ipynb"
 
 website:
   title: "Deep Learning"

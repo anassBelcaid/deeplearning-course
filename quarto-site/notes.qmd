@@ -52,6 +52,22 @@ These notes are written as a connected textbook rather than lecture transcripts.
 :::
 :::
 
+## Part III · Optimization and Generalization
+
+:::{.chapter-list}
+:::{.chapter-entry .available .optimization}
+<span class="chapter-number">04</span>
+
+:::{.chapter-copy}
+### [Optimization: Making Learning Move](notes/04-optimization/index.qmd)
+
+[![](notes/04-optimization/assets/chapter-cover.png){fig-alt="Preview of Chapter 4: several optimizer trajectories descending through a contoured loss landscape."}](notes/04-optimization/index.qmd)
+:::
+
+<span class="chapter-state">Read chapter →</span>
+:::
+:::
+
 :::{.notes-coming}
 More chapters will appear here as the course develops.
 :::

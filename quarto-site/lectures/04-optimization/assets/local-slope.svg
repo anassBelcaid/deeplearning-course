@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 470" role="img" aria-labelledby="title desc">
+  <title id="title">Local slope and descent direction</title>
+  <desc id="desc">A quadratic loss curve, tangent at w equals three, an uphill gradient arrow, and a downhill negative-gradient arrow.</desc>
+  <defs>
+    <marker id="blue-arrow" markerWidth="6" markerHeight="6" refX="5.4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#2377c9"/></marker>
+    <marker id="orange-arrow" markerWidth="6" markerHeight="6" refX="5.4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#ef5b3f"/></marker>
+  </defs>
+  <rect x="1" y="1" width="658" height="468" rx="22" fill="#fff" stroke="#d7e2eb" stroke-width="2"/>
+  <path d="M74 382H610M96 408V46" fill="none" stroke="#8ba0b2" stroke-width="2"/>
+  <path d="M112 94 C205 282 260 360 328 365 C399 369 465 286 575 68" fill="none" stroke="#17212b" stroke-width="6"/>
+  <path d="M360 350 L574 79" fill="none" stroke="#7258a8" stroke-width="4" stroke-dasharray="10 9"/>
+  <circle cx="450" cy="235" r="13" fill="#ef5b3f" stroke="#fff" stroke-width="5"/>
+  <path d="M458 225 L535 128" fill="none" stroke="#2377c9" stroke-width="6" marker-end="url(#blue-arrow)"/>
+  <path d="M440 247 L355 354" fill="none" stroke="#ef5b3f" stroke-width="6" marker-end="url(#orange-arrow)"/>
+  <g font-family="Arial, sans-serif">
+    <text x="554" y="112" fill="#2377c9" font-size="19" font-weight="700">gradient</text>
+    <text x="260" y="332" fill="#ef5b3f" font-size="19" font-weight="700">negative gradient</text>
+    <text x="463" y="267" fill="#17212b" font-size="18" font-weight="700">current point</text>
+    <text x="315" y="430" fill="#657687" font-size="20" font-style="italic">w</text>
+    <text x="35" y="74" fill="#657687" font-size="20">loss</text>
+  </g>
+</svg>

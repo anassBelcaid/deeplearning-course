@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 560">
+  <defs>
+    <marker id="n" markerWidth="6" markerHeight="6" refX="5.4" refY="3" orient="auto">
+      <path d="M0 0L6 3L0 6Z" fill="#8ca1b3"/>
+    </marker>
+    <marker id="m" markerWidth="6" markerHeight="6" refX="5.4" refY="3" orient="auto">
+      <path d="M0 0L6 3L0 6Z" fill="#ef5b3f"/>
+    </marker>
+  </defs>
+  <rect x="1" y="1" width="658" height="558" rx="22" fill="#fff" stroke="#d7e2eb" stroke-width="2"/>
+  <g fill="none" stroke="#c5def0" stroke-width="2">
+    <ellipse cx="425" cy="290" rx="190" ry="145"/>
+    <ellipse cx="425" cy="290" rx="138" ry="101"/>
+    <ellipse cx="425" cy="290" rx="82" ry="58"/>
+  </g>
+  <circle cx="238" cy="173" r="14" fill="#17212b" stroke="#fff" stroke-width="5"/>
+  <g stroke="#8ca1b3" stroke-width="5" marker-end="url(#n)">
+    <path d="M238 173L336 202"/>
+    <path d="M238 173L314 247"/>
+    <path d="M238 173L360 164"/>
+    <path d="M238 173L283 278"/>
+    <path d="M238 173L350 235"/>
+    <path d="M238 173L299 212"/>
+  </g>
+  <path d="M238 173L342 224" stroke="#ef5b3f" stroke-width="6" marker-end="url(#m)"/>
+  <g font-family="Arial,sans-serif">
+    <text x="65" y="112" font-size="19" font-weight="700" fill="#17212b">one parameter point</text>
+    <text x="370" y="230" font-size="20" font-weight="700" fill="#ef5b3f">average tendency</text>
+    <text x="361" y="458" font-size="18" fill="#657687">lower loss</text>
+  </g>
+</svg>

@@ -126,13 +126,16 @@ Make neural networks learn reliably.
 SGD, momentum, Adam, learning rates, schedules, and failure diagnosis.
 :::
 :::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Lab</span>
+[Notes](notes/04-optimization/index.html){.material-pill .available}[PDF](notes/04-optimization/index.pdf){.material-pill .available}[Slides](lectures/04-optimization/index.html){.material-pill .available}[Lab](labs/04-optimization/index.html){.material-pill .available}
 :::
 :::{.links-cell}
-<span class="coming-soon">Optimizer visualizations · Readings</span>
+<a class="resource-mini explore required" href="https://gradientlab.ai/"><i>◎</i><span>Gradient Lab · Optimizer playground</span></a>
+<a class="resource-mini read required" href="https://distill.pub/2017/momentum/"><i>◫</i><span>Distill · Why Momentum Works</span></a>
+<a class="resource-mini read" href="https://www.deeplearningbook.org/contents/optimization.html"><i>◫</i><span>DL Book · Ch. 8</span></a>
+<a class="resource-mini read" href="https://arxiv.org/abs/1412.6980"><i>◫</i><span>Kingma &amp; Ba · Adam</span></a>
 :::
 :::{.project-cell .track-middle}
-<span class="project-label">Project 1</span><br>Compare optimizers.
+<a class="project-track-link" href="labs/04-optimization/index.html"><span class="project-label">Lab 04</span><br>Implement and race optimizers.</a>
 :::
 :::
 
