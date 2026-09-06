@@ -148,10 +148,17 @@ SGD, momentum, Adam, learning rates, schedules, and failure diagnosis.
 Initialization, normalization, regularization, dropout, and tracking.
 :::
 :::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Lab</span>
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span>[Slides](lectures/05-training-reliably/index.html){.material-pill .available}<span class="material-pill muted">Lab</span>
 :::
 :::{.links-cell}
-<span class="coming-soon">Experiments · Practical checklist</span>
+<a class="resource-mini paper required" href="https://proceedings.mlr.press/v9/glorot10a.html"><i>□</i><span>Glorot &amp; Bengio · Xavier initialization</span></a>
+<a class="resource-mini paper required" href="https://openaccess.thecvf.com/content_iccv_2015/html/He_Delving_Deep_into_ICCV_2015_paper.html"><i>□</i><span>He et al. · Rectifier initialization</span></a>
+<a class="resource-mini paper required" href="https://proceedings.mlr.press/v37/ioffe15.html"><i>□</i><span>Ioffe &amp; Szegedy · Batch normalization</span></a>
+<a class="resource-mini paper" href="https://papers.nips.cc/paper_files/paper/2018/hash/905056c1ac1dad141560467e0a99e1cf-Abstract.html"><i>□</i><span>Santurkar et al. · Why BatchNorm helps</span></a>
+<a class="resource-mini paper" href="https://openreview.net/forum?id=Sy8gdB9xx"><i>□</i><span>Zhang et al. · Rethinking generalization</span></a>
+<a class="resource-mini paper required" href="https://www.jmlr.org/papers/v15/srivastava14a.html"><i>□</i><span>Srivastava et al. · Dropout</span></a>
+<a class="resource-mini paper" href="https://publikationen.bibliothek.kit.edu/7498"><i>□</i><span>Prechelt · Early stopping</span></a>
+<a class="resource-mini read" href="https://www.deeplearningbook.org/contents/regularization"><i>◫</i><span>DL Book · Regularization</span></a>
 :::
 :::{.project-cell .track-end}
 <span class="project-label">Project 1 · Due</span><br>Report and reflection.
