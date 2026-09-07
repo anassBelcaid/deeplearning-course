@@ -22,6 +22,7 @@ These notes are written as a connected textbook rather than lecture transcripts.
 
 <span class="chapter-state">Read chapter →</span>
 :::
+
 :::
 
 ## Part II · Neural Networks from Scratch
@@ -50,6 +51,7 @@ These notes are written as a connected textbook rather than lecture transcripts.
 
 <span class="chapter-state">Read chapter →</span>
 :::
+
 :::
 
 ## Part III · Optimization and Generalization
@@ -62,6 +64,18 @@ These notes are written as a connected textbook rather than lecture transcripts.
 ### [Optimization: Making Learning Move](notes/04-optimization/index.qmd)
 
 [![](notes/04-optimization/assets/chapter-cover.png){fig-alt="Preview of Chapter 4: several optimizer trajectories descending through a contoured loss landscape."}](notes/04-optimization/index.qmd)
+:::
+
+<span class="chapter-state">Read chapter →</span>
+:::
+
+:::{.chapter-entry .available .optimization}
+<span class="chapter-number">05</span>
+
+:::{.chapter-copy}
+### [Making Networks Train Reliably](notes/05-training-reliably/index.qmd)
+
+[![](notes/05-training-reliably/assets/chapter-cover.png){fig-alt="Preview of Chapter 5: unstable signals become organized while passing through a deep network."}](notes/05-training-reliably/index.qmd)
 :::
 
 <span class="chapter-state">Read chapter →</span>

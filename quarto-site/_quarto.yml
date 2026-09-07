@@ -4,6 +4,7 @@ project:
   resources:
     - "projects/**/*.ipynb"
     - "labs/**/*.ipynb"
+    - "lectures/**/*.py"
 
 website:
   title: "Deep Learning"
