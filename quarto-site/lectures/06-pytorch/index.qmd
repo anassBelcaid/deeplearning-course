@@ -1,0 +1,1506 @@
+---
+title: "Building Training Systems with PyTorch"
+subtitle: "From tensors to a reusable Fashion-MNIST classifier"
+author: "Dr. A. Belcaid"
+image: assets/pytorch-tensor-hero.png
+title-slide-attributes:
+  data-visibility: hidden
+format:
+  revealjs:
+    title-slide: false
+    theme: [default, ../01-what-is-learning/slides.scss]
+    css: [../01-what-is-learning/slides.css, week6.css]
+    slide-number: c/t
+    progress: true
+    controls: true
+    transition: fade
+    width: 1440
+    height: 900
+    margin: 0.055
+    center: false
+    mermaid-format: svg
+    footer: "Deep Learning · Chapter 6"
+execute:
+  enabled: false
+---
+
+## Building training systems with PyTorch {.deck-title}
+
+:::: {.deck-title-grid}
+::: {.deck-title-copy}
+<span class="eyebrow">CHAPTER 06 · PYTORCH FUNDAMENTALS</span>
+
+### From tensors to a reusable Fashion-MNIST classifier
+
+Learn the framework by using it: inspect tensors, build an MLP, train it, evaluate it, and save what works.
+
+<span class="deck-author">Dr. A. Belcaid</span>
+:::
+::: {.deck-title-art .pytorch-hero}
+![](assets/pytorch-tensor-hero.png){fig-alt="A minimal navy and orange snake-like ribbon passes through a translucent tensor cube."}
+:::
+::::
+
+::: {.notes}
+Frame this as a practical working session. Students already know the mathematical ingredients of learning; this chapter teaches how PyTorch represents and coordinates them. The Fashion-MNIST MLP is the recurring system, but the first half deliberately builds tensor fluency through many small executable examples before assembling a model.
+:::
+
+## Today's build: tensor → trained system
+
+:::: {.pytorch-toc}
+::: {.toc-stage .tensor-stage}
+<span>01</span>
+
+### From NumPy to PyTorch
+:::
+::: {.toc-stage .fluency-stage}
+<span>02</span>
+
+### Tensor fluency
+:::
+::: {.toc-stage .autograd-stage}
+<span>03</span>
+
+### Autograd
+:::
+::: {.toc-stage .module-stage}
+<span>04</span>
+
+### Models as `nn.Module`
+:::
+::: {.toc-stage .data-stage}
+<span>05</span>
+
+### Data pipeline
+:::
+::: {.toc-stage .loop-stage}
+<span>06</span>
+
+### Train and validate
+:::
+::: {.toc-stage .system-stage}
+<span>07</span>
+
+### Reusable system
+:::
+::::
+
+::: {.notes}
+Use the seven stages as a contract for the 1h30 session. Sections 1 and 2 establish fluency rather than rushing toward broadcasting. Section 3 retrieves backpropagation through a tiny transparent example. Sections 4–7 progressively assemble the Fashion-MNIST system: hypothesis, data, optimization, evaluation, and persistence. Explicitly state that convolution is reserved for the vision chapter.
+:::
+
+# 01 · From NumPy to PyTorch {.section-slide .pytorch-section data-section-progress="1 / 7" style="--section-progress:14.286%"}
+
+## One image, two array objects
+
+:::: {.numpy-torch-layout}
+::: {.light-code-editor}
+<div class="editor-bar"><span>PYTHON</span><strong>first_tensor.py</strong></div>
+<pre><code><span class="code-step"><span class="py-comment"># Begin with one 28 × 28 grayscale image</span>
+<span class="py-kw">import</span> numpy <span class="py-kw">as</span> np
+pixels = np.zeros((<span class="py-num">28</span>, <span class="py-num">28</span>), dtype=np.float32)</span>
+
+<span class="code-step"><span class="py-comment"># Wrap the same numerical storage as a tensor</span>
+<span class="py-kw">import</span> torch
+image = torch.from_numpy(pixels)</span>
+
+<span class="code-step"><span class="py-comment"># The familiar array contract is still visible</span>
+image.shape, image.dtype
+<span class="py-output"># (torch.Size([28, 28]), torch.float32)</span></span></code></pre>
+:::
+::: {.object-transition}
+<div class="object-card numpy-object"><span>NumPy</span><strong>ndarray</strong><small>shape · dtype · numerical storage</small></div>
+<div class="transition-arrow">→</div>
+<div class="object-card torch-object"><span>PyTorch</span><strong>Tensor</strong><small>the same ideas, plus device and gradients</small></div>
+<div class="course-takeaway-dark bridge-takeaway"><span>THE BRIDGE</span><strong>A tensor feels like an array because it is one—extended for learning systems.</strong></div>
+:::
+::::
+
+<p class="source-note">Sequence adapted from <a href="https://web.stanford.edu/class/cs224n/materials/CS224N_PyTorch_Tutorial.html">Stanford CS224N · PyTorch Tutorial</a>; image example adapted for Fashion-MNIST.</p>
+
+::: {.notes}
+Start from an object students already know. Run the three blocks in order. Do not define tensors abstractly first: let the preserved shape and dtype provide the evidence. Mention that gradients and devices are promises for later sections, not topics to unpack yet.
+:::
+
+## A tensor carries data and a contract
+
+:::: {.tensor-contract-layout}
+::: {.fashion-tensor-demo}
+<div class="pixel-sheet" aria-label="A stylized 28 by 28 grayscale clothing image represented as a grid of pixels"><div class="shirt-icon">T</div></div>
+<div class="axis-label axis-height">28 rows</div>
+<div class="axis-label axis-width">28 columns</div>
+:::
+::: {.tensor-contract-readout}
+<div class="contract-line"><span>shape</span><strong>(28, 28)</strong><small>how the values are organized</small></div>
+<div class="contract-line"><span>dtype</span><strong>torch.float32</strong><small>how each value is represented</small></div>
+<div class="contract-line"><span>device</span><strong>cpu</strong><small>where computation happens</small></div>
+<div class="course-takeaway-dark contract-takeaway"><span>READ BEFORE YOU COMPUTE</span><strong>Most PyTorch bugs become visible in shape, dtype, or device.</strong></div>
+:::
+::::
+
+<div class="tensor-inspection-code"><code>image.shape&nbsp;&nbsp;&nbsp; image.dtype&nbsp;&nbsp;&nbsp; image.device</code></div>
+
+<p class="source-note">Properties follow <a href="https://web.stanford.edu/class/cs224n/materials/CS224N_PyTorch_Tutorial.html">Stanford CS224N · Tensor Properties</a>.</p>
+
+::: {.notes}
+Treat this as a debugging habit, not vocabulary to memorize. Shape gives axis sizes, dtype controls representation and valid operations, device controls the processor and memory holding the values. A single Fashion-MNIST sample has no channel axis after ToTensor conventions are introduced later; here we deliberately use a simple 28 by 28 array.
+:::
+
+## Create tensors from explicit values
+
+:::: {.code-rules-layout}
+::: {.light-code-editor .creation-editor}
+<div class="editor-bar"><span>VALUES → TENSOR</span><strong>creation.py</strong></div>
+<pre><code><span class="code-step"><span class="py-comment"># A vector of four measurements</span>
+x = torch.tensor([<span class="py-num">0.2</span>, <span class="py-num">0.7</span>, <span class="py-num">0.1</span>, <span class="py-num">0.9</span>])</span>
+
+<span class="code-step"><span class="py-comment"># Nested lists create another axis</span>
+batch = torch.tensor([[<span class="py-num">0.2</span>, <span class="py-num">0.7</span>],
+                      [<span class="py-num">0.1</span>, <span class="py-num">0.9</span>]])</span>
+
+<span class="code-step"><span class="py-comment"># State the dtype when the role requires it</span>
+labels = torch.tensor([<span class="py-num">9</span>, <span class="py-num">0</span>, <span class="py-num">3</span>], dtype=torch.long)</span>
+
+<span class="code-step"><span class="py-comment"># Convert an existing tensor explicitly</span>
+pixels = labels.float()</span></code></pre>
+:::
+::: {.creation-rules}
+<div class="rule-card"><span>NESTING</span><strong>Each regular list level introduces an axis.</strong></div>
+<div class="rule-card"><span>INFERENCE</span><strong>Decimals infer floating point; integers infer integer storage.</strong></div>
+<div class="rule-card"><span>MODEL INPUTS</span><strong>Inputs are usually floating point; class labels are usually <code>long</code>.</strong></div>
+:::
+::::
+
+<p class="source-note">Examples adapted from <a href="https://web.stanford.edu/class/cs224n/materials/CS224N_PyTorch_Tutorial.html">Stanford CS224N · From a Python List</a>.</p>
+
+::: {.notes}
+Reveal one code block and its matching rule together. Stress semantic dtype: class labels are indices consumed by cross entropy, not measured quantities. Avoid cataloguing every dtype.
+:::
+
+## Create tensors by describing the values
+
+::: {.factory-editor .light-code-editor}
+<div class="editor-bar"><span>FACTORY FUNCTIONS</span><strong>initialization.py</strong></div>
+<pre><code><span class="factory-row"><span><span class="py-comment"># Start an empty image</span>
+canvas = torch.zeros(<span class="py-num">28</span>, <span class="py-num">28</span>)</span><b>all 0</b></span>
+<span class="factory-row"><span><span class="py-comment"># Start a mask that keeps every pixel</span>
+mask = torch.ones(<span class="py-num">28</span>, <span class="py-num">28</span>)</span><b>all 1</b></span>
+<span class="factory-row"><span><span class="py-comment"># Fill a tensor with one chosen value</span>
+midgray = torch.full((<span class="py-num">28</span>, <span class="py-num">28</span>), <span class="py-num">0.5</span>)</span><b>all 0.5</b></span>
+<span class="factory-row"><span><span class="py-comment"># Draw initial values uniformly from [0, 1)</span>
+noise = torch.rand(<span class="py-num">28</span>, <span class="py-num">28</span>)</span><b>uniform</b></span>
+<span class="factory-row"><span><span class="py-comment"># Draw initial values from a standard normal</span>
+weights = torch.randn(<span class="py-num">784</span>, <span class="py-num">128</span>)</span><b>normal</b></span>
+<span class="factory-row"><span><span class="py-comment"># Generate an integer sequence</span>
+classes = torch.arange(<span class="py-num">10</span>)</span><b>0 … 9</b></span></code></pre>
+:::
+
+<div class="course-takeaway-dark factory-takeaway"><span>CHOOSE BY INTENT</span><strong>Values known? Use <code>tensor</code>. Shape known? Use a factory. Sequence needed? Use <code>arange</code>.</strong></div>
+
+<p class="source-note">Factory sequence follows <a href="https://web.stanford.edu/class/cs224n/materials/CS224N_PyTorch_Tutorial.html">Stanford CS224N · Tensor Initialization</a>.</p>
+
+::: {.notes}
+Move quickly but run every line. The comments name intent rather than repeat syntax. Connect randn to future weight initialization without teaching initialization theory again. Mention that random values change between runs unless the generator is seeded.
+:::
+
+## Match an existing tensor's contract
+
+:::: {.like-layout}
+::: {.light-code-editor .like-editor}
+<div class="editor-bar"><span>LIKE FACTORIES</span><strong>match.py</strong></div>
+<pre><code><span class="code-step"><span class="py-comment"># A mini-batch already has the right contract</span>
+images = torch.rand(<span class="py-num">64</span>, <span class="py-num">1</span>, <span class="py-num">28</span>, <span class="py-num">28</span>, device=device)</span>
+
+<span class="code-step"><span class="py-comment"># Create zeros with the same shape, dtype, and device</span>
+accumulator = torch.zeros_like(images)</span>
+
+<span class="code-step"><span class="py-comment"># Create random values with the same contract</span>
+perturbed = images + <span class="py-num">0.01</span> * torch.randn_like(images)</span></code></pre>
+:::
+::: {.like-contract}
+<span class="like-question">What does <code>_like</code> preserve?</span>
+<div class="preserved-chip"><b>shape</b><small>64 × 1 × 28 × 28</small></div>
+<div class="preserved-chip"><b>dtype</b><small>same representation</small></div>
+<div class="preserved-chip"><b>device</b><small>same location</small></div>
+<div class="like-warning"><strong>Why it matters</strong><span>No hard-coded shape or accidental CPU tensor.</span></div>
+:::
+::::
+
+<p class="source-note">Pattern adapted from <a href="https://web.stanford.edu/class/cs224n/materials/CS224N_PyTorch_Tutorial.html">Stanford CS224N · From a Tensor</a>.</p>
+
+::: {.notes}
+This is the first batch-shaped example. Name the axes without expanding into indexing: batch, channel, height, width. Emphasize that like-factories are robust code because they inherit the relevant contract.
+:::
+
+## NumPy conversion: shared storage or copy?
+
+:::: {.memory-layout}
+::: {.light-code-editor .memory-editor}
+<div class="editor-bar"><span>NUMPY ↔ PYTORCH</span><strong>memory.py</strong></div>
+<pre><code><span class="code-step"><span class="py-comment"># from_numpy reuses compatible NumPy storage</span>
+a = np.array([<span class="py-num">1.</span>, <span class="py-num">2.</span>, <span class="py-num">3.</span>], dtype=np.float32)
+t_shared = torch.from_numpy(a)</span>
+
+<span class="code-step"><span class="py-comment"># A mutation is visible through both objects</span>
+a[<span class="py-num">0</span>] = <span class="py-num">99.</span>
+t_shared
+<span class="py-output"># tensor([99., 2., 3.])</span></span>
+
+<span class="code-step"><span class="py-comment"># tensor constructs independent storage</span>
+t_copy = torch.tensor(a)</span></code></pre>
+:::
+::: {.memory-rules}
+<div class="memory-rule shared-rule"><span>torch.from_numpy(a)</span><strong>shares CPU memory</strong><small>fast, but mutations can travel</small></div>
+<div class="memory-rule copy-rule"><span>torch.tensor(a)</span><strong>copies the values</strong><small>independent, but allocates memory</small></div>
+<div class="course-takeaway-dark memory-takeaway"><span>MAKE THE CHOICE DELIBERATE</span><strong>Use sharing for an efficient bridge; copy when isolation matters.</strong></div>
+:::
+::::
+
+<p class="source-note">Conversion introduced in <a href="https://web.stanford.edu/class/cs224n/materials/CS224N_PyTorch_Tutorial.html">Stanford CS224N · From a NumPy Array</a>; sharing behavior: <a href="https://docs.pytorch.org/docs/stable/generated/torch.from_numpy.html">official PyTorch documentation</a>.</p>
+
+::: {.notes}
+Ask students to predict t_shared before revealing the output. Clarify that from_numpy shares supported CPU storage and the returned tensor is not resizable. The deliberate choice—not memorizing a slogan—is the point.
+:::
+
+## Section 1 checkpoint: choose the constructor
+
+:::: {.constructor-check}
+<div class="constructor-case"><span>KNOWN VALUES</span><strong>Three class labels: 2, 4, 7</strong><code>torch.tensor([2, 4, 7], dtype=torch.long)</code></div>
+<div class="constructor-case"><span>KNOWN SHAPE</span><strong>A blank mini-batch: 64 × 1 × 28 × 28</strong><code>torch.zeros(64, 1, 28, 28)</code></div>
+<div class="constructor-case"><span>MATCH A TENSOR</span><strong>A mask with the same contract as images</strong><code>torch.ones_like(images)</code></div>
+<div class="constructor-case"><span>NUMPY BRIDGE</span><strong>Reuse an array's CPU storage</strong><code>torch.from_numpy(array)</code></div>
+::::
+
+<div class="course-takeaway-dark constructor-takeaway"><span>YOU NOW HAVE THE OBJECT</span><strong>Next: select, reshape, combine, and reduce tensors fluently.</strong></div>
+
+<p class="source-note">Constructor repertoire synthesized from <a href="https://web.stanford.edu/class/cs224n/materials/CS224N_PyTorch_Tutorial.html">Stanford CS224N · Tensor Initialization</a>.</p>
+
+::: {.notes}
+Use this as retrieval: read each situation and ask the room for the constructor before revealing it. This closes creation cleanly and sets the boundary for Section 2, where operations begin.
+:::
+
+# 02 · Tensor fluency {.section-slide .fluency-section data-section-progress="2 / 7" style="--section-progress:28.572%"}
+
+## Indexing selects; slicing preserves structure
+
+:::: {.code-rules-layout}
+::: {.light-code-editor .index-editor}
+<div class="editor-bar"><span>INDEXING</span><strong>select.py</strong></div>
+<pre><code><span class="code-step"><span class="py-comment"># Three samples, four features each</span>
+x = torch.tensor([[<span class="py-num">10</span>, <span class="py-num">11</span>, <span class="py-num">12</span>, <span class="py-num">13</span>],
+                  [<span class="py-num">20</span>, <span class="py-num">21</span>, <span class="py-num">22</span>, <span class="py-num">23</span>],
+                  [<span class="py-num">30</span>, <span class="py-num">31</span>, <span class="py-num">32</span>, <span class="py-num">33</span>]])</span>
+
+<span class="code-step"><span class="py-comment"># Integer index: select one row</span>
+x[<span class="py-num">1</span>]              <span class="py-output"># shape (4,)  → [20, 21, 22, 23]</span></span>
+
+<span class="code-step"><span class="py-comment"># Two integer indices: select one scalar</span>
+x[<span class="py-num">1</span>, <span class="py-num">2</span>]           <span class="py-output"># shape ()    → 22</span></span>
+
+<span class="code-step"><span class="py-comment"># A length-one slice keeps the row axis</span>
+x[<span class="py-num">1</span>:<span class="py-num">2</span>]           <span class="py-output"># shape (1, 4)</span></span></code></pre>
+:::
+::: {.creation-rules}
+<div class="rule-card"><span>INTEGER INDEX</span><strong>Removes the indexed axis.</strong></div>
+<div class="rule-card"><span>SLICE</span><strong>Keeps the axis, even when one item remains.</strong></div>
+<div class="rule-card"><span>COMMA</span><strong>One selector per axis: <code>x[row, column]</code>.</strong></div>
+:::
+::::
+
+<p class="source-note">Examples follow <a href="https://web.stanford.edu/class/cs224n/materials/CS224N_PyTorch_Tutorial.html">Stanford CS224N · Tensor Indexing</a>.</p>
+
+::: {.notes}
+Make students predict the shape before reading each comment. The important distinction is not brackets versus commas; it is whether an axis survives the selection.
+:::
+
+## Read a slice one axis at a time
+
+:::: {.code-rules-layout}
+::: {.light-code-editor .slice-editor}
+<div class="editor-bar"><span>SLICING A BATCH</span><strong>slices.py</strong></div>
+<pre><code><span class="code-step"><span class="py-comment"># batch × channel × height × width</span>
+images = torch.zeros(<span class="py-num">64</span>, <span class="py-num">1</span>, <span class="py-num">28</span>, <span class="py-num">28</span>)</span>
+
+<span class="code-step"><span class="py-comment"># First eight images; keep every other axis</span>
+small_batch = images[:<span class="py-num">8</span>]</span>
+
+<span class="code-step"><span class="py-comment"># Crop rows 4…23 and columns 6…21</span>
+crop = images[:, :, <span class="py-num">4</span>:<span class="py-num">24</span>, <span class="py-num">6</span>:<span class="py-num">22</span>]</span>
+
+<span class="code-step"><span class="py-comment"># Sample every second column</span>
+stripes = images[:, :, :, ::<span class="py-num">2</span>]</span>
+
+<span class="code-step"><span class="py-comment"># Ellipsis means “all omitted middle axes”</span>
+last_column = images[..., -<span class="py-num">1</span>]</span></code></pre>
+:::
+::: {.slice-rules}
+<div class="slice-rule"><code>:</code><strong>all entries</strong></div>
+<div class="slice-rule"><code>a:b</code><strong>start included, stop excluded</strong></div>
+<div class="slice-rule"><code>::s</code><strong>take every <em>s</em>-th entry</strong></div>
+<div class="slice-rule"><code>-1</code><strong>last entry on that axis</strong></div>
+<div class="slice-rule"><code>...</code><strong>fill omitted axes with <code>:</code></strong></div>
+:::
+::::
+
+<p class="source-note">Syntax adapted from <a href="https://web.stanford.edu/class/cs224n/materials/CS224N_PyTorch_Tutorial.html">Stanford CS224N · Tensor Indexing</a>.</p>
+
+::: {.notes}
+Read every expression aloud from left to right. The stop is exclusive, exactly as in Python and NumPy. PyTorch does not support negative slice steps; use torch.flip when reversal is required.
+:::
+
+## A Boolean mask keeps matching elements
+
+:::: {.mask-code-layout}
+::: {.mask-mini-visual}
+<div class="mini-tensor-label">confidence</div>
+<div class="mini-tensor confidence-array"><i>0.91</i><i>0.42</i><i>0.77</i><i>0.18</i><i>0.83</i></div>
+<b class="mini-flow-arrow">↓ compare with 0.75</b>
+<div class="mini-tensor-label">keep</div>
+<div class="mini-tensor binary-mask"><i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i></div>
+<b class="mini-flow-arrow">↓ select black positions</b>
+<div class="mini-tensor-label">selected</div>
+<div class="mini-tensor result-array"><i>0.91</i><i>0.77</i><i>0.83</i></div>
+<small>shape (3,)</small>
+:::
+::: {.light-code-editor .mask-code-editor}
+<div class="editor-bar"><span>BOOLEAN INDEXING</span><strong>filter.py</strong></div>
+<pre><code><span class="code-step"><span class="py-comment"># Confidence for five predictions</span>
+confidence = torch.tensor([
+    <span class="py-num">0.91</span>, <span class="py-num">0.42</span>, <span class="py-num">0.77</span>, <span class="py-num">0.18</span>, <span class="py-num">0.83</span>
+])</span>
+
+<span class="code-step"><span class="py-comment"># Compare every value with the threshold</span>
+keep = confidence &gt;= <span class="py-num">0.75</span>
+<span class="py-output"># tensor([ True, False,  True, False,  True])</span></span>
+
+<span class="code-step"><span class="py-comment"># Keep values aligned with True mask entries</span>
+selected = confidence[keep]
+<span class="py-output"># tensor([0.91, 0.77, 0.83])</span></span></code></pre>
+:::
+::::
+
+<div class="course-takeaway-dark mask-code-takeaway"><span>BOOLEAN INDEXING</span><strong>The mask and source align position by position; the output length equals the number of <code>True</code> entries.</strong></div>
+
+<p class="source-note">Boolean masking follows <a href="https://web.stanford.edu/class/cs224n/materials/CS224N_PyTorch_Tutorial.html">Stanford CS224N · Tensor Indexing</a>.</p>
+
+::: {.notes}
+Keep attention on the code. Use the left diagram only to trace the three lines: five confidence values, five aligned mask positions, then three selected values. Black means True and white means False.
+:::
+
+## Reshape reorganizes the same values
+
+::: {.reshape-story}
+<div class="reshape-scene single-scene"><span>ONE IMAGE</span><div class="mini-pixel-grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><strong>28 × 28</strong><small>784 pixels</small></div>
+<div class="reshape-arrow"><code>image.reshape(784)</code><b>→</b></div>
+<div class="reshape-scene vector-scene"><span>ONE FEATURE VECTOR</span><div class="pixel-strip"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><em>…</em></div><strong>784</strong><small>same pixels · new organization</small></div>
+:::
+
+::: {.batch-reshape-story}
+<div><span>64 IMAGES</span><div class="stacked-images"><i></i><i></i><i></i></div><strong>(64, 1, 28, 28)</strong></div>
+<b>→</b>
+<code>images.reshape(64, -1)</code>
+<b>→</b>
+<div><span>64 FEATURE VECTORS</span><div class="batch-lines"><i></i><i></i><i></i><em>⋮</em></div><strong>(64, 784)</strong></div>
+:::
+
+<div class="reshape-invariant-wide"><span>INVARIANT</span><strong>64 × 1 × 28 × 28 = 64 × 784 = 50,176 values</strong></div>
+
+<p class="source-note">Sequence adapted from <a href="https://web.stanford.edu/class/cs224n/materials/CS224N_PyTorch_Tutorial.html">Stanford CS224N · Shape</a>.</p>
+
+::: {.notes}
+Trace the first few pixel cells from the square into the strip: values do not change and are not recomputed. In the batch example, 64 remains the sample axis; only the three image axes are collapsed. Explain that -1 asks PyTorch to infer 784 from the conserved element count.
+:::
+
+## Add, remove, or reorder axes
+
+::: {.axis-operations}
+<div class="axis-operation"><span>ADD ONE AXIS · <code>unsqueeze(0)</code></span><div class="axis-picture unsqueeze-picture"><div class="plane">28 × 28</div><b>→</b><div class="sleeve"><small>1</small><div class="plane">28 × 28</div></div></div><strong>(28, 28) → (1, 28, 28)</strong></div>
+<div class="axis-operation"><span>REMOVE SIZE-1 AXIS · <code>squeeze(1)</code></span><div class="axis-picture squeeze-picture"><div class="batch-block">64</div><div class="thin-axis">1</div><div class="plane">28 × 28</div><b>→</b><div class="batch-block">64</div><div class="plane">28 × 28</div></div><strong>(64, 1, 28, 28) → (64, 28, 28)</strong></div>
+<div class="axis-operation"><span>SWAP TWO AXES · <code>transpose(0, 1)</code></span><div class="axis-picture transpose-picture"><div class="matrix-grid rows"><i></i><i></i><i></i><i></i><i></i><i></i></div><b>↗</b><div class="matrix-grid columns"><i></i><i></i><i></i><i></i><i></i><i></i></div></div><strong>(3, 2) → (2, 3)</strong></div>
+<div class="axis-operation"><span>REORDER ALL AXES · <code>permute(0, 2, 3, 1)</code></span><div class="axis-picture permute-picture"><div class="axis-order"><i>N</i><i>C</i><i>H</i><i>W</i></div><b>→</b><div class="axis-order reordered"><i>N</i><i>H</i><i>W</i><i>C</i></div></div><strong>(N, C, H, W) → (N, H, W, C)</strong></div>
+:::
+
+<div class="course-takeaway-dark axis-takeaway"><span>AXES CARRY MEANING</span><strong>Shape manipulation is correct only when the semantic role of every axis is preserved.</strong></div>
+
+<p class="source-note"><code>squeeze</code> and <code>unsqueeze</code> follow <a href="https://web.stanford.edu/class/cs224n/materials/CS224N_PyTorch_Tutorial.html">Stanford CS224N · Shape</a>.</p>
+
+::: {.notes}
+Walk through the pictures before reading the method names. Unsqueeze wraps a plane in a new size-one sleeve; squeeze removes only that sleeve. Transpose swaps two directions. Permute states the complete new axis order. Warn that squeeze() with no dimension can also remove a batch axis of size one.
+:::
+
+## Elementwise multiplication is not matrix multiplication
+
+:::: {.operation-compare}
+::: {.operation-column}
+<span>ELEMENTWISE</span>
+
+```python
+a = torch.tensor([[1., 2.],
+                  [3., 4.]])
+b = torch.tensor([[10., 10.],
+                  [20., 20.]])
+
+a * b
+# [[10., 20.],
+#  [60., 80.]]
+```
+
+<strong>Same-position values interact.</strong>
+:::
+::: {.operation-column .matmul-column}
+<span>MATRIX PRODUCT</span>
+
+```python
+x = torch.tensor([[1., 2., 3.]])
+W = torch.ones(3, 2)
+
+x @ W
+# [[6., 6.]]
+
+# (1, 3) @ (3, 2) → (1, 2)
+```
+
+<strong>Inner dimensions must agree.</strong>
+:::
+::::
+
+<div class="operation-question"><span>OUR FUTURE LINEAR LAYER</span><strong><code>batch @ W</code>: (64, 784) @ (784, 128) → (64, 128)</strong></div>
+
+<p class="source-note">Syntax follows <a href="https://web.stanford.edu/class/cs224n/materials/CS224N_PyTorch_Tutorial.html">Stanford CS224N · Operations</a>.</p>
+
+::: {.notes}
+Ask which dimension disappears and which survives in the future layer. Retrieve the linear algebra; spend the slide time on reading tensor shapes.
+:::
+
+## Reductions answer a question along an axis
+
+:::: {.reduction-code-layout}
+::: {.reduction-mini-visual}
+<div class="reduction-input"><span>scores · shape (3, 4)</span><div class="score-grid"><i>2</i><i>1</i><i>0</i><i>3</i><i>1</i><i>4</i><i>2</i><i>0</i><i>3</i><i>2</i><i>5</i><i>1</i></div></div>
+<div class="reduction-case dim-zero"><div><code>dim=0</code><small>collapse rows ↓</small></div><b>→</b><div class="reduction-output horizontal-output"><i>2</i><i>2.33</i><i>2.33</i><i>1.33</i></div><strong>shape (4,)</strong></div>
+<div class="reduction-case dim-one"><div><code>dim=1</code><small>collapse columns →</small></div><b>→</b><div class="reduction-output vertical-output"><i>1.50</i><i>1.75</i><i>2.75</i></div><strong>shape (3,)</strong></div>
+<div class="reduction-case dim-both"><div><code>dim=(0, 1)</code><small>collapse both axes</small></div><b>→</b><div class="reduction-output scalar-output"><i>2.00</i></div><strong>shape ()</strong></div>
+:::
+::: {.light-code-editor .reduction-code-editor}
+<div class="editor-bar"><span>REDUCTIONS</span><strong>summaries.py</strong></div>
+<pre><code><span class="code-step"><span class="py-comment"># Three samples, four class scores each</span>
+scores = torch.tensor([[<span class="py-num">2.</span>, <span class="py-num">1.</span>, <span class="py-num">0.</span>, <span class="py-num">3.</span>],
+                       [<span class="py-num">1.</span>, <span class="py-num">4.</span>, <span class="py-num">2.</span>, <span class="py-num">0.</span>],
+                       [<span class="py-num">3.</span>, <span class="py-num">2.</span>, <span class="py-num">5.</span>, <span class="py-num">1.</span>]])</span>
+
+<span class="code-step"><span class="py-comment"># dim=0: combine the three samples</span>
+scores.mean(dim=<span class="py-num">0</span>)
+<span class="py-output"># tensor([2.00, 2.33, 2.33, 1.33])</span></span>
+
+<span class="code-step"><span class="py-comment"># dim=1: combine the four classes</span>
+scores.mean(dim=<span class="py-num">1</span>)
+<span class="py-output"># tensor([1.50, 1.75, 2.75])</span></span>
+
+<span class="code-step"><span class="py-comment"># Both axes: combine all twelve values</span>
+scores.mean(dim=(<span class="py-num">0</span>, <span class="py-num">1</span>))
+<span class="py-output"># tensor(2.00)</span></span></code></pre>
+:::
+::::
+
+<div class="course-takeaway-dark reduction-code-takeaway"><span>THE NAMED DIMENSION DISAPPEARS</span><strong><code>dim=0</code> leaves four columns; <code>dim=1</code> leaves three rows; <code>dim=(0, 1)</code> leaves one scalar.</strong></div>
+
+<p class="source-note">Examples adapted from <a href="https://web.stanford.edu/class/cs224n/materials/CS224N_PyTorch_Tutorial.html">Stanford CS224N · Operations</a>.</p>
+
+::: {.notes}
+Keep attention on the code and use the left panels to trace which direction collapses. Ask students to predict the surviving shape before reading each output. A tuple reduces several named axes in one operation.
+:::
+
+## Concatenate extends an axis; stack creates one
+
+::: {.combine-demo}
+<div class="combine-column"><span>INPUTS</span><code>a.shape == (2, 3)<br>b.shape == (2, 3)</code><div class="mini-matrices"><i>A</i><i>B</i></div></div>
+<div class="combine-column cat-column"><span><code>torch.cat([a, b], dim=0)</code></span><strong>(4, 3)</strong><div class="cat-visual"><i>A</i><i>B</i></div><small>The existing row axis becomes longer.</small></div>
+<div class="combine-column stack-column"><span><code>torch.stack([a, b], dim=0)</code></span><strong>(2, 2, 3)</strong><div class="stack-visual"><i>A</i><i>B</i></div><small>A new leading axis records which tensor.</small></div>
+:::
+
+<div class="course-takeaway-dark combine-takeaway"><span>SHAPE TEST</span><strong><code>cat</code> keeps the number of axes; <code>stack</code> adds one axis.</strong></div>
+
+<p class="source-note"><code>cat</code> follows <a href="https://web.stanford.edu/class/cs224n/materials/CS224N_PyTorch_Tutorial.html">Stanford CS224N · Operations</a>; comparison extended for this course.</p>
+
+::: {.notes}
+Concrete uses: cat joins mini-batches; stack collects same-shaped images into a mini-batch. Decide from the desired output shape.
+:::
+
+## Broadcasting aligns shapes from the right
+
+::: {.broadcast-stage}
+<div class="broadcast-frame fragment fade-out" data-fragment-index="0"><div class="broadcast-code light-code-editor"><div class="editor-bar"><span>EXAMPLE 1 · SCALAR</span><strong>broadcast.py</strong></div><pre><code><span class="py-comment"># Add one scalar to every element</span>
+x = torch.tensor([<span class="py-num">1</span>, <span class="py-num">2</span>, <span class="py-num">3</span>, <span class="py-num">4</span>])
+
+y = x + <span class="py-num">10</span>
+
+<span class="py-output"># tensor([11, 12, 13, 14])</span>
+<span class="py-output"># (4,) + () → (4,)</span></code></pre></div><div class="broadcast-visual scalar-broadcast"><span class="broadcast-counter">1 / 4</span><div class="expansion-stage"><div><small>ORIGINAL</small><div class="visual-vector"><i>1</i><i>2</i><i>3</i><i>4</i></div></div><b>+</b><div><small>SCALAR</small><div class="visual-scalar">10</div></div><b>→</b><div><small>EXPANDED VIEW</small><div class="visual-vector expanded-vector"><i>10</i><i>10</i><i>10</i><i>10</i></div></div></div><div class="broadcast-operation-arrow">elementwise addition ↓</div><div class="visual-vector result-vector"><i>11</i><i>12</i><i>13</i><i>14</i></div><strong>The scalar first behaves like a length-four tensor.</strong></div></div>
+<div class="broadcast-frame fragment fade-in-then-out" data-fragment-index="0"><div class="broadcast-code light-code-editor"><div class="editor-bar"><span>EXAMPLE 2 · ROW VECTOR</span><strong>broadcast.py</strong></div><pre><code><span class="py-comment"># Add one bias value per column</span>
+x = torch.tensor([[<span class="py-num">1</span>, <span class="py-num">2</span>, <span class="py-num">3</span>],
+                  [<span class="py-num">4</span>, <span class="py-num">5</span>, <span class="py-num">6</span>]])
+bias = torch.tensor([<span class="py-num">10</span>, <span class="py-num">20</span>, <span class="py-num">30</span>])
+
+y = x + bias
+
+<span class="py-output"># tensor([[11, 22, 33],</span>
+<span class="py-output">#         [14, 25, 36]])</span>
+<span class="py-output"># (2, 3) + (3,) → (2, 3)</span></code></pre></div><div class="broadcast-visual row-broadcast"><span class="broadcast-counter">2 / 4</span><div class="matrix-expansion-stage"><div><small>ORIGINAL · (2, 3)</small><div class="visual-matrix"><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i></div></div><b>+</b><div><small>BIAS · (3,)</small><div class="visual-vector bias-vector"><i>10</i><i>20</i><i>30</i></div></div><b>→</b><div><small>EXPANDED · (2, 3)</small><div class="visual-matrix expanded-matrix"><i>10</i><i>20</i><i>30</i><i>10</i><i>20</i><i>30</i></div></div></div><div class="broadcast-operation-arrow">elementwise addition ↓</div><div class="visual-matrix result-matrix"><i>11</i><i>22</i><i>33</i><i>14</i><i>25</i><i>36</i></div><strong>The row vector is repeated down the missing leading axis.</strong></div></div>
+<div class="broadcast-frame fragment fade-in-then-out" data-fragment-index="1"><div class="broadcast-code light-code-editor"><div class="editor-bar"><span>EXAMPLE 3 · COLUMN VECTOR</span><strong>broadcast.py</strong></div><pre><code><span class="py-comment"># Add one offset per row</span>
+x = torch.tensor([[<span class="py-num">1</span>, <span class="py-num">2</span>, <span class="py-num">3</span>],
+                  [<span class="py-num">4</span>, <span class="py-num">5</span>, <span class="py-num">6</span>]])
+offset = torch.tensor([[<span class="py-num">100</span>],
+                       [<span class="py-num">200</span>]])
+
+y = x + offset
+
+<span class="py-output"># tensor([[101, 102, 103],</span>
+<span class="py-output">#         [204, 205, 206]])</span>
+<span class="py-output"># (2, 3) + (2, 1) → (2, 3)</span></code></pre></div><div class="broadcast-visual column-broadcast"><span class="broadcast-counter">3 / 4</span><div class="matrix-expansion-stage"><div><small>ORIGINAL · (2, 3)</small><div class="visual-matrix"><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i></div></div><b>+</b><div><small>OFFSET · (2, 1)</small><div class="visual-column"><i>100</i><i>200</i></div></div><b>→</b><div><small>EXPANDED · (2, 3)</small><div class="visual-matrix expanded-matrix"><i>100</i><i>100</i><i>100</i><i>200</i><i>200</i><i>200</i></div></div></div><div class="broadcast-operation-arrow">elementwise addition ↓</div><div class="visual-matrix result-matrix"><i>101</i><i>102</i><i>103</i><i>204</i><i>205</i><i>206</i></div><strong>Each size-one row value expands across the columns.</strong></div></div>
+<div class="broadcast-frame fragment" data-fragment-index="2"><div class="broadcast-code light-code-editor"><div class="editor-bar"><span>EXAMPLE 4 · IMAGE BATCH</span><strong>normalize.py</strong></div><pre><code><span class="py-comment"># One mean image for each channel</span>
+images.shape
+<span class="py-output"># torch.Size([64, 3, 28, 28])</span>
+
+mean.shape
+<span class="py-output"># torch.Size([3, 28, 28])</span>
+
+centered = images - mean
+
+centered.shape
+<span class="py-output"># torch.Size([64, 3, 28, 28])</span></code></pre></div><div class="broadcast-visual batch-broadcast"><span class="broadcast-counter">4 / 4</span><div class="tensor4d-equation"><div class="tensor4d-object"><span>images · N × C × H × W</span><div class="batch-volumes"><div class="channel-volume"><i></i><i></i><i></i></div><div class="channel-volume"><i></i><i></i><i></i></div><div class="batch-ellipsis">…</div><div class="channel-volume"><i></i><i></i><i></i></div></div><small>N image volumes</small></div><b>−</b><div class="mean3d-object"><span>mean · C × H × W</span><div class="channel-volume mean-volume"><i></i><i></i><i></i></div><small>one channel volume</small></div></div><div class="volume-expansion-arrow">broadcast over N ↓</div><div class="expanded-volumes"><div class="channel-volume mean-volume"><i></i><i></i><i></i></div><div class="channel-volume mean-volume"><i></i><i></i><i></i></div><div class="batch-ellipsis">…</div><div class="channel-volume mean-volume"><i></i><i></i><i></i></div></div><div class="expanded-volume-label">expanded view · N × C × H × W</div><div class="shape-result-line">images − expanded mean → <b>N × C × H × W</b></div><strong>One mean volume is reused for every image in the batch.</strong></div></div>
+:::
+
+<div class="course-takeaway-dark broadcast-sequence-takeaway"><span>ALIGN FROM THE RIGHT</span><strong>Dimensions are compatible when they are equal or one of them is <code>1</code>; missing leading dimensions behave like <code>1</code>.</strong></div>
+
+<p class="source-note">Example extends <a href="https://web.stanford.edu/class/cs224n/materials/CS224N_PyTorch_Tutorial.html">Stanford CS224N · Operations</a>; rules: <a href="https://docs.pytorch.org/docs/stable/notes/broadcasting.html">PyTorch broadcasting semantics</a>.</p>
+
+::: {.notes}
+Advance through four complete examples. In every diagram, pause at the expanded view before applying the arithmetic. The final image-batch case omits values deliberately and makes the missing leading batch axis explicit.
+:::
+
+## A computation requires one device
+
+:::: {.device-layout}
+::: {.light-code-editor .device-editor}
+<div class="editor-bar"><span>DEVICE-SAFE CODE</span><strong>device.py</strong></div>
+<pre><code><span class="code-step"><span class="py-comment"># Choose the best available accelerator once</span>
+device = torch.device(
+    <span class="py-str">"cuda"</span> <span class="py-kw">if</span> torch.cuda.is_available() <span class="py-kw">else</span> <span class="py-str">"cpu"</span>
+)</span>
+
+<span class="code-step"><span class="py-comment"># Move every participant in the computation</span>
+images = images.to(device)
+labels = labels.to(device)
+model = model.to(device)</span>
+
+<span class="code-step"><span class="py-comment"># NumPy consumes CPU tensors</span>
+array = images.detach().cpu().numpy()</span></code></pre>
+:::
+::: {.device-path}
+<div class="device-node cpu-node"><span>CPU</span><strong>Tensor</strong></div><b>.to(device) →</b><div class="device-node accelerator-node"><span>CUDA</span><strong>Tensor</strong></div>
+<div class="device-error"><span>COMMON ERROR</span><strong>Input on CUDA, model on CPU</strong><small>PyTorch refuses to compute across devices.</small></div>
+:::
+::::
+
+<div class="course-takeaway-dark device-takeaway"><span>ONE OPERATION · ONE LOCATION</span><strong>Move model and data deliberately; move back to CPU before converting to NumPy.</strong></div>
+
+<p class="source-note">Workflow follows <a href="https://web.stanford.edu/class/cs224n/materials/CS224N_PyTorch_Tutorial.html">Stanford CS224N · Device</a> and <a href="https://docs.pytorch.org/docs/stable/tensor_attributes.html#torch.device">PyTorch device documentation</a>.</p>
+
+::: {.notes}
+Do not promise CUDA is present. The device variable makes the code portable. Explain detach only as removing autograd history before NumPy conversion; Section 3 gives it full meaning.
+:::
+
+## Section 2 checkpoint: read the contract first
+
+::: {.fluency-check-grid}
+<div><span>SLICE</span><code>images[:8, :, 4:24, 6:22]</code><strong>(8, 1, 20, 16)</strong></div>
+<div><span>FLATTEN FOR MLP</span><code>images.reshape(64, -1)</code><strong>(64, 784)</strong></div>
+<div><span>REDUCE CLASSES</span><code>scores.argmax(dim=1)</code><strong>(64,)</strong></div>
+<div><span>STACK IMAGES</span><code>torch.stack([a, b, c])</code><strong>(3, 1, 28, 28)</strong></div>
+<div><span>BROADCAST BIAS</span><code>(64, 128) + (128,)</code><strong>(64, 128)</strong></div>
+<div><span>MOVE</span><code>images.to(device)</code><strong>same shape · new location</strong></div>
+:::
+
+<div class="course-takeaway-dark fluency-takeaway"><span>THE WORKING HABIT</span><strong>Before running an operation, predict its output shape, dtype, and device.</strong></div>
+
+::: {.notes}
+Use this as a rapid oral checkpoint. Pause before reading each result. Predicting the tensor contract is the section outcome.
+:::
+
+# 03 · Autograd {.section-slide .autograd-section data-section-progress="3 / 7" style="--section-progress:42.858%"}
+
+## The forward pass records a computation graph
+
+:::: {.autograd-layout}
+::: {.autograd-graph}
+<div class="graph-leaves"><div><span>x</span><strong>2</strong></div><div class="parameter-node"><span>w</span><strong>3</strong></div><div class="parameter-node"><span>b</span><strong>1</strong></div></div>
+<div class="graph-operation"><b>×</b><small>MulBackward</small></div>
+<div class="graph-operation"><b>+</b><small>AddBackward</small></div>
+<div class="graph-value"><span>prediction</span><strong>7</strong></div>
+<div class="graph-operation loss-operation"><b>(· − 10)²</b><small>PowBackward</small></div>
+<div class="graph-value loss-node"><span>loss</span><strong>9</strong></div>
+:::
+::: {.light-code-editor .autograd-code}
+<div class="editor-bar"><span>FORWARD PASS</span><strong>graph.py</strong></div>
+<pre><code><span class="py-comment"># Parameters ask autograd to track operations</span>
+w = torch.tensor(<span class="py-num">3.</span>, requires_grad=<span class="py-kw">True</span>)
+b = torch.tensor(<span class="py-num">1.</span>, requires_grad=<span class="py-kw">True</span>)
+
+<span class="py-comment"># Data need not receive a gradient</span>
+x = torch.tensor(<span class="py-num">2.</span>)
+target = torch.tensor(<span class="py-num">10.</span>)
+
+<span class="py-comment"># Executing operations constructs the graph</span>
+prediction = w * x + b
+loss = (prediction - target) ** <span class="py-num">2</span>
+
+loss, loss.grad_fn
+<span class="py-output"># (tensor(9.), &lt;PowBackward0&gt;)</span></code></pre>
+:::
+::::
+
+<div class="course-takeaway-dark autograd-takeaway"><span>DYNAMIC GRAPH</span><strong>PyTorch records the operations that actually ran; the graph is rebuilt on the next forward pass.</strong></div>
+
+<p class="source-note">Mechanism adapted from <a href="https://web.stanford.edu/class/cs224n/materials/CS224N_PyTorch_Tutorial.html">Stanford CS224N · Autograd</a> and <a href="https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html">PyTorch · Automatic Differentiation</a>.</p>
+
+::: {.notes}
+Students know the chain rule. Focus on object state: requires_grad marks leaf parameters; each executed operation stores a grad_fn in the result. The graph is a record of this particular forward computation.
+:::
+
+## `backward()` sends gradients to leaf tensors
+
+:::: {.autograd-layout}
+::: {.backward-visual}
+<div class="backward-chain"><div class="loss-grad"><span>loss</span><strong>9</strong><small>seed gradient = 1</small></div><b>←</b><div><span>prediction</span><strong>7</strong><small>∂L/∂prediction = −6</small></div><b>←</b><div class="leaf-grads"><span>LEAF GRADIENTS</span><strong>w.grad = −12</strong><strong>b.grad = −6</strong></div></div>
+<div class="chain-rule-check"><span>CHECK</span><code>∂L/∂w = 2(prediction − target) · x<br>= 2(7 − 10) · 2 = −12</code></div>
+:::
+::: {.light-code-editor .autograd-code}
+<div class="editor-bar"><span>BACKWARD PASS</span><strong>graph.py</strong></div>
+<pre><code><span class="py-comment"># Differentiate the scalar loss</span>
+loss.backward()
+
+<span class="py-comment"># Gradients accumulate on tracked leaves</span>
+w.grad
+<span class="py-output"># tensor(-12.)</span>
+
+b.grad
+<span class="py-output"># tensor(-6.)</span>
+
+<span class="py-comment"># Intermediate results are not leaf tensors</span>
+prediction.is_leaf
+<span class="py-output"># False</span></code></pre>
+:::
+::::
+
+<div class="course-takeaway-dark autograd-takeaway"><span>WHERE TO LOOK</span><strong>After <code>loss.backward()</code>, inspect <code>.grad</code> on the leaf parameters being optimized.</strong></div>
+
+<p class="source-note">Gradient storage follows <a href="https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html">PyTorch · Computing Gradients</a>.</p>
+
+::: {.notes}
+Trace backward from the scalar root. Emphasize that backward computes and accumulates gradients; it does not update w or b. Non-leaf gradients are normally used internally and then released.
+:::
+
+## A batch becomes one scalar loss
+
+:::: {.autograd-layout}
+::: {.loss-reduction-visual}
+<div class="loss-vector"><span>prediction − target</span><div><i>1</i><i>−2</i><i>3</i></div></div>
+<b>square ↓</b>
+<div class="loss-vector squared-errors"><span>per-example losses</span><div><i>1</i><i>4</i><i>9</i></div></div>
+<b>mean ↓</b>
+<div class="scalar-loss"><span>batch loss</span><strong>14 / 3</strong><small>shape ()</small></div>
+:::
+::: {.light-code-editor .autograd-code}
+<div class="editor-bar"><span>SCALAR OBJECTIVE</span><strong>batch_loss.py</strong></div>
+<pre><code><span class="py-comment"># Three predictions produce three errors</span>
+prediction = torch.tensor(
+    [<span class="py-num">4.</span>, <span class="py-num">3.</span>, <span class="py-num">10.</span>],
+    requires_grad=<span class="py-kw">True</span>
+)
+target = torch.tensor([<span class="py-num">3.</span>, <span class="py-num">5.</span>, <span class="py-num">7.</span>])
+
+<span class="py-comment"># Reduce per-example losses to one objective</span>
+per_example = (prediction - target) ** <span class="py-num">2</span>
+loss = per_example.mean()
+
+per_example, loss
+<span class="py-output"># (tensor([1., 4., 9.]), tensor(4.6667))</span>
+
+loss.backward()</code></pre>
+:::
+::::
+
+<div class="course-takeaway-dark autograd-takeaway"><span>WHY REDUCE?</span><strong>A scalar loss gives one objective whose gradient combines evidence from the complete mini-batch.</strong></div>
+
+<p class="source-note">Scalar-loss convention: <a href="https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html">PyTorch · Tensor Gradients and Jacobian Products</a>.</p>
+
+::: {.notes}
+Connect back to reductions. backward() without an argument seeds a scalar output with gradient one. Vector outputs require an explicit gradient argument and compute a vector–Jacobian product; that is not needed in the ordinary training loop.
+:::
+
+## Gradients accumulate until you clear them
+
+:::: {.autograd-layout}
+::: {.accumulation-visual}
+<div class="grad-state"><span>START</span><strong>w.grad = None</strong></div><b>backward →</b><div class="grad-state first-grad"><span>AFTER BATCH 1</span><strong>w.grad = 4</strong></div><b>backward →</b><div class="grad-state accumulated-grad"><span>AFTER BATCH 2</span><strong>w.grad = 8</strong></div><b>zero_ ↓</b><div class="grad-state cleared-grad"><span>CLEARED</span><strong>w.grad = 0</strong></div>
+:::
+::: {.light-code-editor .autograd-code .accumulation-code}
+<div class="editor-bar"><span>ACCUMULATION</span><strong>grad_state.py</strong></div>
+<pre><code>w = torch.tensor(<span class="py-num">2.</span>, requires_grad=<span class="py-kw">True</span>)
+
+<span class="py-comment"># First graph contributes gradient 4</span>
+(w ** <span class="py-num">2</span>).backward()
+w.grad                         <span class="py-output"># tensor(4.)</span>
+
+<span class="py-comment"># A new graph adds another gradient 4</span>
+(w ** <span class="py-num">2</span>).backward()
+w.grad                         <span class="py-output"># tensor(8.)</span>
+
+<span class="py-comment"># Clear before the next independent batch</span>
+w.grad.zero_()
+w.grad                         <span class="py-output"># tensor(0.)</span></code></pre>
+:::
+::::
+
+<div class="course-takeaway-dark autograd-takeaway danger-grad"><span>TRAINING INVARIANT</span><strong>Clear old gradients before computing the next batch gradient—unless accumulation is intentional.</strong></div>
+
+<p class="source-note">Accumulation behavior follows <a href="https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html">PyTorch · More on Computational Graphs</a>.</p>
+
+::: {.notes}
+This is a stateful behavior, so show it explicitly. Each expression w**2 creates a fresh graph, but both backward calls add into the same leaf gradient buffer. Later the optimizer will provide zero_grad().
+:::
+
+## One complete regression update
+
+:::: {.autograd-layout}
+::: {.update-cycle}
+<div><span>1</span><strong>forward</strong><small>predict with w and b</small></div><b>→</b><div><span>2</span><strong>loss</strong><small>mean squared error</small></div><b>→</b><div><span>3</span><strong>backward</strong><small>populate .grad</small></div><b>→</b><div><span>4</span><strong>update</strong><small>no graph needed</small></div><b>→</b><div><span>5</span><strong>clear</strong><small>prepare next batch</small></div>
+<div class="parameter-update"><span>ONE STEP</span><strong>w: 0 → 2.267</strong><strong>b: 0 → 1.000</strong></div>
+:::
+::: {.light-code-editor .autograd-code .update-code}
+<div class="editor-bar"><span>MANUAL TRAINING STEP</span><strong>regression.py</strong></div>
+<pre><code>x = torch.tensor([<span class="py-num">1.</span>, <span class="py-num">2.</span>, <span class="py-num">3.</span>])
+y = torch.tensor([<span class="py-num">3.</span>, <span class="py-num">5.</span>, <span class="py-num">7.</span>])
+w = torch.tensor(<span class="py-num">0.</span>, requires_grad=<span class="py-kw">True</span>)
+b = torch.tensor(<span class="py-num">0.</span>, requires_grad=<span class="py-kw">True</span>)
+
+prediction = w * x + b
+loss = ((prediction - y) ** <span class="py-num">2</span>).mean()
+loss.backward()
+
+<span class="py-kw">with</span> torch.no_grad():
+    w -= <span class="py-num">0.1</span> * w.grad
+    b -= <span class="py-num">0.1</span> * b.grad
+
+w.grad.zero_()
+b.grad.zero_()</code></pre>
+:::
+::::
+
+<div class="course-takeaway-dark autograd-takeaway"><span>AUTOGRAD'S JOB ENDS AT .GRAD</span><strong>Autograd differentiates; the update rule changes parameters; clearing gradients resets the state.</strong></div>
+
+<p class="source-note">Workflow adapted from <a href="https://web.stanford.edu/class/cs224n/materials/CS224N_PyTorch_Tutorial.html">Stanford CS224N · Autograd</a> and <a href="https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html">PyTorch · Automatic Differentiation</a>.</p>
+
+::: {.notes}
+This is the bridge to nn.Module and optimizers. no_grad prevents the parameter update itself from joining the next graph. Verify the first gradients orally: w.grad = -22.667 and b.grad = -10, so learning rate 0.1 gives the displayed parameters.
+:::
+
+# 04 · Models as `nn.Module` {.section-slide .module-section data-section-progress="4 / 7" style="--section-progress:57.144%"}
+
+## The `nn.Module` contract
+
+<div class="module-definition"><span>DEFINITION</span><strong><code>nn.Module</code> is PyTorch’s base class for models and layers.</strong><p>We implement only <code>__init__</code> and <code>forward</code>. The base class already provides parameter registration, device movement, training/evaluation modes, state handling, hooks, and the callable <code>model(x)</code> interface.</p></div>
+
+:::: {.module-contract-comparison}
+::: {.light-code-editor .contract-code .template-code}
+<div class="editor-bar"><span>GENERIC TEMPLATE</span><strong>module_template.py</strong></div>
+<pre><code><span class="py-kw">class</span> MyModel(nn.Module):
+    <span class="py-kw">def</span> __init__(self):
+        super().__init__()
+
+        <span class="py-comment"># Define the reusable layers</span>
+        self.layers = ...
+
+    <span class="py-kw">def</span> forward(self, x):
+        <span class="py-comment"># Define how data flows</span>
+        output = ...
+        <span class="py-kw">return</span> output</code></pre>
+:::
+::: {.light-code-editor .contract-code .implemented-code}
+<div class="editor-bar"><span>OUR IMPLEMENTATION</span><strong>fashion_mlp.py</strong></div>
+<pre><code><span class="py-kw">class</span> FashionMLP(nn.Module):
+    <span class="py-kw">def</span> __init__(self):
+        super().__init__()
+        self.flatten = nn.Flatten()
+        self.network = nn.Sequential(
+            nn.Linear(<span class="py-num">28</span> * <span class="py-num">28</span>, <span class="py-num">128</span>),
+            nn.ReLU(),
+            nn.Linear(<span class="py-num">128</span>, <span class="py-num">10</span>),
+        )
+
+    <span class="py-kw">def</span> forward(self, images):
+        x = self.flatten(images)
+        <span class="py-kw">return</span> self.network(x)</code></pre>
+:::
+::::
+
+<p class="source-note">Structure adapted from <a href="https://docs.pytorch.org/tutorials/beginner/basics/buildmodel_tutorial.html">PyTorch · Build the Neural Network</a>.</p>
+
+::: {.notes}
+Start from the abstraction boundary, not the familiar neural-network diagram. Students supply the model's owned pieces and computation; PyTorch supplies the surrounding model machinery. Then map each placeholder in the generic template to the Fashion-MNIST implementation. Mention that the final layer returns 10 logits and that CrossEntropyLoss will consume them later.
+:::
+
+## `__init__` owns layers; `forward` uses them
+
+:::: {.module-layout}
+::: {.module-lifecycle-visual}
+<div class="lifecycle-box"><span>CONSTRUCTION · ONCE</span><strong>model = FashionMLP()</strong><small>create and register layers</small></div>
+<b>stores ↓</b>
+<div class="model-object-tree"><span>FashionMLP</span><div><i>flatten</i><small>nn.Flatten</small></div><div><i>network.0</i><small>nn.Linear</small></div><div><i>network.1</i><small>nn.ReLU</small></div><div><i>network.2</i><small>nn.Linear</small></div></div>
+<b>reuses for every batch ↓</b>
+<div class="lifecycle-box forward-box"><span>COMPUTATION · REPEATED</span><strong>logits = model(images)</strong><small>run the registered layers</small></div>
+:::
+::: {.light-code-editor .module-code .ownership-code}
+<div class="editor-bar"><span>OWNERSHIP AND COMPUTATION</span><strong>model.py</strong></div>
+<pre><code><span class="py-kw">class</span> FashionMLP(nn.Module):
+    <span class="py-kw">def</span> __init__(self):
+        super().__init__()
+
+        <span class="py-comment"># self.* registers each submodule</span>
+        self.flatten = nn.Flatten()
+        self.network = nn.Sequential(
+            nn.Linear(<span class="py-num">784</span>, <span class="py-num">128</span>),
+            nn.ReLU(),
+            nn.Linear(<span class="py-num">128</span>, <span class="py-num">10</span>),
+        )
+
+    <span class="py-kw">def</span> forward(self, images):
+        <span class="py-comment"># Temporary activations belong to this call</span>
+        x = self.flatten(images)
+        <span class="py-kw">return</span> self.network(x)</code></pre>
+:::
+::::
+
+<div class="course-takeaway-dark module-takeaway"><span>TWO RESPONSIBILITIES</span><strong><code>__init__</code> defines owned components; <code>forward</code> defines the computation performed with them.</strong></div>
+
+<p class="source-note">Module construction follows <a href="https://web.stanford.edu/class/cs224n/materials/CS224N_PyTorch_Tutorial.html">Stanford CS224N · Building a Neural Network</a>.</p>
+
+::: {.notes}
+Contrast parameters with temporary activations: layers belong to the object, whereas x is created anew for each batch. super().__init__ initializes Module's registration machinery.
+:::
+
+## Call the model—do not call `forward` directly
+
+:::: {.module-layout}
+::: {.model-call-visual}
+<div class="call-input"><span>images</span><strong>(64, 1, 28, 28)</strong></div>
+<div class="module-call-shell"><span>model(images)</span><div><small>Module call machinery</small><b>↓</b><strong>forward(images)</strong></div></div>
+<div class="call-output"><span>logits</span><strong>(64, 10)</strong></div>
+<div class="one-row-scores"><span>ONE IMAGE</span><i>−1.2</i><i>0.4</i><i>2.1</i><i>…</i><i>−0.3</i></div>
+:::
+::: {.light-code-editor .module-code}
+<div class="editor-bar"><span>ONE FORWARD PASS</span><strong>forward_pass.py</strong></div>
+<pre><code>model = FashionMLP()
+images = torch.randn(<span class="py-num">64</span>, <span class="py-num">1</span>, <span class="py-num">28</span>, <span class="py-num">28</span>)
+
+<span class="py-comment"># Call the Module object</span>
+logits = model(images)
+
+images.shape
+<span class="py-output"># torch.Size([64, 1, 28, 28])</span>
+
+logits.shape
+<span class="py-output"># torch.Size([64, 10])</span>
+
+<span class="py-comment"># This bypasses Module.__call__</span>
+logits = model.forward(images)  <span class="py-output"># avoid</span></code></pre>
+:::
+::::
+
+<div class="course-takeaway-dark module-takeaway"><span>PUBLIC INTERFACE</span><strong>Use <code>model(batch)</code>. PyTorch's call machinery then invokes your <code>forward</code> method.</strong></div>
+
+<p class="source-note">Calling convention: <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html">PyTorch · nn.Module</a>.</p>
+
+::: {.notes}
+The 64 images remain independent. Raw logits are not probabilities and need not sum to one. Module.__call__ handles registered hooks and framework behavior around forward.
+:::
+
+## Registered layers expose registered parameters
+
+:::: {.module-layout}
+::: {.parameter-tree-visual}
+<div class="parameter-root"><span>FashionMLP</span><strong>101,770 trainable values</strong></div>
+<div class="parameter-branch"><span>network.0 · Linear(784, 128)</span><div><i>weight</i><strong>128 × 784</strong></div><div><i>bias</i><strong>128</strong></div></div>
+<div class="parameter-branch output-branch"><span>network.2 · Linear(128, 10)</span><div><i>weight</i><strong>10 × 128</strong></div><div><i>bias</i><strong>10</strong></div></div>
+<small><b>Flatten</b> and <b>ReLU</b> own no trainable tensors.</small>
+:::
+::: {.light-code-editor .module-code .parameter-code}
+<div class="editor-bar"><span>INSPECT THE MODEL</span><strong>parameters.py</strong></div>
+<pre><code>model = FashionMLP()
+
+<span class="py-comment"># Names reveal where each tensor lives</span>
+<span class="py-kw">for</span> name, parameter <span class="py-kw">in</span> model.named_parameters():
+    print(name, tuple(parameter.shape))
+
+<span class="py-output"># network.0.weight (128, 784)</span>
+<span class="py-output"># network.0.bias   (128,)</span>
+<span class="py-output"># network.2.weight (10, 128)</span>
+<span class="py-output"># network.2.bias   (10,)</span>
+
+<span class="py-comment"># The optimizer will receive these tensors</span>
+trainable = sum(
+    p.numel() <span class="py-kw">for</span> p <span class="py-kw">in</span> model.parameters()
+)
+trainable
+<span class="py-output"># 101770</span></code></pre>
+:::
+::::
+
+<div class="course-takeaway-dark module-takeaway"><span>WHY REGISTRATION MATTERS</span><strong>PyTorch discovers parameters recursively—so optimizers, devices, and checkpoints can act on the complete model.</strong></div>
+
+<p class="source-note">Parameter iteration: <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html">PyTorch · nn.Module</a>.</p>
+
+::: {.notes}
+Calculate the total: 128×784 + 128 + 10×128 + 10 = 101,770. named_parameters is useful for debugging; parameters is normally passed to an optimizer.
+:::
+
+## Move the model and the batch together
+
+:::: {.module-layout}
+::: {.device-pair-visual}
+<div class="device-choice"><span>DEVICE</span><strong>"cuda" if available</strong><small>otherwise "cpu"</small></div>
+<div class="device-arrow">move both ↓</div>
+<div class="device-residents"><div><span>MODEL</span><strong>parameters</strong><small>weights + biases</small></div><div><span>BATCH</span><strong>images</strong><small>input tensors</small></div></div>
+<div class="same-device-rule"><span>FORWARD PASS</span><strong>same device ✓</strong></div>
+:::
+::: {.light-code-editor .module-code .device-code}
+<div class="editor-bar"><span>DEVICE-SAFE FORWARD PASS</span><strong>device.py</strong></div>
+<pre><code>device = (
+    <span class="py-str">"cuda"</span>
+    <span class="py-kw">if</span> torch.cuda.is_available()
+    <span class="py-kw">else</span> <span class="py-str">"cpu"</span>
+)
+
+model = FashionMLP().to(device)
+images = images.to(device)
+
+logits = model(images)
+
+next(model.parameters()).device
+<span class="py-output"># device(type='cuda', index=0)</span>
+
+logits.device
+<span class="py-output"># device(type='cuda', index=0)</span></code></pre>
+:::
+::::
+
+<div class="course-takeaway-dark module-takeaway"><span>ONE LOCATION</span><strong>Operations require tensors on one device; moving the model moves every registered parameter recursively.</strong></div>
+
+<p class="source-note">Device workflow: <a href="https://docs.pytorch.org/tutorials/beginner/basics/buildmodel_tutorial.html">PyTorch · Build the Neural Network</a>.</p>
+
+::: {.notes}
+This cashes out parameter registration. model.to(device) acts recursively because the layers were assigned as submodules. On a CPU machine the displayed device will be cpu.
+:::
+
+# 05 · Data pipeline {.section-slide .data-section data-section-progress="5 / 7" style="--section-progress:71.430%"}
+
+## Two objects, two responsibilities
+
+<div class="data-contract-flow">
+<div class="data-contract dataset-contract"><span>RANDOM ACCESS</span><strong><code>Dataset</code></strong><p>Owns samples and labels. Given one index, returns one example.</p><code>image, label = dataset[17]</code></div>
+<b>wrapped by →</b>
+<div class="data-contract loader-contract"><span>ITERATION POLICY</span><strong><code>DataLoader</code></strong><p>Chooses indices, groups samples, optionally shuffles, and yields batches.</p><code>images, labels = next(iter(loader))</code></div>
+</div>
+
+<div class="data-protocols">
+<div class="protocol-card">
+<span>DATASET PROTOCOL</span>
+<code>__len__()</code>
+<small>How many examples?</small>
+<code>__getitem__(index)</code>
+<small>What is example <i>index</i>?</small>
+</div>
+<div class="protocol-card loader-protocol">
+<span>DATALOADER CONFIGURATION</span>
+<code>batch_size=64</code>
+<small>How many examples per step?</small>
+<code>shuffle=True</code>
+<small>In what order this epoch?</small>
+</div>
+</div>
+
+<p class="source-note">Abstractions: <a href="https://docs.pytorch.org/tutorials/beginner/basics/data_tutorial.html">PyTorch · Datasets &amp; DataLoaders</a>.</p>
+
+::: {.notes}
+Keep the distinction crisp. A Dataset answers questions about one indexed example; a DataLoader controls how examples arrive during iteration. The model should not know filenames, shuffling, or batching policy.
+:::
+
+## Load the same task as two dataset splits
+
+::: {.light-code-editor .full-data-code}
+<div class="editor-bar"><span>FASHION-MNIST DATASETS</span><strong>data.py</strong></div>
+<pre><code><span class="py-kw">from</span> torchvision <span class="py-kw">import</span> datasets
+<span class="py-kw">from</span> torchvision.transforms <span class="py-kw">import</span> v2
+
+transform = v2.Compose([
+    v2.ToImage(),
+    v2.ToDtype(torch.float32, scale=<span class="py-kw">True</span>),
+])
+
+train_data = datasets.FashionMNIST(
+    root=<span class="py-str">"data"</span>, train=<span class="py-kw">True</span>, download=<span class="py-kw">True</span>,
+    transform=transform,
+)
+test_data = datasets.FashionMNIST(
+    root=<span class="py-str">"data"</span>, train=<span class="py-kw">False</span>, download=<span class="py-kw">True</span>,
+    transform=transform,
+)</code></pre>
+:::
+
+<div class="dataset-argument-strip"><div><span><code>root</code></span><strong>where files live</strong></div><div><span><code>train</code></span><strong>60k train or 10k test</strong></div><div><span><code>download</code></span><strong>fetch only if missing</strong></div><div><span><code>transform</code></span><strong>image → float tensor</strong></div></div>
+
+<p class="source-note">Dataset construction follows <a href="https://docs.pytorch.org/tutorials/beginner/basics/quickstart_tutorial.html">PyTorch · Quickstart</a>.</p>
+
+::: {.notes}
+Walk through the arguments rather than reteaching Fashion-MNIST. The modern v2 transform first makes a torchvision image and then converts it to float32 while scaling byte values to [0,1]. The split flag is the only semantic difference between these two objects.
+:::
+
+## Inspect one sample before batching anything
+
+:::: {.sample-inspection-layout}
+::: {.fashion-sample-card}
+<div class="sample-pixels"><div class="sample-shirt">T</div></div>
+<div class="sample-readout"><span>IMAGE</span><strong>1 × 28 × 28</strong><small>float32 · values in [0, 1]</small></div>
+<div class="sample-readout label-readout"><span>LABEL</span><strong>6 → Shirt</strong><small>scalar integer class index</small></div>
+:::
+::: {.light-code-editor .sample-code}
+<div class="editor-bar"><span>VERIFY THE SAMPLE CONTRACT</span><strong>inspect_sample.py</strong></div>
+<pre><code>class_names = [
+    <span class="py-str">"T-shirt/top"</span>, <span class="py-str">"Trouser"</span>, <span class="py-str">"Pullover"</span>,
+    <span class="py-str">"Dress"</span>, <span class="py-str">"Coat"</span>, <span class="py-str">"Sandal"</span>,
+    <span class="py-str">"Shirt"</span>, <span class="py-str">"Sneaker"</span>, <span class="py-str">"Bag"</span>,
+    <span class="py-str">"Ankle boot"</span>,
+]
+
+image, label = train_data[<span class="py-num">0</span>]
+
+image.shape, image.dtype
+<span class="py-output"># (torch.Size([1, 28, 28]), torch.float32)</span>
+
+label, class_names[label]
+<span class="py-output"># (6, 'Shirt')</span>
+
+image.min(), image.max()
+<span class="py-output"># (tensor(0.), tensor(1.))</span></code></pre>
+:::
+::::
+
+<div class="course-takeaway-dark data-takeaway"><span>DEBUG ONE EXAMPLE FIRST</span><strong>Verify shape, dtype, range, and label meaning before a DataLoader hides mistakes inside a batch.</strong></div>
+
+<p class="source-note">Fashion-MNIST sample contract: <a href="https://docs.pytorch.org/tutorials/beginner/basics/data_tutorial.html">PyTorch · Datasets &amp; DataLoaders</a>.</p>
+
+::: {.notes}
+This is the data equivalent of inspecting tensor contracts. The channel axis is present even for grayscale images. The label is an integer index because CrossEntropyLoss expects class indices, not one-hot vectors.
+:::
+
+## `DataLoader` redraws the order, then forms batches
+
+<div class="loader-code-ribbon"><code>train_loader = DataLoader(train_data, batch_size=<b>4</b>, shuffle=<b>True</b>)</code></div>
+
+<div class="shuffle-batch-story">
+<div class="index-row"><span>DATASET INDICES</span><i>0</i><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i><i>10</i><i>11</i></div>
+<div class="story-arrow">shuffle once at the start of each epoch ↓</div>
+<div class="index-row shuffled-row"><span>EPOCH ORDER</span><i>7</i><i>2</i><i>10</i><i>4</i><i>1</i><i>9</i><i>0</i><i>11</i><i>5</i><i>3</i><i>8</i><i>6</i></div>
+<div class="batch-brackets"><div><span>BATCH 1</span><b>7 · 2 · 10 · 4</b></div><div><span>BATCH 2</span><b>1 · 9 · 0 · 11</b></div><div><span>BATCH 3</span><b>5 · 3 · 8 · 6</b></div></div>
+</div>
+
+<div class="loader-policy-row"><div><span>TRAIN</span><strong><code>shuffle=True</code></strong><small>new order each epoch</small></div><div><span>TEST</span><strong><code>shuffle=False</code></strong><small>stable order for evaluation</small></div><div><span>LAST BATCH</span><strong><code>drop_last=False</code></strong><small>may contain fewer samples</small></div></div>
+
+<p class="source-note">Loading semantics: <a href="https://docs.pytorch.org/docs/stable/data.html">PyTorch · torch.utils.data</a>.</p>
+
+::: {.notes}
+Here the visual earns its space: it explains that shuffling changes the index order, not the stored Dataset, and batching then chunks that order. With 60,000 examples and batch size 64, the final training batch has 32 examples unless drop_last=True.
+:::
+
+## The training loop receives tensors—not samples
+
+:::: {.batch-loop-layout}
+::: {.light-code-editor .batch-loop-code}
+<div class="editor-bar"><span>ONE LOADER ITERATION</span><strong>batches.py</strong></div>
+<pre><code><span class="py-kw">from</span> torch.utils.data <span class="py-kw">import</span> DataLoader
+
+train_loader = DataLoader(
+    train_data,
+    batch_size=<span class="py-num">64</span>,
+    shuffle=<span class="py-kw">True</span>,
+)
+
+<span class="py-kw">for</span> images, labels <span class="py-kw">in</span> train_loader:
+    images = images.to(device)
+    labels = labels.to(device)
+
+    logits = model(images)
+    <span class="py-kw">break</span>
+
+images.shape   <span class="py-output"># torch.Size([64, 1, 28, 28])</span>
+labels.shape   <span class="py-output"># torch.Size([64])</span>
+logits.shape   <span class="py-output"># torch.Size([64, 10])</span></code></pre>
+:::
+::: {.batch-contract-panel}
+<span>ONE ITERATION</span>
+<div><small>FEATURES</small><strong>images</strong><code>(B, 1, 28, 28)</code></div>
+<b>→ model →</b>
+<div class="logit-batch"><small>PREDICTIONS</small><strong>logits</strong><code>(B, 10)</code></div>
+<div><small>TARGETS</small><strong>labels</strong><code>(B,)</code></div>
+<p><code>B</code> is the current batch size—not necessarily always 64.</p>
+:::
+::::
+
+<div class="course-takeaway-dark data-takeaway"><span>THE LOOP CONTRACT</span><strong>Every iteration supplies one feature batch and its matching target batch; the model preserves the batch axis.</strong></div>
+
+<p class="source-note">Iteration pattern: <a href="https://docs.pytorch.org/tutorials/beginner/basics/data_tutorial.html">PyTorch · Datasets &amp; DataLoaders</a>.</p>
+
+::: {.notes}
+This is the bridge to optimization. Stress B rather than 64 because the final batch can be smaller. Moving images and labels happens inside the loop; the Dataset normally remains in host memory. The next section will replace break with loss, backward, and optimizer steps.
+:::
+
+# 06 · Train and validate {.section-slide .loop-section data-section-progress="6 / 7" style="--section-progress:85.716%"}
+
+## Choose what to minimize—and how to move
+
+<div class="optimization-pair">
+<div class="optimization-role loss-role"><span>OBJECTIVE</span><strong><code>nn.CrossEntropyLoss</code></strong><p>Compares the model’s <b>logits</b> with integer class labels.</p><div><code>(B, 10)</code><b> + </b><code>(B,)</code><b> → </b><code>()</code></div></div>
+<div class="optimization-role optimizer-role"><span>UPDATE RULE</span><strong><code>torch.optim.SGD</code></strong><p>Uses registered parameter gradients to change the model.</p><div><code>parameters</code><b> + </b><code>lr=1e-3</code></div></div>
+</div>
+
+::: {.light-code-editor .setup-code}
+<div class="editor-bar"><span>OPTIMIZATION OBJECTS</span><strong>configure.py</strong></div>
+<pre><code>loss_fn = nn.CrossEntropyLoss()
+
+optimizer = torch.optim.SGD(
+    model.parameters(),
+    lr=<span class="py-num">1e-3</span>,
+)
+
+logits = model(images)       <span class="py-output"># (B, 10)</span>
+loss = loss_fn(logits, labels)
+loss.shape                   <span class="py-output"># torch.Size([])</span></code></pre>
+:::
+
+<div class="course-takeaway-dark loop-takeaway"><span>KEEP LOGITS RAW</span><strong><code>CrossEntropyLoss</code> applies the required log-softmax internally; do not add softmax to the model.</strong></div>
+
+<p class="source-note">Loss and optimizer setup: <a href="https://docs.pytorch.org/tutorials/beginner/basics/optimization_tutorial.html">PyTorch · Optimizing Model Parameters</a>.</p>
+
+::: {.notes}
+Connect to the five-part frame: the model is the hypothesis, CrossEntropyLoss is the objective, and SGD is the optimization rule. The loss reduces a batch to the scalar root needed by backward.
+:::
+
+## One batch performs one parameter update
+
+:::: {.training-step-layout}
+::: {.step-rail}
+<div><span>1</span><strong>clear</strong><small>remove old gradients</small></div>
+<div><span>2</span><strong>forward</strong><small>compute logits</small></div>
+<div><span>3</span><strong>loss</strong><small>compare with labels</small></div>
+<div><span>4</span><strong>backward</strong><small>populate <code>.grad</code></small></div>
+<div><span>5</span><strong>step</strong><small>update parameters</small></div>
+:::
+::: {.light-code-editor .training-step-code}
+<div class="editor-bar"><span>ONE OPTIMIZATION STEP</span><strong>train_step.py</strong></div>
+<pre><code>images = images.to(device)
+labels = labels.to(device)
+
+<span class="py-comment"># 1 · Start this batch with empty gradients</span>
+optimizer.zero_grad()
+
+<span class="py-comment"># 2–3 · Build the graph and its scalar loss</span>
+logits = model(images)
+loss = loss_fn(logits, labels)
+
+<span class="py-comment"># 4 · Differentiate the current graph</span>
+loss.backward()
+
+<span class="py-comment"># 5 · Use gradients to change parameters</span>
+optimizer.step()</code></pre>
+:::
+::::
+
+<div class="step-invariant"><span>ORDER IS STATE</span><code>zero_grad → forward → loss → backward → step</code><strong>Changing this order changes the computation.</strong></div>
+
+<p class="source-note">Training-step order: <a href="https://docs.pytorch.org/tutorials/beginner/basics/optimization_tutorial.html">PyTorch · Optimization Loop</a>.</p>
+
+::: {.notes}
+Retrieve the manual regression update from autograd, then show what the optimizer encapsulates. zero_grad may also be placed after step if it is guaranteed to run before the next backward; this lecture uses the start-of-batch convention because its state is explicit.
+:::
+
+## Package the training behavior for one epoch
+
+:::: {.epoch-function-layout}
+<div class="epoch-contract" markdown="0">
+<span>INPUTS</span>
+<code>model</code><code>loader</code><code>loss_fn</code><code>optimizer</code><code>device</code>
+<b>↓ iterate over every batch ↓</b>
+<span>OUTPUT</span>
+<strong>mean training loss</strong>
+<small>The function mutates model parameters.</small>
+</div>
+
+::: {.light-code-editor .epoch-function-code}
+<div class="editor-bar"><span>TRAIN ONE EPOCH</span><strong>train.py</strong></div>
+<pre><code><span class="py-kw">def</span> train_one_epoch(model, loader, loss_fn, optimizer, device):
+    model.train()
+    total_loss = <span class="py-num">0.0</span>
+
+    <span class="py-kw">for</span> images, labels <span class="py-kw">in</span> loader:
+        images = images.to(device)
+        labels = labels.to(device)
+
+        optimizer.zero_grad()
+        logits = model(images)
+        loss = loss_fn(logits, labels)
+        loss.backward()
+        optimizer.step()
+
+        total_loss += loss.item() * images.size(<span class="py-num">0</span>)
+
+    <span class="py-kw">return</span> total_loss / len(loader.dataset)</code></pre>
+:::
+::::
+
+<div class="course-takeaway-dark loop-takeaway"><span><code>model.train()</code></span><strong>Set training behavior explicitly at the start of the function—even when today’s MLP has no dropout or batch normalization.</strong></div>
+
+<p class="source-note">Epoch structure adapted from <a href="https://docs.pytorch.org/tutorials/beginner/basics/optimization_tutorial.html">PyTorch · Full Implementation</a>.</p>
+
+::: {.notes}
+The explicit function boundary makes mutation visible: parameters change, and the returned value is only a summary. Multiplying mean batch loss by batch size prepares an example-weighted epoch average, which matters when the last batch is smaller.
+:::
+
+## Validation changes state—but never parameters
+
+<div class="mode-comparison">
+<div class="mode-column training-mode"><span>TRAINING</span><code>model.train()</code><strong>gradients enabled</strong><strong>optimizer.step()</strong><small>parameters change</small></div>
+<div class="mode-column validation-mode"><span>VALIDATION</span><code>model.eval()</code><strong><code>torch.inference_mode()</code></strong><strong>no optimizer</strong><small>parameters stay fixed</small></div>
+</div>
+
+::: {.light-code-editor .validation-code}
+<div class="editor-bar"><span>VALIDATION LOOP</span><strong>validate.py</strong></div>
+<pre><code><span class="py-kw">def</span> validate(model, loader, loss_fn, device):
+    model.eval()
+    total_loss, total_correct = <span class="py-num">0.0</span>, <span class="py-num">0</span>
+
+    <span class="py-kw">with</span> torch.inference_mode():
+        <span class="py-kw">for</span> images, labels <span class="py-kw">in</span> loader:
+            images = images.to(device)
+            labels = labels.to(device)
+            logits = model(images)
+
+            total_loss += loss_fn(logits, labels).item() * images.size(<span class="py-num">0</span>)
+            total_correct += (logits.argmax(dim=<span class="py-num">1</span>) == labels).sum().item()
+
+    n = len(loader.dataset)
+    <span class="py-kw">return</span> total_loss / n, total_correct / n</code></pre>
+:::
+
+<p class="source-note">Evaluation pattern: <a href="https://docs.pytorch.org/tutorials/beginner/basics/quickstart_tutorial.html">PyTorch · Quickstart</a>.</p>
+
+::: {.notes}
+Separate the two independent switches. eval changes module behavior such as dropout and batch normalization; inference_mode disables autograd work. Neither one updates parameters. They are both worth using even though this first MLP behaves identically in train and eval mode.
+:::
+
+## Average over examples—not over batches
+
+:::: {.metric-aggregation-layout}
+::: {.uneven-batch-example}
+<span>TWO VALIDATION BATCHES</span>
+<div><strong>64 examples</strong><code>mean loss = 0.50</code><small>loss sum = 32.0</small></div>
+<div><strong>16 examples</strong><code>mean loss = 1.00</code><small>loss sum = 16.0</small></div>
+<div class="wrong-average"><span>WRONG</span><code>(0.50 + 1.00) / 2 = 0.75</code></div>
+<div class="right-average"><span>CORRECT</span><code>(32 + 16) / 80 = 0.60</code></div>
+:::
+::: {.light-code-editor .metric-code}
+<div class="editor-bar"><span>EXAMPLE-WEIGHTED METRICS</span><strong>metrics.py</strong></div>
+<pre><code>total_loss = <span class="py-num">0.0</span>
+total_correct = <span class="py-num">0</span>
+
+<span class="py-kw">for</span> images, labels <span class="py-kw">in</span> loader:
+    logits = model(images)
+    loss = loss_fn(logits, labels)
+
+    batch_size = images.size(<span class="py-num">0</span>)
+    total_loss += loss.item() * batch_size
+    total_correct += (
+        logits.argmax(dim=<span class="py-num">1</span>) == labels
+    ).sum().item()
+
+n = len(loader.dataset)
+mean_loss = total_loss / n
+accuracy = total_correct / n</code></pre>
+:::
+::::
+
+<div class="course-takeaway-dark loop-takeaway"><span>WHY WEIGHT?</span><strong>A mean-of-batch-means gives a small final batch the same influence as a full batch.</strong></div>
+
+<p class="source-note">Metric loop extends <a href="https://docs.pytorch.org/tutorials/beginner/basics/optimization_tutorial.html">PyTorch · Optimizing Model Parameters</a>.</p>
+
+::: {.notes}
+This numerical counterexample motivates the accumulation rule. It applies whenever reduction='mean' produces each batch loss. Accuracy already counts correct examples, so only divide the total count once at the end.
+:::
+
+# 07 · Reusable system {.section-slide .system-section data-section-progress="7 / 7" style="--section-progress:100%"}
+
+## The outer loop coordinates complete epochs
+
+::: {.light-code-editor .driver-code}
+<div class="editor-bar"><span>TRAINING DRIVER</span><strong>main.py</strong></div>
+<pre><code>epochs = <span class="py-num">10</span>
+
+<span class="py-kw">for</span> epoch <span class="py-kw">in</span> range(<span class="py-num">1</span>, epochs + <span class="py-num">1</span>):
+    train_loss = train_one_epoch(
+        model, train_loader, loss_fn, optimizer, device
+    )
+    val_loss, val_accuracy = validate(
+        model, test_loader, loss_fn, device
+    )
+
+    print(
+        <span class="py-str">f"epoch {epoch:02d} | "</span>
+        <span class="py-str">f"train loss {train_loss:.4f} | "</span>
+        <span class="py-str">f"val loss {val_loss:.4f} | "</span>
+        <span class="py-str">f"val accuracy {val_accuracy:.1%}"</span>
+    )
+
+<span class="py-output"># epoch 01 | train loss 1.8742 | val loss 1.6128 | val accuracy 42.7%</span>
+<span class="py-output"># ...</span>
+<span class="py-output"># epoch 10 | train loss 0.5216 | val loss 0.5489 | val accuracy 80.4%</span></code></pre>
+:::
+
+<div class="driver-boundaries"><div><span>TRAIN</span><strong>parameters change</strong></div><b>→</b><div><span>VALIDATE</span><strong>measure frozen model</strong></div><b>→</b><div><span>REPORT</span><strong>one record per epoch</strong></div></div>
+
+<p class="source-note">Driver structure adapted from <a href="https://docs.pytorch.org/tutorials/beginner/basics/optimization_tutorial.html">PyTorch · Optimizing Model Parameters</a>.</p>
+
+::: {.notes}
+This loop is deliberately boring: orchestration should be easy to read because the complicated behavior lives in named functions. Validation follows training once per epoch; it does not participate in gradient updates.
+:::
+
+## Keep the best validation state—not merely the last
+
+<div class="best-state-rule"><span>MODEL-SELECTION RULE</span><strong>Replace the checkpoint only when validation loss improves.</strong><p>The test/validation signal chooses among training states; it must never call <code>optimizer.step()</code>.</p></div>
+
+:::: {.best-checkpoint-layout}
+::: {.validation-history}
+<div><span>EPOCH 1</span><strong>0.82</strong><small>save ✓</small></div>
+<div><span>EPOCH 2</span><strong>0.67</strong><small>save ✓</small></div>
+<div class="best-epoch"><span>EPOCH 3</span><strong>0.61</strong><small>save ✓ · best</small></div>
+<div><span>EPOCH 4</span><strong>0.65</strong><small>keep epoch 3</small></div>
+<div><span>EPOCH 5</span><strong>0.69</strong><small>keep epoch 3</small></div>
+:::
+::: {.light-code-editor .best-checkpoint-code}
+<div class="editor-bar"><span>SELECT AND SAVE</span><strong>checkpoint.py</strong></div>
+<pre><code>best_val_loss = float(<span class="py-str">"inf"</span>)
+
+<span class="py-kw">for</span> epoch <span class="py-kw">in</span> range(<span class="py-num">1</span>, epochs + <span class="py-num">1</span>):
+    train_loss = train_one_epoch(
+        model, train_loader, loss_fn, optimizer, device
+    )
+    val_loss, val_accuracy = validate(
+        model, test_loader, loss_fn, device
+    )
+
+    <span class="py-kw">if</span> val_loss &lt; best_val_loss:
+        best_val_loss = val_loss
+        torch.save(
+            model.state_dict(),
+            <span class="py-str">"fashion_mlp.pth"</span>,
+        )</code></pre>
+:::
+::::
+
+<p class="source-note">State saving follows <a href="https://docs.pytorch.org/tutorials/beginner/saving_loading_models.html">PyTorch · Saving and Loading Models</a>.</p>
+
+::: {.notes}
+Use validation loss for the example because it is continuous and aligns with the objective. In a real project choose the selection metric before training. This simple checkpoint stores only inference weights; resuming training would also require optimizer state and epoch metadata.
+:::
+
+## A `state_dict` stores values—not the architecture
+
+:::: {.state-dict-comparison}
+::: {.light-code-editor .save-state-code}
+<div class="editor-bar"><span>SAVE VALUES</span><strong>save.py</strong></div>
+<pre><code>state = model.state_dict()
+
+state.keys()
+<span class="py-output"># odict_keys([</span>
+<span class="py-output">#   'network.0.weight',</span>
+<span class="py-output">#   'network.0.bias',</span>
+<span class="py-output">#   'network.2.weight',</span>
+<span class="py-output">#   'network.2.bias'</span>
+<span class="py-output"># ])</span>
+
+torch.save(state, <span class="py-str">"fashion_mlp.pth"</span>)</code></pre>
+:::
+::: {.light-code-editor .load-state-code}
+<div class="editor-bar"><span>REBUILD, THEN LOAD</span><strong>load.py</strong></div>
+<pre><code><span class="py-comment"># Architecture comes from Python code</span>
+restored = FashionMLP().to(device)
+
+<span class="py-comment"># The file supplies matching tensor values</span>
+state = torch.load(
+    <span class="py-str">"fashion_mlp.pth"</span>,
+    map_location=device,
+    weights_only=<span class="py-kw">True</span>,
+)
+restored.load_state_dict(state)
+<span class="py-output"># &lt;All keys matched successfully&gt;</span>
+
+restored.eval()</code></pre>
+:::
+::::
+
+<div class="state-equation"><strong>class definition</strong><b> + </b><strong>state dictionary</strong><b> = </b><strong>restored model</strong></div>
+
+<p class="source-note">Recommended pattern: <a href="https://docs.pytorch.org/tutorials/beginner/basics/saveloadrun_tutorial.html">PyTorch · Save and Load the Model</a>.</p>
+
+::: {.notes}
+This reconnects to registered parameters. state_dict keys mirror the module tree seen earlier. Recreate the architecture first, then load values into it. weights_only=True limits loading to tensor state, and map_location makes the file portable across devices.
+:::
+
+## Inference is a small, explicit pipeline
+
+:::: {.inference-layout}
+::: {.inference-result}
+<span>ONE TEST IMAGE</span>
+<div class="inference-shirt">T</div>
+<div class="prediction-rank"><i style="--score:92%"><span>Shirt · logit</span><b>2.92</b></i><i style="--score:48%"><span>T-shirt · logit</span><b>1.31</b></i><i style="--score:22%"><span>Coat · logit</span><b>0.12</b></i></div>
+<strong>prediction: Shirt</strong>
+<small>target: Shirt</small>
+:::
+::: {.light-code-editor .inference-code}
+<div class="editor-bar"><span>PREDICT ONE EXAMPLE</span><strong>predict.py</strong></div>
+<pre><code>model = FashionMLP().to(device)
+state = torch.load(
+    <span class="py-str">"fashion_mlp.pth"</span>,
+    map_location=device,
+    weights_only=<span class="py-kw">True</span>,
+)
+model.load_state_dict(state)
+model.eval()
+
+image, target = test_data[<span class="py-num">0</span>]
+image = image.unsqueeze(<span class="py-num">0</span>).to(device)
+
+<span class="py-kw">with</span> torch.inference_mode():
+    logits = model(image)
+    predicted = logits.argmax(dim=<span class="py-num">1</span>).item()
+
+class_names[predicted], class_names[target]
+<span class="py-output"># ('Shirt', 'Shirt')</span></code></pre>
+:::
+::::
+
+<div class="course-takeaway-dark system-takeaway"><span>COMPLETE SYSTEM</span><strong>transform → batch → model → loss → gradients → update → validate → save → restore → predict</strong></div>
+
+<p class="source-note">Inference workflow adapted from <a href="https://docs.pytorch.org/tutorials/beginner/basics/quickstart_tutorial.html">PyTorch · Quickstart</a>.</p>
+
+::: {.notes}
+The single sample lacks a batch axis, so unsqueeze restores shape (1,1,28,28). argmax selects the largest logit; probabilities are unnecessary if only the winning class is needed. End by reading the complete system chain aloud and pointing back to the seven-section progress bar.
+:::

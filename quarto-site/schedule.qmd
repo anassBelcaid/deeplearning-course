@@ -184,10 +184,12 @@ Turn the mechanics into a reusable training system.
 Tensors, autograd, modules, data loaders, devices, and training loops.
 :::
 :::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span>[Slides](lectures/06-pytorch/index.html){.material-pill .available}<span class="material-pill muted">Notebook</span>
 :::
 :::{.links-cell}
-<span class="coming-soon">PyTorch documentation · Exercises</span>
+<a class="resource-mini read required" href="https://docs.pytorch.org/tutorials/beginner/basics/intro.html"><i>◫</i><span>PyTorch · Learn the Basics</span></a>
+<a class="resource-mini read required" href="https://docs.pytorch.org/tutorials/beginner/basics/quickstart_tutorial.html"><i>◫</i><span>PyTorch · Quickstart</span></a>
+<a class="resource-mini read" href="https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html"><i>◫</i><span>PyTorch · Automatic differentiation</span></a>
 :::
 :::{.project-cell .track-start}
 <span class="project-label">Project 2 · Vision system</span><br>Training pipeline checkpoint.
