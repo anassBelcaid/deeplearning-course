@@ -213,7 +213,7 @@ From spatial structure to modern visual systems.
 Convolution, padding, stride, receptive fields, pooling, and features.
 :::
 :::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span>[Slides](lectures/07-convolutional-networks/index.html){.material-pill .available}<span class="material-pill muted">Notebook</span>
 :::
 :::{.links-cell}
 <span class="coming-soon">Interactive convolution demo</span>
