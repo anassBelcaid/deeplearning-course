@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 720" role="img" aria-labelledby="title desc">
+  <title id="title">Convolutional feature hierarchy</title>
+  <desc id="desc">An image grid is scanned by a small filter, producing feature maps that grow into a hierarchy of edges, motifs, and an object part.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#102835"/><stop offset="1" stop-color="#07151d"/></linearGradient>
+    <pattern id="grid" width="42" height="42" patternUnits="userSpaceOnUse"><path d="M42 0H0V42" fill="none" stroke="#b8d8e4" stroke-opacity=".28" stroke-width="2"/></pattern>
+    <filter id="shadow"><feDropShadow dx="0" dy="12" stdDeviation="12" flood-opacity=".25"/></filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0L12 6L0 12Z" fill="#ef6b52"/></marker>
+  </defs>
+  <rect width="1440" height="720" fill="url(#bg)"/>
+  <circle cx="1240" cy="100" r="260" fill="#0f8f98" opacity=".12"/><circle cx="180" cy="690" r="300" fill="#ef6b52" opacity=".1"/>
+  <g filter="url(#shadow)">
+    <rect x="90" y="120" width="390" height="390" rx="14" fill="#f8fbfc"/>
+    <rect x="115" y="145" width="340" height="340" fill="url(#grid)" stroke="#90b6c4" stroke-width="3"/>
+    <path d="M145 405C220 278 310 352 425 205" fill="none" stroke="#192d38" stroke-width="28" stroke-linecap="round"/>
+    <rect x="268" y="265" width="126" height="126" fill="#ef6b52" fill-opacity=".2" stroke="#ef6b52" stroke-width="7"/>
+  </g>
+  <path d="M510 315H630" stroke="#ef6b52" stroke-width="8" marker-end="url(#arrow)"/>
+  <g filter="url(#shadow)">
+    <rect x="665" y="178" width="265" height="265" rx="12" fill="#edf6f8" stroke="#55aab0" stroke-width="5"/>
+    <g fill="none" stroke="#168994" stroke-width="16" stroke-linecap="round"><path d="M705 375L800 240"/><path d="M790 386L880 255"/></g>
+    <rect x="700" y="213" width="196" height="196" fill="url(#grid)" opacity=".45"/>
+  </g>
+  <path d="M960 315H1055" stroke="#ef6b52" stroke-width="8" marker-end="url(#arrow)"/>
+  <g filter="url(#shadow)">
+    <rect x="1090" y="135" width="265" height="350" rx="14" fill="#f7f3fb" stroke="#8d70b5" stroke-width="5"/>
+    <path d="M1130 312Q1220 218 1315 312Q1220 408 1130 312Z" fill="none" stroke="#7655ad" stroke-width="18"/>
+    <circle cx="1222" cy="312" r="43" fill="#7655ad"/><circle cx="1208" cy="296" r="12" fill="#fff" opacity=".8"/>
+  </g>
+</svg>

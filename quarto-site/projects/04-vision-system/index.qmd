@@ -1,0 +1,93 @@
+---
+title: "Project 2 · The Vision Training System"
+subtitle: "One PyTorch pipeline, two models: MLP first, CNN next"
+description: "A two-session coding project on datasets, augmentation, models, devices, schedulers, checkpoints, and fair MLP–CNN comparison."
+toc: true
+toc-depth: 2
+page-layout: article
+---
+
+:::{.project-brief}
+<span><strong>Duration:</strong> Two sessions × 1h30</span>
+<span><strong>Mode:</strong> Individual or pairs</span>
+<span><strong>Format:</strong> Guided Jupyter notebook</span>
+<span><strong>Deliverable:</strong> Executed notebook, comparison table, and short technical conclusions</span>
+:::
+
+## The continuous experiment
+
+You will build one reusable CIFAR-10 training system, then change its hypothesis while keeping the experimental protocol visible.
+
+```{mermaid}
+flowchart LR
+    A[CIFAR-10] --> B[Transforms]
+    B --> C[DataLoaders]
+    C --> D[MLP]
+    C --> E[CNN]
+    D --> F[Shared train/validate API]
+    E --> F
+    F --> G[Scheduler + checkpoint]
+    G --> H[Fair comparison]
+```
+
+The first session practices the PyTorch machinery from Chapter 6. The second session begins after convolution is taught and focuses on declaring and inspecting a CNN. Dataset, optimizer, scheduler, metric, and checkpoint interfaces remain stable.
+
+[Open notebook](starter/vision_training_system.ipynb){.btn .btn-primary}
+
+<a class="btn btn-secondary" href="/projects/04-vision-system/starter/vision_training_system.ipynb?download=1" download="vision_training_system.ipynb">Download notebook</a>
+
+[Open in Google Colab](https://colab.research.google.com/github/anassBelcaid/deeplearning/blob/redesign/quarto-2026/quarto-site/projects/04-vision-system/starter/vision_training_system.ipynb){.btn .btn-secondary}
+
+## Session 1 · PyTorch system with an MLP
+
+1. Inspect CIFAR-10 and define training/evaluation transforms.
+2. Visualize repeated stochastic augmentations of one image.
+3. Build reproducible train, validation, and test loaders.
+4. Define an MLP and verify every tensor shape.
+5. Compute its parameter count analytically and programmatically.
+6. Configure cross-entropy, optimizers, and a learning-rate scheduler.
+7. Train the same initialized model on CPU and GPU and compare measured time.
+8. Save a resumable checkpoint.
+
+## Session 2 · Replace the hypothesis with a CNN
+
+The CNN section is explicitly reserved until convolution has been introduced. Students then:
+
+1. declare convolutional blocks and trace spatial shapes;
+2. compute the CNN parameter count;
+3. train directly on GPU when available;
+4. use the fixed AdamW optimizer and cosine scheduler;
+5. compare the MLP and CNN under the same data split and metrics;
+6. reload a checkpoint and continue training without resetting optimizer or scheduler state.
+
+:::{.callout-important}
+## Fair comparison contract
+
+MLP and CNN runs must use the same split, class mapping, validation metric, epoch accounting, and augmentation policy. Session 2 changes the model family—not every experimental decision at once.
+:::
+
+## Assessment boundaries
+
+At the end of Session 1, students are assessed on tensors, transforms, loaders, modules, parameter counting, loss/optimizer configuration, devices, schedulers, and checkpoints.
+
+The CNN implementation is not a Session 1 requirement. Its scaffold is labeled as locked infrastructure until the convolution lecture. After that lecture, declaring the CNN and explaining its shape changes become assessed work.
+
+## Submission standard
+
+Restart the kernel and run the notebook from top to bottom for the completed session. Submit:
+
+- passing checks for all unlocked TODOs;
+- an augmentation gallery;
+- MLP and CNN parameter counts with a written calculation;
+- a CPU/GPU timing table with the hardware named;
+- training/validation curves and learning-rate history;
+- a checkpoint-resume demonstration; and
+- a conclusion that separates speed, optimization, and generalization claims.
+
+## References
+
+- [PyTorch · Datasets and DataLoaders](https://docs.pytorch.org/tutorials/beginner/basics/data_tutorial.html)
+- [TorchVision · Transforming and augmenting images](https://docs.pytorch.org/vision/stable/transforms.html)
+- [PyTorch · Optimizing model parameters](https://docs.pytorch.org/tutorials/beginner/basics/optimization_tutorial.html)
+- [PyTorch · Learning-rate schedulers](https://docs.pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate)
+- [PyTorch · Saving and loading models](https://docs.pytorch.org/tutorials/beginner/saving_loading_models.html)

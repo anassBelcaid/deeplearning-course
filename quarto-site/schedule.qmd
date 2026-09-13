@@ -184,7 +184,7 @@ Turn the mechanics into a reusable training system.
 Tensors, autograd, modules, data loaders, devices, and training loops.
 :::
 :::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span>[Slides](lectures/06-pytorch/index.html){.material-pill .available}<span class="material-pill muted">Notebook</span>
+[Notes](notes/06-pytorch/index.html){.material-pill .available}[PDF](notes/06-pytorch/index.pdf){.material-pill .available}[Slides](lectures/06-pytorch/index.html){.material-pill .available}[Notebook](projects/04-vision-system/starter/vision_training_system.ipynb){.material-pill .available}
 :::
 :::{.links-cell}
 <a class="resource-mini read required" href="https://docs.pytorch.org/tutorials/beginner/basics/intro.html"><i>◫</i><span>PyTorch · Learn the Basics</span></a>
@@ -192,7 +192,7 @@ Tensors, autograd, modules, data loaders, devices, and training loops.
 <a class="resource-mini read" href="https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html"><i>◫</i><span>PyTorch · Automatic differentiation</span></a>
 :::
 :::{.project-cell .track-start}
-<span class="project-label">Project 2 · Vision system</span><br>Training pipeline checkpoint.
+<a class="project-track-link" href="projects/04-vision-system/index.html"><span class="project-label">Project 2 · Vision system</span><br>Build the MLP training pipeline.</a>
 :::
 :::
 
@@ -213,13 +213,15 @@ From spatial structure to modern visual systems.
 Convolution, padding, stride, receptive fields, pooling, and features.
 :::
 :::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span>[Slides](lectures/07-convolutional-networks/index.html){.material-pill .available}<span class="material-pill muted">Notebook</span>
+[Notes](notes/07-convolutional-networks/index.html){.material-pill .available}[PDF](notes/07-convolutional-networks/index.pdf){.material-pill .available}[Slides](lectures/07-convolutional-networks/index.html){.material-pill .available}[Notebook](projects/04-vision-system/starter/vision_training_system.ipynb){.material-pill .available}
 :::
 :::{.links-cell}
-<span class="coming-soon">Interactive convolution demo</span>
+<a class="resource-mini read required" href="https://cs231n.github.io/convolutional-networks/"><i>◫</i><span>CS231n · Convolutional networks</span></a>
+<a class="resource-mini read" href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Conv2d.html"><i>◫</i><span>PyTorch · Conv2d contract</span></a>
+<a class="resource-mini read" href="https://arxiv.org/abs/1701.04128"><i>◫</i><span>Luo et al. · Effective receptive fields</span></a>
 :::
 :::{.project-cell .track-middle}
-<span class="project-label">Project 2</span><br>Implement and train a CNN.
+<a class="project-track-link" href="projects/04-vision-system/index.html"><span class="project-label">Project 2 · Vision system</span><br>Replace the MLP with a CNN and resume training.</a>
 :::
 :::
 

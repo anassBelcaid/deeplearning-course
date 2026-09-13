@@ -59,6 +59,19 @@
 .course-network-diagram svg { display:block; max-width:100%; margin:0 auto; }
 .course-network-diagram .network-edge { stroke:color-mix(in srgb,var(--blue) 24%,white); stroke-width:2; }
 .course-network-diagram .network-node { fill:white; stroke:var(--node-color,var(--blue)); stroke-width:4; }
+
+/* Approved light code-editor language for technical lectures. */
+.light-code-editor { overflow:hidden; border:2px solid #bfd0dc; border-radius:17px; background:#fbfcfd; box-shadow:0 8px 24px rgba(23,33,43,.07); }
+.editor-bar { display:flex; padding:12px 20px; border-bottom:2px solid #d8e2e8; background:#edf3f6; align-items:center; justify-content:space-between; }
+.editor-bar span { color:#2377c9; font:800 11px/1 "DM Mono",monospace; letter-spacing:.07em; }
+.editor-bar strong { color:#526573; font:600 13px/1 "DM Mono",monospace; }
+.light-code-editor pre { width:auto; max-height:none!important; margin:0; padding:20px 23px; overflow:visible!important; background:transparent; box-shadow:none; }
+.light-code-editor pre code { max-height:none!important; padding:0!important; overflow:visible!important; background:transparent!important; color:#17212b; font:500 17px/1.47 "DM Mono",monospace; white-space:pre; }
+.light-code-editor .py-kw { color:#7258a8; font-weight:800; }
+.light-code-editor .py-num { color:#c45a19; }
+.light-code-editor .py-str { color:#29845a; }
+.light-code-editor .py-comment { display:block; color:#61788a; font-style:italic; }
+.light-code-editor .py-output { color:#29845a; }
 .big-summary { margin-top:.8em!important; color:var(--blue); text-align:center; font-family:"Newsreader",serif; font-size:1.2em; font-weight:600; }
 .danger-line { margin-top:1em!important; color:var(--coral); text-align:center; font-weight:700; }
 .timeline { margin-top:1.2em; padding-top:.7em; border-top:2px solid var(--line); color:var(--muted); text-align:center; font-size:.54em; }

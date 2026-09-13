@@ -147,7 +147,7 @@
 .cat-photo p { width: 100%; height: 100%; margin: 0 !important; }
 .cat-photo img { display: block; width: 520px !important; height: auto !important; max-width: none !important; margin: 0 !important; transform: translate(-2px,-15px); }
 .mistake-example > p:has(.cat-source) { margin: .08em 0 !important; text-align: center; }
-.cat-source { display: block; color: var(--muted); font-family: "DM Mono", monospace; font-size: .25em; text-align: center; }
+.cat-source { display: block; color: var(--muted); font-family: "DM Mono", monospace; font-size: 12px; line-height: 1.25; text-align: center; }
 .cat-source a { color: var(--blue); }
 .target-label { text-align: center; }
 .target-label small,

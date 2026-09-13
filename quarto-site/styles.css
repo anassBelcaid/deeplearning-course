@@ -214,6 +214,18 @@
 .course-button.primary { background: var(--ink); color: white; }
 .course-button:hover { background: var(--signal); border-color: var(--signal); color: white; }
 
+.hero-art p { margin: 0; }
+
+.course-thumbnail {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border: 1px solid rgba(23, 33, 43, .18);
+  border-radius: 18%;
+  box-shadow: 18px 18px 0 var(--signal);
+}
+
 .network-mark {
   position: relative;
   aspect-ratio: 1;
@@ -436,6 +448,13 @@
 .learning-objectives h3 { margin-top: 0; color: var(--foundations); font-size: 1.15rem; }
 .learning-objectives ol { margin-bottom: 0; }
 .learning-objectives li { margin-bottom: .45rem; }
+
+/* Notes chapters: section headings organize the chapter; they are not page titles. */
+main.content section.level1 > h1 {
+  margin-top: 2.8rem;
+  font-size: clamp(1.65rem, 2.25vw, 2.15rem);
+  line-height: 1.14;
+}
 
 .paradigm-compare, .fit-generalize { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.7rem 0; }
 .paradigm-card, .fit-panel { padding: 1.4rem; border: 1px solid var(--line); background: rgba(255,253,247,.55); }

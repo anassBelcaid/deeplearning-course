@@ -82,6 +82,38 @@ These notes are written as a connected textbook rather than lecture transcripts.
 :::
 :::
 
+## Part IV · PyTorch Fundamentals
+
+:::{.chapter-list}
+:::{.chapter-entry .available .pytorch}
+<span class="chapter-number">06</span>
+
+:::{.chapter-copy}
+### [Building Training Systems with PyTorch](notes/06-pytorch/index.qmd)
+
+[![](lectures/06-pytorch/assets/pytorch-tensor-hero.png){fig-alt="Preview of Chapter 6: a Python-like ribbon passing through a tensor cube."}](notes/06-pytorch/index.qmd)
+:::
+
+<span class="chapter-state">Read chapter →</span>
+:::
+:::
+
+## Part V · Learning from Images
+
+:::{.chapter-list}
+:::{.chapter-entry .available .vision}
+<span class="chapter-number">07</span>
+
+:::{.chapter-copy}
+### [Convolutional Neural Networks](notes/07-convolutional-networks/index.qmd)
+
+[![](notes/07-convolutional-networks/assets/chapter-cover.svg){fig-alt="Preview of Chapter 7: local pixels become shared feature responses and then a composed visual part."}](notes/07-convolutional-networks/index.qmd)
+:::
+
+<span class="chapter-state">Read chapter →</span>
+:::
+:::
+
 :::{.notes-coming}
 More chapters will appear here as the course develops.
 :::

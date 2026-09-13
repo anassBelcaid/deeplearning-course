@@ -95,3 +95,23 @@ Grow a scalar `Value` class into reverse-mode autodiff, compose an MLP, and lear
 :::
 :::
 :::
+
+## PyTorch vision systems
+
+:::{.chapter-list}
+:::{.chapter-entry .available .pytorch}
+<span class="chapter-number">P2</span>
+
+:::{.chapter-copy}
+### [The Vision Training System](projects/04-vision-system/index.qmd)
+
+Build one reusable CIFAR-10 pipeline, compare an MLP with a CNN, measure CPU/GPU training, schedule the learning rate, and resume from a checkpoint.
+
+`Two sessions`{.topic-tag} `PyTorch`{.topic-tag} `CIFAR-10`{.topic-tag} `MLP → CNN`{.topic-tag}
+:::
+
+:::{.chapter-state}
+[View project](projects/04-vision-system/index.qmd) · [Open notebook](projects/04-vision-system/starter/vision_training_system.ipynb)
+:::
+:::
+:::

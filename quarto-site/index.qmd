@@ -2,6 +2,7 @@
 title: "Deep Learning"
 page-layout: full
 toc: false
+image: assets/course-thumbnail-candidate-01.png
 ---
 
 :::{.hero}
@@ -18,10 +19,8 @@ toc: false
 :::
 :::
 
-:::{.hero-art aria-hidden="true"}
-:::{.network-mark}
-<span></span>
-:::
+:::{.hero-art}
+![](assets/course-thumbnail-candidate-01.png){.course-thumbnail fig-alt="Seven colored learning paths pass through a neural network and converge into one output."}
 :::
 :::
 

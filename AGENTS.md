@@ -10,6 +10,8 @@ These instructions apply to the whole repository. Use them whenever creating or 
 - When introducing a correction or scaling factor, first derive it from the quantity that should be preserved, then replace the derivation with a concrete numerical application that verifies the rule.
 - Keep the five-part frame visible where useful: data, hypothesis, loss, optimization, and evaluation.
 - Notes are the durable technical reference; slides are the visual, conversational teaching path. They should agree, but the notes should not merely transcribe the slides.
+- Keep notes section headings visually subordinate to the chapter title. Top-level chapter sections should organize the reading path without appearing like a new document title on every section.
+- When synchronizing approved slides into notes, preserve every pedagogically meaningful visual example or reconstruct it in a notes-appropriate form. Do not replace the lecture's visual evidence with prose merely because the notes add deeper derivations.
 - Give every notes chapter an original, purpose-made visual cover that previews its central idea without embedded text. Use that cover as the opening visual and as the dominant entry on the Notes index; keep only the title and navigation label as supporting index text.
 
 ## Slides
