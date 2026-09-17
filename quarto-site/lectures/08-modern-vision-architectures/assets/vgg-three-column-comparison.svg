@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1260" height="610" viewBox="0 0 1260 610" role="img" aria-labelledby="title desc">
+  <title id="title">VGG network, VGG block, and AlexNet comparison</title>
+  <desc id="desc">Three columns show a full VGG network assembled from five repeated blocks, the internal structure of one VGG block, and AlexNet as an irregular reference stack.</desc>
+  <defs>
+    <filter id="s"><feDropShadow dx="0" dy="1.5" stdDeviation="1.6" flood-color="#17212b" flood-opacity=".13"/></filter>
+    <style>
+      .heading{fill:#17212b;font:700 18px Arial,sans-serif;text-anchor:middle}.sub{fill:#526573;font:600 13px Arial,sans-serif;text-anchor:middle}
+      .plate{fill:#edf6ff;stroke:#2878c8;stroke-width:2;stroke-dasharray:7 5;rx:13}.alexplate{fill:#fff7eb;stroke:#d26d22;stroke-width:2;stroke-dasharray:7 5;rx:13}
+      .conv{fill:#b9dcf7;stroke:#17212b;stroke-width:1.2;rx:5;filter:url(#s)}.pool{fill:#f4b267;stroke:#17212b;stroke-width:1.2;rx:5}.fc{fill:#d8c8ec;stroke:#17212b;stroke-width:1.2;rx:5}.relu{fill:#dff2e8;stroke:#25734d;stroke-width:1.2;rx:5}.io{fill:#f7f4ec;stroke:#526573;stroke-width:1.2;rx:5}
+      .label{fill:#17212b;font:600 12px Arial,sans-serif;text-anchor:middle;dominant-baseline:middle}.tiny{fill:#526573;font:600 11px Arial,sans-serif;text-anchor:middle}.plate-label{fill:#1f5f96;font:700 11px Arial,sans-serif}.alex-label{fill:#a75217;font:700 11px Arial,sans-serif}
+    </style>
+  </defs>
+  <line x1="420" y1="8" x2="420" y2="598" stroke="#c8d6df"/><line x1="840" y1="8" x2="840" y2="598" stroke="#c8d6df"/>
+
+  <text class="heading" x="210" y="27">VGG FULL MODEL</text><text class="sub" x="210" y="48">compose the same block five times</text>
+  <rect class="fc" x="110" y="73" width="200" height="29"/><text class="label" x="210" y="87.5">FC head</text>
+  <rect class="plate" x="65" y="118" width="290" height="73"/><text class="plate-label" x="82" y="138">BLOCK 5</text><rect class="conv" x="103" y="145" width="214" height="22"/><text class="label" x="210" y="156">3 × conv3-512</text><rect class="pool" x="129" y="169" width="162" height="15"/>
+  <rect class="plate" x="57" y="202" width="306" height="73"/><text class="plate-label" x="74" y="222">BLOCK 4</text><rect class="conv" x="94" y="229" width="232" height="22"/><text class="label" x="210" y="240">3 × conv3-512</text><rect class="pool" x="119" y="253" width="182" height="15"/>
+  <rect class="plate" x="49" y="286" width="322" height="73"/><text class="plate-label" x="66" y="306">BLOCK 3</text><rect class="conv" x="84" y="313" width="252" height="22"/><text class="label" x="210" y="324">3 × conv3-256</text><rect class="pool" x="109" y="337" width="202" height="15"/>
+  <rect class="plate" x="41" y="370" width="338" height="73"/><text class="plate-label" x="58" y="390">BLOCK 2</text><rect class="conv" x="74" y="397" width="272" height="22"/><text class="label" x="210" y="408">2 × conv3-128</text><rect class="pool" x="99" y="421" width="222" height="15"/>
+  <rect class="plate" x="33" y="454" width="354" height="73"/><text class="plate-label" x="50" y="474">BLOCK 1</text><rect class="conv" x="64" y="481" width="292" height="22"/><text class="label" x="210" y="492">2 × conv3-64</text><rect class="pool" x="89" y="505" width="242" height="15"/>
+  <rect class="io" x="20" y="548" width="380" height="31"/><text class="label" x="210" y="563.5">image · 224 × 224 × 3</text>
+
+  <text class="heading" x="630" y="27">ONE VGG BLOCK</text><text class="sub" x="630" y="48">one reusable construction rule</text>
+  <rect class="pool" x="490" y="70" width="280" height="42"/><text class="label" x="630" y="91">MaxPool 2 × 2 · stride 2</text>
+  <rect class="plate" x="465" y="125" width="330" height="390"/><text class="plate-label" x="486" y="150">REPEAT × n</text>
+  <rect class="relu" x="540" y="166" width="180" height="34"/><text class="label" x="630" y="183">ReLU</text>
+  <rect class="conv" x="500" y="212" width="260" height="42"/><text class="label" x="630" y="233">Conv 3 × 3 · pad 1</text>
+  <circle cx="630" cy="284" r="3.5" fill="#526573"/><circle cx="630" cy="300" r="3.5" fill="#526573"/><circle cx="630" cy="316" r="3.5" fill="#526573"/>
+  <rect class="relu" x="540" y="346" width="180" height="34"/><text class="label" x="630" y="363">ReLU</text>
+  <rect class="conv" x="500" y="392" width="260" height="42"/><text class="label" x="630" y="413">Conv 3 × 3 · pad 1</text>
+  <text class="tiny" x="630" y="586">preserve inside · halve once at exit</text>
+
+  <text class="heading" x="1050" y="27">ALEXNET REFERENCE</text><text class="sub" x="1050" y="48">layer recipe changes by stage</text>
+  <rect class="alexplate" x="867" y="67" width="366" height="512"/><text class="alex-label" x="888" y="91">ONE-OFF SEQUENCE</text>
+  <rect class="fc" x="970" y="103" width="160" height="24"/><text class="label" x="1050" y="115">FC 1000</text><rect class="fc" x="946" y="135" width="208" height="24"/><text class="label" x="1050" y="147">FC 4096 × 2</text>
+  <rect class="pool" x="925" y="175" width="250" height="26"/><text class="label" x="1050" y="188">pool3 · s2</text>
+  <rect class="conv" x="905" y="211" width="290" height="29"/><text class="label" x="1050" y="225.5">conv3-256</text><rect class="conv" x="905" y="248" width="290" height="29"/><text class="label" x="1050" y="262.5">conv3-384</text><rect class="conv" x="905" y="285" width="290" height="29"/><text class="label" x="1050" y="299.5">conv3-384</text>
+  <rect class="pool" x="890" y="326" width="320" height="26"/><text class="label" x="1050" y="339">pool3 · s2</text><rect class="conv" x="880" y="362" width="340" height="29"/><text class="label" x="1050" y="376.5">conv5-256</text>
+  <rect class="pool" x="865" y="403" width="370" height="26"/><text class="label" x="1050" y="416">pool3 · s2</text><rect class="conv" x="855" y="439" width="390" height="29"/><text class="label" x="1050" y="453.5">conv11-96 · stride 4</text>
+  <rect class="io" x="850" y="490" width="400" height="31"/><text class="label" x="1050" y="505.5">image · 224 × 224 × 3</text>
+  <text class="tiny" x="1050" y="552">wide → medium → small kernels</text>
+</svg>

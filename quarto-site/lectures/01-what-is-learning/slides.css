@@ -59,6 +59,15 @@
 .course-network-diagram svg { display:block; max-width:100%; margin:0 auto; }
 .course-network-diagram .network-edge { stroke:color-mix(in srgb,var(--blue) 24%,white); stroke-width:2; }
 .course-network-diagram .network-node { fill:white; stroke:var(--node-color,var(--blue)); stroke-width:4; }
+.course-centered-figure { display:grid; width:100%; margin:8px auto 0; place-items:center; }
+.course-centered-figure>figure { display:grid; grid-template-rows:minmax(0,1fr) auto; width:min(980px,86%); height:650px; margin:0!important; overflow:hidden; border:2px solid #c8d6df; border-radius:18px; background:white; box-shadow:0 8px 24px rgba(23,33,43,.07); justify-items:center; }
+.course-centered-figure img { display:block; width:auto; max-width:92%; height:500px; max-height:100%; margin:auto!important; object-fit:contain; align-self:center; justify-self:center; }
+.course-centered-figure figcaption { display:grid; box-sizing:border-box; width:100%; margin:0; padding:10px 18px 11px; border-top:4px solid var(--blue); background:var(--raised); color:var(--ink); text-align:center; justify-self:stretch; }
+.course-centered-figure figcaption>span { color:var(--blue); font:800 10px/1 "DM Mono",monospace; letter-spacing:.06em; }
+.course-centered-figure figcaption>strong { margin-top:6px; color:var(--ink); font-size:15px; line-height:1.25; }
+.course-centered-figure figcaption>small { margin-top:4px; color:var(--muted); font-size:12px; line-height:1.25; }
+.course-centered-figure .course-caption-source { padding-top:6px; border-top:1px solid var(--line); color:var(--muted); font:500 11px/1.25 "DM Mono",monospace; }
+.course-centered-figure .course-caption-source a { color:var(--blue); }
 
 /* Approved light code-editor language for technical lectures. */
 .light-code-editor { overflow:hidden; border:2px solid #bfd0dc; border-radius:17px; background:#fbfcfd; box-shadow:0 8px 24px rgba(23,33,43,.07); }
@@ -68,8 +77,13 @@
 .light-code-editor pre { width:auto; max-height:none!important; margin:0; padding:20px 23px; overflow:visible!important; background:transparent; box-shadow:none; }
 .light-code-editor pre code { max-height:none!important; padding:0!important; overflow:visible!important; background:transparent!important; color:#17212b; font:500 17px/1.47 "DM Mono",monospace; white-space:pre; }
 .light-code-editor .py-kw { color:#7258a8; font-weight:800; }
-.light-code-editor .py-num { color:#c45a19; }
+.light-code-editor .py-fn { color:#1769aa; font-weight:800; }
+.light-code-editor .py-mod { color:#9b4f12; font-weight:700; }
+.light-code-editor .py-call { color:#087f75; font-weight:700; }
+.light-code-editor .py-param { color:#3f596b; font-style:italic; }
+.light-code-editor .py-num { color:#c44732; font-weight:700; }
 .light-code-editor .py-str { color:#29845a; }
+.light-code-editor .py-punc { color:#78909f; }
 .light-code-editor .py-comment { display:block; color:#61788a; font-style:italic; }
 .light-code-editor .py-output { color:#29845a; }
 .big-summary { margin-top:.8em!important; color:var(--blue); text-align:center; font-family:"Newsreader",serif; font-size:1.2em; font-weight:600; }

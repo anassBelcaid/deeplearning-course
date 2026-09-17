@@ -234,10 +234,12 @@ Convolution, padding, stride, receptive fields, pooling, and features.
 VGG, residual learning, efficient models, augmentation, and transfer.
 :::
 :::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span>[Slides](lectures/08-modern-vision-architectures/index.html){.material-pill .available}<span class="material-pill muted">Notebook</span>
 :::
 :::{.links-cell}
-<span class="coming-soon">Architecture papers · Model explorer</span>
+<a class="resource-mini read required" href="https://arxiv.org/abs/1409.1556"><i>◫</i><span>Simonyan &amp; Zisserman · Very deep CNNs</span></a>
+<a class="resource-mini read required" href="https://arxiv.org/abs/1512.03385"><i>◫</i><span>He et al. · Residual learning</span></a>
+<a class="resource-mini read" href="https://arxiv.org/abs/1608.06993"><i>◫</i><span>Huang et al. · Dense connectivity</span></a>
 :::
 :::{.project-cell .track-middle}
 <span class="project-label">Project 2</span><br>Architecture study.

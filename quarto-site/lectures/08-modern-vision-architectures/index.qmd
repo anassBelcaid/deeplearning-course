@@ -1,0 +1,1104 @@
+---
+title: "Modern Vision Architectures"
+subtitle: "Designing depth, information flow, and reuse"
+author: "Dr. A. Belcaid"
+image: assets/modern-vision-hero.png
+bibliography: ../../references.bib
+suppress-bibliography: true
+title-slide-attributes:
+  data-visibility: hidden
+format:
+  revealjs:
+    title-slide: false
+    theme: [default, ../01-what-is-learning/slides.scss]
+    css: [../01-what-is-learning/slides.css, week8.css]
+    slide-number: c/t
+    progress: true
+    controls: true
+    transition: fade
+    width: 1440
+    height: 900
+    margin: 0.055
+    center: false
+    footer: "Deep Learning · Chapter 8"
+execute:
+  enabled: false
+---
+
+## Modern Vision Architectures {.deck-title}
+
+:::: {.deck-title-grid}
+::: {.deck-title-copy}
+<span class="eyebrow">CHAPTER 08 · LEARNING FROM IMAGES</span>
+
+### Designing depth, information flow, and reuse
+
+How can a vision model become deeper and more capable without becoming impossible to optimize or deploy?
+
+<span class="deck-author">Dr. A. Belcaid</span>
+:::
+
+::: {.deck-title-art .modern-vision-hero}
+![](assets/modern-vision-hero.png){fig-alt="A stylized image tensor passes through modular feature blocks while a skip path carries information around the middle transformations."}
+:::
+::::
+
+::: {.notes}
+The image previews the lecture's design problem rather than one named architecture. The main path becomes deeper and more abstract; the arc preserves an earlier signal and merges it back later. Ask students what can go wrong as we keep stacking the convolutional blocks from Chapter 7. This lecture studies architectural answers: disciplined repetition, residual information flow, feature reuse, augmentation, and transfer.
+:::
+
+## A first-level map of the lecture
+
+:::: {.architecture-toc}
+::: {.architecture-toc-item .pressure-item}
+<span>01</span>
+
+### Why architecture becomes a design problem
+:::
+
+::: {.architecture-toc-item .blocks-item}
+<span>02</span>
+
+### Depth through repeated blocks
+:::
+
+::: {.architecture-toc-item .branch-item}
+<span>03</span>
+
+### Branching across spatial scales
+:::
+
+::: {.architecture-toc-item .residual-item}
+<span>04</span>
+
+### Learning residual corrections
+:::
+
+::: {.architecture-toc-item .dense-item}
+<span>05</span>
+
+### Reusing earlier features
+:::
+
+::: {.architecture-toc-item .augmentation-item}
+<span>06</span>
+
+### The architecture toolkit
+:::
+
+::: {.architecture-toc-item .transfer-item}
+<span>07</span>
+
+### Composing a task-specific network
+:::
+::::
+
+::: {.notes}
+Keep this roadmap at the level of transferable design ideas. We first establish why a naive chain of convolution and pooling does not scale cleanly: resolution may disappear too quickly, wide kernels and dense heads spend parameters heavily, and deeper chains become harder to optimize. VGG supplies the concrete case for depth through repeated small padded convolutions [@simonyan2015vgg]. ResNet introduces residual addition [@he2016resnet], while DenseNet uses dense concatenation to reuse earlier features [@huang2017densenet]. The final two sections turn the historical architectures into a reusable toolkit, then compose several mechanisms around one task specification.
+:::
+
+# 01 · Why architecture becomes a design problem {.section-slide .architecture-section .pressure-section data-section-progress="1 / 7" style="--section-progress:14.286%"}
+
+## Yesterday's CNN meets a larger world
+
+:::: {.scale-up-stage}
+::: {.scale-up-model}
+<span>THE FAMILIAR MODEL</span>
+<strong>two convolution blocks</strong>
+<div class="mini-pipeline" aria-label="A small image passes through two convolution and pooling blocks into a classifier."><i>32²</i><b>conv<br>pool</b><i>16²</i><b>conv<br>pool</b><i>8²</i><b>linear</b><i>10</i></div>
+<small>CIFAR-10 · 32 × 32 RGB · 10 classes</small>
+:::
+
+<div class="scale-up-arrow fragment" data-fragment-index="0" aria-hidden="true">→</div>
+
+::: {.scale-up-brief .fragment data-fragment-index="0"}
+<span>NEW DESIGN BRIEF</span>
+<strong>recognize 1,000 categories</strong>
+<div><b>224 × 224</b><small>larger images</small></div>
+<div><b>1.2M</b><small>training examples</small></div>
+<div><b>1,000</b><small>output classes</small></div>
+:::
+::::
+
+::: {.scale-up-question .fragment data-fragment-index="1"}
+<span>YOUR PREDICTION</span>
+<strong>Can we scale by repeating the same block—convolution, pooling, repeat?</strong>
+:::
+
+<p class="source-note">Large-scale setting: ImageNet / ILSVRC classification [@deng2009imagenet; @he2016resnet].</p>
+
+::: {.notes}
+Retrieve the exact model students read at the end of Chapter 7, then change the problem rather than beginning with an architecture name. The 1.2 million count refers to the ILSVRC classification training set. Reveal the new brief and ask for a show of hands: repeat the familiar block, redesign it, or unsure. Do not judge the answers yet. This section will audit that tempting first proposal.
+:::
+
+## Audit the tempting design
+
+:::: {.audit-layout}
+::: {.audit-chain}
+<span>PROPOSED PLAIN CNN</span>
+<div><b>INPUT</b><strong>224 × 224 × 3</strong></div>
+<i>↓</i>
+<div><b>BLOCK × 5</b><strong>Conv · ReLU · Pool /2</strong></div>
+<i>↓</i>
+<div><b>FEATURES</b><strong>512 × ? × ?</strong></div>
+<i>↓</i>
+<div><b>HEAD</b><strong>Flatten · Linear 4096</strong></div>
+:::
+
+::: {.audit-task}
+<span>EXACT TASK</span>
+<strong>Audit the design before training it.</strong>
+<div><b>1</b><small>What spatial size remains after five pools?</small></div>
+<div><b>2</b><small>How many values enter the first dense layer?</small></div>
+<div><b>3</b><small>How many weights does that dense layer own?</small></div>
+:::
+::::
+
+::: {.pause-panel .architecture-audit-pause .fragment .fade-out data-fragment-index="0"}
+<strong>PAUSE · 90 seconds</strong><span>Track only $H\times W$ first; restore the 512 channels at the end.</span>
+:::
+
+::: {.audit-solution .fragment data-fragment-index="0"}
+<span>WORKED AUDIT</span>
+<div><strong>$224/2^5=7$</strong><small>final spatial size</small></div>
+<div><strong>$512\times7\times7=25{,}088$</strong><small>flattened values</small></div>
+<div><strong>$25{,}088\times4{,}096\approx102.8\text{M}$</strong><small>weights in one layer</small></div>
+:::
+
+::: {.notes}
+Honor the pause. Students know pooling geometry and dense-layer parameter counting from earlier chapters, so this is retrieval in service of a new design question. The computation deliberately resembles the first VGG dense layer, but do not name VGG yet. Reveal the complete solution on one advancement. Bias parameters add only 4,096 and do not change the conclusion.
+:::
+
+## Every pool spends spatial resolution
+
+<div class="resolution-question"><span>TRACE ONE SMALL OBJECT</span><strong>At which stage does its precise location become difficult to preserve?</strong></div>
+
+:::: {.resolution-ledger}
+::: {.resolution-stage .r224}
+<span>INPUT</span><strong>224²</strong><div class="tiny-object object-1" aria-label="A small object occupies a small region of a 224 by 224 representation."></div><small>1×</small>
+:::
+
+<b>→</b>
+
+::: {.resolution-stage .r112 .fragment}
+<span>POOL 1</span><strong>112²</strong><div class="tiny-object object-2"></div><small>½ width</small>
+:::
+
+<b class="fragment">→</b>
+
+::: {.resolution-stage .r56 .fragment}
+<span>POOL 2</span><strong>56²</strong><div class="tiny-object object-3"></div><small>¼ width</small>
+:::
+
+<b class="fragment">→</b>
+
+::: {.resolution-stage .r28 .fragment}
+<span>POOL 3</span><strong>28²</strong><div class="tiny-object object-4"></div><small>⅛ width</small>
+:::
+
+<b class="fragment">→</b>
+
+::: {.resolution-stage .r7 .fragment}
+<span>POOL 5</span><strong>7²</strong><div class="tiny-object object-5"></div><small>1⁄32 width</small>
+:::
+
+::::
+
+::: {.resolution-verdict .fragment}
+<span>DESIGN DECISION</span><strong>Downsampling buys context and efficiency—but it spends localization detail.</strong>
+:::
+
+::: {.notes}
+Ask students to follow the orange object, not merely recite the dimensions. Each displayed square is schematic: it represents the resolution budget rather than literal pixels. Pooling is not a mistake; reducing resolution increases the effective field of view and lowers computation. The architectural question is when to spend that budget. Segmentation and detection will make the cost of localization loss especially visible in Chapter 9.
+:::
+
+## Capacity can accumulate in the wrong place
+
+:::: {.parameter-balance}
+::: {.parameter-map}
+<span>WHERE DO THE WEIGHTS LIVE?</span>
+<div class="feature-bank" aria-label="A bank of 512 feature maps, each 7 by 7."><b>512</b><i>feature maps</i><strong>7 × 7</strong></div>
+<div class="flatten-mark">flatten → <strong>25,088</strong></div>
+<div class="dense-bank"><b>4,096</b><i>dense units</i></div>
+:::
+
+::: {.parameter-reckoning}
+<span>ONE MATRIX</span>
+<p>$25{,}088\times4{,}096$</p>
+<strong class="fragment">102,760,448 weights</strong>
+<small class="fragment">before its bias—and before the next dense layer</small>
+<div class="parameter-question fragment">Which representation owns most of the hypothesis: the spatial feature extractor or the classifier head?</div>
+:::
+::::
+
+::: {.parameter-verdict .fragment}
+More parameters do not automatically mean better features. <strong>Placement matters.</strong>
+:::
+
+::: {.notes}
+Let students estimate the order of magnitude before revealing the exact multiplication. The question is about parameter allocation, not an assertion that dense layers are universally wrong. Historically, large dense heads were viable and influential. Later designs increasingly replace them with pooling and small classifiers so capacity is concentrated in learned spatial features. This slide sets up that later evolution without jumping ahead to its solution.
+:::
+
+## A deeper hypothesis should not be worse—should it?
+
+:::: {.depth-thought-experiment}
+::: {.depth-model .shallow-model}
+<span>20-LAYER PLAIN CNN</span>
+<div class="depth-stack">20</div>
+<small>learn a classifier $f(x)$</small>
+:::
+
+::: {.depth-logic}
+<span>CONSTRUCTION ARGUMENT</span>
+<p>Copy the 20 learned layers.</p>
+<strong>Set the 36 added layers to identity mappings.</strong>
+<p class="fragment">Then the deeper model can represent the same function.</p>
+:::
+
+::: {.depth-model .deep-model .fragment}
+<span>56-LAYER PLAIN CNN</span>
+<div class="depth-stack">56</div>
+<small>contains at least that candidate solution</small>
+:::
+
+::::
+
+::: {.depth-prediction .fragment}
+<span>PREDICT BEFORE THE DATA</span><strong>Should its training error be lower, equal, or higher?</strong>
+:::
+
+::: {.notes}
+This argument is adapted from the motivation in He et al. [@he2016resnet]. Be precise: it establishes the existence of a candidate solution for a suitably constructed deeper counterpart; it does not claim that ordinary nonlinear layers are automatically initialized as exact identities. Ask students to vote lower, equal, or higher. Their optimization algorithm must still find the useful parameters.
+:::
+
+## Three pressures define the design brief
+
+:::: {.design-brief-grid}
+::: {.design-pressure .pressure-space}
+<span>01 · REPRESENTATION</span>
+<div class="pressure-icon spatial-icon" aria-hidden="true"></div>
+<strong>When should resolution shrink?</strong>
+<small>Preserve detail long enough; buy context and efficiency deliberately.</small>
+:::
+::: {.design-pressure .pressure-capacity .fragment}
+<span>02 · CAPACITY</span>
+<div class="pressure-icon capacity-icon" aria-hidden="true"></div>
+<strong>Where should parameters live?</strong>
+<small>Spend capacity on reusable features, not accidental bottlenecks.</small>
+:::
+::: {.design-pressure .pressure-flow .fragment}
+<span>03 · OPTIMIZATION</span>
+<div class="pressure-icon flow-icon" aria-hidden="true"></div>
+<strong>How should information travel?</strong>
+<small>Make useful deep solutions reachable by gradient-based training.</small>
+:::
+::::
+
+::: {.design-bridge .fragment}
+<span>NEXT</span><strong>Repeated small blocks make depth systematic.</strong><i>→ VGG</i>
+:::
+
+::: {.notes}
+Use this as the section synthesis. Architecture is part of the hypothesis: it determines representation geometry, parameter allocation, and information flow. The three pressures came from concrete evidence, not a taxonomy. Map them forward without giving away the full lecture: VGG makes depth systematic, ResNet changes information flow, and DenseNet makes feature reuse explicit. The next section begins with VGG and asks how repeated small kernels can grow depth economically.
+:::
+
+# 02 · Depth through repeated small blocks {.section-slide .architecture-section .blocks-section data-section-progress="2 / 7" style="--section-progress:28.571%"}
+
+## AlexNet: the reference recipe
+
+<div class="alexnet-schematic">
+<img src="assets/alexnet-layer-stack.svg" alt="AlexNet represented as a narrowing vertical stack of convolution, pooling, and fully connected layers. Read from the bottom upward.">
+</div>
+
+<div class="alexnet-schematic-guide">
+<span>READ BOTTOM → TOP</span>
+<strong>Which components repeat—and which design choices keep changing?</strong>
+<small class="fragment">Convolution and pooling repeat, but kernel sizes shift from $11\times11$ to $5\times5$ to $3\times3$.</small>
+</div>
+
+<p class="source-note">Course-made reconstruction of AlexNet from Krizhevsky, Sutskever &amp; Hinton [@krizhevsky2012imagenet]. Bar width qualitatively indicates the reduction of spatial resolution.</p>
+
+::: {.notes}
+Let students read the figure before interpreting it. The layer bars deliberately follow the compact graphical grammar of the supplied AlexNet–VGG reference: one bar per operation, a distinct color for pooling, and a bottom-to-top computational path. Ask students to identify the recurring components first. Then reveal the irregularity that VGG will address: AlexNet changes kernel sizes and uses an aggressive stride-four entrance before settling on three-by-three convolutions.
+:::
+
+## VGG turns architecture design into an experiment
+
+:::: {.vgg-paper-intro}
+::: {.vgg-paper-figure}
+<img src="assets/vgg-paper-table1.png" alt="Table 1 from the original VGG paper, comparing network configurations A through E as depth increases from 11 to 19 learned layers.">
+<small>Original architecture configurations · Table 1</small>
+:::
+
+::: {.vgg-paper-ideas}
+<span>SIMONYAN &amp; ZISSERMAN · 2014</span>
+<strong>Very Deep Convolutional Networks for Large-Scale Image Recognition</strong>
+<div><b>STANDARDIZE</b><small>Replace changing kernel recipes with padded $3\times3$ convolutions.</small></div>
+<div class="fragment"><b>ISOLATE DEPTH</b><small>Compare configurations built from the same disciplined design rules.</small></div>
+<div class="fragment"><b>DELAY DOWNSAMPLING</b><small>Apply several convolutions before spending resolution on pooling.</small></div>
+:::
+::::
+
+<div class="vgg-paper-question fragment">
+<span>RESEARCH QUESTION</span><strong>Can a deeper, regular stack outperform a shallower sequence of special cases?</strong>
+</div>
+
+<p class="source-note">Original Table 1 and design analysis from Simonyan &amp; Zisserman [@simonyan2015vgg]. See also the <a href="https://anassbelcaid.github.io/deeplearning/modernconv/">2024 course chapter</a>.</p>
+
+::: {.notes}
+Introduce VGG as a research program rather than merely a named architecture. The table is the paper's experimental design: configurations A through E increase learned depth while retaining a disciplined local recipe. Ask students what must remain fixed if depth is the variable of interest. Reveal the three ideas only after their answers. The crucial abstraction is to stop designing every layer as a special case and begin composing repeated blocks.
+:::
+
+## One VGG block becomes the design unit
+
+:::: {.vgg-block-code-layout}
+::: {.vgg-block-native-figure}
+<img src="assets/vgg-block-schematic.svg" alt="A VGG block shown as a labeled plate containing repeated padded three by three convolution and ReLU layers, followed by two by two max pooling.">
+:::
+
+::: {.light-code-editor .vgg-native-editor}
+<div class="editor-bar"><span>PYTORCH · BLOCK FACTORY</span><strong>vgg.py</strong></div>
+<pre><code><span class="py-kw">def</span> <span class="py-fn">vgg_block</span>(<span class="py-param">num_convs</span>, <span class="py-param">out_channels</span>):
+    layers <span class="py-punc">=</span> []
+
+    <span class="py-kw">for</span> _ <span class="py-kw">in</span> <span class="py-call">range</span>(num_convs):
+        layers.<span class="py-call">extend</span>([
+            <span class="py-mod">nn</span>.<span class="py-call">LazyConv2d</span>(
+                out_channels,
+                <span class="py-param">kernel_size</span><span class="py-punc">=</span><span class="py-num">3</span>, <span class="py-param">padding</span><span class="py-punc">=</span><span class="py-num">1</span>
+            ),
+            <span class="py-mod">nn</span>.<span class="py-call">ReLU</span>(),
+        ])
+
+    layers.<span class="py-call">append</span>(
+        <span class="py-mod">nn</span>.<span class="py-call">MaxPool2d</span>(<span class="py-param">kernel_size</span><span class="py-punc">=</span><span class="py-num">2</span>, <span class="py-param">stride</span><span class="py-punc">=</span><span class="py-num">2</span>)
+    )
+    <span class="py-kw">return</span> <span class="py-mod">nn</span>.<span class="py-call">Sequential</span>(*layers)</code></pre>
+:::
+::::
+
+<div class="vgg-block-contract fragment">
+<span>BLOCK CONTRACT</span><strong>$H\times W$ is preserved inside the plate</strong><b>→</b><strong>pooling returns $H/2\times W/2$ once</strong>
+</div>
+
+<p class="source-note">Block design from Simonyan &amp; Zisserman [@simonyan2015vgg]; PyTorch implementation adapted from the instructor’s 2024 course chapter.</p>
+
+::: {.notes}
+Trace the figure and code together from bottom to top. The loop is the plate: it repeats the same spatially preserving operation. Padding one keeps height and width unchanged for every three-by-three convolution. Pooling sits outside the repetition and therefore halves resolution exactly once per block. Ask students which two arguments define a block; the answer is its repetition count and output channel count.
+:::
+
+## From AlexNet’s sequence to VGG’s grammar
+
+<div class="vgg-three-column-figure">
+<img src="assets/vgg-three-column-comparison.svg" alt="Three-column comparison showing the full VGG model composed from five blocks, the repeated layers inside one VGG block, and AlexNet as a reference sequence whose kernel choices change by stage.">
+</div>
+
+<div class="vgg-comparison-reading fragment">
+<span>THE ARCHITECTURAL MOVE</span>
+<strong>AlexNet chooses layers one by one.</strong>
+<b>→</b>
+<strong>VGG defines one block, then scales by composition.</strong>
+</div>
+
+<p class="source-note">Course-made comparison derived from Krizhevsky et al. [@krizhevsky2012imagenet] and Simonyan &amp; Zisserman [@simonyan2015vgg].</p>
+
+::: {.notes}
+Read the columns in the requested order. Start with the full VGG model on the left: five labeled plates make the repeated organization visible. Move to the center to open one plate and expose its internal contract. End with AlexNet on the right as the reference: it uses the same broad vocabulary of convolution, pooling, and fully connected layers, but its local recipe changes by stage. The conceptual advance is architectural grammar—one reusable unit whose repetition count and channel width specify the network.
+:::
+
+## The architecture becomes a short specification
+
+:::: {.vgg-model-code-layout}
+::: {.vgg-arch-spec}
+<span>PAPER CONFIGURATION A · VGG-11</span>
+<pre><code>arch = ((1, 64),
+        (1, 128),
+        (2, 256),
+        (2, 512),
+        (2, 512))</code></pre>
+<div class="vgg-spec-reading">
+<b>$(n, C)$</b><strong>repeat $n$ convolutions<br>with $C$ output channels</strong>
+</div>
+<div class="vgg-spec-blocks">
+<i><b>1×</b><span>64</span></i>
+<i><b>1×</b><span>128</span></i>
+<i><b>2×</b><span>256</span></i>
+<i><b>2×</b><span>512</span></i>
+<i><b>2×</b><span>512</span></i>
+</div>
+<small>Five tuples → five calls to <code>vgg_block</code></small>
+:::
+
+::: {.light-code-editor .vgg-model-editor}
+<div class="editor-bar"><span>PYTORCH · FULL MODEL</span><strong>vgg.py</strong></div>
+<pre><code><span class="py-kw">class</span> <span class="py-fn">VGG</span>(<span class="py-mod">nn</span>.<span class="py-call">Module</span>):
+    <span class="py-kw">def</span> <span class="py-fn">__init__</span>(<span class="py-param">self</span>, <span class="py-param">arch</span>, <span class="py-param">num_classes</span><span class="py-punc">=</span><span class="py-num">10</span>):
+        <span class="py-call">super</span>().<span class="py-call">__init__</span>()
+
+        conv_blocks <span class="py-punc">=</span> [
+            <span class="py-call">vgg_block</span>(num_convs, out_channels)
+            <span class="py-kw">for</span> num_convs, out_channels <span class="py-kw">in</span> arch
+        ]
+
+        self.net <span class="py-punc">=</span> <span class="py-mod">nn</span>.<span class="py-call">Sequential</span>(
+            *conv_blocks,
+            <span class="py-mod">nn</span>.<span class="py-call">Flatten</span>(),
+            <span class="py-mod">nn</span>.<span class="py-call">LazyLinear</span>(<span class="py-num">4096</span>), <span class="py-mod">nn</span>.<span class="py-call">ReLU</span>(), <span class="py-mod">nn</span>.<span class="py-call">Dropout</span>(<span class="py-num">0.5</span>),
+            <span class="py-mod">nn</span>.<span class="py-call">LazyLinear</span>(<span class="py-num">4096</span>), <span class="py-mod">nn</span>.<span class="py-call">ReLU</span>(), <span class="py-mod">nn</span>.<span class="py-call">Dropout</span>(<span class="py-num">0.5</span>),
+            <span class="py-mod">nn</span>.<span class="py-call">LazyLinear</span>(num_classes),
+        )
+        self.net.<span class="py-call">apply</span>(d2l.init_cnn)</code></pre>
+:::
+::::
+
+<div class="vgg-code-trace fragment">
+<span>TRACE THE ABSTRACTION</span><strong>configuration</strong><b>→</b><strong>block factory</strong><b>→</b><strong>feature extractor</strong><b>→</b><strong>classifier</strong>
+</div>
+
+<p class="source-note">Configuration A from Table 1 of Simonyan &amp; Zisserman [@simonyan2015vgg]. Implementation adapted from the instructor’s <a href="https://anassbelcaid.github.io/deeplearning/modernconv/">2024 course chapter</a>.</p>
+
+::: {.notes}
+Begin on the left. Each pair stores only two decisions: how many convolutions the block repeats and how many channels those convolutions produce. Configuration A expands to eight convolutional layers across five blocks; the three fully connected layers produce the name VGG-11. Then trace the list comprehension on the right: each tuple becomes one call to the block factory from the previous slide. The sequential model concatenates the five blocks, flattens once, and attaches the historical VGG classifier. Mention that num_classes is ten here for course datasets; the ImageNet paper used one thousand outputs.
+:::
+
+## VGG’s legacy—and its unfinished business
+
+<div class="network-audit-prompt"><span>ARCHITECTURE AUDIT · VGG</span><strong>What became systematic—and what still prevents clean scaling?</strong></div>
+
+:::: {.network-synthesis}
+::: {.network-ledger .network-gains}
+<span>MAIN IDEAS</span>
+<div><b>REPEAT</b><strong>Build depth from a reusable convolutional block.</strong><small>Architecture becomes a short configuration.</small></div>
+<div><b>STANDARDIZE</b><strong>Use padded $3\times3$ kernels throughout.</strong><small>Small kernels accumulate context and nonlinearities.</small></div>
+<div><b>CONTROL RESOLUTION</b><strong>Pool once after several convolutions.</strong><small>Feature extraction happens before downsampling.</small></div>
+:::
+::: {.network-ledger .network-limits .fragment}
+<span>DRAWBACKS</span>
+<div><b>DENSE HEAD</b><strong>Most parameters remain in the classifier.</strong><small>Flattening creates very large matrices.</small></div>
+<div><b>PLAIN CHAIN</b><strong>Every signal follows one long route.</strong><small>Optimization becomes harder as depth grows.</small></div>
+<div><b>COMPUTE</b><strong>Repeated dense convolutions remain expensive.</strong><small>Regular does not automatically mean efficient.</small></div>
+:::
+::::
+
+<div class="network-next-step fragment"><span>NEXT RESPONSE</span><strong>Keep spatial structure, add local channel mixing, and remove the dense head.</strong><b>→ NiN</b></div>
+
+<p class="source-note">Synthesis based on Simonyan &amp; Zisserman [@simonyan2015vgg].</p>
+
+::: {.notes}
+Ask students to supply one item in each column before revealing the drawbacks. VGG's durable contribution is a regular block grammar built from small padded convolutions and deliberate pooling. Its original implementation still carries a huge fully connected classifier, and the feature extractor is a plain sequential chain. The compute cost also remains high because every block applies dense spatial convolutions. Use the final bridge to motivate NiN without claiming that NiN solves optimization at extreme depth.
+:::
+
+## NiN fixes what VGG leaves expensive
+
+<div class="nin-paper-line">
+<span>LIN · CHEN · YAN · ICLR 2014</span>
+<strong>Network in Network</strong>
+<small>Replace a linear local filter with a tiny network—and remove the dense classifier.</small>
+</div>
+
+<div class="nin-fixes-figure">
+<img src="assets/nin-vgg-fixes.svg" alt="Comparison of VGG's parameter-heavy fully connected classifier with NiN's local one-by-one channel mixing and global average pooling head.">
+</div>
+
+<div class="nin-two-fixes fragment">
+<div><b>FIX 1 · LOCAL EXPRESSIVENESS</b><strong>$1\times1$ convolutions mix channels independently at every spatial location.</strong></div>
+<div><b>FIX 2 · CLASSIFIER COST</b><strong>One class map per label + global average pooling replaces the dense head.</strong></div>
+</div>
+
+<p class="source-note">NiN motivation and global-average-pooling design from Lin, Chen &amp; Yan [@lin2014nin]. Framing follows the instructor’s <a href="https://anassbelcaid.github.io/deeplearning/modernconv/">2024 course chapter</a>.</p>
+
+::: {.notes}
+Start from VGG's remaining problems, not from the NiN name. Flattening destroys the spatial arrangement and feeds a very large dense classifier. Yet inserting a standard fully connected layer earlier would also destroy spatial structure. NiN's first move is a one-by-one convolution: at each pixel location it applies the same learned channel transformation, behaving like a shared fully connected layer without mixing locations. Its second move is global average pooling. The last block produces one spatial map per class; averaging each map yields its class logit. Ask students to point to the two places where parameters disappear.
+:::
+
+## A NiN block learns within each location
+
+:::: {.nin-block-code-layout}
+::: {.nin-block-figure}
+<img src="assets/nin-block-schematic.svg" alt="A NiN block plate containing one spatial convolution and two one-by-one convolutions, each followed by ReLU.">
+:::
+
+::: {.light-code-editor .nin-block-editor}
+<div class="editor-bar"><span>PYTORCH · NiN BLOCK</span><strong>nin.py</strong></div>
+<pre><code><span class="py-kw">def</span> <span class="py-fn">nin_block</span>(
+    <span class="py-param">out_channels</span>, <span class="py-param">kernel_size</span>,
+    <span class="py-param">stride</span><span class="py-punc">=</span><span class="py-num">1</span>, <span class="py-param">padding</span><span class="py-punc">=</span><span class="py-num">0</span>
+):
+    <span class="py-kw">return</span> <span class="py-mod">nn</span>.<span class="py-call">Sequential</span>(
+        <span class="py-mod">nn</span>.<span class="py-call">LazyConv2d</span>(
+            out_channels, kernel_size,
+            stride<span class="py-punc">=</span>stride, padding<span class="py-punc">=</span>padding
+        ),
+        <span class="py-mod">nn</span>.<span class="py-call">ReLU</span>(),
+        <span class="py-mod">nn</span>.<span class="py-call">LazyConv2d</span>(out_channels, <span class="py-num">1</span>),
+        <span class="py-mod">nn</span>.<span class="py-call">ReLU</span>(),
+        <span class="py-mod">nn</span>.<span class="py-call">LazyConv2d</span>(out_channels, <span class="py-num">1</span>),
+        <span class="py-mod">nn</span>.<span class="py-call">ReLU</span>(),
+    )</code></pre>
+:::
+::::
+
+<div class="nin-location-contract fragment">
+<span>AT EACH $(h,w)$</span><strong>channel vector $\mathbf{x}_{h,w}$</strong><b>→</b><strong>shared MLP</strong><b>→</b><strong>richer channel vector</strong><small>Spatial positions remain distinct.</small>
+</div>
+
+<p class="source-note">MLPConv block from Lin, Chen &amp; Yan [@lin2014nin].</p>
+
+::: {.notes}
+Read the plate from bottom to top. The first convolution performs the usual spatial extraction and may change resolution. The following one-by-one convolutions do not look at neighboring pixels; they transform the channel vector at each location with shared weights. ReLU after every convolution turns the sequence into a small multilayer perceptron applied across channels. Contrast this with VGG: VGG repeats spatial three-by-three convolutions, whereas NiN follows one spatial convolution with two channel-mixing convolutions.
+:::
+
+## NiN ends with class maps—not a dense head
+
+<div class="nin-full-figure">
+<img src="assets/nin-full-architecture.svg" alt="Full NiN architecture with four grouped NiN blocks, pooling after the first three, and global average pooling over class maps instead of fully connected layers.">
+</div>
+
+<div class="nin-head-equation fragment">
+<span>ONE MAP PER CLASS</span><strong>$z_k = \dfrac{1}{HW}\sum_{h,w} A_{h,w,k}$</strong><small>Evidence for class $k$ is averaged across all locations.</small>
+</div>
+
+<div class="nin-vgg-verdict fragment">
+<strong>VGG:</strong><span>features → flatten → large dense head</span><b>→</b><strong>NiN:</strong><span>class maps → global average → logits</span>
+</div>
+
+<p class="source-note">Course-made reconstruction of NiN from Lin, Chen &amp; Yan [@lin2014nin].</p>
+
+::: {.notes}
+Build from the image upward. The first three blocks retain AlexNet-like spatial kernel sizes—eleven, five, then three—but each becomes a NiN block by adding two one-by-one transformations. Pooling follows those blocks. The final NiN block outputs num_classes channels, so each channel can be interpreted as a class evidence map. Adaptive average pooling reduces each map to one number, and flattening produces the logits. This removes the two 4096-unit fully connected layers. Emphasize the tradeoff: far fewer classifier parameters, but the model must learn spatial maps whose averages are directly predictive.
+:::
+
+## The complete NiN module mirrors the figure
+
+:::: {.nin-model-code-layout}
+::: {.nin-code-map}
+<img src="assets/nin-code-map.svg" alt="Compact construction trace for the full NiN module: three feature blocks with pooling, dropout, a class-map block, global average pooling, and logits.">
+:::
+
+::: {.light-code-editor .nin-model-editor}
+<div class="editor-bar"><span>PYTORCH · FULL MODEL</span><strong>nin.py</strong></div>
+<pre><code><span class="py-kw">class</span> <span class="py-fn">NiN</span>(<span class="py-mod">nn</span>.<span class="py-call">Module</span>):
+    <span class="py-kw">def</span> <span class="py-fn">__init__</span>(<span class="py-param">self</span>, <span class="py-param">num_classes</span><span class="py-punc">=</span><span class="py-num">10</span>):
+        <span class="py-call">super</span>().<span class="py-call">__init__</span>()
+
+        self.net <span class="py-punc">=</span> <span class="py-mod">nn</span>.<span class="py-call">Sequential</span>(
+            <span class="py-call">nin_block</span>(<span class="py-num">96</span>,  <span class="py-num">11</span>, stride<span class="py-punc">=</span><span class="py-num">4</span>),
+            <span class="py-mod">nn</span>.<span class="py-call">MaxPool2d</span>(<span class="py-num">3</span>, stride<span class="py-punc">=</span><span class="py-num">2</span>),
+            <span class="py-call">nin_block</span>(<span class="py-num">256</span>, <span class="py-num">5</span>, padding<span class="py-punc">=</span><span class="py-num">2</span>),
+            <span class="py-mod">nn</span>.<span class="py-call">MaxPool2d</span>(<span class="py-num">3</span>, stride<span class="py-punc">=</span><span class="py-num">2</span>),
+            <span class="py-call">nin_block</span>(<span class="py-num">384</span>, <span class="py-num">3</span>, padding<span class="py-punc">=</span><span class="py-num">1</span>),
+            <span class="py-mod">nn</span>.<span class="py-call">MaxPool2d</span>(<span class="py-num">3</span>, stride<span class="py-punc">=</span><span class="py-num">2</span>),
+            <span class="py-mod">nn</span>.<span class="py-call">Dropout</span>(<span class="py-num">0.5</span>),
+            <span class="py-call">nin_block</span>(num_classes, <span class="py-num">3</span>, padding<span class="py-punc">=</span><span class="py-num">1</span>),
+            <span class="py-mod">nn</span>.<span class="py-call">AdaptiveAvgPool2d</span>((<span class="py-num">1</span>, <span class="py-num">1</span>)),
+            <span class="py-mod">nn</span>.<span class="py-call">Flatten</span>(),
+        )
+        self.net.<span class="py-call">apply</span>(d2l.init_cnn)</code></pre>
+:::
+::::
+
+<div class="nin-model-trace fragment">
+<span>LAST THREE LINES</span><strong>$K$ class maps</strong><b>→</b><strong>average each map to $1\times1$</strong><b>→</b><strong>flatten to $K$ logits</strong>
+</div>
+
+<p class="source-note">Implementation adapted from the instructor’s <a href="https://anassbelcaid.github.io/deeplearning/modernconv/">2024 course chapter</a> and Lin, Chen &amp; Yan [@lin2014nin].</p>
+
+::: {.notes}
+Map each code line to the compact trace. The first three NiN blocks use the same spatial kernel sizes and output channels described on the previous slide, with max pooling after each block. Dropout regularizes the final feature representation. The last NiN block has num_classes output channels, producing one evidence map per class. AdaptiveAvgPool2d forces every map to one-by-one regardless of the incoming spatial size, and Flatten converts the K scalar averages into the classifier output. We omit the learning-rate argument and save_hyperparameters because this class is a plain torch module; training configuration belongs outside the architecture.
+:::
+
+## NiN changes both the block and the head
+
+<div class="network-audit-prompt"><span>ARCHITECTURE AUDIT · NiN</span><strong>Which VGG costs disappear—and which design choices remain rigid?</strong></div>
+
+:::: {.network-synthesis}
+::: {.network-ledger .network-gains}
+<span>MAIN IDEAS</span>
+<div><b>LOCAL MLP</b><strong>Stack $1\times1$ convolutions inside each block.</strong><small>Mix channels without destroying spatial layout.</small></div>
+<div><b>CLASS MAPS</b><strong>Produce one spatial evidence map per class.</strong><small>The representation connects directly to prediction.</small></div>
+<div><b>GLOBAL AVERAGE</b><strong>Replace the dense classifier with averaging.</strong><small>Classifier parameters collapse dramatically.</small></div>
+:::
+::: {.network-ledger .network-limits .fragment}
+<span>DRAWBACKS</span>
+<div><b>FIXED PATH</b><strong>Every block still chooses one spatial kernel.</strong><small>Only one receptive-field scale is processed at a time.</small></div>
+<div><b>AGGRESSIVE STEM</b><strong>Large early kernels and pooling remain.</strong><small>Fine spatial evidence can disappear quickly.</small></div>
+<div><b>CLASS-MAP CONTRACT</b><strong>The last channels must become class evidence.</strong><small>Global averaging can discard spatial arrangement.</small></div>
+:::
+::::
+
+<div class="network-next-step fragment"><span>NEXT RESPONSE</span><strong>Process several spatial scales in parallel, then concatenate their evidence.</strong><b>→ Inception</b></div>
+
+<p class="source-note">Synthesis based on Lin, Chen &amp; Yan [@lin2014nin].</p>
+
+::: {.notes}
+Retrieve the two NiN fixes first: local channel-wise nonlinear transformations and a parameter-light global-average-pooling head. Then ask what NiN still forces the designer to choose. Each spatial stage selects one kernel size and follows one path. Its early architecture also retains AlexNet-like wide kernels and aggressive pooling. The final class-map contract is elegant but restrictive: the representation must align channels with labels before averaging. This leads naturally to Inception's parallel multi-scale paths.
+:::
+
+# 03 · Branching across spatial scales {.section-slide .architecture-section .branching-section data-section-progress="3 / 7" style="--section-progress:42.857%"}
+
+## One input—four receptive-field choices
+
+<div class="inception-paper-line">
+<span>SZEGEDY ET AL. · CVPR 2015</span><strong>Going Deeper with Convolutions</strong><small>Instead of choosing one kernel size, let the block learn from several scales in parallel.</small>
+</div>
+
+<div class="inception-block-figure">
+<img src="assets/inception-block-schematic.svg" alt="An Inception block splitting one input into four branches using one-by-one, three-by-three, five-by-five, and pooling operations, then concatenating their outputs along channels.">
+</div>
+
+<div class="inception-reading fragment"><span>SAME $H\times W$</span><strong>Every path preserves spatial size.</strong><b>+</b><span>DIFFERENT EVIDENCE</span><strong>Each path sees or summarizes a different spatial extent.</strong><b>→</b><span>CONCATENATE</span><strong>Keep every branch along the channel axis.</strong></div>
+
+<p class="source-note">Course-made Inception diagram based on Szegedy et al. [@szegedy2015googlenet].</p>
+
+::: {.notes}
+Ask students to choose a kernel size before revealing the full diagram. The Inception answer is not to choose: the input is sent through four parallel paths. The one-by-one branch captures channel interactions, the three-by-three and five-by-five branches see different spatial extents, and the pooling branch summarizes local context. All branches preserve height and width through stride one and appropriate padding, which makes concatenation possible. Concatenation increases channels; it does not add the branch tensors elementwise.
+:::
+
+## The $1\times1$ layers are capacity valves
+
+:::: {.inception-bottleneck-layout}
+::: {.inception-expensive-path}
+<span>WITHOUT REDUCTION</span><strong>$C_{in}\xrightarrow{5\times5}C_{out}$</strong><div><b>$25C_{in}C_{out}$</b><small>weights</small></div>
+:::
+::: {.inception-valve-path .fragment}
+<span>WITH A $1\times1$ VALVE</span><strong>$C_{in}\xrightarrow{1\times1}C_r\xrightarrow{5\times5}C_{out}$</strong><div><b>$C_{in}C_r+25C_rC_{out}$</b><small>weights</small></div>
+:::
+::::
+
+<div class="inception-capacity-choice fragment"><span>THE DESIGN VARIABLE</span><strong>Allocate channels to branches—not one kernel to the entire layer.</strong><small>The reduction width $C_r$ controls how expensive the wider spatial kernel becomes.</small></div>
+
+<p class="source-note">Dimension-reduction rationale from Szegedy et al. [@szegedy2015googlenet].</p>
+
+::: {.notes}
+Use the five-by-five branch to explain why the one-by-one convolution appears before wider kernels. A direct five-by-five convolution costs twenty-five times input channels times output channels. Reducing first to Cr channels changes the cost to Cin times Cr plus twenty-five times Cr times Cout. The one-by-one layer is therefore a learned capacity valve. It also adds a nonlinearity. Ask students what happens as Cr approaches Cin: the saving disappears.
+:::
+
+## The diagram becomes an Inception module
+
+:::: {.inception-code-layout}
+::: {.inception-code-miniature}
+<img src="assets/inception-block-schematic.svg" alt="Compact Inception block diagram corresponding to the four branches in the adjacent PyTorch implementation.">
+:::
+
+::: {.light-code-editor .inception-editor}
+<div class="editor-bar"><span>PYTORCH · FOUR BRANCHES</span><strong>inception.py</strong></div>
+<pre><code><span class="py-kw">class</span> <span class="py-fn">Inception</span>(<span class="py-mod">nn</span>.<span class="py-call">Module</span>):
+    <span class="py-kw">def</span> <span class="py-fn">__init__</span>(<span class="py-param">self</span>, <span class="py-param">c1</span>, <span class="py-param">c2</span>, <span class="py-param">c3</span>, <span class="py-param">c4</span>):
+        <span class="py-call">super</span>().<span class="py-call">__init__</span>()
+        self.b1 <span class="py-punc">=</span> conv_relu(c1, <span class="py-num">1</span>)
+        self.b2 <span class="py-punc">=</span> <span class="py-mod">nn</span>.<span class="py-call">Sequential</span>(
+            conv_relu(c2[<span class="py-num">0</span>], <span class="py-num">1</span>),
+            conv_relu(c2[<span class="py-num">1</span>], <span class="py-num">3</span>, padding<span class="py-punc">=</span><span class="py-num">1</span>))
+        self.b3 <span class="py-punc">=</span> <span class="py-mod">nn</span>.<span class="py-call">Sequential</span>(
+            conv_relu(c3[<span class="py-num">0</span>], <span class="py-num">1</span>),
+            conv_relu(c3[<span class="py-num">1</span>], <span class="py-num">5</span>, padding<span class="py-punc">=</span><span class="py-num">2</span>))
+        self.b4 <span class="py-punc">=</span> <span class="py-mod">nn</span>.<span class="py-call">Sequential</span>(
+            <span class="py-mod">nn</span>.<span class="py-call">MaxPool2d</span>(<span class="py-num">3</span>, stride<span class="py-punc">=</span><span class="py-num">1</span>, padding<span class="py-punc">=</span><span class="py-num">1</span>),
+            conv_relu(c4, <span class="py-num">1</span>))
+
+    <span class="py-kw">def</span> <span class="py-fn">forward</span>(<span class="py-param">self</span>, <span class="py-param">x</span>):
+        ys <span class="py-punc">=</span> [branch(x) <span class="py-kw">for</span> branch <span class="py-kw">in</span>
+              (self.b1, self.b2, self.b3, self.b4)]
+        <span class="py-kw">return</span> <span class="py-mod">torch</span>.<span class="py-call">cat</span>(ys, dim<span class="py-punc">=</span><span class="py-num">1</span>)</code></pre>
+:::
+::::
+
+<div class="inception-code-contract fragment"><span>SHAPE CONTRACT</span><strong>branches agree on $(H,W)$</strong><b>→</b><strong><code>torch.cat(..., dim=1)</code></strong><b>→</b><strong>channels sum</strong></div>
+
+<p class="source-note">Simplified PyTorch implementation based on Szegedy et al. [@szegedy2015googlenet] and the instructor’s <a href="https://anassbelcaid.github.io/deeplearning/modernconv/">2024 course chapter</a>.</p>
+
+::: {.notes}
+The helper conv_relu denotes a convolution followed by ReLU and keeps the code focused on branch topology. Match b1 through b4 to the four lanes in the figure. Each branch receives the same x. Because padding preserves height and width, torch.cat can join the outputs along dimension one, the channel dimension in NCHW tensors. Ask students to compute the output channel count: c1 plus c2[1] plus c3[1] plus c4.
+:::
+
+## Once understood, compress the block
+
+<div class="googlenet-compressed-figure"><img src="assets/googlenet-compressed.svg" alt="GoogLeNet architecture assembled from nine compressed Inception block symbols arranged into groups of two, five, and two, with pooling between groups and global average pooling in the head."></div>
+
+<div class="googlenet-reading fragment"><span>STEM</span><strong>ingest the image</strong><b>→</b><span>BODY</span><strong>2 + 5 + 2 Inception blocks</strong><b>→</b><span>HEAD</span><strong>global average pooling + classifier</strong></div>
+
+<p class="source-note">Course-made compressed GoogLeNet diagram based on Szegedy et al. [@szegedy2015googlenet]. The original network also used auxiliary classifiers during training.</p>
+
+::: {.notes}
+Now that students understand the internal four-branch structure, replace it with one compact green symbol. GoogLeNet uses nine Inception blocks arranged into groups of two, five, and two, with max pooling between groups. The stem performs early image ingestion; the body performs multi-scale processing; the head uses global average pooling, inherited conceptually from NiN, before classification. Mention that the original paper included auxiliary classifiers to stabilize training, but the simplified course implementation omits them because modern training recipes make them less essential.
+:::
+
+## Nine blocks become one GoogLeNet class
+
+:::: {.googlenet-code-layout}
+::: {.googlenet-code-map}
+<div class="gg-mini-head">GAP → Linear(K)</div>
+<div class="gg-mini-stage"><span>BODY 5</span><strong>Inception × 2</strong></div>
+<b>↑</b>
+<div class="gg-mini-pool">MaxPool · stride 2</div>
+<div class="gg-mini-stage five-stage"><span>BODY 4</span><strong>Inception × 5</strong></div>
+<b>↑</b>
+<div class="gg-mini-pool">MaxPool · stride 2</div>
+<div class="gg-mini-stage"><span>BODY 3</span><strong>Inception × 2</strong></div>
+<b>↑</b>
+<div class="gg-mini-stem">STEM</div>
+<div class="gg-mini-input">224² × 3 image</div>
+:::
+
+::: {.light-code-editor .googlenet-editor}
+<div class="editor-bar"><span>PYTORCH · COMPRESSED MODEL</span><strong>googlenet.py</strong></div>
+<pre><code><span class="py-kw">class</span> <span class="py-fn">GoogLeNet</span>(<span class="py-mod">nn</span>.<span class="py-call">Module</span>):
+    <span class="py-kw">def</span> <span class="py-fn">__init__</span>(<span class="py-param">self</span>, <span class="py-param">num_classes</span><span class="py-punc">=</span><span class="py-num">10</span>):
+        <span class="py-call">super</span>().<span class="py-call">__init__</span>()
+        pool <span class="py-punc">=</span> <span class="py-kw">lambda</span>: <span class="py-mod">nn</span>.<span class="py-call">MaxPool2d</span>(<span class="py-num">3</span>, <span class="py-num">2</span>, <span class="py-num">1</span>)
+
+        self.stem <span class="py-punc">=</span> <span class="py-mod">nn</span>.<span class="py-call">Sequential</span>(
+            conv_relu(<span class="py-num">64</span>, <span class="py-num">7</span>, stride<span class="py-punc">=</span><span class="py-num">2</span>, padding<span class="py-punc">=</span><span class="py-num">3</span>), pool(),
+            conv_relu(<span class="py-num">64</span>, <span class="py-num">1</span>), conv_relu(<span class="py-num">192</span>, <span class="py-num">3</span>, padding<span class="py-punc">=</span><span class="py-num">1</span>), pool())
+
+        self.body <span class="py-punc">=</span> <span class="py-mod">nn</span>.<span class="py-call">Sequential</span>(
+            Inception(<span class="py-num">64</span>, (<span class="py-num">96</span>,<span class="py-num">128</span>), (<span class="py-num">16</span>,<span class="py-num">32</span>), <span class="py-num">32</span>),
+            Inception(<span class="py-num">128</span>, (<span class="py-num">128</span>,<span class="py-num">192</span>), (<span class="py-num">32</span>,<span class="py-num">96</span>), <span class="py-num">64</span>), pool(),
+            Inception(<span class="py-num">192</span>, (<span class="py-num">96</span>,<span class="py-num">208</span>), (<span class="py-num">16</span>,<span class="py-num">48</span>), <span class="py-num">64</span>),
+            Inception(<span class="py-num">160</span>, (<span class="py-num">112</span>,<span class="py-num">224</span>), (<span class="py-num">24</span>,<span class="py-num">64</span>), <span class="py-num">64</span>),
+            Inception(<span class="py-num">128</span>, (<span class="py-num">128</span>,<span class="py-num">256</span>), (<span class="py-num">24</span>,<span class="py-num">64</span>), <span class="py-num">64</span>),
+            Inception(<span class="py-num">112</span>, (<span class="py-num">144</span>,<span class="py-num">288</span>), (<span class="py-num">32</span>,<span class="py-num">64</span>), <span class="py-num">64</span>),
+            Inception(<span class="py-num">256</span>, (<span class="py-num">160</span>,<span class="py-num">320</span>), (<span class="py-num">32</span>,<span class="py-num">128</span>), <span class="py-num">128</span>), pool(),
+            Inception(<span class="py-num">256</span>, (<span class="py-num">160</span>,<span class="py-num">320</span>), (<span class="py-num">32</span>,<span class="py-num">128</span>), <span class="py-num">128</span>),
+            Inception(<span class="py-num">384</span>, (<span class="py-num">192</span>,<span class="py-num">384</span>), (<span class="py-num">48</span>,<span class="py-num">128</span>), <span class="py-num">128</span>))
+
+        self.head <span class="py-punc">=</span> <span class="py-mod">nn</span>.<span class="py-call">Sequential</span>(
+            <span class="py-mod">nn</span>.<span class="py-call">AdaptiveAvgPool2d</span>((<span class="py-num">1</span>,<span class="py-num">1</span>)), <span class="py-mod">nn</span>.<span class="py-call">Flatten</span>(),
+            <span class="py-mod">nn</span>.<span class="py-call">Dropout</span>(<span class="py-num">0.4</span>), <span class="py-mod">nn</span>.<span class="py-call">LazyLinear</span>(num_classes))
+
+    <span class="py-kw">def</span> <span class="py-fn">forward</span>(<span class="py-param">self</span>, <span class="py-param">x</span>):
+        <span class="py-kw">return</span> self.head(self.body(self.stem(x)))</code></pre>
+:::
+::::
+
+<div class="googlenet-code-trace fragment"><span>READ THE CLASS</span><strong><code>stem</code></strong><b>→</b><strong><code>body</code>: 2 + 5 + 2 blocks</strong><b>→</b><strong><code>head</code>: GAP + classifier</strong></div>
+
+<p class="source-note">Simplified GoogLeNet without auxiliary classifiers, based on Szegedy et al. [@szegedy2015googlenet].</p>
+
+::: {.notes}
+Keep the compressed figure visible while reading the class. The stem performs early downsampling and reaches 192 channels. The body contains exactly nine Inception calls: two before the first pool, five before the second, and two at the final resolution. Each constructor tuple allocates output channels across the four branches. The head compresses each channel to one spatial value, flattens, applies dropout, and learns the final class projection. The forward method exposes the persistent stem–body–head pattern. This simplified teaching implementation omits the original auxiliary classifiers.
+:::
+
+## GoogLeNet gains scale diversity—at a cost
+
+<div class="network-audit-prompt"><span>ARCHITECTURE AUDIT · GOOGLENET</span><strong>What does branching buy—and what complexity does it introduce?</strong></div>
+
+:::: {.network-synthesis}
+::: {.network-ledger .network-gains}
+<span>MAIN IDEAS</span>
+<div><b>MULTI-SCALE</b><strong>Process $1\times1$, $3\times3$, $5\times5$, and pooled evidence together.</strong><small>The block avoids committing to one receptive field.</small></div>
+<div><b>CAPACITY VALVES</b><strong>Use $1\times1$ reductions before wide kernels.</strong><small>Branch widths allocate the parameter budget.</small></div>
+<div><b>MODULAR BODY</b><strong>Compress four paths into one reusable symbol.</strong><small>Nine blocks form a clear stem–body–head network.</small></div>
+:::
+::: {.network-ledger .network-limits .fragment}
+<span>DRAWBACKS</span>
+<div><b>HAND-TUNED WIDTHS</b><strong>Every branch needs several channel choices.</strong><small>The architecture specification becomes intricate.</small></div>
+<div><b>BRANCH COMPLEXITY</b><strong>Parallel paths complicate implementation and hardware scheduling.</strong><small>Fewer parameters do not guarantee simple execution.</small></div>
+<div><b>TRAINING SUPPORT</b><strong>The original model used auxiliary classifiers.</strong><small>Very deep plain information paths remain difficult.</small></div>
+:::
+::::
+
+<div class="network-next-step fragment"><span>OPEN PROBLEM</span><strong>Can adding depth preserve an easy route for information and gradients?</strong><b>→ residual learning</b></div>
+
+<p class="source-note">Synthesis based on Szegedy et al. [@szegedy2015googlenet].</p>
+
+::: {.notes}
+Have students name the benefit of each branch before showing the drawbacks. GoogLeNet makes multi-scale processing explicit and uses one-by-one reductions to allocate capacity economically. Once compressed, the Inception symbol supports a modular nine-block body. The cost is architectural complexity: many branch widths must be hand tuned, parallel paths are less straightforward to schedule, and the original model used auxiliary classifiers during training. Close on the remaining information-flow problem, which prepares the residual-learning section without teaching it yet.
+:::
+
+# 04 · Learning residual corrections {.section-slide .architecture-section .resnet-section data-section-progress="4 / 7" style="--section-progress:57.143%"}
+
+<div class="resnet-evidence-layout">
+<div class="resnet-paper-figure">
+<img src="assets/resnet-plain-degradation-figure1.png" alt="Training and test error curves from the ResNet paper comparing plain 20-layer and 56-layer networks on CIFAR-10; the deeper plain network has higher error.">
+<small>Plain networks on CIFAR-10 · He et al., Figure 1</small>
+</div>
+<div class="resnet-evidence-question">
+<span>PREDICT BEFORE REVEAL</span>
+<strong>If 20 layers work, should 56 layers fit the training set at least as well?</strong>
+<div class="fragment"><b>No.</b><p>The deeper <em>plain</em> network has higher training error—not merely higher test error.</p></div>
+<div class="fragment"><b>DIAGNOSIS</b><p>Extra depth created an optimization problem: the added layers failed even to learn an identity mapping.</p></div>
+</div>
+</div>
+
+<p class="source-note">Original experimental curves reproduced from He et al. [@he2016resnet], Figure 1.</p>
+
+::: {.notes}
+Begin with the apparently obvious claim: a deeper model contains enough capacity to imitate the shallower one by making the extra layers identities. Ask students to predict the 56-layer training curve. Reveal that it is worse than the 20-layer curve. Because the failure already appears in training error, this is not the usual overfitting story. He et al. call it the degradation problem. The architecture needs to make “do nothing” easy before depth can become reliably useful.
+:::
+
+## Learn the correction—not the whole transformation
+
+<div class="residual-mechanism-layout">
+<div class="residual-main-figure"><img src="assets/residual-block-schematic.svg" alt="Residual block in which an identity shortcut carries x around two convolutions and addition produces F(x) plus x."></div>
+<div class="residual-idea-stack">
+<span>THE RESIDUAL CONTRACT</span>
+<div class="fragment"><b>TARGET</b><strong>Desired mapping: $H(x)$</strong><small>A plain stack must learn the entire transformation.</small></div>
+<div class="fragment"><b>REPARAMETERIZE</b><strong>Learn $F(x)=H(x)-x$</strong><small>The block returns $H(x)=F(x)+x$.</small></div>
+<div class="fragment"><b>EASY FALLBACK</b><strong>Set $F(x)\approx0$ to preserve $x$</strong><small>Information and gradients retain a direct route.</small></div>
+</div>
+</div>
+
+<div class="residual-verdict fragment"><span>ASK THE ROOM</span><strong>What must be true before the two paths can be added?</strong><b>same shape</b></div>
+
+<p class="source-note">Course-made diagram based on the residual building block in He et al. [@he2016resnet].</p>
+
+::: {.notes}
+Trace the two routes with a finger. The main path learns a correction F(x); the shortcut transports x unchanged. Addition is elementwise, so shape compatibility is a hard interface contract. Ask what happens if all convolutional weights produce zero: the block becomes an identity after the final activation. The important claim is not that gradients magically avoid every difficulty, but that residual parameterization provides a short information and gradient route and makes the identity solution accessible.
+:::
+
+## One block, two shortcut policies
+
+:::: {.residual-code-layout}
+::: {.residual-code-visual}
+<span>READ THE DECISION</span>
+<div class="res-code-choice"><b>same shape?</b><strong><code>projection = None</code></strong><small>Reuse $x$ directly.</small></div>
+<div class="res-code-arrow">↓</div>
+<div class="res-code-choice projected"><b>shape changes?</b><strong><code>Conv2d(1×1)</code></strong><small>Align channels and resolution.</small></div>
+<div class="res-code-sum"><strong>$F(x)$</strong><b>+</b><strong>$x$ or $W_sx$</strong></div>
+:::
+::: {.light-code-editor .residual-editor}
+<div class="editor-bar"><span>PYTORCH · RESIDUAL BLOCK</span><strong>residual.py</strong></div>
+<pre><code><span class="py-kw">class</span> <span class="py-fn">ResidualBlock</span>(<span class="py-mod">nn</span>.<span class="py-call">Module</span>):
+    <span class="py-kw">def</span> <span class="py-fn">__init__</span>(<span class="py-self">self</span>, in_ch, out_ch,
+                 stride=<span class="py-num">1</span>, use_projection=<span class="py-bool">False</span>):
+        <span class="py-mod">super</span>().<span class="py-call">__init__</span>()
+        <span class="py-self">self</span>.main = <span class="py-mod">nn</span>.<span class="py-call">Sequential</span>(
+            <span class="py-mod">nn</span>.<span class="py-call">Conv2d</span>(in_ch, out_ch, <span class="py-num">3</span>, stride,
+                      padding=<span class="py-num">1</span>, bias=<span class="py-bool">False</span>),
+            <span class="py-mod">nn</span>.<span class="py-call">BatchNorm2d</span>(out_ch), <span class="py-mod">nn</span>.<span class="py-call">ReLU</span>(),
+            <span class="py-mod">nn</span>.<span class="py-call">Conv2d</span>(out_ch, out_ch, <span class="py-num">3</span>,
+                      padding=<span class="py-num">1</span>, bias=<span class="py-bool">False</span>),
+            <span class="py-mod">nn</span>.<span class="py-call">BatchNorm2d</span>(out_ch))
+
+        <span class="py-self">self</span>.shortcut = (
+            <span class="py-mod">nn</span>.<span class="py-call">Conv2d</span>(in_ch, out_ch, <span class="py-num">1</span>, stride,
+                      bias=<span class="py-bool">False</span>)
+            <span class="py-kw">if</span> use_projection <span class="py-kw">else</span> <span class="py-bool">None</span>)
+
+    <span class="py-kw">def</span> <span class="py-fn">forward</span>(<span class="py-self">self</span>, x):
+        identity = x <span class="py-kw">if</span> <span class="py-self">self</span>.shortcut <span class="py-kw">is</span> <span class="py-bool">None</span> \
+                     <span class="py-kw">else</span> <span class="py-self">self</span>.shortcut(x)
+        <span class="py-kw">return</span> <span class="py-mod">F</span>.<span class="py-call">relu</span>(<span class="py-self">self</span>.main(x) + identity)</code></pre>
+:::
+::::
+
+<p class="source-note">Teaching implementation of the basic residual block from He et al. [@he2016resnet].</p>
+
+::: {.notes}
+Keep the code as the principal content. The main branch is identical in both cases; only the shortcut policy changes. With stride one and equal channel counts, use_projection stays false and identity is exactly x. At a stage boundary, the caller sets stride two and enables the one-by-one projection. Point out that both paths then downsample consistently before addition. This explicit flag makes the architectural decision visible to students.
+:::
+
+## Addition imposes a shape contract
+
+<div class="residual-variants-figure"><img src="assets/residual-shortcut-variants.svg" alt="Side-by-side residual blocks: an identity shortcut for matching shapes and a one-by-one convolutional projection for changing spatial size and channels."></div>
+
+<div class="residual-shape-contract">
+<div><span>IDENTITY</span><strong><code>ResidualBlock(64, 64)</code></strong><small>H × W × C stays fixed · zero shortcut parameters</small></div>
+<div><span>PROJECTION</span><strong><code>ResidualBlock(64, 128, stride=2, use_projection=True)</code></strong><small>H and W halve · channels double · learned alignment</small></div>
+</div>
+
+<div class="residual-takeaway fragment"><span>DESIGN RULE</span><strong>Use identity whenever shapes agree; project only when the stage changes shape.</strong></div>
+
+<p class="source-note">Course-made comparison based on the shortcut options in He et al. [@he2016resnet].</p>
+
+::: {.notes}
+Ask students to decide which shortcut the two constructor calls require before revealing the design rule. Addition requires identical H, W, and C. Inside a stage, the residual branch preserves shape and the free identity shortcut is preferable. At a stage transition, stride two changes spatial resolution and the output channel count grows, so a one-by-one convolution applies the same stride and learns the necessary channel projection. Contrast this with concatenation: addition preserves the channel count rather than stacking both representations.
+:::
+
+# 05 · Reusing every feature with DenseNet {.section-slide .architecture-section .densenet-section data-section-progress="5 / 7" style="--section-progress:71.429%"}
+
+<div class="densenet-paper-layout">
+<div class="densenet-paper-figure"><img src="assets/densenet-paper-figure1.png" alt="Figure 1 from the DenseNet paper showing a five-layer dense block in which each layer receives all earlier feature maps."></div>
+<div class="densenet-paper-question">
+<span>READ THE CONNECTIONS</span>
+<strong>What reaches $H_4$ that would not reach it in a plain chain?</strong>
+<div class="fragment"><b>EVERY EARLIER FEATURE</b><p>$H_4$ receives $[x_0,x_1,x_2,x_3]$ directly.</p></div>
+<div class="fragment"><b>NO SUMMATION</b><p>Features remain distinguishable because DenseNet concatenates them.</p></div>
+<a href="https://arxiv.org/abs/1608.06993" target="_blank" rel="noopener">Read the original paper ↗</a>
+</div>
+</div>
+
+<p class="source-note">Original Figure 1 from Huang et al. [@huang2017densenet]. <a href="https://arxiv.org/abs/1608.06993">Densely Connected Convolutional Networks</a>.</p>
+
+::: {.notes}
+Let students inspect the colored curves before naming the mechanism. Ask them to list the inputs of H4. A plain chain would supply only x3; the dense block supplies x0 through x3. The paper’s figure uses growth rate k=4: each layer contributes only four new feature maps, but all earlier maps remain available. Make the paper link explicit so students can trace the architecture to its primary source.
+:::
+
+## A dense layer appends—it does not replace
+
+<div class="dense-mechanism-layout">
+<div class="dense-main-figure"><img src="assets/densenet-reuse-schematic.svg" alt="Course diagram of four dense layers receiving all previous features and appending k channels each."></div>
+<div class="dense-idea-stack">
+<span>THE DENSE CONTRACT</span>
+<div class="fragment"><b>READ</b><strong>$z_\ell=[x_0,\ldots,x_{\ell-1}]$</strong><small>Concatenate the entire feature history.</small></div>
+<div class="fragment"><b>CONTRIBUTE</b><strong>$x_\ell=H_\ell(z_\ell)$</strong><small>Produce only $k$ new feature maps.</small></div>
+<div class="fragment"><b>GROW</b><strong>$C_\ell=C_0+\ell k$</strong><small>The growth rate controls new capacity.</small></div>
+</div>
+</div>
+
+<div class="dense-resnet-contrast fragment"><span>RESNET</span><strong>$F(x)+x$ · combine by addition</strong><b>vs.</b><span>DENSENET</span><strong>$[x_0,x_1,\ldots]$ · preserve by concatenation</strong></div>
+
+<p class="source-note">Course-made diagram based on Huang et al. [@huang2017densenet].</p>
+
+::: {.notes}
+Build the equations from the picture rather than presenting them first. Each layer reads the concatenated feature history and contributes k new maps. The channel count therefore grows linearly within a dense block. Contrast this with ResNet’s addition: ResNet merges two same-shaped tensors into one state, whereas DenseNet preserves separate feature maps and makes them jointly visible downstream.
+:::
+
+## Watch the feature bank grow
+
+<div class="dense-growth-question"><span>START WITH</span><strong>$C_0=8$ channels</strong><span>EACH LAYER ADDS</span><strong>$k=4$ channels</strong><b>Predict the width after four layers.</b></div>
+
+<div class="dense-growth-animation">
+<div class="growth-stage"><span>INPUT</span><div class="dense-channel-bank"><i></i><i></i></div><strong>8</strong><small>channels</small></div>
+<b class="fragment">+</b>
+<div class="growth-stage fragment"><span>$H_1$ ADDS 4</span><div class="dense-channel-bank"><i></i><i></i><i></i></div><strong>12</strong><small>$8+4$</small></div>
+<b class="fragment">+</b>
+<div class="growth-stage fragment"><span>$H_2$ ADDS 4</span><div class="dense-channel-bank"><i></i><i></i><i></i><i></i></div><strong>16</strong><small>$8+2(4)$</small></div>
+<b class="fragment">+</b>
+<div class="growth-stage fragment"><span>$H_3$ ADDS 4</span><div class="dense-channel-bank"><i></i><i></i><i></i><i></i><i></i></div><strong>20</strong><small>$8+3(4)$</small></div>
+<b class="fragment">+</b>
+<div class="growth-stage fragment"><span>$H_4$ ADDS 4</span><div class="dense-channel-bank"><i></i><i></i><i></i><i></i><i></i><i></i></div><strong>24</strong><small>$8+4(4)$</small></div>
+</div>
+
+<div class="dense-growth-rule fragment"><span>GENERAL RULE</span><strong>After $L$ layers: $C_L=C_0+Lk$</strong><b>Depth grows the feature bank predictably.</b></div>
+
+::: {.notes}
+Ask for the final width before advancing. Reveal one dense layer at a time and make students update the running channel count aloud. The key is that a layer does not output the entire wider state from scratch: it computes only k new maps, then concatenation carries the existing bank forward. With C0 equal to eight, growth rate four, and four layers, the output contains twenty-four channels.
+:::
+
+## Cool the representation before it grows again
+
+<div class="dense-cooling-animation">
+<div class="cool-stage hot"><span>DENSE BLOCK OUTPUT</span><div class="cool-bank"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><strong>$C$ channels</strong><small>many reusable activations</small></div>
+<b class="cool-arrow fragment">→</b>
+<div class="cool-stage compressed fragment"><span>1 × 1 CONV</span><div class="cool-bank"><i></i><i></i><i></i><i></i></div><strong>$\lfloor\theta C\rfloor$</strong><small>$0\lt\theta\leq1$ controls width</small></div>
+<b class="cool-arrow fragment">→</b>
+<div class="cool-stage pooled fragment"><span>AVG POOL 2 × 2</span><div class="cool-bank"><i></i><i></i><i></i><i></i></div><strong>$H/2\times W/2$</strong><small>less spatial redundancy</small></div>
+</div>
+
+<div class="dense-regularization-row">
+<div class="fragment"><span>CAPACITY CONTROL</span><strong>Compression prevents uncontrolled channel growth.</strong><small>DenseNet-BC commonly uses transition compression.</small></div>
+<div class="fragment"><span>OVERFITTING CONTROL</span><strong>Dropout can mask newly produced features during training.</strong><small>The paper uses dropout on small datasets; augmentation remains essential.</small></div>
+</div>
+
+<div class="dense-cooling-verdict fragment"><span>DO NOT CONFUSE THEM</span><strong>Compression makes the network smaller; dropout makes feature reliance stochastic.</strong></div>
+
+<p class="source-note">Transition compression and dropout follow the DenseNet training variants in Huang et al. [@huang2017densenet].</p>
+
+::: {.notes}
+Use “cooling” as a visual metaphor, then make the mechanisms precise. The transition layer first uses a one-by-one convolution to reduce channels by compression factor theta, then average pooling halves the spatial resolution. This controls representation size and computation. It is not identical to regularization: dropout directly combats co-adaptation by randomly masking newly produced features during training. The paper reports dropout for several small-dataset experiments, while the later augmentation section will treat data-side regularization in depth.
+:::
+
+## The implementation mirrors the equation
+
+:::: {.dense-code-layout}
+::: {.dense-code-map}
+<span>CHANNEL ACCOUNTING</span>
+<div><b>START</b><strong>$C_0$</strong></div><i>+</i>
+<div><b>LAYER 1</b><strong>$k$</strong></div><i>+</i>
+<div><b>LAYER 2</b><strong>$k$</strong></div><i>+</i>
+<div><b>LAYER $L$</b><strong>$k$</strong></div>
+<p>$C_{out}=C_0+Lk$</p>
+<small><strong>torch.cat</strong> is the architectural operation.</small>
+:::
+::: {.light-code-editor .dense-editor}
+<div class="editor-bar"><span>PYTORCH · DENSE BLOCK</span><strong>densenet.py</strong></div>
+<pre><code><span class="py-kw">class</span> <span class="py-fn">DenseLayer</span>(<span class="py-mod">nn</span>.<span class="py-call">Module</span>):
+    <span class="py-kw">def</span> <span class="py-fn">__init__</span>(<span class="py-self">self</span>, in_ch, growth_rate):
+        <span class="py-mod">super</span>().<span class="py-call">__init__</span>()
+        <span class="py-self">self</span>.transform = <span class="py-mod">nn</span>.<span class="py-call">Sequential</span>(
+            <span class="py-mod">nn</span>.<span class="py-call">BatchNorm2d</span>(in_ch), <span class="py-mod">nn</span>.<span class="py-call">ReLU</span>(),
+            <span class="py-mod">nn</span>.<span class="py-call">Conv2d</span>(in_ch, growth_rate, <span class="py-num">3</span>,
+                      padding=<span class="py-num">1</span>, bias=<span class="py-bool">False</span>))
+
+    <span class="py-kw">def</span> <span class="py-fn">forward</span>(<span class="py-self">self</span>, x):
+        new_features = <span class="py-self">self</span>.transform(x)
+        <span class="py-kw">return</span> <span class="py-mod">torch</span>.<span class="py-call">cat</span>([x, new_features], dim=<span class="py-num">1</span>)
+
+<span class="py-kw">def</span> <span class="py-fn">dense_block</span>(in_ch, num_layers, k):
+    layers = []
+    <span class="py-kw">for</span> i <span class="py-kw">in</span> <span class="py-call">range</span>(num_layers):
+        layers.<span class="py-call">append</span>(<span class="py-call">DenseLayer</span>(in_ch + i * k, k))
+    <span class="py-kw">return</span> <span class="py-mod">nn</span>.<span class="py-call">Sequential</span>(*layers)</code></pre>
+:::
+::::
+
+<div class="dense-code-check fragment"><span>CHECK</span><strong><code>dense_block(64, 4, 32)</code></strong><b>→</b><strong>64 + 4 × 32 = 192 output channels</strong></div>
+
+<p class="source-note">Compact teaching implementation based on Huang et al. [@huang2017densenet].</p>
+
+::: {.notes}
+Have students predict the output channel count before revealing the numerical check. DenseLayer receives the accumulated tensor, creates k new maps, and concatenates them with the input along dimension one. Sequential works because each DenseLayer returns the enlarged collective state. The constructor’s in_ch plus i times k is exactly the channel-growth equation translated into code.
+:::
+
+## Feature reuse buys efficiency—but stores activations
+
+<div class="network-audit-prompt"><span>ARCHITECTURE AUDIT · DENSENET</span><strong>What does preserving every feature buy—and what must remain in memory?</strong></div>
+
+:::: {.network-synthesis}
+::: {.network-ledger .network-gains}
+<span>MAIN IDEAS</span>
+<div><b>FEATURE REUSE</b><strong>Every layer can read low- and high-level evidence.</strong><small>Useful maps need not be relearned downstream.</small></div>
+<div><b>SHORT PATHS</b><strong>Features and gradients have many direct routes.</strong><small>Deep supervision emerges without auxiliary heads.</small></div>
+<div><b>NARROW UPDATES</b><strong>Each layer contributes only $k$ new maps.</strong><small>Growth rate separates depth from per-layer width.</small></div>
+:::
+::: {.network-ledger .network-limits .fragment}
+<span>DRAWBACKS</span>
+<div><b>ACTIVATION MEMORY</b><strong>Earlier maps must remain available for reuse.</strong><small>Training memory can become the practical bottleneck.</small></div>
+<div><b>CHANNEL GROWTH</b><strong>Concatenation widens the shared state.</strong><small>Transition layers must compress and downsample.</small></div>
+<div><b>DATA MOVEMENT</b><strong>Repeated concatenation is not computationally free.</strong><small>Parameter efficiency does not guarantee fast execution.</small></div>
+:::
+::::
+
+<div class="network-next-step fragment"><span>ARCHITECTURAL LESSON</span><strong>Skip connections decide not only what bypasses layers—but how information is combined.</strong><b>add vs. concatenate</b></div>
+
+<p class="source-note">Synthesis based on Huang et al. [@huang2017densenet]. <a href="https://arxiv.org/abs/1608.06993">Original paper ↗</a></p>
+
+::: {.notes}
+Ask students to name one benefit and one cost before revealing the right column. Dense connectivity supports feature reuse, short gradient paths, and narrow per-layer contributions. Its main systems cost is activation memory and data movement: earlier features must stay available and the concatenated state grows. Transition layers—typically one-by-one convolution followed by average pooling—control this growth between dense blocks. Close by comparing the combination operators: addition and concatenation express different information-preservation policies.
+:::
+
+# 06 · The architecture toolkit {.section-slide .architecture-section .closing-section .summary-closing data-section-progress="6 / 7" style="--section-progress:85.714%"}
+
+<div class="toolkit-prompt"><span>DO NOT MEMORIZE FIVE NETWORKS</span><strong>Remember five reusable operations—and the pressure each one answers.</strong></div>
+
+<div class="architecture-toolkit">
+<div class="tool-card vgg-tool fragment"><span>VGG</span><div class="tool-icon repeat-icon"><i></i><i></i><i></i></div><strong>REPEAT</strong><small>Build depth from uniform small-kernel blocks.</small><b>cost · compute</b></div>
+<div class="tool-card nin-tool fragment"><span>NiN</span><div class="tool-icon mix-icon"><i></i><em>1×1</em><i></i></div><strong>MIX CHANNELS</strong><small>Learn nonlinear combinations at each location.</small><b>gain · compact head</b></div>
+<div class="tool-card inception-tool fragment"><span>INCEPTION</span><div class="tool-icon branch-icon"><i></i><i></i><i></i></div><strong>BRANCH</strong><small>Process several spatial scales in parallel.</small><b>cost · complexity</b></div>
+<div class="tool-card resnet-tool fragment"><span>RESNET</span><div class="tool-icon add-icon"><i></i><em>+</em></div><strong>ADD</strong><small>Learn a correction while preserving an identity path.</small><b>gain · optimization</b></div>
+<div class="tool-card dense-tool fragment"><span>DENSENET</span><div class="tool-icon concat-icon"><i></i><i></i><i></i><i></i></div><strong>CONCATENATE</strong><small>Expose every earlier feature for explicit reuse.</small><b>cost · memory</b></div>
+</div>
+
+<div class="toolkit-axis fragment"><span>THE COMMON QUESTION</span><strong>What should the next layer receive?</strong><b>one output · many scales · an identity · or the full history</b></div>
+
+::: {.notes}
+Reveal the cards one at a time and ask students to supply the verb before it appears. Each historical network contributes a transferable operation rather than a complete recipe that must be copied wholesale. VGG contributes disciplined repetition, NiN local channel mixing, Inception parallel scales, ResNet additive correction, and DenseNet explicit feature reuse. Keep the cost visible because architecture design always trades one pressure for another.
+:::
+
+# 07 · Compose for the task {.section-slide .architecture-section .closing-section .composition-closing data-section-progress="7 / 7" style="--section-progress:100%"}
+
+<div class="task-specification"><span>DESIGN BRIEF</span><strong>Classify plant disease from mobile images</strong><div><b>small lesions</b><b>limited compute</b><b>deep training must stay stable</b><b>10 classes</b></div></div>
+
+<div class="composed-network">
+<div class="composition-step fragment"><span>STEM</span><strong>VGG idea</strong><small>repeat padded $3\times3$ convolutions</small></div><b class="fragment">→</b>
+<div class="composition-step fragment"><span>LOCAL DETAIL</span><strong>Inception idea</strong><small>branch across receptive-field sizes</small></div><b class="fragment">→</b>
+<div class="composition-step fragment"><span>DEEP FLOW</span><strong>ResNet idea</strong><small>add identity shortcuts</small></div><b class="fragment">→</b>
+<div class="composition-step fragment"><span>HEAD</span><strong>NiN idea</strong><small>class maps + global average pooling</small></div>
+</div>
+
+<div class="design-rejection fragment"><span>WHY NOT EVERYTHING?</span><strong>Dense concatenation is useful, but its activation-memory cost conflicts with the mobile constraint.</strong></div>
+
+<div class="design-logic fragment">
+<div><span>SPECIFICATION</span><strong>What must the model do?</strong></div><b>→</b>
+<div><span>PRESSURE</span><strong>What will fail first?</strong></div><b>→</b>
+<div><span>MECHANISM</span><strong>Which technique addresses it?</strong></div><b>→</b>
+<div><span>EVIDENCE</span><strong>Did the experiment improve?</strong></div>
+</div>
+
+<div class="final-lecture-question fragment"><span>LEAVE WITH THIS</span><strong>A network is not a historical name. It is a composition of mechanisms chosen for a task.</strong></div>
+
+::: {.notes}
+Give students the design brief and ask which techniques they would combine before revealing the proposed network. The answer deliberately borrows from four families: VGG repetition for a regular stem, Inception branching for small lesions at different scales, ResNet shortcuts for stable depth, and NiN’s global-average-pooling head for a compact classifier. DenseNet is not “bad”; it is rejected here because the task says mobile compute and activation memory matter. End with the design loop: specification, pressure, mechanism, evidence. Students should leave prepared to build hybrids rather than choose architecture names from a menu.
+:::

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="540" viewBox="0 0 1040 540" role="img" aria-labelledby="title desc">
+  <title id="title">Residual block with an identity shortcut</title>
+  <desc id="desc">Input x follows a learned two-convolution residual branch and an unchanged identity shortcut. The two paths meet at addition before a final ReLU.</desc>
+  <defs>
+    <filter id="shadow"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#17212b" flood-opacity=".14"/></filter>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0L8 4 0 8Z" fill="#526573"/></marker>
+    <style>
+      .plate{fill:#f7fafc;stroke:#ef5b45;stroke-width:2.5;stroke-dasharray:9 7;rx:18}
+      .conv{fill:#b9dcf7;stroke:#17212b;stroke-width:1.5;rx:7;filter:url(#shadow)}
+      .norm{fill:#dff2e8;stroke:#25734d;stroke-width:1.5;rx:7}
+      .relu{fill:#fee7cb;stroke:#b85b19;stroke-width:1.5;rx:7}
+      .io{fill:#f7f4ec;stroke:#526573;stroke-width:1.5;rx:7}
+      .sum{fill:#ef5b45;stroke:#17212b;stroke-width:1.7}
+      .label{fill:#17212b;font:600 17px Arial,sans-serif;text-anchor:middle;dominant-baseline:middle}
+      .minor{fill:#526573;font:600 14px Arial,sans-serif;text-anchor:middle}
+      .branch{fill:#b33e2f;font:700 14px Arial,sans-serif}
+      .flow{fill:none;stroke:#526573;stroke-width:2.4;marker-end:url(#arrow)}
+      .shortcut{fill:none;stroke:#ef5b45;stroke-width:3.2;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect class="plate" x="210" y="43" width="620" height="452"/>
+  <text class="branch" x="240" y="76">LEARNED CORRECTION · F(x)</text>
+  <rect class="io" x="35" y="230" width="150" height="58"/><text class="label" x="110" y="259">input x</text>
+  <path class="flow" d="M190 259H260"/>
+  <rect class="conv" x="270" y="222" width="165" height="74"/><text class="label" x="352.5" y="248">3 × 3 Conv</text><text class="minor" x="352.5" y="276">learn weights</text>
+  <path class="flow" d="M440 259H480"/>
+  <rect class="norm" x="490" y="222" width="135" height="74"/><text class="label" x="557.5" y="248">BN + ReLU</text><text class="minor" x="557.5" y="276">stabilize</text>
+  <path class="flow" d="M630 259H670"/>
+  <rect class="conv" x="680" y="222" width="125" height="74"/><text class="label" x="742.5" y="248">3 × 3</text><text class="minor" x="742.5" y="276">Conv + BN</text>
+  <path class="flow" d="M810 259H866"/>
+  <path class="shortcut" d="M110 224V125H890V216"/>
+  <text class="branch" x="500" y="113">IDENTITY SHORTCUT · x</text>
+  <circle class="sum" cx="890" cy="259" r="31"/><text x="890" y="260" fill="#fff" font-family="Arial,sans-serif" font-size="31" font-weight="700" text-anchor="middle" dominant-baseline="middle">+</text>
+  <path class="flow" d="M925 259H946"/>
+  <rect class="relu" x="950" y="219" width="76" height="80"/><text class="label" x="988" y="259">ReLU</text>
+  <text class="minor" x="890" y="322">y = F(x) + x</text>
+  <text class="minor" x="520" y="466">If F(x) = 0, the block can preserve x exactly.</text>
+</svg>
