@@ -44,7 +44,7 @@ How can a vision model become deeper and more capable without becoming impossibl
 ::::
 
 ::: {.notes}
-The image previews the lecture's design problem rather than one named architecture. The main path becomes deeper and more abstract; the arc preserves an earlier signal and merges it back later. Ask students what can go wrong as we keep stacking the convolutional blocks from Chapter 7. This lecture studies architectural answers: disciplined repetition, residual information flow, feature reuse, augmentation, and transfer.
+The image previews the lecture's design problem rather than one named architecture. The main path becomes deeper and more abstract; the arc preserves an earlier signal and merges it back later. Ask students what can go wrong as we keep stacking the convolutional blocks from Chapter 7. This lecture studies architectural answers: disciplined repetition, channel mixing, multi-scale branching, residual information flow, dense feature reuse, and task-driven composition.
 :::
 
 ## A first-level map of the lecture
@@ -987,7 +987,7 @@ Ask for the final width before advancing. Reveal one dense layer at a time and m
 <p class="source-note">Transition compression and dropout follow the DenseNet training variants in Huang et al. [@huang2017densenet].</p>
 
 ::: {.notes}
-Use “cooling” as a visual metaphor, then make the mechanisms precise. The transition layer first uses a one-by-one convolution to reduce channels by compression factor theta, then average pooling halves the spatial resolution. This controls representation size and computation. It is not identical to regularization: dropout directly combats co-adaptation by randomly masking newly produced features during training. The paper reports dropout for several small-dataset experiments, while the later augmentation section will treat data-side regularization in depth.
+Use “cooling” as a visual metaphor, then make the mechanisms precise. The transition layer first uses a one-by-one convolution to reduce channels by compression factor theta, then average pooling halves the spatial resolution. This controls representation size and computation. It is not identical to regularization: dropout directly combats co-adaptation by randomly masking newly produced features during training. The paper reports dropout for several small-dataset experiments; data augmentation is a complementary data-side intervention rather than a connectivity mechanism.
 :::
 
 ## The implementation mirrors the equation

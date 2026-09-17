@@ -231,10 +231,10 @@ Convolution, padding, stride, receptive fields, pooling, and features.
 
 ### Modern Vision Architectures
 
-VGG, residual learning, efficient models, augmentation, and transfer.
+VGG, NiN, Inception, residual learning, dense connectivity, and task-driven composition.
 :::
 :::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span>[Slides](lectures/08-modern-vision-architectures/index.html){.material-pill .available}<span class="material-pill muted">Notebook</span>
+[Notes](notes/08-modern-vision-architectures/index.html){.material-pill .available}[PDF](notes/08-modern-vision-architectures/index.pdf){.material-pill .available}[Slides](lectures/08-modern-vision-architectures/index.html){.material-pill .available}<a class="material-pill available" href="projects/05-flower-architectures/starter/flower_architectures.ipynb?download=1">Notebook</a>
 :::
 :::{.links-cell}
 <a class="resource-mini read required" href="https://arxiv.org/abs/1409.1556"><i>◫</i><span>Simonyan &amp; Zisserman · Very deep CNNs</span></a>
@@ -242,7 +242,7 @@ VGG, residual learning, efficient models, augmentation, and transfer.
 <a class="resource-mini read" href="https://arxiv.org/abs/1608.06993"><i>◫</i><span>Huang et al. · Dense connectivity</span></a>
 :::
 :::{.project-cell .track-middle}
-<span class="project-label">Project 2</span><br>Architecture study.
+<a class="project-track-link" href="projects/05-flower-architectures/index.html"><span class="project-label">Homework 3 · Flower architectures</span><br>VGG transfer and DenseNet from verified components.</a>
 :::
 :::
 

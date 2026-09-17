@@ -112,6 +112,18 @@ These notes are written as a connected textbook rather than lecture transcripts.
 
 <span class="chapter-state">Read chapter →</span>
 :::
+
+:::{.chapter-entry .available .vision}
+<span class="chapter-number">08</span>
+
+:::{.chapter-copy}
+### [Modern Vision Architectures](notes/08-modern-vision-architectures/index.qmd)
+
+[![](lectures/08-modern-vision-architectures/assets/modern-vision-hero.png){fig-alt="Preview of Chapter 8: feature blocks deepen, branch, and reconnect through a residual shortcut."}](notes/08-modern-vision-architectures/index.qmd)
+:::
+
+<span class="chapter-state">Read chapter →</span>
+:::
 :::
 
 :::{.notes-coming}

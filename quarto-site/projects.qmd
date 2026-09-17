@@ -114,4 +114,20 @@ Build one reusable CIFAR-10 pipeline, compare an MLP with a CNN, measure CPU/GPU
 [View project](projects/04-vision-system/index.qmd) · [Open notebook](projects/04-vision-system/starter/vision_training_system.ipynb)
 :::
 :::
+
+:::{.chapter-entry .available .pytorch}
+<span class="chapter-number">H3</span>
+
+:::{.chapter-copy}
+### [Flower Architectures](projects/05-flower-architectures/index.qmd)
+
+Audit Oxford Flowers 102, reconstruct VGG11 precisely enough to load official weights, then assemble and verify a compact DenseNet one component at a time.
+
+`Homework`{.topic-tag} `Flowers102`{.topic-tag} `VGG11`{.topic-tag} `DenseNet`{.topic-tag}
+:::
+
+:::{.chapter-state}
+[View assignment](projects/05-flower-architectures/index.qmd) · <a href="projects/05-flower-architectures/starter/flower_architectures.ipynb?download=1">Open notebook</a>
+:::
+:::
 :::
