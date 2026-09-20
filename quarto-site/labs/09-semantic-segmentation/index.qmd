@@ -1,0 +1,66 @@
+---
+title: "Lab 09 · Seeing Every Pixel"
+subtitle: "Open a pretrained segmentation model and make its spatial decisions visible"
+description: "A visual, inference-only PyTorch investigation of semantic segmentation, LRASPP internals, masks, overlays, confidence, and transformation consistency."
+toc: true
+toc-depth: 2
+page-layout: article
+---
+
+:::{.project-brief}
+<span><strong>Duration:</strong> One session × 1h30</span>
+<span><strong>Mode:</strong> Individual or pairs</span>
+<span><strong>Format:</strong> Guided Jupyter notebook</span>
+<span><strong>Compute:</strong> CPU or GPU · inference only</span>
+<span><strong>Deliverable:</strong> Executed visual notebook and six-question exit ticket</span>
+:::
+
+## One image, one decision at every pixel
+
+This laboratory is an exploration, not a training exercise. You will load a lightweight pretrained LRASPP–MobileNetV3, choose real scenes, trace the spatial tensors inside its backbone, and turn its class-score maps into semantic masks and overlays.
+
+All expensive and repetitive machinery is supplied. There is no dataset loader, optimizer, loss, backward pass, or training loop. Your job is to change images and visualization choices, inspect what happens, and explain the evidence.
+
+<a class="btn btn-primary" href="starter/seeing_every_pixel.html">View notebook</a>
+<a class="btn btn-secondary" href="/labs/09-semantic-segmentation/starter/seeing_every_pixel.ipynb?download=1" download="seeing_every_pixel.ipynb">Download notebook</a>
+
+## What you will investigate
+
+1. Interpret the image and output tensor contracts.
+2. Locate the backbone, spatial feature stages, and pixel classifier.
+3. Observe how resolution and channel depth change through the network.
+4. Convert 21 class-score maps into one colored semantic mask.
+5. Compare images, masks, overlays, and confidence maps.
+6. Test whether the prediction remains stable after a horizontal flip.
+
+## The visual destination
+
+The notebook makes the desired output visible at every stage. These are representative results from the supplied model; your chosen scene may expose different successes and failures.
+
+::: {layout-ncol="2"}
+![Six real scenes available for experimentation.](assets/scene-gallery.png){fig-alt="A two-row gallery of six real photographs used to test the semantic segmentation model."}
+
+![Spatial activations observed at six depths of LRASPP–MobileNetV3.](assets/feature-gallery.png){fig-alt="Six heat maps showing progressively deeper spatial feature representations inside the segmentation network."}
+
+![The strongest class-score maps produced for one image.](assets/class-score-maps.png){fig-alt="An input photograph followed by four class probability heat maps predicted at every image location."}
+
+![The original image, predicted semantic mask, and transparent overlay.](assets/mask-overlay.png){fig-alt="Three panels comparing a real photograph, its colored semantic segmentation, and the segmentation overlaid on the photograph."}
+
+![Confidence reveals pixels hidden by the hard class decision.](assets/confidence-gallery.png){fig-alt="Three panels showing prediction confidence, low-confidence pixels, and uncertain pixels highlighted over the segmentation."}
+
+![Prediction consistency after horizontally flipping an image.](assets/flip-consistency.png){fig-alt="Four panels comparing the original prediction with a restored prediction after horizontal flipping and a pixel agreement map."}
+:::
+
+![Six scenes shown as photographs, semantic masks, and overlays.](assets/all-scenes-gallery.png){fig-alt="A large gallery comparing photographs, predicted semantic class colors, and transparent overlays for six different scenes."}
+
+:::{.callout-important}
+## Success is a visual explanation
+
+A successful notebook does not report a mysterious accuracy number. It identifies what the model recognizes, points to a visible failure, connects that behavior to an internal tensor or confidence map, and explains what instance segmentation would add.
+:::
+
+## Before class
+
+Use a Python environment containing `torch`, `torchvision`, `Pillow`, `matplotlib`, and Jupyter. The first run needs internet access to cache the TorchVision weights and sample images. After that, the laboratory performs inference locally and never trains the network.
+
+The sample photographs come from the official COCO image server. The notebook retains the source information alongside the exercise.

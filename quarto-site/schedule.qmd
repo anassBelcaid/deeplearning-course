@@ -255,7 +255,7 @@ VGG, NiN, Inception, residual learning, dense connectivity, and task-driven comp
 Dense prediction, U-Net, bounding boxes, IoU, NMS, and detectors.
 :::
 :::{.material-cell}
-[Notes](notes/09-segmentation-detection/index.html){.material-pill .available}[PDF](notes/09-segmentation-detection/index.pdf){.material-pill .available}[Slides](lectures/09-segmentation-detection/index.html){.material-pill .available}<span class="material-pill muted">Notebook</span>
+[Notes](notes/09-segmentation-detection/index.html){.material-pill .available}[PDF](notes/09-segmentation-detection/index.pdf){.material-pill .available}[Slides](lectures/09-segmentation-detection/index.html){.material-pill .available}[Lab](labs/09-semantic-segmentation/index.html){.material-pill .available}
 :::
 :::{.links-cell}
 <a class="resource-mini paper required" href="https://arxiv.org/abs/1505.04597"><i>□</i><span>Ronneberger et al. · U-Net</span></a>
@@ -265,6 +265,8 @@ Dense prediction, U-Net, bounding boxes, IoU, NMS, and detectors.
 <a class="resource-mini paper" href="https://openaccess.thecvf.com/content_iccv_2015/html/Xie_Holistically-Nested_Edge_Detection_ICCV_2015_paper.html"><i>□</i><span>Xie &amp; Tu · HED</span></a>
 :::
 :::{.project-cell .track-end}
+<a class="project-track-link" href="labs/09-semantic-segmentation/index.html"><span class="project-label">Lab 09 · Seeing every pixel</span><br>Open a pretrained segmenter and interpret its spatial predictions.</a>
+
 <span class="project-label">Project 2 · Due</span><br>Evaluation and model card.
 :::
 :::
