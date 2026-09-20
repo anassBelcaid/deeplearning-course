@@ -124,6 +124,18 @@ These notes are written as a connected textbook rather than lecture transcripts.
 
 <span class="chapter-state">Read chapter →</span>
 :::
+
+:::{.chapter-entry .available .vision}
+<span class="chapter-number">09</span>
+
+:::{.chapter-copy}
+### [Segmentation and Object Detection](notes/09-segmentation-detection/index.qmd)
+
+[![](notes/09-segmentation-detection/assets/chapter-cover.png){fig-alt="Preview of Chapter 9: one street scene interpreted through boxes, semantic regions, instance masks, and edge contours."}](notes/09-segmentation-detection/index.qmd)
+:::
+
+<span class="chapter-state">Read chapter →</span>
+:::
 :::
 
 :::{.notes-coming}

@@ -255,10 +255,14 @@ VGG, NiN, Inception, residual learning, dense connectivity, and task-driven comp
 Dense prediction, U-Net, bounding boxes, IoU, NMS, and detectors.
 :::
 :::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+[Notes](notes/09-segmentation-detection/index.html){.material-pill .available}[PDF](notes/09-segmentation-detection/index.pdf){.material-pill .available}[Slides](lectures/09-segmentation-detection/index.html){.material-pill .available}<span class="material-pill muted">Notebook</span>
 :::
 :::{.links-cell}
-<span class="coming-soon">U-Net · Detection resources</span>
+<a class="resource-mini paper required" href="https://arxiv.org/abs/1505.04597"><i>□</i><span>Ronneberger et al. · U-Net</span></a>
+<a class="resource-mini paper required" href="https://openaccess.thecvf.com/content_cvpr_2015/html/Long_Fully_Convolutional_Networks_2015_CVPR_paper.html"><i>□</i><span>Long et al. · Fully Convolutional Networks</span></a>
+<a class="resource-mini paper required" href="https://papers.nips.cc/paper/2015/hash/14bfa6bb14875e45bba028a21ed38046-Abstract.html"><i>□</i><span>Ren et al. · Faster R-CNN</span></a>
+<a class="resource-mini paper" href="https://openaccess.thecvf.com/content_iccv_2017/html/He_Mask_R-CNN_ICCV_2017_paper.html"><i>□</i><span>He et al. · Mask R-CNN</span></a>
+<a class="resource-mini paper" href="https://openaccess.thecvf.com/content_iccv_2015/html/Xie_Holistically-Nested_Edge_Detection_ICCV_2015_paper.html"><i>□</i><span>Xie &amp; Tu · HED</span></a>
 :::
 :::{.project-cell .track-end}
 <span class="project-label">Project 2 · Due</span><br>Evaluation and model card.
