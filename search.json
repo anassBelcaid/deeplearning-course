@@ -2615,7 +2615,7 @@
     "href": "schedule.html#generative-representation-learning",
     "title": "Schedule",
     "section": "Generative Representation Learning",
-    "text": "Generative Representation Learning\nLearn a latent space and use it to create."
+    "text": "Generative Representation Learning\nLearn useful latent spaces, generate images, and compare generative mechanisms."
   },
   {
     "objectID": "index.html",
@@ -5185,5 +5185,12 @@
     "title": "Deep Learning",
     "section": "Course staff",
     "text": "Course staff\n\n\n\n\n\nDr. Anass Belcaid\nINSTRUCTOR\nEmail a.belcaid@uae.ac.ma\nDepartment Artificial Intelligence and Digitalisation"
+  },
+  {
+    "objectID": "schedule.html#optional-extension-learning-from-sequences",
+    "href": "schedule.html#optional-extension-learning-from-sequences",
+    "title": "Schedule",
+    "section": "Optional Extension: Learning from Sequences",
+    "text": "Optional Extension: Learning from Sequences\nA compact bridge to the dedicated NLP course: recurrence, memory, and gated state updates."
   }
 ]

@@ -177,7 +177,7 @@ ul.task-list li input[type="checkbox"] {
 <p><span class="status-chip">Provisional roadmap</span></p>
 </div>
 <div class="schedule-legend">
-<p><span class="legend-item"><i class="dot foundations"></i> Foundations</span> <span class="legend-item"><i class="dot scratch"></i> From scratch</span> <span class="legend-item"><i class="dot optimization"></i> Optimization</span> <span class="legend-item"><i class="dot pytorch"></i> PyTorch</span> <span class="legend-item"><i class="dot vision"></i> Vision</span> <span class="legend-item"><i class="dot sequences"></i> Sequences</span> <span class="legend-item"><i class="dot generative"></i> Generative models</span></p>
+<p><span class="legend-item"><i class="dot foundations"></i> Foundations</span> <span class="legend-item"><i class="dot scratch"></i> From scratch</span> <span class="legend-item"><i class="dot optimization"></i> Optimization</span> <span class="legend-item"><i class="dot pytorch"></i> PyTorch</span> <span class="legend-item"><i class="dot vision"></i> Vision</span> <span class="legend-item"><i class="dot generative"></i> Generative models</span> <span class="legend-item"><i class="dot sequences"></i> Optional extension</span></p>
 </div>
 <div class="schedule-table">
 <div class="schedule-head">
@@ -383,108 +383,108 @@ ul.task-list li input[type="checkbox"] {
 <p><span class="project-label">Project 2 · Due</span><br>Evaluation and model card.</p>
 </div>
 </div>
-<div class="part-banner sequences">
-<p><span>Part VI</span></p>
-<section id="learning-from-sequences" class="level2">
-<h2 class="anchored" data-anchor-id="learning-from-sequences">Learning from Sequences</h2>
-<p>Memory, recurrence, and temporally structured data.</p>
-</section>
-</div>
-<div class="week-row sequences">
-<div class="week-topic">
-<p><span class="week-number">Week 10</span></p>
-<section id="recurrent-neural-networks" class="level3">
-<h3 class="anchored" data-anchor-id="recurrent-neural-networks">Recurrent Neural Networks</h3>
-<p>Hidden states, recurrence, unrolling, BPTT, and unstable gradients.</p>
-</section>
-</div>
-<div class="material-cell">
-<p><span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span></p>
-</div>
-<div class="links-cell">
-<p><span class="coming-soon">Sequence visualizations · Readings</span></p>
-</div>
-<div class="project-cell track-start">
-<p><span class="project-label">Project 3 · Sequences</span><br>Baseline recurrent model.</p>
-</div>
-</div>
-<div class="week-row sequences">
-<div class="week-topic">
-<p><span class="week-number">Week 11</span></p>
-<section id="gated-recurrent-networks" class="level3">
-<h3 class="anchored" data-anchor-id="gated-recurrent-networks">Gated Recurrent Networks</h3>
-<p>GRU and LSTM gates, memory, and comparative behavior.</p>
-</section>
-</div>
-<div class="material-cell">
-<p><span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span></p>
-</div>
-<div class="links-cell">
-<p><span class="coming-soon">Gate diagrams · GRU/LSTM readings</span></p>
-</div>
-<div class="project-cell track-middle">
-<p><span class="project-label">Project 3</span><br>Compare RNN, GRU, and LSTM.</p>
-</div>
-</div>
-<div class="week-row sequences">
-<div class="week-topic">
-<p><span class="week-number">Week 12</span></p>
-<section id="sequence-learning-in-practice" class="level3">
-<h3 class="anchored" data-anchor-id="sequence-learning-in-practice">Sequence Learning in Practice</h3>
-<p>Padding, masking, bidirectionality, and variable-length batches.</p>
-</section>
-</div>
-<div class="material-cell">
-<p><span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span></p>
-</div>
-<div class="links-cell">
-<p><span class="coming-soon">PyTorch sequence utilities</span></p>
-</div>
-<div class="project-cell track-end">
-<p><span class="project-label">Project 3 · Due</span><br>Analysis and error study.</p>
-</div>
-</div>
 <div class="part-banner generative">
-<p><span>Part VII</span></p>
+<p><span>Part VI</span></p>
 <section id="generative-representation-learning" class="level2">
 <h2 class="anchored" data-anchor-id="generative-representation-learning">Generative Representation Learning</h2>
-<p>Learn a latent space and use it to create.</p>
+<p>Learn useful latent spaces, generate images, and compare generative mechanisms.</p>
 </section>
+</div>
+<div class="week-row generative">
+<div class="week-topic">
+<p><span class="week-number">Week 10</span></p>
+<section id="autoencoders-and-latent-representations" class="level3">
+<h3 class="anchored" data-anchor-id="autoencoders-and-latent-representations">Autoencoders and Latent Representations</h3>
+<p>Encoding, bottlenecks, reconstruction, denoising, and latent interpolation.</p>
+</section>
+</div>
+<div class="material-cell">
+<p><span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span></p>
+</div>
+<div class="links-cell">
+<p><span class="coming-soon">Autoencoder readings · Latent-space explorer</span></p>
+</div>
+<div class="project-cell track-start">
+<p><span class="project-label">Project 3 · Generative models</span><br>Reconstruct images and inspect a learned latent space.</p>
+</div>
+</div>
+<div class="week-row generative">
+<div class="week-topic">
+<p><span class="week-number">Week 11</span></p>
+<section id="variational-autoencoders" class="level3">
+<h3 class="anchored" data-anchor-id="variational-autoencoders">Variational Autoencoders</h3>
+<p>Latent distributions, reparameterization, KL divergence, sampling, and interpolation.</p>
+</section>
+</div>
+<div class="material-cell">
+<p><span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span></p>
+</div>
+<div class="links-cell">
+<p><span class="coming-soon">VAE paper · Reparameterization visualizations</span></p>
+</div>
+<div class="project-cell track-middle">
+<p><span class="project-label">Project 3</span><br>Compare reconstruction, sampling, and interpolation.</p>
+</div>
+</div>
+<div class="week-row generative">
+<div class="week-topic">
+<p><span class="week-number">Week 12</span></p>
+<section id="generative-adversarial-networks" class="level3">
+<h3 class="anchored" data-anchor-id="generative-adversarial-networks">Generative Adversarial Networks</h3>
+<p>Generator–discriminator competition, adversarial objectives, DCGAN, mode collapse, and instability.</p>
+</section>
+</div>
+<div class="material-cell">
+<p><span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span></p>
+</div>
+<div class="links-cell">
+<p><span class="coming-soon">GAN paper · Pretrained generator explorer</span></p>
+</div>
+<div class="project-cell track-middle">
+<p><span class="project-label">Project 3</span><br>Inspect generations and diagnose common failures.</p>
+</div>
 </div>
 <div class="week-row generative">
 <div class="week-topic">
 <p><span class="week-number">Week 13</span></p>
-<section id="autoencoders" class="level3">
-<h3 class="anchored" data-anchor-id="autoencoders">Autoencoders</h3>
-<p>Bottlenecks, reconstruction, denoising, and latent representations.</p>
+<section id="comparing-generative-models" class="level3">
+<h3 class="anchored" data-anchor-id="comparing-generative-models">Comparing Generative Models</h3>
+<p>Choose among autoencoders, VAEs, and GANs through samples, latent structure, evaluation, and failure analysis.</p>
 </section>
 </div>
 <div class="material-cell">
 <p><span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span></p>
 </div>
 <div class="links-cell">
-<p><span class="coming-soon">Latent-space explorer · Readings</span></p>
-</div>
-<div class="project-cell track-start">
-<p><span class="project-label">Generative mini-project</span><br>Learn and inspect a latent space.</p>
-</div>
-</div>
-<div class="week-row generative">
-<div class="week-topic">
-<p><span class="week-number">Week 14</span></p>
-<section id="variational-autoencoders" class="level3">
-<h3 class="anchored" data-anchor-id="variational-autoencoders">Variational Autoencoders</h3>
-<p>Latent distributions, reparameterization, KL divergence, and sampling.</p>
-</section>
-</div>
-<div class="material-cell">
-<p><span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span></p>
-</div>
-<div class="links-cell">
-<p><span class="coming-soon">VAE paper · Interactive explanation</span></p>
+<p><span class="coming-soon">Model-comparison gallery · Evaluation readings</span></p>
 </div>
 <div class="project-cell track-end">
-<p><span class="project-label">Mini-project · Due</span><br>Interpolation and reflection.</p>
+<p><span class="project-label">Project 3 · Due</span><br>Visual comparison and evidence-based model choice.</p>
+</div>
+</div>
+<div class="part-banner sequences">
+<p><span>Part VII · If time permits</span></p>
+<section id="optional-extension-learning-from-sequences" class="level2">
+<h2 class="anchored" data-anchor-id="optional-extension-learning-from-sequences">Optional Extension: Learning from Sequences</h2>
+<p>A compact bridge to the dedicated NLP course: recurrence, memory, and gated state updates.</p>
+</section>
+</div>
+<div class="week-row sequences">
+<div class="week-topic">
+<p><span class="week-number">Week 14</span></p>
+<section id="sequence-models-a-first-look" class="level3">
+<h3 class="anchored" data-anchor-id="sequence-models-a-first-look">Sequence Models: A First Look</h3>
+<p>Hidden states, unrolling, unstable gradients, and the motivation for GRU and LSTM gates.</p>
+</section>
+</div>
+<div class="material-cell">
+<p><span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span></p>
+</div>
+<div class="links-cell">
+<p><span class="coming-soon">Optional sequence visualizations · Follow-up NLP course</span></p>
+</div>
+<div class="project-cell">
+<p><span class="project-label">Optional extension</span><br>No new assessed project milestone.</p>
 </div>
 </div>
 </div>
