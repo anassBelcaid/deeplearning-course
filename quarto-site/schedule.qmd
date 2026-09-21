@@ -17,8 +17,8 @@ The course moves from first principles to complete learning systems. Color marks
 <span class="legend-item"><i class="dot optimization"></i> Optimization</span>
 <span class="legend-item"><i class="dot pytorch"></i> PyTorch</span>
 <span class="legend-item"><i class="dot vision"></i> Vision</span>
-<span class="legend-item"><i class="dot sequences"></i> Sequences</span>
 <span class="legend-item"><i class="dot generative"></i> Generative models</span>
+<span class="legend-item"><i class="dot sequences"></i> Optional extension</span>
 :::
 
 :::{.schedule-table}
@@ -271,114 +271,114 @@ Dense prediction, U-Net, bounding boxes, IoU, NMS, and detectors.
 :::
 :::
 
-:::{.part-banner .sequences}
-<span>Part VI</span>
-
-## Learning from Sequences
-
-Memory, recurrence, and temporally structured data.
-:::
-
-:::{.week-row .sequences}
-:::{.week-topic}
-<span class="week-number">Week 10</span>
-
-### Recurrent Neural Networks
-
-Hidden states, recurrence, unrolling, BPTT, and unstable gradients.
-:::
-:::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
-:::
-:::{.links-cell}
-<span class="coming-soon">Sequence visualizations · Readings</span>
-:::
-:::{.project-cell .track-start}
-<span class="project-label">Project 3 · Sequences</span><br>Baseline recurrent model.
-:::
-:::
-
-:::{.week-row .sequences}
-:::{.week-topic}
-<span class="week-number">Week 11</span>
-
-### Gated Recurrent Networks
-
-GRU and LSTM gates, memory, and comparative behavior.
-:::
-:::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
-:::
-:::{.links-cell}
-<span class="coming-soon">Gate diagrams · GRU/LSTM readings</span>
-:::
-:::{.project-cell .track-middle}
-<span class="project-label">Project 3</span><br>Compare RNN, GRU, and LSTM.
-:::
-:::
-
-:::{.week-row .sequences}
-:::{.week-topic}
-<span class="week-number">Week 12</span>
-
-### Sequence Learning in Practice
-
-Padding, masking, bidirectionality, and variable-length batches.
-:::
-:::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
-:::
-:::{.links-cell}
-<span class="coming-soon">PyTorch sequence utilities</span>
-:::
-:::{.project-cell .track-end}
-<span class="project-label">Project 3 · Due</span><br>Analysis and error study.
-:::
-:::
-
 :::{.part-banner .generative}
-<span>Part VII</span>
+<span>Part VI</span>
 
 ## Generative Representation Learning
 
-Learn a latent space and use it to create.
+Learn useful latent spaces, generate images, and compare generative mechanisms.
+:::
+
+:::{.week-row .generative}
+:::{.week-topic}
+<span class="week-number">Week 10</span>
+
+### Autoencoders and Latent Representations
+
+Encoding, bottlenecks, reconstruction, denoising, and latent interpolation.
+:::
+:::{.material-cell}
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+:::
+:::{.links-cell}
+<span class="coming-soon">Autoencoder readings · Latent-space explorer</span>
+:::
+:::{.project-cell .track-start}
+<span class="project-label">Project 3 · Generative models</span><br>Reconstruct images and inspect a learned latent space.
+:::
+:::
+
+:::{.week-row .generative}
+:::{.week-topic}
+<span class="week-number">Week 11</span>
+
+### Variational Autoencoders
+
+Latent distributions, reparameterization, KL divergence, sampling, and interpolation.
+:::
+:::{.material-cell}
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+:::
+:::{.links-cell}
+<span class="coming-soon">VAE paper · Reparameterization visualizations</span>
+:::
+:::{.project-cell .track-middle}
+<span class="project-label">Project 3</span><br>Compare reconstruction, sampling, and interpolation.
+:::
+:::
+
+:::{.week-row .generative}
+:::{.week-topic}
+<span class="week-number">Week 12</span>
+
+### Generative Adversarial Networks
+
+Generator–discriminator competition, adversarial objectives, DCGAN, mode collapse, and instability.
+:::
+:::{.material-cell}
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+:::
+:::{.links-cell}
+<span class="coming-soon">GAN paper · Pretrained generator explorer</span>
+:::
+:::{.project-cell .track-middle}
+<span class="project-label">Project 3</span><br>Inspect generations and diagnose common failures.
+:::
 :::
 
 :::{.week-row .generative}
 :::{.week-topic}
 <span class="week-number">Week 13</span>
 
-### Autoencoders
+### Comparing Generative Models
 
-Bottlenecks, reconstruction, denoising, and latent representations.
+Choose among autoencoders, VAEs, and GANs through samples, latent structure, evaluation, and failure analysis.
 :::
 :::{.material-cell}
 <span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
 :::
 :::{.links-cell}
-<span class="coming-soon">Latent-space explorer · Readings</span>
+<span class="coming-soon">Model-comparison gallery · Evaluation readings</span>
 :::
-:::{.project-cell .track-start}
-<span class="project-label">Generative mini-project</span><br>Learn and inspect a latent space.
+:::{.project-cell .track-end}
+<span class="project-label">Project 3 · Due</span><br>Visual comparison and evidence-based model choice.
 :::
 :::
 
-:::{.week-row .generative}
+:::{.part-banner .sequences}
+<span>Part VII · If time permits</span>
+
+## Optional Extension: Learning from Sequences
+
+A compact bridge to the dedicated NLP course: recurrence, memory, and gated state updates.
+:::
+
+:::{.week-row .sequences}
 :::{.week-topic}
 <span class="week-number">Week 14</span>
 
-### Variational Autoencoders
+### Sequence Models: A First Look
 
-Latent distributions, reparameterization, KL divergence, and sampling.
+Hidden states, unrolling, unstable gradients, and the motivation for GRU and LSTM gates.
 :::
 :::{.material-cell}
 <span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
 :::
 :::{.links-cell}
-<span class="coming-soon">VAE paper · Interactive explanation</span>
+<span class="coming-soon">Optional sequence visualizations · Follow-up NLP course</span>
 :::
-:::{.project-cell .track-end}
-<span class="project-label">Mini-project · Due</span><br>Interpolation and reflection.
+:::{.project-cell}
+<span class="project-label">Optional extension</span><br>No new assessed project milestone.
 :::
 :::
 :::
