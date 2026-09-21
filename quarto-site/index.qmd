@@ -90,12 +90,12 @@ Use ED Discussion for course announcements, technical questions, useful resource
 
 :::{.staff-card}
 :::{.staff-photo}
-![Portrait of Dr. Anass Belcaid.](assets/anass-belcaid.jpg){fig-alt="Portrait photograph of Dr. Anass Belcaid, the course instructor."}
+![](assets/anass-belcaid.jpg){fig-alt="Dr. Anass Belcaid, course instructor"}
 :::
 :::{.staff-copy}
-<span class="staff-role">INSTRUCTOR</span>
-
 ### Dr. Anass Belcaid
+
+<span class="staff-role">INSTRUCTOR</span>
 
 <span class="staff-detail"><strong>Email</strong> <a href="mailto:a.belcaid@uae.ac.ma">a.belcaid@uae.ac.ma</a></span>
 
