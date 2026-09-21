@@ -50,11 +50,23 @@ ED
 
 ED Discussion will be our main communication space for questions, announcements, technical problems, useful resources, and conversations that continue beyond the classroom.
 
-<span class="status-chip">Course link available soon</span>
+<a class="status-chip" href="https://edstem.org/us/courses/102787/">Open ED Discussion →</a>
 :::
 :::
 
-Students are encouraged to answer questions as well as ask them. Explaining an idea clearly is an important part of learning it.
+Students are encouraged to answer questions as well as ask them. Explaining an idea clearly is an important part of learning it, and a useful discussion can help the whole class move forward.
+
+:::{.callout-important}
+## Discussion contributes 10% of the course grade
+
+ED activity forms the **Discussion and course engagement** half of the 20% engagement grade. Assessment rewards sustained, useful participation across the semester—not the largest number of posts.
+:::
+
+### A useful weekly rhythm
+
+Aim to make at least one substantive contribution during most course weeks. This is a rhythm rather than a message quota: one precise question, careful explanation, or useful experiment is more valuable than several superficial replies.
+
+Before posting a question, show what you tried and where your reasoning became uncertain. When answering, help the other student take the next step without completing assessed work for them. Return to your discussions when possible to confirm what resolved the issue or summarize what the class learned.
 
 Meaningful participation can include:
 
@@ -154,4 +166,3 @@ When AI tools are permitted and how their use must be acknowledged.
 Required software, Python environment, hardware, and reproducibility expectations.
 :::
 :::
-

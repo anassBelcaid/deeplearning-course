@@ -24,6 +24,9 @@ website:
       - href: logistics.qmd
         text: Logistics
     right:
+      - text: "ED"
+        href: https://edstem.org/us/courses/102787/
+        aria-label: ED Discussion
       - icon: github
         href: https://github.com/anassBelcaid/deeplearning-course
         aria-label: Course repository
