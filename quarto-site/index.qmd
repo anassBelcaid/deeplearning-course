@@ -16,6 +16,7 @@ image: assets/course-thumbnail-candidate-01.png
 :::{.button-row}
 [Explore the schedule](schedule.qmd){.course-button .primary}
 [Read the notes](notes.qmd){.course-button}
+[Join ED Discussion](https://edstem.org/us/courses/102787/){.course-button .discussion}
 :::
 :::
 
@@ -42,7 +43,7 @@ image: assets/course-thumbnail-candidate-01.png
 
 ## Course structure
 
-<p class="section-intro">This first prototype establishes the visual language and navigation. Course material will be added after the theme is approved.</p>
+<p class="section-intro">Each week connects explanation, experimentation, and sustained project work.</p>
 
 :::{.card-grid}
 :::{.course-card}
@@ -67,5 +68,39 @@ Small experiments that expose how the machinery works.
 ### Projects
 
 Open-ended work connecting foundations to modern systems.
+:::
+:::
+
+## Stay connected
+
+:::{.home-discussion}
+:::{.home-discussion-mark aria-hidden="true"}
+ED
+:::
+:::{.home-discussion-copy}
+### Questions become shared learning
+
+Use ED Discussion for course announcements, technical questions, useful resources, and explanations that can help the whole class. Meaningful, regular contributions form **10% of the course grade**.
+
+[Open ED Discussion →](https://edstem.org/us/courses/102787/){.home-discussion-link}
+:::
+:::
+
+## Course staff
+
+<p class="section-intro">One instructor, currently wearing all the course hats.</p>
+
+:::{.staff-card}
+:::{.staff-photo}
+![Portrait of Dr. Anass Belcaid.](assets/anass-belcaid.jpg){fig-alt="Portrait photograph of Dr. Anass Belcaid, the course instructor."}
+:::
+:::{.staff-copy}
+<span class="staff-role">INSTRUCTOR · COURSE RESPONSIBLE</span>
+
+### Dr. Anass Belcaid
+
+Lectures, notes, laboratories, projects, assessment, and course communication. For the time being, there is no separate teaching-assistant or supervision team—so yes, one person is wearing all the hats.
+
+[Personal webpage](https://anassbelcaid.github.io/) · [Ask on ED](https://edstem.org/us/courses/102787/)
 :::
 :::
