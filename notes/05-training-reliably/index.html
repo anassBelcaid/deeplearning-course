@@ -206,6 +206,10 @@ window.Quarto = {
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://edstem.org/us/courses/102787/"> 
+<span class="menu-text">ED</span></a>
+  </li>  
   <li class="nav-item compact">
     <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
 </i> 
@@ -698,7 +702,7 @@ x\odot m=[2,0,6,0],
 </section>
 <section id="numpy-implementation" class="level3" data-number="5.2">
 <h3 data-number="5.2" class="anchored" data-anchor-id="numpy-implementation"><span class="header-section-number">5.2</span> NumPy implementation</h3>
-<div id="24bb0a14" class="cell">
+<div id="d0d48507" class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> dropout(x, p, training, rng):</span>
@@ -715,7 +719,7 @@ x\odot m=[2,0,6,0],
 </div>
 <p>Randomness is passed in rather than recreated inside the function. This makes experiments reproducible while still producing a new mask on every call.</p>
 <p>Useful tests check properties rather than one arbitrary random outcome:</p>
-<div id="410aee67" class="cell">
+<div id="f46616a8" class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">7</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.array([<span class="fl">2.0</span>, <span class="fl">4.0</span>, <span class="fl">6.0</span>, <span class="fl">8.0</span>])</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -770,7 +774,7 @@ w\ge P\quad\Longrightarrow\quad
 \text{stop and restore }\theta^*.
 \]</span></p>
 <p>The distinction between <strong>stop</strong> and <strong>keep the last state</strong> is essential. Validation at the stopping epoch is normally worse than at the saved checkpoint.</p>
-<div id="272568ae" class="cell">
+<div id="d81c8ebe" class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>best_score <span class="op">=</span> np.inf</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>best_weights <span class="op">=</span> <span class="va">None</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>wait <span class="op">=</span> <span class="dv">0</span></span>
