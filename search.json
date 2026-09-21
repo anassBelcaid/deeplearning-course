@@ -2622,7 +2622,7 @@
     "href": "index.html",
     "title": "Deep Learning",
     "section": "",
-    "text": "Deep Learning · Academic Year 2026–2027\n\n\n\n\nA visual, mathematical, and practical journey through modern deep learning.\n\n\nExplore the schedule Read the notes"
+    "text": "Deep Learning · Academic Year 2026–2027\n\n\n\n\nA visual, mathematical, and practical journey through modern deep learning.\n\n\nExplore the schedule Read the notes Join ED Discussion"
   },
   {
     "objectID": "index.html#the-learning-journey",
@@ -2636,7 +2636,7 @@
     "href": "index.html#course-structure",
     "title": "Deep Learning",
     "section": "Course structure",
-    "text": "Course structure\n\nThis first prototype establishes the visual language and navigation. Course material will be added after the theme is approved.\n\n\n\n01 · UNDERSTAND\n\nConcepts\nVisual explanations supported by precise mathematics.\n\n\n\n02 · IMPLEMENT\n\nPractice\nSmall experiments that expose how the machinery works.\n\n\n\n03 · CREATE\n\nProjects\nOpen-ended work connecting foundations to modern systems."
+    "text": "Course structure\n\nEach week connects explanation, experimentation, and sustained project work.\n\n\n\n01 · UNDERSTAND\n\nConcepts\nVisual explanations supported by precise mathematics.\n\n\n\n02 · IMPLEMENT\n\nPractice\nSmall experiments that expose how the machinery works.\n\n\n\n03 · CREATE\n\nProjects\nOpen-ended work connecting foundations to modern systems."
   },
   {
     "objectID": "projects.html",
@@ -5171,5 +5171,19 @@
     "title": "Lab 09 · Seeing Every Pixel",
     "section": "Before class",
     "text": "Before class\nUse a Python environment containing torch, torchvision, Pillow, matplotlib, and Jupyter. The first run needs internet access to cache the TorchVision weights and sample images. After that, the laboratory performs inference locally and never trains the network.\nThe sample photographs come from the official COCO image server. The notebook retains the source information alongside the exercise."
+  },
+  {
+    "objectID": "index.html#stay-connected",
+    "href": "index.html#stay-connected",
+    "title": "Deep Learning",
+    "section": "Stay connected",
+    "text": "Stay connected\n\n\nED\n\n\nQuestions become shared learning\nUse ED Discussion for course announcements, technical questions, useful resources, and explanations that can help the whole class. Meaningful, regular contributions form 10% of the course grade.\nOpen ED Discussion →"
+  },
+  {
+    "objectID": "index.html#course-staff",
+    "href": "index.html#course-staff",
+    "title": "Deep Learning",
+    "section": "Course staff",
+    "text": "Course staff\n\nOne instructor, currently wearing all the course hats.\n\n\n\n\n\n\nPortrait of Dr. Anass Belcaid.\n\n\n\n\nINSTRUCTOR · COURSE RESPONSIBLE\n\nDr. Anass Belcaid\nLectures, notes, laboratories, projects, assessment, and course communication. For the time being, there is no separate teaching-assistant or supervision team—so yes, one person is wearing all the hats.\nPersonal webpage · Ask on ED"
   }
 ]
