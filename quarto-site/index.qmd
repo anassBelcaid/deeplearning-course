@@ -88,19 +88,17 @@ Use ED Discussion for course announcements, technical questions, useful resource
 
 ## Course staff
 
-<p class="section-intro">One instructor, currently wearing all the course hats.</p>
-
 :::{.staff-card}
 :::{.staff-photo}
 ![Portrait of Dr. Anass Belcaid.](assets/anass-belcaid.jpg){fig-alt="Portrait photograph of Dr. Anass Belcaid, the course instructor."}
 :::
 :::{.staff-copy}
-<span class="staff-role">INSTRUCTOR · COURSE RESPONSIBLE</span>
+<span class="staff-role">INSTRUCTOR</span>
 
 ### Dr. Anass Belcaid
 
-Lectures, notes, laboratories, projects, assessment, and course communication. For the time being, there is no separate teaching-assistant or supervision team—so yes, one person is wearing all the hats.
+<span class="staff-detail"><strong>Email</strong> <a href="mailto:a.belcaid@uae.ac.ma">a.belcaid@uae.ac.ma</a></span>
 
-[Personal webpage](https://anassbelcaid.github.io/) · [Ask on ED](https://edstem.org/us/courses/102787/)
+<span class="staff-detail"><strong>Department</strong> Artificial Intelligence and Digitalisation</span>
 :::
 :::
