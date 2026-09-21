@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Lab 09 — Seeing Every Pixel – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-2e7c9b518fe54fcaa4a8b379123416fc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+
+<link rel="stylesheet" href="../../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../../assets/mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../../assets/mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../schedule.html"> 
+<span class="menu-text">Schedule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../logistics.html"> 
+<span class="menu-text">Logistics</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#session-map" id="toc-session-map" class="nav-link active" data-scroll-target="#session-map">Session map</a></li>
+  <li><a href="#start-the-visual-laboratory" id="toc-start-the-visual-laboratory" class="nav-link" data-scroll-target="#start-the-visual-laboratory">0 — Start the visual laboratory</a>
+  <ul class="collapse">
+  <li><a href="#first-contact-six-scenes-six-predictions-waiting-to-happen" id="toc-first-contact-six-scenes-six-predictions-waiting-to-happen" class="nav-link" data-scroll-target="#first-contact-six-scenes-six-predictions-waiting-to-happen">First contact: six scenes, six predictions waiting to happen</a></li>
+  </ul></li>
+  <li><a href="#one-image-becomes-a-tensor" id="toc-one-image-becomes-a-tensor" class="nav-link" data-scroll-target="#one-image-becomes-a-tensor">1 — One image becomes a tensor</a>
+  <ul class="collapse">
+  <li><a href="#pause-and-read-the-contract" id="toc-pause-and-read-the-contract" class="nav-link" data-scroll-target="#pause-and-read-the-contract">Pause and read the contract</a></li>
+  </ul></li>
+  <li><a href="#open-the-pretrained-model" id="toc-open-the-pretrained-model" class="nav-link" data-scroll-target="#open-the-pretrained-model">2 — Open the pretrained model</a>
+  <ul class="collapse">
+  <li><a href="#architecture-scavenger-hunt" id="toc-architecture-scavenger-hunt" class="nav-link" data-scroll-target="#architecture-scavenger-hunt">Architecture scavenger hunt</a></li>
+  </ul></li>
+  <li><a href="#watch-spatial-features-travel-through-the-network" id="toc-watch-spatial-features-travel-through-the-network" class="nav-link" data-scroll-target="#watch-spatial-features-travel-through-the-network">3 — Watch spatial features travel through the network</a>
+  <ul class="collapse">
+  <li><a href="#interpret-the-internal-movie" id="toc-interpret-the-internal-movie" class="nav-link" data-scroll-target="#interpret-the-internal-movie">Interpret the internal movie</a></li>
+  </ul></li>
+  <li><a href="#twenty-one-score-maps-become-one-semantic-mask" id="toc-twenty-one-score-maps-become-one-semantic-mask" class="nav-link" data-scroll-target="#twenty-one-score-maps-become-one-semantic-mask">4 — Twenty-one score maps become one semantic mask</a>
+  <ul class="collapse">
+  <li><a href="#the-decisive-line" id="toc-the-decisive-line" class="nav-link" data-scroll-target="#the-decisive-line">The decisive line</a></li>
+  </ul></li>
+  <li><a href="#make-the-prediction-visible" id="toc-make-the-prediction-visible" class="nav-link" data-scroll-target="#make-the-prediction-visible">5 — Make the prediction visible</a>
+  <ul class="collapse">
+  <li><a href="#look-closely" id="toc-look-closely" class="nav-link" data-scroll-target="#look-closely">Look closely</a></li>
+  </ul></li>
+  <li><a href="#where-is-the-model-unsure" id="toc-where-is-the-model-unsure" class="nav-link" data-scroll-target="#where-is-the-model-unsure">6 — Where is the model unsure?</a>
+  <ul class="collapse">
+  <li><a href="#change-one-visual-decision" id="toc-change-one-visual-decision" class="nav-link" data-scroll-target="#change-one-visual-decision">Change one visual decision</a></li>
+  </ul></li>
+  <li><a href="#the-oh-gallery-run-every-scene" id="toc-the-oh-gallery-run-every-scene" class="nav-link" data-scroll-target="#the-oh-gallery-run-every-scene">7 — The “oh!” gallery: run every scene</a>
+  <ul class="collapse">
+  <li><a href="#compare-do-not-score" id="toc-compare-do-not-score" class="nav-link" data-scroll-target="#compare-do-not-score">Compare, do not score</a></li>
+  </ul></li>
+  <li><a href="#manipulate-the-input-does-the-interpretation-survive" id="toc-manipulate-the-input-does-the-interpretation-survive" class="nav-link" data-scroll-target="#manipulate-the-input-does-the-interpretation-survive">8 — Manipulate the input; does the interpretation survive?</a>
+  <ul class="collapse">
+  <li><a href="#interpret-the-disagreement" id="toc-interpret-the-disagreement" class="nav-link" data-scroll-target="#interpret-the-disagreement">Interpret the disagreement</a></li>
+  </ul></li>
+  <li><a href="#exit-ticket-tell-the-story-of-one-scene" id="toc-exit-ticket-tell-the-story-of-one-scene" class="nav-link" data-scroll-target="#exit-ticket-tell-the-story-of-one-scene">9 — Exit ticket: tell the story of one scene</a></li>
+  <li><a href="#image-and-model-sources" id="toc-image-and-model-sources" class="nav-link" data-scroll-target="#image-and-model-sources">Image and model sources</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Lab 09 — Seeing Every Pixel</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><strong>One session · 1h30 · pretrained model · no training</strong></p>
+<p>Today an image classifier becomes a <em>dense predictor</em>. You will open a pretrained segmenter, watch spatial feature maps move through it, and turn its output into colorful semantic masks.</p>
+<p>You are not building or training a model. The supplied cells handle downloads, preprocessing, hooks, and plotting. Your work is to <strong>manipulate images, inspect tensors, and explain what the network sees</strong>.</p>
+<section id="session-map" class="level2">
+<h2 class="anchored" data-anchor-id="session-map">Session map</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 40%">
+<col style="width: 30%">
+<col style="width: 30%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Time</th>
+<th>Investigation</th>
+<th>Visible evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0–10 min</td>
+<td>What is semantic segmentation?</td>
+<td>image and pixel labels</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">10–25 min</td>
+<td>What is inside the model?</td>
+<td>module map and parameter counts</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">25–40 min</td>
+<td>What survives through the backbone?</td>
+<td>feature-map gallery</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">40–55 min</td>
+<td>How do scores become a mask?</td>
+<td>21 score maps → one mask</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">55–75 min</td>
+<td>What does the model see?</td>
+<td>masks, overlays, confidence</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">75–85 min</td>
+<td>How stable is its interpretation?</td>
+<td>transformed-image comparison</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">85–90 min</td>
+<td>What did we learn?</td>
+<td>visual exit ticket</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="blockquote">
+<p><strong>Rule for today:</strong> every answer must point to an image, tensor shape, or visualization.</p>
+</blockquote>
+</section>
+<section id="start-the-visual-laboratory" class="level2">
+<h2 class="anchored" data-anchor-id="start-the-visual-laboratory">0 — Start the visual laboratory</h2>
+<p>Run the supplied setup cell. On the first run, TorchVision downloads the lightweight pretrained LRASPP weights and six small test images. Later runs reuse the cache.</p>
+<div id="cell-003" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-20T22:06:40.124706Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-20T22:06:40.124611Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-20T22:06:42.138538Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-20T22:06:42.138044Z&quot;}}" data-tags="[&quot;provided-infrastructure&quot;]" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> __future__ <span class="im">import</span> annotations</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> urllib.request <span class="im">import</span> urlretrieve</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn.functional <span class="im">as</span> F</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image, ImageFile</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torchvision.models.segmentation <span class="im">import</span> (</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    LRASPP_MobileNet_V3_Large_Weights,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    lraspp_mobilenet_v3_large,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torchvision.transforms <span class="im">import</span> functional <span class="im">as</span> TF</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>DEVICE <span class="op">=</span> torch.device(<span class="st">"cuda"</span> <span class="cf">if</span> torch.cuda.is_available() <span class="cf">else</span> <span class="st">"cpu"</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>ImageFile.LOAD_TRUNCATED_IMAGES <span class="op">=</span> <span class="va">True</span>  <span class="co"># tolerate harmless missing JPEG end bytes</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>DATA_DIR <span class="op">=</span> Path(<span class="st">"data/segmentation-scenes"</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>DATA_DIR.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Six photographs from the official COCO validation image server.</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>SAMPLE_IMAGES <span class="op">=</span> {</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cats"</span>: <span class="st">"http://images.cocodataset.org/val2017/000000039769.jpg"</span>,</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"kitchen"</span>: <span class="st">"http://images.cocodataset.org/val2017/000000397133.jpg"</span>,</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">"living_room"</span>: <span class="st">"http://images.cocodataset.org/val2017/000000000139.jpg"</span>,</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">"city_people"</span>: <span class="st">"http://images.cocodataset.org/val2017/000000252219.jpg"</span>,</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">"dog_and_cat"</span>: <span class="st">"http://images.cocodataset.org/val2017/000000219578.jpg"</span>,</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">"challenge_scene"</span>: <span class="st">"http://images.cocodataset.org/val2017/000000037777.jpg"</span>,</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, url <span class="kw">in</span> SAMPLE_IMAGES.items():</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    target <span class="op">=</span> DATA_DIR <span class="op">/</span> <span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">.jpg"</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> target.exists():</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>            urlretrieve(url, target)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> exc:</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"Could not download </span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>exc<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>available <span class="op">=</span> {name: DATA_DIR <span class="op">/</span> <span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">.jpg"</span> <span class="cf">for</span> name <span class="kw">in</span> SAMPLE_IMAGES</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>             <span class="cf">if</span> (DATA_DIR <span class="op">/</span> <span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">.jpg"</span>).exists()}</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> available, <span class="st">"No sample image is available. Check the internet connection once."</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>weights <span class="op">=</span> LRASPP_MobileNet_V3_Large_Weights.DEFAULT</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> lraspp_mobilenet_v3_large(weights<span class="op">=</span>weights).to(DEVICE).<span class="bu">eval</span>()</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>preprocess <span class="op">=</span> weights.transforms()</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>CLASSES <span class="op">=</span> weights.meta[<span class="st">"categories"</span>]</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="co"># A stable PASCAL-style palette: one distinct color for each class index.</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_palette(n):</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    palette <span class="op">=</span> np.zeros((n, <span class="dv">3</span>), dtype<span class="op">=</span>np.uint8)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> label <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>        value, bit <span class="op">=</span> label, <span class="dv">0</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> value:</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>            palette[label, <span class="dv">0</span>] <span class="op">|=</span> ((value <span class="op">&gt;&gt;</span> <span class="dv">0</span>) <span class="op">&amp;</span> <span class="dv">1</span>) <span class="op">&lt;&lt;</span> (<span class="dv">7</span> <span class="op">-</span> bit)</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>            palette[label, <span class="dv">1</span>] <span class="op">|=</span> ((value <span class="op">&gt;&gt;</span> <span class="dv">1</span>) <span class="op">&amp;</span> <span class="dv">1</span>) <span class="op">&lt;&lt;</span> (<span class="dv">7</span> <span class="op">-</span> bit)</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>            palette[label, <span class="dv">2</span>] <span class="op">|=</span> ((value <span class="op">&gt;&gt;</span> <span class="dv">2</span>) <span class="op">&amp;</span> <span class="dv">1</span>) <span class="op">&lt;&lt;</span> (<span class="dv">7</span> <span class="op">-</span> bit)</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>            bit <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span> value <span class="op">&gt;&gt;=</span> <span class="dv">3</span></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> palette</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>PALETTE <span class="op">=</span> make_palette(<span class="bu">len</span>(CLASSES))</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> save_preview(fig, filename):</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>    target <span class="op">=</span> Path(<span class="st">"../assets"</span>)</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>    target.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>    fig.savefig(target <span class="op">/</span> filename, dpi<span class="op">=</span><span class="dv">170</span>, bbox_inches<span class="op">=</span><span class="st">"tight"</span>)</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"PyTorch </span><span class="sc">{</span>torch<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss"> · device=</span><span class="sc">{</span>DEVICE<span class="sc">}</span><span class="ss"> · </span><span class="sc">{</span><span class="bu">len</span>(CLASSES)<span class="sc">}</span><span class="ss"> output classes"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>PyTorch 2.14.0+cu130 · device=cpu · 21 output classes</code></pre>
+</div>
+</div>
+<section id="first-contact-six-scenes-six-predictions-waiting-to-happen" class="level3">
+<h3 class="anchored" data-anchor-id="first-contact-six-scenes-six-predictions-waiting-to-happen">First contact: six scenes, six predictions waiting to happen</h3>
+<p>The model knows only its fixed label vocabulary. Before running it, choose two scenes and predict which regions it will recognize confidently.</p>
+<p><strong>My prediction:</strong> …</p>
+<div id="cell-005" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-20T22:06:42.139971Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-20T22:06:42.139805Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-20T22:06:43.928809Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-20T22:06:43.928038Z&quot;}}" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">8</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, (name, path) <span class="kw">in</span> <span class="bu">zip</span>(axes.flat, available.items()):</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    ax.imshow(Image.<span class="bu">open</span>(path).convert(<span class="st">"RGB"</span>))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    ax.set_title(name.replace(<span class="st">"_"</span>, <span class="st">" "</span>).title(), weight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    ax.axis(<span class="st">"off"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes.flat[<span class="bu">len</span>(available):]: ax.axis(<span class="st">"off"</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="st">"Choose a scene to investigate"</span>, fontsize<span class="op">=</span><span class="dv">18</span>, weight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()<span class="op">;</span> save_preview(fig, <span class="st">"scene-gallery.png"</span>)<span class="op">;</span> plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="seeing_every_pixel_files/figure-html/cell-3-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="one-image-becomes-a-tensor" class="level2">
+<h2 class="anchored" data-anchor-id="one-image-becomes-a-tensor">1 — One image becomes a tensor</h2>
+<p>Change <code>IMAGE_NAME</code> to any title in the gallery. This is the main control you will revisit throughout the notebook.</p>
+<div id="cell-007" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-20T22:06:43.941486Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-20T22:06:43.941319Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-20T22:06:44.217695Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-20T22:06:44.216848Z&quot;}}" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># YOUR CHOICE: cats, kitchen, living_room, city_people, dog_and_cat, or challenge_scene</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>IMAGE_NAME <span class="op">=</span> <span class="st">"cats"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>image <span class="op">=</span> Image.<span class="bu">open</span>(available[IMAGE_NAME]).convert(<span class="st">"RGB"</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>input_tensor <span class="op">=</span> preprocess(image).unsqueeze(<span class="dv">0</span>).to(DEVICE)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"PIL image size (width, height):"</span>, image.size)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Model input (batch, channels, height, width):"</span>, <span class="bu">tuple</span>(input_tensor.shape))</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">5</span>))</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].imshow(image)<span class="op">;</span> axes[<span class="dv">0</span>].set_title(<span class="st">"Human view: RGB image"</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].imshow(input_tensor[<span class="dv">0</span>].cpu().permute(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">0</span>).clip(<span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"Model view: resized + normalized tensor"</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes: ax.axis(<span class="st">"off"</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()<span class="op">;</span> plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>PIL image size (width, height): (640, 480)
+Model input (batch, channels, height, width): (1, 3, 520, 693)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="seeing_every_pixel_files/figure-html/cell-4-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="pause-and-read-the-contract" class="level3">
+<h3 class="anchored" data-anchor-id="pause-and-read-the-contract">Pause and read the contract</h3>
+<ol type="1">
+<li>Which axis holds the three color channels?</li>
+<li>Why does the model need a batch axis even for one image?</li>
+<li>Did preprocessing preserve the original aspect ratio?</li>
+</ol>
+<p><strong>Your observations:</strong> …</p>
+</section>
+</section>
+<section id="open-the-pretrained-model" class="level2">
+<h2 class="anchored" data-anchor-id="open-the-pretrained-model">2 — Open the pretrained model</h2>
+<p>LRASPP–MobileNetV3 has two visible parts:</p>
+<pre class="text"><code>RGB image → MobileNetV3 backbone → low/high spatial features → LRASPP classifier → class scores</code></pre>
+<p>The backbone does not end in one class vector. It returns a grid of features because the final decision must return to every pixel.</p>
+<div id="cell-010" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-20T22:06:44.223754Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-20T22:06:44.223481Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-20T22:06:44.228368Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-20T22:06:44.227817Z&quot;}}" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> parameter_count(module):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">sum</span>(p.numel() <span class="cf">for</span> p <span class="kw">in</span> module.parameters())</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(model)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Backbone parameters:"</span>, <span class="ss">f"</span><span class="sc">{</span>parameter_count(model.backbone)<span class="sc">:,}</span><span class="ss">"</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Classifier parameters:"</span>, <span class="ss">f"</span><span class="sc">{</span>parameter_count(model.classifier)<span class="sc">:,}</span><span class="ss">"</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Total parameters:"</span>, <span class="ss">f"</span><span class="sc">{</span>parameter_count(model)<span class="sc">:,}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>LRASPP(
+  (backbone): IntermediateLayerGetter(
+    (0): Conv2dNormActivation(
+      (0): Conv2d(3, 16, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (1): BatchNorm2d(16, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+      (2): Hardswish()
+    )
+    (1): InvertedResidual(
+      (block): Sequential(
+        (0): Conv2dNormActivation(
+          (0): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16, bias=False)
+          (1): BatchNorm2d(16, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (1): Conv2dNormActivation(
+          (0): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(16, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+        )
+      )
+    )
+    (2): InvertedResidual(
+      (block): Sequential(
+        (0): Conv2dNormActivation(
+          (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(64, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (1): Conv2dNormActivation(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=64, bias=False)
+          (1): BatchNorm2d(64, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (2): Conv2dNormActivation(
+          (0): Conv2d(64, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(24, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+        )
+      )
+    )
+    (3): InvertedResidual(
+      (block): Sequential(
+        (0): Conv2dNormActivation(
+          (0): Conv2d(24, 72, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(72, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (1): Conv2dNormActivation(
+          (0): Conv2d(72, 72, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=72, bias=False)
+          (1): BatchNorm2d(72, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (2): Conv2dNormActivation(
+          (0): Conv2d(72, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(24, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+        )
+      )
+    )
+    (4): InvertedResidual(
+      (block): Sequential(
+        (0): Conv2dNormActivation(
+          (0): Conv2d(24, 72, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(72, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (1): Conv2dNormActivation(
+          (0): Conv2d(72, 72, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2), groups=72, bias=False)
+          (1): BatchNorm2d(72, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (2): SqueezeExcitation(
+          (avgpool): AdaptiveAvgPool2d(output_size=1)
+          (fc1): Conv2d(72, 24, kernel_size=(1, 1), stride=(1, 1))
+          (fc2): Conv2d(24, 72, kernel_size=(1, 1), stride=(1, 1))
+          (activation): ReLU()
+          (scale_activation): Hardsigmoid()
+        )
+        (3): Conv2dNormActivation(
+          (0): Conv2d(72, 40, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(40, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+        )
+      )
+    )
+    (5): InvertedResidual(
+      (block): Sequential(
+        (0): Conv2dNormActivation(
+          (0): Conv2d(40, 120, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(120, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (1): Conv2dNormActivation(
+          (0): Conv2d(120, 120, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=120, bias=False)
+          (1): BatchNorm2d(120, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (2): SqueezeExcitation(
+          (avgpool): AdaptiveAvgPool2d(output_size=1)
+          (fc1): Conv2d(120, 32, kernel_size=(1, 1), stride=(1, 1))
+          (fc2): Conv2d(32, 120, kernel_size=(1, 1), stride=(1, 1))
+          (activation): ReLU()
+          (scale_activation): Hardsigmoid()
+        )
+        (3): Conv2dNormActivation(
+          (0): Conv2d(120, 40, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(40, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+        )
+      )
+    )
+    (6): InvertedResidual(
+      (block): Sequential(
+        (0): Conv2dNormActivation(
+          (0): Conv2d(40, 120, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(120, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (1): Conv2dNormActivation(
+          (0): Conv2d(120, 120, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=120, bias=False)
+          (1): BatchNorm2d(120, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (2): SqueezeExcitation(
+          (avgpool): AdaptiveAvgPool2d(output_size=1)
+          (fc1): Conv2d(120, 32, kernel_size=(1, 1), stride=(1, 1))
+          (fc2): Conv2d(32, 120, kernel_size=(1, 1), stride=(1, 1))
+          (activation): ReLU()
+          (scale_activation): Hardsigmoid()
+        )
+        (3): Conv2dNormActivation(
+          (0): Conv2d(120, 40, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(40, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+        )
+      )
+    )
+    (7): InvertedResidual(
+      (block): Sequential(
+        (0): Conv2dNormActivation(
+          (0): Conv2d(40, 240, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(240, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (1): Conv2dNormActivation(
+          (0): Conv2d(240, 240, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=240, bias=False)
+          (1): BatchNorm2d(240, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (2): Conv2dNormActivation(
+          (0): Conv2d(240, 80, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(80, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+        )
+      )
+    )
+    (8): InvertedResidual(
+      (block): Sequential(
+        (0): Conv2dNormActivation(
+          (0): Conv2d(80, 200, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(200, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (1): Conv2dNormActivation(
+          (0): Conv2d(200, 200, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=200, bias=False)
+          (1): BatchNorm2d(200, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (2): Conv2dNormActivation(
+          (0): Conv2d(200, 80, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(80, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+        )
+      )
+    )
+    (9): InvertedResidual(
+      (block): Sequential(
+        (0): Conv2dNormActivation(
+          (0): Conv2d(80, 184, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(184, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (1): Conv2dNormActivation(
+          (0): Conv2d(184, 184, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=184, bias=False)
+          (1): BatchNorm2d(184, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (2): Conv2dNormActivation(
+          (0): Conv2d(184, 80, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(80, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+        )
+      )
+    )
+    (10): InvertedResidual(
+      (block): Sequential(
+        (0): Conv2dNormActivation(
+          (0): Conv2d(80, 184, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(184, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (1): Conv2dNormActivation(
+          (0): Conv2d(184, 184, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=184, bias=False)
+          (1): BatchNorm2d(184, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (2): Conv2dNormActivation(
+          (0): Conv2d(184, 80, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(80, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+        )
+      )
+    )
+    (11): InvertedResidual(
+      (block): Sequential(
+        (0): Conv2dNormActivation(
+          (0): Conv2d(80, 480, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(480, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (1): Conv2dNormActivation(
+          (0): Conv2d(480, 480, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=480, bias=False)
+          (1): BatchNorm2d(480, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (2): SqueezeExcitation(
+          (avgpool): AdaptiveAvgPool2d(output_size=1)
+          (fc1): Conv2d(480, 120, kernel_size=(1, 1), stride=(1, 1))
+          (fc2): Conv2d(120, 480, kernel_size=(1, 1), stride=(1, 1))
+          (activation): ReLU()
+          (scale_activation): Hardsigmoid()
+        )
+        (3): Conv2dNormActivation(
+          (0): Conv2d(480, 112, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(112, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+        )
+      )
+    )
+    (12): InvertedResidual(
+      (block): Sequential(
+        (0): Conv2dNormActivation(
+          (0): Conv2d(112, 672, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(672, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (1): Conv2dNormActivation(
+          (0): Conv2d(672, 672, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=672, bias=False)
+          (1): BatchNorm2d(672, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (2): SqueezeExcitation(
+          (avgpool): AdaptiveAvgPool2d(output_size=1)
+          (fc1): Conv2d(672, 168, kernel_size=(1, 1), stride=(1, 1))
+          (fc2): Conv2d(168, 672, kernel_size=(1, 1), stride=(1, 1))
+          (activation): ReLU()
+          (scale_activation): Hardsigmoid()
+        )
+        (3): Conv2dNormActivation(
+          (0): Conv2d(672, 112, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(112, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+        )
+      )
+    )
+    (13): InvertedResidual(
+      (block): Sequential(
+        (0): Conv2dNormActivation(
+          (0): Conv2d(112, 672, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(672, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (1): Conv2dNormActivation(
+          (0): Conv2d(672, 672, kernel_size=(5, 5), stride=(1, 1), padding=(4, 4), dilation=(2, 2), groups=672, bias=False)
+          (1): BatchNorm2d(672, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (2): SqueezeExcitation(
+          (avgpool): AdaptiveAvgPool2d(output_size=1)
+          (fc1): Conv2d(672, 168, kernel_size=(1, 1), stride=(1, 1))
+          (fc2): Conv2d(168, 672, kernel_size=(1, 1), stride=(1, 1))
+          (activation): ReLU()
+          (scale_activation): Hardsigmoid()
+        )
+        (3): Conv2dNormActivation(
+          (0): Conv2d(672, 160, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(160, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+        )
+      )
+    )
+    (14): InvertedResidual(
+      (block): Sequential(
+        (0): Conv2dNormActivation(
+          (0): Conv2d(160, 960, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(960, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (1): Conv2dNormActivation(
+          (0): Conv2d(960, 960, kernel_size=(5, 5), stride=(1, 1), padding=(4, 4), dilation=(2, 2), groups=960, bias=False)
+          (1): BatchNorm2d(960, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (2): SqueezeExcitation(
+          (avgpool): AdaptiveAvgPool2d(output_size=1)
+          (fc1): Conv2d(960, 240, kernel_size=(1, 1), stride=(1, 1))
+          (fc2): Conv2d(240, 960, kernel_size=(1, 1), stride=(1, 1))
+          (activation): ReLU()
+          (scale_activation): Hardsigmoid()
+        )
+        (3): Conv2dNormActivation(
+          (0): Conv2d(960, 160, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(160, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+        )
+      )
+    )
+    (15): InvertedResidual(
+      (block): Sequential(
+        (0): Conv2dNormActivation(
+          (0): Conv2d(160, 960, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(960, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (1): Conv2dNormActivation(
+          (0): Conv2d(960, 960, kernel_size=(5, 5), stride=(1, 1), padding=(4, 4), dilation=(2, 2), groups=960, bias=False)
+          (1): BatchNorm2d(960, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (2): SqueezeExcitation(
+          (avgpool): AdaptiveAvgPool2d(output_size=1)
+          (fc1): Conv2d(960, 240, kernel_size=(1, 1), stride=(1, 1))
+          (fc2): Conv2d(240, 960, kernel_size=(1, 1), stride=(1, 1))
+          (activation): ReLU()
+          (scale_activation): Hardsigmoid()
+        )
+        (3): Conv2dNormActivation(
+          (0): Conv2d(960, 160, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(160, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+        )
+      )
+    )
+    (16): Conv2dNormActivation(
+      (0): Conv2d(160, 960, kernel_size=(1, 1), stride=(1, 1), bias=False)
+      (1): BatchNorm2d(960, eps=0.001, momentum=0.01, affine=True, bias=True, track_running_stats=True)
+      (2): Hardswish()
+    )
+  )
+  (classifier): LRASPPHead(
+    (cbr): Sequential(
+      (0): Conv2d(960, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+      (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, bias=True, track_running_stats=True)
+      (2): ReLU(inplace=True)
+    )
+    (scale): Sequential(
+      (0): AdaptiveAvgPool2d(output_size=1)
+      (1): Conv2d(960, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+      (2): Sigmoid()
+    )
+    (low_classifier): Conv2d(40, 21, kernel_size=(1, 1), stride=(1, 1))
+    (high_classifier): Conv2d(128, 21, kernel_size=(1, 1), stride=(1, 1))
+  )
+)
+
+Backbone parameters: 2,971,952
+Classifier parameters: 249,586
+Total parameters: 3,221,538</code></pre>
+</div>
+</div>
+<section id="architecture-scavenger-hunt" class="level3">
+<h3 class="anchored" data-anchor-id="architecture-scavenger-hunt">Architecture scavenger hunt</h3>
+<p>Use the printed architecture to find:</p>
+<ul>
+<li>the first convolution and its stride;</li>
+<li>the sequence of MobileNet inverted-residual blocks;</li>
+<li>the final classifier convolution;</li>
+<li>the number of output channels in that last convolution.</li>
+</ul>
+<p><strong>Why must the final number of channels equal the number of class names?</strong> …</p>
+</section>
+</section>
+<section id="watch-spatial-features-travel-through-the-network" class="level2">
+<h2 class="anchored" data-anchor-id="watch-spatial-features-travel-through-the-network">3 — Watch spatial features travel through the network</h2>
+<p>The supplied hooks take snapshots without modifying the model. Predict first: will feature maps become spatially larger or smaller as depth increases?</p>
+<p><strong>Prediction:</strong> …</p>
+<div id="cell-013" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-20T22:06:44.229722Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-20T22:06:44.229616Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-20T22:06:44.321709Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-20T22:06:44.321268Z&quot;}}" data-tags="[&quot;provided-infrastructure&quot;]" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>snapshots <span class="op">=</span> {}</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> remember(name):</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> hook(_module, _inputs, output):</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        snapshots[name] <span class="op">=</span> output.detach().cpu()</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> hook</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample five ordered backbone blocks from early to late depth.</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>backbone_blocks <span class="op">=</span> <span class="bu">list</span>(model.backbone.named_children())</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>sampled <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="bu">len</span>(backbone_blocks) <span class="op">-</span> <span class="dv">1</span>, <span class="dv">5</span>, dtype<span class="op">=</span><span class="bu">int</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>observed_layers <span class="op">=</span> {</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"block </span><span class="sc">{</span>backbone_blocks[i][<span class="dv">0</span>]<span class="sc">}</span><span class="ss">"</span>: backbone_blocks[i][<span class="dv">1</span>] <span class="cf">for</span> i <span class="kw">in</span> sampled</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>observed_layers[<span class="st">"classifier"</span>] <span class="op">=</span> model.classifier</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>handles <span class="op">=</span> [layer.register_forward_hook(remember(name))</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>           <span class="cf">for</span> name, layer <span class="kw">in</span> observed_layers.items()]</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.inference_mode():</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    output <span class="op">=</span> model(input_tensor)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> handle <span class="kw">in</span> handles: handle.remove()</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, activation <span class="kw">in</span> snapshots.items():</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:10s}</span><span class="ss"> → </span><span class="sc">{</span><span class="bu">tuple</span>(activation.shape)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"returned output →"</span>, <span class="bu">tuple</span>(output[<span class="st">"out"</span>].shape))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>block 0    → (1, 16, 260, 347)
+block 4    → (1, 40, 65, 87)
+block 8    → (1, 80, 33, 44)
+block 12   → (1, 112, 33, 44)
+block 16   → (1, 960, 33, 44)
+classifier → (1, 21, 65, 87)
+returned output → (1, 21, 520, 693)</code></pre>
+</div>
+</div>
+<div id="cell-014" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-20T22:06:44.323075Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-20T22:06:44.322951Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-20T22:06:44.959427Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-20T22:06:44.958725Z&quot;}}" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="fl">9.5</span>))</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, (name, activation) <span class="kw">in</span> <span class="bu">zip</span>(axes.flat, snapshots.items()):</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Channel energy gives one readable summary of hundreds of feature maps.</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    view <span class="op">=</span> activation[<span class="dv">0</span>].square().mean(<span class="dv">0</span>).sqrt()</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    ax.imshow(view, cmap<span class="op">=</span><span class="st">"magma"</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ch">\n</span><span class="sc">{</span>activation<span class="sc">.</span>shape[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> channels · </span><span class="sc">{</span>activation<span class="sc">.</span>shape[<span class="op">-</span><span class="dv">2</span>]<span class="sc">}</span><span class="ss">×</span><span class="sc">{</span>activation<span class="sc">.</span>shape[<span class="op">-</span><span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    ax.axis(<span class="st">"off"</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="st">"The same scene, represented at six depths"</span>, fontsize<span class="op">=</span><span class="dv">18</span>, weight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>fig.tight_layout(rect<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">.96</span>], h_pad<span class="op">=</span><span class="fl">3.5</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>save_preview(fig, <span class="st">"feature-gallery.png"</span>)<span class="op">;</span> plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="seeing_every_pixel_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="interpret-the-internal-movie" class="level3">
+<h3 class="anchored" data-anchor-id="interpret-the-internal-movie">Interpret the internal movie</h3>
+<ol type="1">
+<li>Where does spatial resolution fall most sharply?</li>
+<li>Where does the number of channels grow?</li>
+<li>Which display still resembles image structure most clearly?</li>
+<li>Why is the classifier output coarse before it is resized?</li>
+</ol>
+<p><strong>Your explanation:</strong> …</p>
+</section>
+</section>
+<section id="twenty-one-score-maps-become-one-semantic-mask" class="level2">
+<h2 class="anchored" data-anchor-id="twenty-one-score-maps-become-one-semantic-mask">4 — Twenty-one score maps become one semantic mask</h2>
+<p>At every output position, the network supplies one score per class. <code>argmax</code> asks which class has the largest score <strong>at each pixel</strong>.</p>
+<div id="cell-017" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-20T22:06:44.962690Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-20T22:06:44.962423Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-20T22:06:44.976331Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-20T22:06:44.975975Z&quot;}}" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>logits <span class="op">=</span> output[<span class="st">"out"</span>][<span class="dv">0</span>].cpu()             <span class="co"># [classes, height, width]</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>probabilities <span class="op">=</span> logits.softmax(dim<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>confidence, prediction <span class="op">=</span> probabilities.<span class="bu">max</span>(dim<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>present_ids <span class="op">=</span> prediction.unique().tolist()</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>present_classes <span class="op">=</span> [(index, CLASSES[index], <span class="bu">int</span>((prediction <span class="op">==</span> index).<span class="bu">sum</span>()))</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>                   <span class="cf">for</span> index <span class="kw">in</span> present_ids]</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"logits:"</span>, <span class="bu">tuple</span>(logits.shape))</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"prediction:"</span>, <span class="bu">tuple</span>(prediction.shape))</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"classes found:"</span>)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> index, name, pixels <span class="kw">in</span> <span class="bu">sorted</span>(present_classes, key<span class="op">=</span><span class="kw">lambda</span> row: <span class="op">-</span>row[<span class="dv">2</span>]):</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>index<span class="sc">:2d}</span><span class="ss"> · </span><span class="sc">{</span>name<span class="sc">:12s}</span><span class="ss"> · </span><span class="sc">{</span>pixels<span class="sc">:,}</span><span class="ss"> pixels"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>logits: (21, 520, 693)
+prediction: (520, 693)
+classes found:
+  18 · sofa         · 209,566 pixels
+   8 · cat          · 133,928 pixels
+   0 · __background__ · 16,866 pixels</code></pre>
+</div>
+</div>
+<div id="cell-018" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-20T22:06:44.977621Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-20T22:06:44.977523Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-20T22:06:45.449405Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-20T22:06:45.448829Z&quot;}}" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the four strongest non-background class-score maps.</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>strength <span class="op">=</span> probabilities.flatten(<span class="dv">1</span>).amax(<span class="dv">1</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>candidate_ids <span class="op">=</span> [i <span class="cf">for</span> i <span class="kw">in</span> strength.argsort(descending<span class="op">=</span><span class="va">True</span>).tolist() <span class="cf">if</span> i <span class="op">!=</span> <span class="dv">0</span>][:<span class="dv">4</span>]</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">5</span>, figsize<span class="op">=</span>(<span class="dv">17</span>, <span class="dv">4</span>))</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].imshow(image)<span class="op">;</span> axes[<span class="dv">0</span>].set_title(<span class="st">"Input image"</span>, weight<span class="op">=</span><span class="st">"bold"</span>)<span class="op">;</span> axes[<span class="dv">0</span>].axis(<span class="st">"off"</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, class_id <span class="kw">in</span> <span class="bu">zip</span>(axes[<span class="dv">1</span>:], candidate_ids):</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    heat <span class="op">=</span> probabilities[class_id]</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    shown <span class="op">=</span> ax.imshow(heat, cmap<span class="op">=</span><span class="st">"viridis"</span>, vmin<span class="op">=</span><span class="dv">0</span>, vmax<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f"</span><span class="sc">{</span>CLASSES[class_id]<span class="sc">}</span><span class="ch">\n</span><span class="ss">max=</span><span class="sc">{</span>heat<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    ax.axis(<span class="st">"off"</span>)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>fig.colorbar(shown, ax<span class="op">=</span>axes[<span class="dv">1</span>:].tolist(), fraction<span class="op">=</span><span class="fl">.018</span>, pad<span class="op">=</span><span class="fl">.02</span>, label<span class="op">=</span><span class="st">"class probability"</span>)</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="st">"The model votes for every class at every location"</span>, fontsize<span class="op">=</span><span class="dv">17</span>, weight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>save_preview(fig, <span class="st">"class-score-maps.png"</span>)<span class="op">;</span> plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="seeing_every_pixel_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="the-decisive-line" class="level3">
+<h3 class="anchored" data-anchor-id="the-decisive-line">The decisive line</h3>
+<p>Complete the expression mentally before running it:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>prediction <span class="op">=</span> logits.argmax(dim<span class="op">=</span>____)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Why would <code>dim=1</code> be wrong after the batch dimension has already been removed?</p>
+</section>
+</section>
+<section id="make-the-prediction-visible" class="level2">
+<h2 class="anchored" data-anchor-id="make-the-prediction-visible">5 — Make the prediction visible</h2>
+<p>The class-index mask is correct but hard to read as raw numbers. A palette turns indices into colors; an overlay reconnects those colors to the scene.</p>
+<div id="cell-021" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-20T22:06:45.452955Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-20T22:06:45.452749Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-20T22:06:46.522641Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-20T22:06:46.522078Z&quot;}}" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> colorize(mask):</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> PALETTE[mask.numpy()]</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> resize_rgb(pil_image, height, width):</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.asarray(pil_image.resize((width, height), Image.Resampling.BILINEAR))</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>mask_rgb <span class="op">=</span> colorize(prediction)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>image_rgb <span class="op">=</span> resize_rgb(image, <span class="op">*</span>prediction.shape)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>overlay <span class="op">=</span> (<span class="fl">0.55</span> <span class="op">*</span> image_rgb <span class="op">+</span> <span class="fl">0.45</span> <span class="op">*</span> mask_rgb).astype(np.uint8)</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">16</span>, <span class="dv">5</span>))</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, content, title <span class="kw">in</span> <span class="bu">zip</span>(</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    axes,</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    [image_rgb, mask_rgb, overlay],</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    [<span class="st">"Original scene"</span>, <span class="st">"Semantic mask"</span>, <span class="st">"Image + mask overlay"</span>],</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>    ax.imshow(content)<span class="op">;</span> ax.set_title(title, weight<span class="op">=</span><span class="st">"bold"</span>)<span class="op">;</span> ax.axis(<span class="st">"off"</span>)</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="ss">f"One image → one label for every pixel (</span><span class="sc">{</span>IMAGE_NAME<span class="sc">}</span><span class="ss">)"</span>, fontsize<span class="op">=</span><span class="dv">18</span>, weight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()<span class="op">;</span> save_preview(fig, <span class="st">"mask-overlay.png"</span>)<span class="op">;</span> plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="seeing_every_pixel_files/figure-html/cell-10-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-022" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-20T22:06:46.528758Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-20T22:06:46.528462Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-20T22:06:46.576317Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-20T22:06:46.575823Z&quot;}}" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A legend containing only the classes that actually appear.</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="fl">2.2</span>))</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>ax.axis(<span class="st">"off"</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> class_id <span class="kw">in</span> present_ids:</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    ax.add_patch(plt.Rectangle((x, <span class="fl">.35</span>), <span class="fl">.07</span>, <span class="fl">.3</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>                              color<span class="op">=</span>PALETTE[class_id] <span class="op">/</span> <span class="dv">255</span>))</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    ax.text(x <span class="op">+</span> <span class="fl">.085</span>, <span class="fl">.5</span>, CLASSES[class_id], va<span class="op">=</span><span class="st">"center"</span>, fontsize<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    x <span class="op">+=</span> <span class="bu">max</span>(<span class="fl">.20</span>, <span class="fl">.085</span> <span class="op">+</span> <span class="fl">.014</span> <span class="op">*</span> <span class="bu">len</span>(CLASSES[class_id]))</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="dv">0</span>, <span class="bu">max</span>(x, <span class="dv">1</span>))<span class="op">;</span> ax.set_ylim(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Colors used in this prediction"</span>, weight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="seeing_every_pixel_files/figure-html/cell-11-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="look-closely" class="level3">
+<h3 class="anchored" data-anchor-id="look-closely">Look closely</h3>
+<p>Name one example of each, if present:</p>
+<ul>
+<li>a large region the model gets right;</li>
+<li>a boundary that looks too coarse;</li>
+<li>a small object that disappears;</li>
+<li>a region assigned to a plausible but wrong class;</li>
+<li>two objects of the same class receiving the same semantic label.</li>
+</ul>
+<p><strong>Visual notes:</strong> …</p>
+</section>
+</section>
+<section id="where-is-the-model-unsure" class="level2">
+<h2 class="anchored" data-anchor-id="where-is-the-model-unsure">6 — Where is the model unsure?</h2>
+<p>A prediction always chooses a winner, even when no class wins convincingly. Use confidence to separate “the model predicted this” from “the model strongly believes this.”</p>
+<div id="cell-025" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-20T22:06:46.577791Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-20T22:06:46.577689Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-20T22:06:47.367829Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-20T22:06:47.367456Z&quot;}}" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>uncertain <span class="op">=</span> confidence <span class="op">&lt;</span> <span class="fl">0.65</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>uncertainty_view <span class="op">=</span> overlay.copy()</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>uncertainty_view[uncertain.numpy()] <span class="op">=</span> [<span class="dv">240</span>, <span class="dv">55</span>, <span class="dv">70</span>]</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">16</span>, <span class="dv">5</span>))</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].imshow(confidence, cmap<span class="op">=</span><span class="st">"magma"</span>, vmin<span class="op">=</span><span class="dv">0</span>, vmax<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"Winning-class confidence"</span>)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].imshow(uncertain, cmap<span class="op">=</span><span class="st">"gray"</span>)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"Confidence &lt; 0.65"</span>)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].imshow(uncertainty_view)</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].set_title(<span class="st">"Uncertain pixels in red"</span>)</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes: ax.axis(<span class="st">"off"</span>)</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="st">"A hard mask hides hesitation"</span>, fontsize<span class="op">=</span><span class="dv">18</span>, weight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()<span class="op">;</span> save_preview(fig, <span class="st">"confidence-gallery.png"</span>)<span class="op">;</span> plt.show()</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Uncertain pixels: </span><span class="sc">{</span>uncertain<span class="sc">.</span><span class="bu">float</span>()<span class="sc">.</span>mean()<span class="sc">:.1%}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="seeing_every_pixel_files/figure-html/cell-12-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Uncertain pixels: 20.5%</code></pre>
+</div>
+</div>
+<section id="change-one-visual-decision" class="level3">
+<h3 class="anchored" data-anchor-id="change-one-visual-decision">Change one visual decision</h3>
+<p>Try confidence thresholds <code>0.40</code>, <code>0.65</code>, and <code>0.85</code>. The model does not change—only your rule for calling a prediction uncertain changes.</p>
+<p>Where does uncertainty concentrate: object interiors, boundaries, small objects, or unfamiliar regions?</p>
+<p><strong>Observation:</strong> …</p>
+</section>
+</section>
+<section id="the-oh-gallery-run-every-scene" class="level2">
+<h2 class="anchored" data-anchor-id="the-oh-gallery-run-every-scene">7 — The “oh!” gallery: run every scene</h2>
+<p>This supplied function repeats the same inference pipeline. It is intentionally compact: the goal is to compare visual behavior, not copy boilerplate.</p>
+<div id="cell-028" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-20T22:06:47.371798Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-20T22:06:47.371568Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-20T22:06:52.182515Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-20T22:06:52.181481Z&quot;}}" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="at">@torch.inference_mode</span>()</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> segment(pil_image):</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    tensor <span class="op">=</span> preprocess(pil_image).unsqueeze(<span class="dv">0</span>).to(DEVICE)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    scores <span class="op">=</span> model(tensor)[<span class="st">"out"</span>][<span class="dv">0</span>].cpu()</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    probs <span class="op">=</span> scores.softmax(<span class="dv">0</span>)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    conf, mask <span class="op">=</span> probs.<span class="bu">max</span>(<span class="dv">0</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    rgb <span class="op">=</span> resize_rgb(pil_image, <span class="op">*</span>mask.shape)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    colors <span class="op">=</span> colorize(mask)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    blended <span class="op">=</span> (<span class="fl">0.58</span> <span class="op">*</span> rgb <span class="op">+</span> <span class="fl">0.42</span> <span class="op">*</span> colors).astype(np.uint8)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> mask, conf, colors, blended</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="bu">len</span>(available), <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="fl">4.2</span> <span class="op">*</span> <span class="bu">len</span>(available)))</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> row, (name, path) <span class="kw">in</span> <span class="bu">enumerate</span>(available.items()):</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    scene <span class="op">=</span> Image.<span class="bu">open</span>(path).convert(<span class="st">"RGB"</span>)</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    mask, conf, colors, blended <span class="op">=</span> segment(scene)</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>    rgb <span class="op">=</span> resize_rgb(scene, <span class="op">*</span>mask.shape)</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    axes[row, <span class="dv">0</span>].imshow(rgb)</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    axes[row, <span class="dv">1</span>].imshow(colors)</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>    axes[row, <span class="dv">2</span>].imshow(blended)</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>    axes[row, <span class="dv">0</span>].set_ylabel(name.title(), fontsize<span class="op">=</span><span class="dv">13</span>, weight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> col <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>): axes[row, col].axis(<span class="st">"off"</span>)</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, title <span class="kw">in</span> <span class="bu">zip</span>(axes[<span class="dv">0</span>], [<span class="st">"Image"</span>, <span class="st">"Predicted labels"</span>, <span class="st">"Overlay"</span>]):</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>    ax.set_title(title, fontsize<span class="op">=</span><span class="dv">15</span>, weight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="st">"Six scenes through the same pretrained model"</span>, fontsize<span class="op">=</span><span class="dv">20</span>, weight<span class="op">=</span><span class="st">"bold"</span>, y<span class="op">=</span><span class="fl">1.0</span>)</span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()<span class="op">;</span> save_preview(fig, <span class="st">"all-scenes-gallery.png"</span>)<span class="op">;</span> plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="seeing_every_pixel_files/figure-html/cell-13-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="compare-do-not-score" class="level3">
+<h3 class="anchored" data-anchor-id="compare-do-not-score">Compare, do not score</h3>
+<p>Choose the most impressive and most surprising scene.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Scene</th>
+<th>What worked?</th>
+<th>What failed?</th>
+<th>Your explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Most impressive</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+<tr class="even">
+<td>Most surprising</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody>
+</table>
+<p>Do not invent an accuracy number: these images have no ground-truth masks in this notebook. Careful qualitative evidence is the correct tool here.</p>
+</section>
+</section>
+<section id="manipulate-the-input-does-the-interpretation-survive" class="level2">
+<h2 class="anchored" data-anchor-id="manipulate-the-input-does-the-interpretation-survive">8 — Manipulate the input; does the interpretation survive?</h2>
+<p>A horizontal flip should not change the meaning of a dog, person, or car. Test whether the predicted mask is consistent after flipping the result back.</p>
+<div id="cell-031" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-20T22:06:52.201422Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-20T22:06:52.201076Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-20T22:06:53.483150Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-20T22:06:53.482312Z&quot;}}" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>flipped_image <span class="op">=</span> TF.hflip(image)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>flip_mask, _, flip_colors, flip_overlay <span class="op">=</span> segment(flipped_image)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>flip_mask_back <span class="op">=</span> torch.flip(flip_mask, dims<span class="op">=</span>[<span class="dv">1</span>])</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>agreement <span class="op">=</span> (prediction <span class="op">==</span> flip_mask_back).<span class="bu">float</span>()</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>flip_overlay_back <span class="op">=</span> np.fliplr(flip_overlay)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">4</span>, figsize<span class="op">=</span>(<span class="dv">18</span>, <span class="dv">5</span>))</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].imshow(image_rgb)<span class="op">;</span> axes[<span class="dv">0</span>].set_title(<span class="st">"Original"</span>)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].imshow(overlay)<span class="op">;</span> axes[<span class="dv">1</span>].set_title(<span class="st">"Original prediction"</span>)</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].imshow(flip_overlay_back)<span class="op">;</span> axes[<span class="dv">2</span>].set_title(<span class="st">"Flipped prediction, restored"</span>)</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">3</span>].imshow(agreement, cmap<span class="op">=</span><span class="st">"RdYlGn"</span>, vmin<span class="op">=</span><span class="dv">0</span>, vmax<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">3</span>].set_title(<span class="ss">f"Pixel agreement: </span><span class="sc">{</span>agreement<span class="sc">.</span>mean()<span class="sc">:.1%}</span><span class="ss">"</span>)</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes: ax.axis(<span class="st">"off"</span>)</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="st">"Same content, different pixel arrangement"</span>, fontsize<span class="op">=</span><span class="dv">18</span>, weight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()<span class="op">;</span> save_preview(fig, <span class="st">"flip-consistency.png"</span>)<span class="op">;</span> plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="seeing_every_pixel_files/figure-html/cell-14-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="interpret-the-disagreement" class="level3">
+<h3 class="anchored" data-anchor-id="interpret-the-disagreement">Interpret the disagreement</h3>
+<p>Inspect the red regions. Are they concentrated near boundaries, small objects, or large object interiors? Does the disagreement change your trust in the hard mask?</p>
+<p><strong>Your explanation:</strong> …</p>
+</section>
+</section>
+<section id="exit-ticket-tell-the-story-of-one-scene" class="level2">
+<h2 class="anchored" data-anchor-id="exit-ticket-tell-the-story-of-one-scene">9 — Exit ticket: tell the story of one scene</h2>
+<p>Submit the executed notebook with your selected image and all plots visible. Answer briefly:</p>
+<ol type="1">
+<li>What does each axis of <code>[1, 21, H, W]</code> mean?</li>
+<li>What role does the backbone play? What role does the classifier play?</li>
+<li>Why is <code>argmax(dim=0)</code> a pixel-wise decision here?</li>
+<li>Cite one visible success and one visible failure.</li>
+<li>Where was the model uncertain, and why might that region be difficult?</li>
+<li>What information would <strong>instance segmentation</strong> add to this output?</li>
+</ol>
+<p><strong>Final sentence:</strong> Semantic segmentation is not “one label for an image”; it is …</p>
+</section>
+<section id="image-and-model-sources" class="level2">
+<h2 class="anchored" data-anchor-id="image-and-model-sources">Image and model sources</h2>
+<ul>
+<li>Model and preprocessing: TorchVision <code>LRASPP_MobileNet_V3_Large_Weights.DEFAULT</code>, trained on the PASCAL VOC categories available through the COCO subset.</li>
+<li>Test scenes: COCO 2017 validation images, downloaded from the official COCO image server.</li>
+</ul>
+<p>The images are used only for classroom model inspection. Keep these source notes with any screenshots you export.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Deep Learning · ENSA Tétouan</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 610" role="img" aria-labelledby="title desc">
+  <title id="title">Spatial prediction in a street scene</title>
+  <desc id="desc">A vehicle has a coral detection rectangle, a person has a violet pixel mask, and the road has a translucent blue segmentation mask.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b9dce9"/><stop offset="1" stop-color="#eff3ec"/>
+    </linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#65747b"/><stop offset="1" stop-color="#27343b"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#17212b" flood-opacity=".18"/>
+    </filter>
+  </defs>
+
+  <rect width="920" height="610" fill="url(#sky)"/>
+  <circle cx="742" cy="100" r="52" fill="#f3c75f" opacity=".92"/>
+  <path d="M0 305 150 197 277 282 415 151 585 286 733 190 920 310V0H0Z" fill="#d6e1dc" opacity=".75"/>
+
+  <g fill="#f7f2e8" stroke="#9aabb2" stroke-width="5">
+    <path d="M40 143h192v238H40z"/><path d="M660 118h214v274H660z"/>
+  </g>
+  <g fill="#7aa8bc">
+    <rect x="70" y="178" width="42" height="55"/><rect x="143" y="178" width="42" height="55"/>
+    <rect x="70" y="265" width="42" height="55"/><rect x="143" y="265" width="42" height="55"/>
+    <rect x="695" y="158" width="48" height="60"/><rect x="787" y="158" width="48" height="60"/>
+    <rect x="695" y="255" width="48" height="60"/><rect x="787" y="255" width="48" height="60"/>
+  </g>
+
+  <path d="M222 318h476l222 292H0Z" fill="url(#road)"/>
+  <path d="M397 337h115l78 273H319Z" fill="#fff7db" opacity=".88"/>
+  <path d="M0 610V530L283 347h354L920 532v78Z" fill="#2878c8" opacity=".27"/>
+  <path d="M446 356v58M418 448l-21 77M490 448l21 77" fill="none" stroke="#fff7db" stroke-width="14" stroke-linecap="round"/>
+
+  <g filter="url(#shadow)">
+    <path d="M254 404 312 345h178l67 59 34 21v87H205v-76Z" fill="#f4efe5" stroke="#17212b" stroke-width="7"/>
+    <path d="m333 361-34 44h193l-42-44Z" fill="#78adc4"/>
+    <circle cx="282" cy="511" r="35" fill="#17212b"/><circle cx="513" cy="511" r="35" fill="#17212b"/>
+    <circle cx="282" cy="511" r="15" fill="#b9c2c4"/><circle cx="513" cy="511" r="15" fill="#b9c2c4"/>
+  </g>
+  <rect x="183" y="327" width="431" height="213" rx="12" fill="none" stroke="#ef5b45" stroke-width="10"/>
+  <path d="M183 362v-35h35M579 327h35v35M183 505v35h35M579 540h35v-35" fill="none" stroke="#fffdf7" stroke-width="4"/>
+
+  <g transform="translate(705 303)" filter="url(#shadow)">
+    <path d="M60 0c24 0 43 20 43 44 0 14-7 27-18 35l27 91 24 100H86L64 187 43 270H-5l27-102 19-90C27 71 18 56 18 40 18 18 37 0 60 0Z" fill="#7655ad" opacity=".9"/>
+    <circle cx="60" cy="39" r="28" fill="#f3b89e"/>
+    <path d="M34 29c8-28 54-33 63 2-20-10-41-11-63-2Z" fill="#17212b"/>
+    <path d="m42 88-36 90M83 89l53 72" fill="none" stroke="#7655ad" stroke-width="28" stroke-linecap="round"/>
+  </g>
+  <path d="M707 323c15-46 76-60 111-22 35 39 32 117 62 186l-29 83H701l-32-91c25-55 22-111 38-156Z" fill="none" stroke="#7655ad" stroke-width="8" stroke-dasharray="10 10"/>
+
+  <g fill="#38865a">
+    <circle cx="98" cy="362" r="54"/><circle cx="145" cy="350" r="47"/><circle cx="832" cy="380" r="55"/>
+  </g>
+</svg>

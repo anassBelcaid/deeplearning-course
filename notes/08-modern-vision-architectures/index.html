@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dr.&nbsp;A. Belcaid">
+<meta name="description" content="From VGG blocks to Inception branches, residual shortcuts, dense connectivity, and task-specific architecture composition">
+
+<title>Modern Vision Architectures – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e90830a6c3a870e8aa2cd7457ccbff49.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../schedule.html"> 
+<span class="menu-text">Schedule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../logistics.html"> 
+<span class="menu-text">Logistics</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#why-architecture-becomes-a-design-problem" id="toc-why-architecture-becomes-a-design-problem" class="nav-link active" data-scroll-target="#why-architecture-becomes-a-design-problem"><span class="header-section-number">1</span> Why architecture becomes a design problem</a>
+  <ul class="collapse">
+  <li><a href="#alexnet-as-the-reference-point" id="toc-alexnet-as-the-reference-point" class="nav-link" data-scroll-target="#alexnet-as-the-reference-point"><span class="header-section-number">1.1</span> AlexNet as the reference point</a></li>
+  </ul></li>
+  <li><a href="#vgg-depth-through-repeated-small-blocks" id="toc-vgg-depth-through-repeated-small-blocks" class="nav-link" data-scroll-target="#vgg-depth-through-repeated-small-blocks"><span class="header-section-number">2</span> VGG: depth through repeated small blocks</a>
+  <ul class="collapse">
+  <li><a href="#why-repeated-3times3-convolutions" id="toc-why-repeated-3times3-convolutions" class="nav-link" data-scroll-target="#why-repeated-3times3-convolutions"><span class="header-section-number">2.1</span> Why repeated <span class="math inline">\(3\times3\)</span> convolutions?</a></li>
+  <li><a href="#the-full-model-becomes-a-short-specification" id="toc-the-full-model-becomes-a-short-specification" class="nav-link" data-scroll-target="#the-full-model-becomes-a-short-specification"><span class="header-section-number">2.2</span> The full model becomes a short specification</a></li>
+  </ul></li>
+  <li><a href="#nin-learn-within-each-spatial-location" id="toc-nin-learn-within-each-spatial-location" class="nav-link" data-scroll-target="#nin-learn-within-each-spatial-location"><span class="header-section-number">3</span> NiN: learn within each spatial location</a>
+  <ul class="collapse">
+  <li><a href="#a-1times1-convolution-is-a-learned-channel-mixer" id="toc-a-1times1-convolution-is-a-learned-channel-mixer" class="nav-link" data-scroll-target="#a-1times1-convolution-is-a-learned-channel-mixer"><span class="header-section-number">3.1</span> A <span class="math inline">\(1\times1\)</span> convolution is a learned channel mixer</a></li>
+  <li><a href="#replace-the-dense-head-with-class-evidence-maps" id="toc-replace-the-dense-head-with-class-evidence-maps" class="nav-link" data-scroll-target="#replace-the-dense-head-with-class-evidence-maps"><span class="header-section-number">3.2</span> Replace the dense head with class evidence maps</a></li>
+  </ul></li>
+  <li><a href="#inception-branch-across-spatial-scales" id="toc-inception-branch-across-spatial-scales" class="nav-link" data-scroll-target="#inception-branch-across-spatial-scales"><span class="header-section-number">4</span> Inception: branch across spatial scales</a>
+  <ul class="collapse">
+  <li><a href="#googlenet-compresses-the-block-into-a-reusable-symbol" id="toc-googlenet-compresses-the-block-into-a-reusable-symbol" class="nav-link" data-scroll-target="#googlenet-compresses-the-block-into-a-reusable-symbol"><span class="header-section-number">4.1</span> GoogLeNet compresses the block into a reusable symbol</a></li>
+  </ul></li>
+  <li><a href="#resnet-learn-a-residual-correction" id="toc-resnet-learn-a-residual-correction" class="nav-link" data-scroll-target="#resnet-learn-a-residual-correction"><span class="header-section-number">5</span> ResNet: learn a residual correction</a>
+  <ul class="collapse">
+  <li><a href="#reparameterize-the-desired-mapping" id="toc-reparameterize-the-desired-mapping" class="nav-link" data-scroll-target="#reparameterize-the-desired-mapping"><span class="header-section-number">5.1</span> Reparameterize the desired mapping</a></li>
+  <li><a href="#identity-versus-projection-shortcuts" id="toc-identity-versus-projection-shortcuts" class="nav-link" data-scroll-target="#identity-versus-projection-shortcuts"><span class="header-section-number">5.2</span> Identity versus projection shortcuts</a></li>
+  </ul></li>
+  <li><a href="#densenet-preserve-the-full-feature-history" id="toc-densenet-preserve-the-full-feature-history" class="nav-link" data-scroll-target="#densenet-preserve-the-full-feature-history"><span class="header-section-number">6</span> DenseNet: preserve the full feature history</a>
+  <ul class="collapse">
+  <li><a href="#the-dense-contract" id="toc-the-dense-contract" class="nav-link" data-scroll-target="#the-dense-contract"><span class="header-section-number">6.1</span> The dense contract</a>
+  <ul class="collapse">
+  <li><a href="#numerical-growth-example" id="toc-numerical-growth-example" class="nav-link" data-scroll-target="#numerical-growth-example"><span class="header-section-number">6.1.1</span> Numerical growth example</a></li>
+  </ul></li>
+  <li><a href="#transition-layers-cool-channel-growth" id="toc-transition-layers-cool-channel-growth" class="nav-link" data-scroll-target="#transition-layers-cool-channel-growth"><span class="header-section-number">6.2</span> Transition layers cool channel growth</a></li>
+  <li><a href="#pytorch-implementation" id="toc-pytorch-implementation" class="nav-link" data-scroll-target="#pytorch-implementation"><span class="header-section-number">6.3</span> PyTorch implementation</a></li>
+  </ul></li>
+  <li><a href="#the-architecture-toolkit" id="toc-the-architecture-toolkit" class="nav-link" data-scroll-target="#the-architecture-toolkit"><span class="header-section-number">7</span> The architecture toolkit</a></li>
+  <li><a href="#compose-mechanisms-for-a-task" id="toc-compose-mechanisms-for-a-task" class="nav-link" data-scroll-target="#compose-mechanisms-for-a-task"><span class="header-section-number">8</span> Compose mechanisms for a task</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">9</span> Check your understanding</a>
+  <ul class="collapse">
+  <li><a href="#exercise-1-vgg-receptive-field-and-parameters" id="toc-exercise-1-vgg-receptive-field-and-parameters" class="nav-link" data-scroll-target="#exercise-1-vgg-receptive-field-and-parameters"><span class="header-section-number">9.1</span> Exercise 1: VGG receptive field and parameters</a></li>
+  <li><a href="#exercise-2-inception-output-channels" id="toc-exercise-2-inception-output-channels" class="nav-link" data-scroll-target="#exercise-2-inception-output-channels"><span class="header-section-number">9.2</span> Exercise 2: Inception output channels</a></li>
+  <li><a href="#exercise-3-choose-a-residual-shortcut" id="toc-exercise-3-choose-a-residual-shortcut" class="nav-link" data-scroll-target="#exercise-3-choose-a-residual-shortcut"><span class="header-section-number">9.3</span> Exercise 3: choose a residual shortcut</a></li>
+  <li><a href="#exercise-4-densenet-growth" id="toc-exercise-4-densenet-growth" class="nav-link" data-scroll-target="#exercise-4-densenet-growth"><span class="header-section-number">9.4</span> Exercise 4: DenseNet growth</a></li>
+  </ul></li>
+  <li><a href="#further-reading-and-implementation-links" id="toc-further-reading-and-implementation-links" class="nav-link" data-scroll-target="#further-reading-and-implementation-links"><span class="header-section-number">10</span> Further reading and implementation links</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Modern Vision Architectures</h1>
+<p class="subtitle lead">Chapter 8 · Designing depth, information flow, and reuse</p>
+</div>
+
+<div>
+  <div class="description">
+    From VGG blocks to Inception branches, residual shortcuts, dense connectivity, and task-specific architecture composition
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dr.&nbsp;A. Belcaid </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="chapter-opening">
+<div class="chapter-kicker">
+<p>PART V · LEARNING FROM IMAGES</p>
+</div>
+<div class="chapter-cover">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../lectures/08-modern-vision-architectures/assets/modern-vision-hero.png" class="img-fluid figure-img" alt="A dark blue visual architecture pipeline with layered feature maps, a multi-branch module, and a glowing residual shortcut."></p>
+<figcaption>A visual architecture pipeline in which feature blocks become deeper, branch, and reconnect through a shortcut. Original course illustration created for this chapter.</figcaption>
+</figure>
+</div>
+</div>
+<p>Chapter 7 established the basic convolutional vocabulary: local filters, channels, nonlinearities, pooling, and receptive fields. This chapter asks the next design question: <strong>how should those operations be organized when a vision model must become deeper, more expressive, and still trainable?</strong></p>
+<p>The named architectures are historically important, but the durable objective is not to memorize five model names. It is to extract reusable mechanisms—repeat, mix channels, branch, add, and concatenate—and learn to compose them around a task specification.</p>
+</div>
+<section id="by-the-end-of-this-chapter-you-should-be-able-to" class="level3 unnumbered unlisted learning-objectives">
+<h3 class="unnumbered unlisted anchored" data-anchor-id="by-the-end-of-this-chapter-you-should-be-able-to">By the end of this chapter, you should be able to</h3>
+<ol type="1">
+<li>Explain why depth is an architectural and optimization decision, not merely a layer count.</li>
+<li>Construct VGG-style repeated convolutional blocks from a compact configuration.</li>
+<li>Explain how NiN uses <span class="math inline">\(1\times1\)</span> convolutions and global average pooling.</li>
+<li>Trace all four branches of an Inception block and account for its output channels.</li>
+<li>Distinguish identity and projection shortcuts in a residual block.</li>
+<li>Explain DenseNet growth rate, transition compression, and activation-memory cost.</li>
+<li>Translate each architecture diagram into PyTorch code.</li>
+<li>Combine mechanisms from several architecture families to satisfy one task specification.</li>
+</ol>
+</section>
+<section id="why-architecture-becomes-a-design-problem" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Why architecture becomes a design problem</h1>
+<p>Consider scaling a familiar CNN from a small dataset to ImageNet-scale recognition. The input becomes larger, the number of classes grows, and the visual variation becomes much broader. Repeating the same convolution–activation–pooling recipe is tempting, but three pressures appear quickly:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Pressure</th>
+<th>What can go wrong?</th>
+<th>Architectural question</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Spatial resolution</td>
+<td>Aggressive pooling erases small structures early.</td>
+<td>Where should downsampling occur?</td>
+</tr>
+<tr class="even">
+<td>Parameter allocation</td>
+<td>Wide kernels and dense heads dominate the budget.</td>
+<td>Where should capacity be spent?</td>
+</tr>
+<tr class="odd">
+<td>Information flow</td>
+<td>A deeper plain chain becomes harder to optimize.</td>
+<td>How can earlier signals reach later layers?</td>
+</tr>
+</tbody>
+</table>
+<p>Architecture is therefore part of the hypothesis. It decides which computations are easy to express, which signals remain available, and how gradients can travel through the model.</p>
+<section id="alexnet-as-the-reference-point" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="alexnet-as-the-reference-point"><span class="header-section-number">1.1</span> AlexNet as the reference point</h2>
+<p>AlexNet demonstrated that a deep convolutional system trained with GPUs, ReLU activations, dropout, and data augmentation could succeed on large-scale image recognition <span class="citation" data-cites="krizhevsky2012imagenet">(<a href="#ref-krizhevsky2012imagenet" role="doc-biblioref">Krizhevsky et al. 2012</a>)</span>. Its structure also gives us a useful reference: early wide kernels and aggressive strides ingest the image, while a large fully connected head performs classification.</p>
+<div id="fig-alexnet-reference" class="quarto-float quarto-figure quarto-figure-center anchored" alt="AlexNet shown as colored layer bars for convolution, pooling, flattening, and fully connected layers.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-alexnet-reference-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/08-modern-vision-architectures/assets/alexnet-layer-stack.svg" class="img-fluid figure-img" style="width:100.0%" alt="AlexNet shown as colored layer bars for convolution, pooling, flattening, and fully connected layers.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-alexnet-reference-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Course reconstruction of AlexNet as a sequence of compact layer bars. The diagram uses the visual grammar followed throughout this chapter.
+</figcaption>
+</figure>
+</div>
+<p>The architecture worked, but it left open questions. Must every layer be designed individually? Can depth be increased systematically? Can the classifier avoid spending most of the parameters? Can information follow shorter routes through a deep model?</p>
+</section>
+</section>
+<section id="vgg-depth-through-repeated-small-blocks" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> VGG: depth through repeated small blocks</h1>
+<p>The VGG study treated architecture design as a controlled experiment <span class="citation" data-cites="simonyan2015vgg">(<a href="#ref-simonyan2015vgg" role="doc-biblioref">Simonyan and Zisserman 2015</a>)</span>. Across configurations A through E, the local recipe remains stable while learned depth increases. This makes depth an experimental variable rather than an accidental consequence of unrelated layer choices.</p>
+<div id="fig-vgg-table" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The original VGG paper table comparing configurations A through E with increasing convolutional depth.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-vgg-table-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/08-modern-vision-architectures/assets/vgg-paper-table1.png" class="img-fluid figure-img" style="width:88.0%" alt="The original VGG paper table comparing configurations A through E with increasing convolutional depth.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-vgg-table-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Original VGG configuration table showing networks A through E. Source: Simonyan and Zisserman, Table 1.
+</figcaption>
+</figure>
+</div>
+<p><a href="https://arxiv.org/abs/1409.1556">Read the original VGG paper</a>. The authors’ <a href="https://www.robots.ox.ac.uk/~vgg/research/very_deep/">Visual Geometry Group project page</a> also provides the original model information.</p>
+<section id="why-repeated-3times3-convolutions" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="why-repeated-3times3-convolutions"><span class="header-section-number">2.1</span> Why repeated <span class="math inline">\(3\times3\)</span> convolutions?</h2>
+<p>Two padded <span class="math inline">\(3\times3\)</span> convolutions have an effective receptive field of <span class="math inline">\(5\times5\)</span>; three have an effective receptive field of <span class="math inline">\(7\times7\)</span>. Stacking small kernels has two advantages:</p>
+<ol type="1">
+<li>it inserts a nonlinearity after every convolution;</li>
+<li>it often uses fewer parameters than one equally wide large kernel.</li>
+</ol>
+<p>For equal input and output width <span class="math inline">\(C\)</span>, one <span class="math inline">\(5\times5\)</span> convolution uses approximately <span class="math inline">\(25C^2\)</span> weights. Two <span class="math inline">\(3\times3\)</span> convolutions use approximately <span class="math inline">\(18C^2\)</span> weights. The comparison is not exact when intermediate channel widths differ, but it explains the design pressure.</p>
+<div id="fig-vgg-block" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A labeled VGG block plate containing repeated 3 by 3 convolution and ReLU layers followed by max pooling.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-vgg-block-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/08-modern-vision-architectures/assets/vgg-block-schematic.svg" class="img-fluid figure-img" style="width:72.0%" alt="A labeled VGG block plate containing repeated 3 by 3 convolution and ReLU layers followed by max pooling.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-vgg-block-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: A VGG block groups repeated padded three-by-three convolutions and ReLU operations before one max-pooling step. Original course SVG.
+</figcaption>
+</figure>
+</div>
+<p>The block preserves <span class="math inline">\(H\times W\)</span> while extracting features, then pooling halves the spatial resolution. This ordering matters: the model performs several learned transformations before discarding spatial detail.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch <span class="im">import</span> nn</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> vgg_block(num_convs: <span class="bu">int</span>, out_channels: <span class="bu">int</span>) <span class="op">-&gt;</span> nn.Sequential:</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    layers <span class="op">=</span> []</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(num_convs):</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        layers.extend([</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>            nn.LazyConv2d(out_channels, kernel_size<span class="op">=</span><span class="dv">3</span>, padding<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>            nn.ReLU(),</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        ])</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    layers.append(nn.MaxPool2d(kernel_size<span class="op">=</span><span class="dv">2</span>, stride<span class="op">=</span><span class="dv">2</span>))</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> nn.Sequential(<span class="op">*</span>layers)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Conv2d.html"><code>Conv2d</code> documentation</a> defines the channel, kernel, stride, and padding contract. <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Sequential.html"><code>Sequential</code></a> is appropriate because each operation has exactly one successor.</p>
+</section>
+<section id="the-full-model-becomes-a-short-specification" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="the-full-model-becomes-a-short-specification"><span class="header-section-number">2.2</span> The full model becomes a short specification</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> VGG(nn.Module):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, arch, num_classes<span class="op">=</span><span class="dv">10</span>):</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        blocks <span class="op">=</span> [vgg_block(n, c) <span class="cf">for</span> n, c <span class="kw">in</span> arch]</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.net <span class="op">=</span> nn.Sequential(</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>            <span class="op">*</span>blocks,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>            nn.Flatten(),</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            nn.LazyLinear(<span class="dv">4096</span>), nn.ReLU(), nn.Dropout(<span class="fl">0.5</span>),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>            nn.LazyLinear(<span class="dv">4096</span>), nn.ReLU(), nn.Dropout(<span class="fl">0.5</span>),</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>            nn.LazyLinear(num_classes),</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.net(x)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>vgg11 <span class="op">=</span> ((<span class="dv">1</span>, <span class="dv">64</span>), (<span class="dv">1</span>, <span class="dv">128</span>), (<span class="dv">2</span>, <span class="dv">256</span>), (<span class="dv">2</span>, <span class="dv">512</span>), (<span class="dv">2</span>, <span class="dv">512</span>))</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> VGG(vgg11)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="fig-vgg-comparison" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Three-column comparison of the full VGG model, the reusable VGG block, and AlexNet.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-vgg-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/08-modern-vision-architectures/assets/vgg-three-column-comparison.svg" class="img-fluid figure-img" style="width:100.0%" alt="Three-column comparison of the full VGG model, the reusable VGG block, and AlexNet.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-vgg-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: VGG represented as a full configuration, a reusable VGG block, and the AlexNet reference architecture. Original course SVG.
+</figcaption>
+</figure>
+</div>
+<p>VGG’s contribution is methodological: standardize the local rule, then express the architecture as a sequence of block settings. Its principal drawbacks are the expensive dense classifier, high convolutional cost, and a plain information path through increasing depth.</p>
+</section>
+</section>
+<section id="nin-learn-within-each-spatial-location" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> NiN: learn within each spatial location</h1>
+<p>Network in Network (NiN) responds to two VGG-era costs: limited channel interaction inside a convolutional stage and a very large dense classifier <span class="citation" data-cites="lin2014nin">(<a href="#ref-lin2014nin" role="doc-biblioref">Lin et al. 2014</a>)</span>. <a href="https://arxiv.org/abs/1312.4400">Read the original NiN paper</a>.</p>
+<section id="a-1times1-convolution-is-a-learned-channel-mixer" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="a-1times1-convolution-is-a-learned-channel-mixer"><span class="header-section-number">3.1</span> A <span class="math inline">\(1\times1\)</span> convolution is a learned channel mixer</h2>
+<p>At a fixed spatial position <span class="math inline">\((h,w)\)</span>, a <span class="math inline">\(1\times1\)</span> convolution computes</p>
+<p><span class="math display">\[
+y_{o,h,w}=b_o+\sum_{c=1}^{C_{in}}W_{o,c}x_{c,h,w}.
+\]</span></p>
+<p>It does not collect neighboring pixels. It learns a new combination of the channels already available at that location. With an activation after each <span class="math inline">\(1\times1\)</span> convolution, the block becomes a small multilayer perceptron shared across all spatial positions.</p>
+<div id="fig-nin-block" class="quarto-float quarto-figure quarto-figure-center anchored" alt="NiN block with one spatial convolution followed by two one-by-one convolutions and ReLU activations.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-nin-block-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/08-modern-vision-architectures/assets/nin-block-schematic.svg" class="img-fluid figure-img" style="width:76.0%" alt="NiN block with one spatial convolution followed by two one-by-one convolutions and ReLU activations.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-nin-block-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: A NiN block begins with a spatial convolution and follows it with two one-by-one convolutional channel mixers. Original course SVG.
+</figcaption>
+</figure>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> nin_block(out_channels, kernel_size, stride, padding):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> nn.Sequential(</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        nn.LazyConv2d(out_channels, kernel_size, stride, padding), nn.ReLU(),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        nn.LazyConv2d(out_channels, kernel_size<span class="op">=</span><span class="dv">1</span>), nn.ReLU(),</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        nn.LazyConv2d(out_channels, kernel_size<span class="op">=</span><span class="dv">1</span>), nn.ReLU(),</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="replace-the-dense-head-with-class-evidence-maps" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="replace-the-dense-head-with-class-evidence-maps"><span class="header-section-number">3.2</span> Replace the dense head with class evidence maps</h2>
+<p>NiN’s final block emits <code>num_classes</code> channels. Channel <span class="math inline">\(k\)</span> becomes a spatial evidence map for class <span class="math inline">\(k\)</span>. Global average pooling then converts each map into one scalar:</p>
+<p><span class="math display">\[
+s_k=\frac{1}{HW}\sum_{h=1}^{H}\sum_{w=1}^{W}A_{k,h,w}.
+\]</span></p>
+<p>This gives the head an interpretable contract: one map per class, one average per map. PyTorch’s <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.AdaptiveAvgPool2d.html"><code>AdaptiveAvgPool2d</code></a> can force the output to <span class="math inline">\(1\times1\)</span> regardless of the incoming spatial size.</p>
+<div id="fig-nin-full" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Four NiN blocks with pooling after the first three and global average pooling after the class-map block.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-nin-full-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/08-modern-vision-architectures/assets/nin-full-architecture.svg" class="img-fluid figure-img" style="width:100.0%" alt="Four NiN blocks with pooling after the first three and global average pooling after the class-map block.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-nin-full-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: Full NiN architecture with four grouped NiN blocks and a global-average-pooling classifier. Original course SVG.
+</figcaption>
+</figure>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> NiN(nn.Module):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, num_classes<span class="op">=</span><span class="dv">10</span>):</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.net <span class="op">=</span> nn.Sequential(</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>            nin_block(<span class="dv">96</span>, <span class="dv">11</span>, <span class="dv">4</span>, <span class="dv">0</span>), nn.MaxPool2d(<span class="dv">3</span>, stride<span class="op">=</span><span class="dv">2</span>),</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>            nin_block(<span class="dv">256</span>, <span class="dv">5</span>, <span class="dv">1</span>, <span class="dv">2</span>), nn.MaxPool2d(<span class="dv">3</span>, stride<span class="op">=</span><span class="dv">2</span>),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>            nin_block(<span class="dv">384</span>, <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">1</span>), nn.MaxPool2d(<span class="dv">3</span>, stride<span class="op">=</span><span class="dv">2</span>),</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>            nn.Dropout(<span class="fl">0.5</span>),</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>            nin_block(num_classes, <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>            nn.AdaptiveAvgPool2d((<span class="dv">1</span>, <span class="dv">1</span>)),</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>            nn.Flatten(),</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.net(x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>NiN makes channel mixing explicit and removes the dense head, but its early stages still commit to one kernel size and one sequential route.</p>
+</section>
+</section>
+<section id="inception-branch-across-spatial-scales" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Inception: branch across spatial scales</h1>
+<p>An Inception block asks several spatial questions in parallel. Instead of choosing one receptive-field size in advance, it evaluates <span class="math inline">\(1\times1\)</span>, <span class="math inline">\(3\times3\)</span>, <span class="math inline">\(5\times5\)</span>, and pooled evidence, then concatenates their outputs along the channel dimension <span class="citation" data-cites="szegedy2015googlenet">(<a href="#ref-szegedy2015googlenet" role="doc-biblioref">Szegedy et al. 2015</a>)</span>. <a href="https://arxiv.org/abs/1409.4842">Read the original GoogLeNet paper</a>.</p>
+<div id="fig-inception-block" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Four Inception branches: one-by-one convolution, one-by-one then three-by-three, one-by-one then five-by-five, and pooling then one-by-one.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-inception-block-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/08-modern-vision-architectures/assets/inception-block-schematic.svg" class="img-fluid figure-img" style="width:100.0%" alt="Four Inception branches: one-by-one convolution, one-by-one then three-by-three, one-by-one then five-by-five, and pooling then one-by-one.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-inception-block-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: An Inception block with four parallel branches whose outputs are concatenated along channels. Original course SVG.
+</figcaption>
+</figure>
+</div>
+<p>If every branch preserves <span class="math inline">\(H\times W\)</span>, concatenation is legal and the output channel count is</p>
+<p><span class="math display">\[
+C_{out}=c_1+c_{22}+c_{32}+c_4.
+\]</span></p>
+<p>The <span class="math inline">\(1\times1\)</span> operations before the wider kernels are capacity valves. A direct <span class="math inline">\(5\times5\)</span> convolution from <span class="math inline">\(C_{in}\)</span> to <span class="math inline">\(C_{out}\)</span> uses <span class="math inline">\(25C_{in}C_{out}\)</span> weights. Reducing first to <span class="math inline">\(C_r\)</span> channels changes the approximate cost to</p>
+<p><span class="math display">\[
+C_{in}C_r+25C_rC_{out}.
+\]</span></p>
+<p>When <span class="math inline">\(C_r\ll C_{in}\)</span>, the saving can be substantial.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Inception(nn.Module):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, c1, c2, c3, c4):</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.b1 <span class="op">=</span> nn.Sequential(</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>            nn.LazyConv2d(c1, <span class="dv">1</span>), nn.ReLU())</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.b2 <span class="op">=</span> nn.Sequential(</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>            nn.LazyConv2d(c2[<span class="dv">0</span>], <span class="dv">1</span>), nn.ReLU(),</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>            nn.LazyConv2d(c2[<span class="dv">1</span>], <span class="dv">3</span>, padding<span class="op">=</span><span class="dv">1</span>), nn.ReLU())</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.b3 <span class="op">=</span> nn.Sequential(</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>            nn.LazyConv2d(c3[<span class="dv">0</span>], <span class="dv">1</span>), nn.ReLU(),</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>            nn.LazyConv2d(c3[<span class="dv">1</span>], <span class="dv">5</span>, padding<span class="op">=</span><span class="dv">2</span>), nn.ReLU())</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.b4 <span class="op">=</span> nn.Sequential(</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>            nn.MaxPool2d(<span class="dv">3</span>, stride<span class="op">=</span><span class="dv">1</span>, padding<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>            nn.LazyConv2d(c4, <span class="dv">1</span>), nn.ReLU())</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> torch.cat(</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>            [<span class="va">self</span>.b1(x), <span class="va">self</span>.b2(x), <span class="va">self</span>.b3(x), <span class="va">self</span>.b4(x)], dim<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><a href="https://docs.pytorch.org/docs/stable/generated/torch.cat.html"><code>torch.cat</code></a> concatenates tensors along an existing dimension. For NCHW images, <code>dim=1</code> is the channel dimension. Batch size, height, and width must agree across branches.</p>
+<section id="googlenet-compresses-the-block-into-a-reusable-symbol" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="googlenet-compresses-the-block-into-a-reusable-symbol"><span class="header-section-number">4.1</span> GoogLeNet compresses the block into a reusable symbol</h2>
+<p>Once the internal four-branch contract is understood, a full network can treat each Inception block as one module. GoogLeNet uses nine such blocks in groups of two, five, and two, with pooling between groups and global average pooling in the head.</p>
+<div id="fig-googlenet" class="quarto-float quarto-figure quarto-figure-center anchored" alt="GoogLeNet stem, nine compact Inception blocks grouped two-five-two, intervening pooling, and a global-average-pooling head.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-googlenet-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/08-modern-vision-architectures/assets/googlenet-compressed.svg" class="img-fluid figure-img" style="width:100.0%" alt="GoogLeNet stem, nine compact Inception blocks grouped two-five-two, intervening pooling, and a global-average-pooling head.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-googlenet-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: Compressed GoogLeNet architecture assembled from nine Inception modules. Original course SVG.
+</figcaption>
+</figure>
+</div>
+<p>The architecture gains multi-scale processing and parameter-efficient wide branches. The cost is specification complexity: every branch requires channel choices, parallel execution can be hardware-sensitive, and the original model used auxiliary classifiers during training.</p>
+</section>
+</section>
+<section id="resnet-learn-a-residual-correction" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> ResNet: learn a residual correction</h1>
+<p>Adding layers to a plain network does not guarantee lower training error. The original ResNet paper compared 20- and 56-layer plain networks on CIFAR-10; the deeper plain network had <em>higher training error</em> <span class="citation" data-cites="he2016resnet">(<a href="#ref-he2016resnet" role="doc-biblioref">He et al. 2016</a>)</span>. This is an optimization failure, not merely overfitting.</p>
+<div id="fig-resnet-degradation" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Original ResNet paper curves showing higher training and test error for the 56-layer plain network than the 20-layer network.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-resnet-degradation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/08-modern-vision-architectures/assets/resnet-plain-degradation-figure1.png" class="img-fluid figure-img" style="width:88.0%" alt="Original ResNet paper curves showing higher training and test error for the 56-layer plain network than the 20-layer network.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-resnet-degradation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9: Training and test error curves for plain 20- and 56-layer networks. The deeper plain network performs worse. Source: He et al., Figure 1.
+</figcaption>
+</figure>
+</div>
+<p><a href="https://arxiv.org/abs/1512.03385">Read the original ResNet paper</a> or the <a href="https://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html">CVPR open-access version</a>.</p>
+<section id="reparameterize-the-desired-mapping" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="reparameterize-the-desired-mapping"><span class="header-section-number">5.1</span> Reparameterize the desired mapping</h2>
+<p>Suppose the desired block mapping is <span class="math inline">\(H(x)\)</span>. A plain stack attempts to learn <span class="math inline">\(H\)</span> directly. A residual block instead learns</p>
+<p><span class="math display">\[
+F(x)=H(x)-x,
+\]</span></p>
+<p>and returns</p>
+<p><span class="math display">\[
+y=F(x)+x.
+\]</span></p>
+<p>If the best transformation is close to identity, setting <span class="math inline">\(F(x)\approx0\)</span> is easier than forcing several nonlinear layers to reproduce <span class="math inline">\(x\)</span> exactly.</p>
+<div id="fig-residual-block" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Input x travels through a learned two-convolution residual branch and an identity shortcut; addition produces F of x plus x.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-residual-block-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/08-modern-vision-architectures/assets/residual-block-schematic.svg" class="img-fluid figure-img" style="width:92.0%" alt="Input x travels through a learned two-convolution residual branch and an identity shortcut; addition produces F of x plus x.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-residual-block-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10: Residual block with a learned two-convolution path and an identity shortcut meeting at addition. Original course SVG.
+</figcaption>
+</figure>
+</div>
+<p>The shortcut also creates a direct route for information and gradients. It does not eliminate every optimization difficulty, but it changes the geometry of the problem and makes identity preservation structurally available.</p>
+</section>
+<section id="identity-versus-projection-shortcuts" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="identity-versus-projection-shortcuts"><span class="header-section-number">5.2</span> Identity versus projection shortcuts</h2>
+<p>Elementwise addition requires equal shapes. When the residual branch preserves <span class="math inline">\((H,W,C)\)</span>, the shortcut should normally remain the free identity. At a stage boundary, the main path may halve spatial resolution and increase channels. A <span class="math inline">\(1\times1\)</span> projection applies the same stride and maps the shortcut to the required channel count.</p>
+<div id="fig-residual-variants" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Identity shortcut when shape is unchanged and a one-by-one stride-two projection when resolution and channels change.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-residual-variants-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/08-modern-vision-architectures/assets/residual-shortcut-variants.svg" class="img-fluid figure-img" style="width:100.0%" alt="Identity shortcut when shape is unchanged and a one-by-one stride-two projection when resolution and channels change.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-residual-variants-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11: Identity and projection residual shortcuts compared side by side. Original course SVG.
+</figcaption>
+</figure>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ResidualBlock(nn.Module):</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, in_ch, out_ch, stride<span class="op">=</span><span class="dv">1</span>, use_projection<span class="op">=</span><span class="va">False</span>):</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.main <span class="op">=</span> nn.Sequential(</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>            nn.Conv2d(in_ch, out_ch, <span class="dv">3</span>, stride,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                      padding<span class="op">=</span><span class="dv">1</span>, bias<span class="op">=</span><span class="va">False</span>),</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>            nn.BatchNorm2d(out_ch), nn.ReLU(),</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>            nn.Conv2d(out_ch, out_ch, <span class="dv">3</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                      padding<span class="op">=</span><span class="dv">1</span>, bias<span class="op">=</span><span class="va">False</span>),</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>            nn.BatchNorm2d(out_ch),</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.shortcut <span class="op">=</span> (</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>            nn.Conv2d(in_ch, out_ch, <span class="dv">1</span>, stride, bias<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> use_projection <span class="cf">else</span> <span class="va">None</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>        identity <span class="op">=</span> x <span class="cf">if</span> <span class="va">self</span>.shortcut <span class="kw">is</span> <span class="va">None</span> <span class="cf">else</span> <span class="va">self</span>.shortcut(x)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> torch.relu(<span class="va">self</span>.main(x) <span class="op">+</span> identity)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm2d.html"><code>BatchNorm2d</code></a> normalizes each channel using batch statistics during training and running estimates during evaluation. Its placement differs in later pre-activation ResNets; this chapter follows the original basic post-activation teaching block.</p>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Shape audit
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Before every residual addition, write the shapes of both operands. If either spatial resolution or channel count differs, an identity shortcut cannot be added directly.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="densenet-preserve-the-full-feature-history" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> DenseNet: preserve the full feature history</h1>
+<p>ResNet combines a learned correction and a preserved signal by addition. DenseNet makes a different choice: each layer receives the concatenation of <em>all</em> preceding feature maps, and its output remains available to all subsequent layers <span class="citation" data-cites="huang2017densenet">(<a href="#ref-huang2017densenet" role="doc-biblioref">Huang et al. 2017</a>)</span>.</p>
+<div id="fig-densenet-paper" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Original paper figure with five dense layers and colored direct connections from each earlier feature map to every later layer.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-densenet-paper-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/08-modern-vision-architectures/assets/densenet-paper-figure1.png" class="img-fluid figure-img" style="width:68.0%" alt="Original paper figure with five dense layers and colored direct connections from each earlier feature map to every later layer.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-densenet-paper-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12: Original DenseNet paper Figure 1 showing a five-layer dense block with growth rate four.
+</figcaption>
+</figure>
+</div>
+<p><a href="https://arxiv.org/abs/1608.06993">Read the original DenseNet paper</a>, the <a href="https://openaccess.thecvf.com/content_cvpr_2017/html/Huang_Densely_Connected_Convolutional_CVPR_2017_paper.html">CVPR open-access paper</a>, or the authors’ <a href="https://github.com/liuzhuang13/DenseNet">reference implementation</a>.</p>
+<section id="the-dense-contract" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="the-dense-contract"><span class="header-section-number">6.1</span> The dense contract</h2>
+<p>For layer <span class="math inline">\(\ell\)</span>, define the collective input</p>
+<p><span class="math display">\[
+z_\ell=[x_0,x_1,\ldots,x_{\ell-1}],
+\]</span></p>
+<p>where brackets denote channel concatenation. The layer contributes</p>
+<p><span class="math display">\[
+x_\ell=H_\ell(z_\ell).
+\]</span></p>
+<p>If the block begins with <span class="math inline">\(C_0\)</span> channels and every layer contributes <span class="math inline">\(k\)</span> new maps, then after <span class="math inline">\(L\)</span> layers</p>
+<p><span class="math display">\[
+C_L=C_0+Lk.
+\]</span></p>
+<p>The value <span class="math inline">\(k\)</span> is the <strong>growth rate</strong>. Dense layers can remain narrow because they do not need to recreate useful earlier features.</p>
+<div id="fig-densenet-reuse" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Four dense layers each read all preceding feature maps and append k new channels to the collective feature bank.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-densenet-reuse-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/08-modern-vision-architectures/assets/densenet-reuse-schematic.svg" class="img-fluid figure-img" style="width:100.0%" alt="Four dense layers each read all preceding feature maps and append k new channels to the collective feature bank.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-densenet-reuse-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13: Four dense layers append new features to a shared feature history. Original course SVG.
+</figcaption>
+</figure>
+</div>
+<section id="numerical-growth-example" class="level3" data-number="6.1.1">
+<h3 data-number="6.1.1" class="anchored" data-anchor-id="numerical-growth-example"><span class="header-section-number">6.1.1</span> Numerical growth example</h3>
+<p>Let <span class="math inline">\(C_0=8\)</span>, <span class="math inline">\(k=4\)</span>, and <span class="math inline">\(L=4\)</span>. The channel counts after successive layers are</p>
+<p><span class="math display">\[
+8\rightarrow12\rightarrow16\rightarrow20\rightarrow24.
+\]</span></p>
+<p>The block contains 24 output channels, but the fourth layer itself computes only four new maps.</p>
+</section>
+</section>
+<section id="transition-layers-cool-channel-growth" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="transition-layers-cool-channel-growth"><span class="header-section-number">6.2</span> Transition layers cool channel growth</h2>
+<p>Dense concatenation widens the representation continuously. A transition layer commonly applies a <span class="math inline">\(1\times1\)</span> convolution followed by <span class="math inline">\(2\times2\)</span> average pooling. With compression factor <span class="math inline">\(0&lt;\theta\le1\)</span>, the transition emits</p>
+<p><span class="math display">\[
+C_{transition}=\lfloor\theta C\rfloor
+\]</span></p>
+<p>channels and halves spatial resolution. Compression controls capacity and memory; it should not be confused with regularization. The paper also uses dropout in some small-dataset experiments to reduce feature co-adaptation.</p>
+</section>
+<section id="pytorch-implementation" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="pytorch-implementation"><span class="header-section-number">6.3</span> PyTorch implementation</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> DenseLayer(nn.Module):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, in_ch, growth_rate):</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.transform <span class="op">=</span> nn.Sequential(</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>            nn.BatchNorm2d(in_ch), nn.ReLU(),</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>            nn.Conv2d(in_ch, growth_rate, <span class="dv">3</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                      padding<span class="op">=</span><span class="dv">1</span>, bias<span class="op">=</span><span class="va">False</span>),</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>        new_features <span class="op">=</span> <span class="va">self</span>.transform(x)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> torch.cat([x, new_features], dim<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> dense_block(in_ch, num_layers, growth_rate):</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    layers <span class="op">=</span> []</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(num_layers):</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>        current_channels <span class="op">=</span> in_ch <span class="op">+</span> i <span class="op">*</span> growth_rate</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>        layers.append(DenseLayer(current_channels, growth_rate))</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> nn.Sequential(<span class="op">*</span>layers)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For <code>dense_block(64, 4, 32)</code>, the output width is</p>
+<p><span class="math display">\[
+64+4(32)=192\text{ channels}.
+\]</span></p>
+<p>DenseNet creates short routes, encourages feature reuse, and can be parameter-efficient. Its principal systems cost is activation memory and data movement: earlier maps must remain available, and repeated concatenation is not free.</p>
+</section>
+</section>
+<section id="the-architecture-toolkit" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> The architecture toolkit</h1>
+<p>The chapter’s five families can be summarized as operations rather than model names.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Family</th>
+<th>Reusable operation</th>
+<th>Pressure addressed</th>
+<th>Main tradeoff</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>VGG</td>
+<td><strong>Repeat</strong> a uniform small-kernel block</td>
+<td>Systematic depth</td>
+<td>High convolutional cost</td>
+</tr>
+<tr class="even">
+<td>NiN</td>
+<td><strong>Mix channels</strong> with <span class="math inline">\(1\times1\)</span> convolutions</td>
+<td>Local cross-channel interaction and compact heads</td>
+<td>Rigid class-map head</td>
+</tr>
+<tr class="odd">
+<td>Inception</td>
+<td><strong>Branch</strong> across receptive-field sizes</td>
+<td>Multi-scale evidence</td>
+<td>Hand-tuned branch complexity</td>
+</tr>
+<tr class="even">
+<td>ResNet</td>
+<td><strong>Add</strong> a correction to an identity path</td>
+<td>Stable deep optimization</td>
+<td>Addition requires shape alignment</td>
+</tr>
+<tr class="odd">
+<td>DenseNet</td>
+<td><strong>Concatenate</strong> the full feature history</td>
+<td>Explicit feature reuse and short paths</td>
+<td>Activation memory and channel growth</td>
+</tr>
+</tbody>
+</table>
+<p>These mechanisms are compatible. A modern model may use repeated stages, bottleneck <span class="math inline">\(1\times1\)</span> convolutions, parallel branches, residual additions, and selective concatenation in the same architecture.</p>
+</section>
+<section id="compose-mechanisms-for-a-task" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Compose mechanisms for a task</h1>
+<p>Suppose the design brief is:</p>
+<blockquote class="blockquote">
+<p>Classify ten plant diseases from mobile photographs. Lesions may be small, compute is limited, and the network must be deep enough to learn complex texture while remaining trainable.</p>
+</blockquote>
+<p>A defensible first design could combine:</p>
+<ol type="1">
+<li><strong>VGG’s repetition:</strong> a regular stem of padded <span class="math inline">\(3\times3\)</span> convolutions.</li>
+<li><strong>Inception’s branching:</strong> a multi-scale stage for lesions of different apparent sizes.</li>
+<li><strong>ResNet’s addition:</strong> identity shortcuts through deeper stages.</li>
+<li><strong>NiN’s head:</strong> class maps followed by global average pooling.</li>
+</ol>
+<p>Dense concatenation is not intrinsically wrong for this task. It is omitted from this first proposal because its activation-memory cost conflicts with the mobile constraint. A different deployment budget could change that decision.</p>
+<p>The design loop is:</p>
+<p><span class="math display">\[
+\text{specification}
+\rightarrow\text{pressure}
+\rightarrow\text{mechanism}
+\rightarrow\text{evidence}.
+\]</span></p>
+<p>Architecture names help us trace ideas historically. A model design, however, should be justified as a composition of mechanisms chosen for a task.</p>
+</section>
+<section id="check-your-understanding" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Check your understanding</h1>
+<section id="exercise-1-vgg-receptive-field-and-parameters" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="exercise-1-vgg-receptive-field-and-parameters"><span class="header-section-number">9.1</span> Exercise 1: VGG receptive field and parameters</h2>
+<p>Two consecutive convolutions use <span class="math inline">\(3\times3\)</span> kernels, stride one, padding one, and 64 input/output channels. Determine their effective receptive field and compare their weight count with one <span class="math inline">\(5\times5\)</span> convolution from 64 to 64 channels. Ignore biases.</p>
+<details>
+<summary>
+Worked solution
+</summary>
+<p>Two stride-one <span class="math inline">\(3\times3\)</span> convolutions produce an effective <span class="math inline">\(5\times5\)</span> receptive field. Their weight count is</p>
+<p><span class="math display">\[
+2(3\cdot3\cdot64\cdot64)=73{,}728.
+\]</span></p>
+<p>One <span class="math inline">\(5\times5\)</span> convolution uses</p>
+<p><span class="math display">\[
+5\cdot5\cdot64\cdot64=102{,}400
+\]</span></p>
+weights. The stacked version uses fewer weights and inserts an additional nonlinearity.
+</details>
+</section>
+<section id="exercise-2-inception-output-channels" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="exercise-2-inception-output-channels"><span class="header-section-number">9.2</span> Exercise 2: Inception output channels</h2>
+<p>An Inception block emits 64 channels from its direct <span class="math inline">\(1\times1\)</span> branch, 128 from its <span class="math inline">\(3\times3\)</span> branch, 32 from its <span class="math inline">\(5\times5\)</span> branch, and 32 from its pooling branch. What is the output shape for input <code>(N, 192, 28, 28)</code> if every branch preserves resolution?</p>
+<details>
+<summary>
+Worked solution
+</summary>
+<p>Concatenation adds channel counts:</p>
+<p><span class="math display">\[
+C_{out}=64+128+32+32=256.
+\]</span></p>
+The output shape is <code>(N, 256, 28, 28)</code>.
+</details>
+</section>
+<section id="exercise-3-choose-a-residual-shortcut" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="exercise-3-choose-a-residual-shortcut"><span class="header-section-number">9.3</span> Exercise 3: choose a residual shortcut</h2>
+<p>For each transition, decide whether the shortcut can be identity or requires projection.</p>
+<ol type="1">
+<li><code>(N, 64, 32, 32)</code> to <code>(N, 64, 32, 32)</code></li>
+<li><code>(N, 64, 32, 32)</code> to <code>(N, 128, 16, 16)</code></li>
+</ol>
+<details>
+<summary>
+Worked solution
+</summary>
+<ol type="1">
+<li>The shapes agree, so an identity shortcut is valid.</li>
+<li>Channels and spatial dimensions change. Use a <span class="math inline">\(1\times1\)</span> projection with stride two to produce <code>(N, 128, 16, 16)</code> before addition.</li>
+</ol>
+</details>
+</section>
+<section id="exercise-4-densenet-growth" class="level2" data-number="9.4">
+<h2 data-number="9.4" class="anchored" data-anchor-id="exercise-4-densenet-growth"><span class="header-section-number">9.4</span> Exercise 4: DenseNet growth</h2>
+<p>A dense block begins with 96 channels, contains six layers, and uses growth rate <span class="math inline">\(k=24\)</span>. Find its output channels. If a transition uses <span class="math inline">\(\theta=0.5\)</span>, how many channels remain after compression?</p>
+<details>
+<summary>
+Worked solution
+</summary>
+<p>The dense block emits</p>
+<p><span class="math display">\[
+C_6=96+6(24)=240
+\]</span></p>
+<p>channels. Compression gives</p>
+<p><span class="math display">\[
+\lfloor0.5(240)\rfloor=120
+\]</span></p>
+channels.
+</details>
+</section>
+</section>
+<section id="further-reading-and-implementation-links" class="level1" data-number="10">
+<h1 data-number="10"><span class="header-section-number">10</span> Further reading and implementation links</h1>
+<ul>
+<li><a href="https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf">AlexNet: <em>ImageNet Classification with Deep Convolutional Neural Networks</em></a></li>
+<li><a href="https://arxiv.org/abs/1409.1556">VGG: <em>Very Deep Convolutional Networks for Large-Scale Image Recognition</em></a></li>
+<li><a href="https://arxiv.org/abs/1312.4400">Network in Network</a></li>
+<li><a href="https://arxiv.org/abs/1409.4842">GoogLeNet: <em>Going Deeper with Convolutions</em></a></li>
+<li><a href="https://arxiv.org/abs/1512.03385">ResNet: <em>Deep Residual Learning for Image Recognition</em></a></li>
+<li><a href="https://arxiv.org/abs/1608.06993">DenseNet: <em>Densely Connected Convolutional Networks</em></a></li>
+<li><a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html">PyTorch <code>nn.Module</code></a></li>
+<li><a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Sequential.html">PyTorch <code>nn.Sequential</code></a></li>
+<li><a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.ModuleList.html">PyTorch <code>nn.ModuleList</code></a></li>
+<li><a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Conv2d.html">PyTorch <code>Conv2d</code></a></li>
+<li><a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm2d.html">PyTorch <code>BatchNorm2d</code></a></li>
+<li><a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.MaxPool2d.html">PyTorch <code>MaxPool2d</code></a></li>
+<li><a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.AdaptiveAvgPool2d.html">PyTorch <code>AdaptiveAvgPool2d</code></a></li>
+<li><a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Dropout.html">PyTorch <code>Dropout</code></a></li>
+<li><a href="https://docs.pytorch.org/docs/stable/generated/torch.cat.html">PyTorch <code>torch.cat</code></a></li>
+<li><a href="https://docs.pytorch.org/tutorials/beginner/nn_tutorial.html">PyTorch tutorial: What is <code>torch.nn</code> really?</a></li>
+</ul>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-he2016resnet" class="csl-entry" role="listitem">
+He, Kaiming, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. 2016. <span>“Deep Residual Learning for Image Recognition.”</span> <em>IEEE Conference on Computer Vision and Pattern Recognition</em>, 770–78. <a href="https://doi.org/10.1109/CVPR.2016.90">https://doi.org/10.1109/CVPR.2016.90</a>.
+</div>
+<div id="ref-huang2017densenet" class="csl-entry" role="listitem">
+Huang, Gao, Zhuang Liu, Laurens van der Maaten, and Kilian Q. Weinberger. 2017. <span>“Densely Connected Convolutional Networks.”</span> <em>IEEE Conference on Computer Vision and Pattern Recognition</em>, 4700–4708. <a href="https://doi.org/10.1109/CVPR.2017.243">https://doi.org/10.1109/CVPR.2017.243</a>.
+</div>
+<div id="ref-krizhevsky2012imagenet" class="csl-entry" role="listitem">
+Krizhevsky, Alex, Ilya Sutskever, and Geoffrey E. Hinton. 2012. <span>“ImageNet Classification with Deep Convolutional Neural Networks.”</span> <em>Advances in Neural Information Processing Systems</em> 25. <a href="https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks">https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks</a>.
+</div>
+<div id="ref-lin2014nin" class="csl-entry" role="listitem">
+Lin, Min, Qiang Chen, and Shuicheng Yan. 2014. <span>“Network in Network.”</span> <em>International Conference on Learning Representations</em>. <a href="https://arxiv.org/abs/1312.4400">https://arxiv.org/abs/1312.4400</a>.
+</div>
+<div id="ref-simonyan2015vgg" class="csl-entry" role="listitem">
+Simonyan, Karen, and Andrew Zisserman. 2015. <span>“Very Deep Convolutional Networks for Large-Scale Image Recognition.”</span> <em>International Conference on Learning Representations</em>. <a href="https://arxiv.org/abs/1409.1556">https://arxiv.org/abs/1409.1556</a>.
+</div>
+<div id="ref-szegedy2015googlenet" class="csl-entry" role="listitem">
+Szegedy, Christian, Wei Liu, Yangqing Jia, et al. 2015. <span>“Going Deeper with Convolutions.”</span> <em>Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition</em>, 1–9. <a href="https://arxiv.org/abs/1409.4842">https://arxiv.org/abs/1409.4842</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Deep Learning · ENSA Tétouan</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

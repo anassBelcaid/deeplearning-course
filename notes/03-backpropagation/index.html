@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dr.&nbsp;A. Belcaid">
+<meta name="description" content="How neural networks assign responsibility for a loss by passing derivative messages backward">
+
+<title>Backpropagation: From Error to Credit – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e90830a6c3a870e8aa2cd7457ccbff49.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../schedule.html"> 
+<span class="menu-text">Schedule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../logistics.html"> 
+<span class="menu-text">Logistics</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#credit-assignment" id="toc-credit-assignment" class="nav-link active" data-scroll-target="#credit-assignment"><span class="header-section-number">1</span> Credit assignment</a></li>
+  <li><a href="#begin-with-one-variable" id="toc-begin-with-one-variable" class="nav-link" data-scroll-target="#begin-with-one-variable"><span class="header-section-number">2</span> Begin with one variable</a>
+  <ul class="collapse">
+  <li><a href="#a-derivative-is-local-sensitivity" id="toc-a-derivative-is-local-sensitivity" class="nav-link" data-scroll-target="#a-derivative-is-local-sensitivity"><span class="header-section-number">2.1</span> A derivative is local sensitivity</a></li>
+  <li><a href="#one-long-expression-several-small-operations" id="toc-one-long-expression-several-small-operations" class="nav-link" data-scroll-target="#one-long-expression-several-small-operations"><span class="header-section-number">2.2</span> One long expression, several small operations</a></li>
+  <li><a href="#backward-messages" id="toc-backward-messages" class="nav-link" data-scroll-target="#backward-messages"><span class="header-section-number">2.3</span> Backward messages</a></li>
+  <li><a href="#practice-draw-first-differentiate-second" id="toc-practice-draw-first-differentiate-second" class="nav-link" data-scroll-target="#practice-draw-first-differentiate-second"><span class="header-section-number">2.4</span> Practice: draw first, differentiate second</a></li>
+  </ul></li>
+  <li><a href="#several-paths-add-the-contributions" id="toc-several-paths-add-the-contributions" class="nav-link" data-scroll-target="#several-paths-add-the-contributions"><span class="header-section-number">3</span> Several paths: add the contributions</a>
+  <ul class="collapse">
+  <li><a href="#regularization-creates-another-path" id="toc-regularization-creates-another-path" class="nav-link" data-scroll-target="#regularization-creates-another-path"><span class="header-section-number">3.1</span> Regularization creates another path</a></li>
+  </ul></li>
+  <li><a href="#from-one-neuron-to-a-linear-layer" id="toc-from-one-neuron-to-a-linear-layer" class="nav-link" data-scroll-target="#from-one-neuron-to-a-linear-layer"><span class="header-section-number">4</span> From one neuron to a linear layer</a>
+  <ul class="collapse">
+  <li><a href="#matrix-form" id="toc-matrix-form" class="nav-link" data-scroll-target="#matrix-form"><span class="header-section-number">4.1</span> Matrix form</a></li>
+  </ul></li>
+  <li><a href="#backpropagation-as-message-passing" id="toc-backpropagation-as-message-passing" class="nav-link" data-scroll-target="#backpropagation-as-message-passing"><span class="header-section-number">5</span> Backpropagation as message passing</a></li>
+  <li><a href="#a-backward-rule-toolbox" id="toc-a-backward-rule-toolbox" class="nav-link" data-scroll-target="#a-backward-rule-toolbox"><span class="header-section-number">6</span> A backward-rule toolbox</a></li>
+  <li><a href="#complete-two-layer-binary-classifier" id="toc-complete-two-layer-binary-classifier" class="nav-link" data-scroll-target="#complete-two-layer-binary-classifier"><span class="header-section-number">7</span> Complete two-layer binary classifier</a></li>
+  <li><a href="#automatic-differentiation" id="toc-automatic-differentiation" class="nav-link" data-scroll-target="#automatic-differentiation"><span class="header-section-number">8</span> Automatic differentiation</a></li>
+  <li><a href="#what-gradients-reveal" id="toc-what-gradients-reveal" class="nav-link" data-scroll-target="#what-gradients-reveal"><span class="header-section-number">9</span> What gradients reveal</a></li>
+  <li><a href="#backpropagation-in-five-moves" id="toc-backpropagation-in-five-moves" class="nav-link" data-scroll-target="#backpropagation-in-five-moves"><span class="header-section-number">10</span> Backpropagation in five moves</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">11</span> Exercises</a>
+  <ul class="collapse">
+  <li><a href="#exercise-1-shared-paths" id="toc-exercise-1-shared-paths" class="nav-link" data-scroll-target="#exercise-1-shared-paths"><span class="header-section-number">11.1</span> Exercise 1: shared paths</a></li>
+  <li><a href="#exercise-2-linear-layer-shapes" id="toc-exercise-2-linear-layer-shapes" class="nav-link" data-scroll-target="#exercise-2-linear-layer-shapes"><span class="header-section-number">11.2</span> Exercise 2: linear-layer shapes</a></li>
+  <li><a href="#exercise-3-accumulation-bug" id="toc-exercise-3-accumulation-bug" class="nav-link" data-scroll-target="#exercise-3-accumulation-bug"><span class="header-section-number">11.3</span> Exercise 3: accumulation bug</a></li>
+  </ul></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">12</span> Further reading</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Backpropagation: From Error to Credit</h1>
+<p class="subtitle lead">Chapter 3 · Local derivatives, multiple paths, linear layers, and automatic differentiation</p>
+</div>
+
+<div>
+  <div class="description">
+    How neural networks assign responsibility for a loss by passing derivative messages backward
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dr.&nbsp;A. Belcaid </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="chapter-opening">
+<div class="chapter-kicker">
+<p>PART II · NEURAL NETWORKS FROM SCRATCH</p>
+</div>
+<div class="chapter-cover">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../lectures/03-backpropagation/assets/backpropagation-hero.png" class="img-fluid figure-img" alt="A neural network with blue forward paths and coral backward paths connecting an input grid to a scalar objective."></p>
+<figcaption>Forward signals and backward credit messages travel through a multilayer network. Original course illustration generated for this chapter.</figcaption>
+</figure>
+</div>
+</div>
+<p>A network can produce a prediction and a loss without knowing how any parameter contributed to the result. Backpropagation answers the missing question: <strong>if the loss changed, which earlier values were responsible, in which direction, and by how much?</strong></p>
+</div>
+<section id="by-the-end-of-this-chapter-you-should-be-able-to" class="level3 unnumbered unlisted learning-objectives">
+<h3 class="unnumbered unlisted anchored" data-anchor-id="by-the-end-of-this-chapter-you-should-be-able-to">By the end of this chapter, you should be able to</h3>
+<ol type="1">
+<li>Explain backpropagation as credit assignment on a computation graph.</li>
+<li>Apply the chain rule through a sequence of scalar operations.</li>
+<li>Add gradient contributions when a value reaches the loss through several paths.</li>
+<li>Derive backward rules for a linear layer, common activations, and classification losses.</li>
+<li>Trace the complete backward pass of a two-layer binary classifier.</li>
+<li>Explain how reverse-mode automatic differentiation executes local backward rules.</li>
+<li>Interpret gradient signs, magnitudes, and layerwise flow without yet choosing an optimizer.</li>
+</ol>
+</section>
+<section id="credit-assignment" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="credit-assignment"><span class="header-section-number">1</span> Credit assignment</h2>
+<p>Consider a binary classifier that confidently predicts “dog” for a cat image. The final loss is one number, but the computation that produced it involved every input feature, weight, bias, activation, and intermediate representation. Changing only the loss does not tell us where the error came from.</p>
+<p>The <strong>credit-assignment problem</strong> is to distribute responsibility for the final loss across the values that produced it. For a parameter <span class="math inline">\(w\)</span>, the derivative</p>
+<p><span class="math display">\[
+\frac{\partial\mathcal L}{\partial w}
+\]</span></p>
+<p>measures the local sensitivity of the loss to that parameter. Its sign indicates direction; its magnitude indicates strength.</p>
+<p>Backpropagation is an efficient procedure for computing these sensitivities. It is the reverse-mode chain rule organized around a computation graph <span class="citation" data-cites="rumelhart1986backprop">(<a href="#ref-rumelhart1986backprop" role="doc-biblioref">Rumelhart et al. 1986</a>)</span>.</p>
+<div id="fig-symbol-language" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-symbol-language-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/03-backpropagation/assets/two-layer-loss-graph.svg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-symbol-language-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: The symbolic graph used throughout the lecture. Values are blue circles, parameters are purple rounded rectangles, affine maps are square blocks, activations are purple circles, and the loss is coral.
+</figcaption>
+</figure>
+</div>
+<p>The graph separates two ideas:</p>
+<ul>
+<li><strong>identity:</strong> short labels such as <span class="math inline">\(x\)</span>, <span class="math inline">\(W_1\)</span>, <span class="math inline">\(h\)</span>, and <span class="math inline">\(hat y\)</span> name values;</li>
+<li><strong>operation:</strong> stable symbols identify affine maps, activations, and losses without filling every node with prose.</li>
+</ul>
+</section>
+<section id="begin-with-one-variable" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="begin-with-one-variable"><span class="header-section-number">2</span> Begin with one variable</h2>
+<section id="a-derivative-is-local-sensitivity" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="a-derivative-is-local-sensitivity"><span class="header-section-number">2.1</span> A derivative is local sensitivity</h3>
+<p>For a scalar function <span class="math inline">\(y=f(x)\)</span>, the derivative at <span class="math inline">\(x\)</span> is the limiting ratio</p>
+<p><span class="math display">\[
+\frac{dy}{dx}
+=\lim_{\Delta x\to0}
+\frac{f(x+\Delta x)-f(x)}{\Delta x}.
+\]</span></p>
+<p>A derivative is a local promise: for a sufficiently small change,</p>
+<p><span class="math display">\[
+\Delta y\approx \frac{dy}{dx}\Delta x.
+\]</span></p>
+<p>The sign tells us whether <span class="math inline">\(y\)</span> locally rises or falls as <span class="math inline">\(x\)</span> increases. The magnitude tells us how sensitive <span class="math inline">\(y\)</span> is to that change.</p>
+<div id="fig-local-sensitivity" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-local-sensitivity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/03-backpropagation/assets/local-sensitivity.svg" class="img-fluid figure-img" style="width:82.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-local-sensitivity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: A local perturbation is compared with the tangent prediction at one point.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="one-long-expression-several-small-operations" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="one-long-expression-several-small-operations"><span class="header-section-number">2.2</span> One long expression, several small operations</h3>
+<p>Take the expression</p>
+<p><span class="math display">\[
+\mathcal L(x)=\left[(x^2+1)^3-2\right]^2,\qquad x=1.
+\]</span></p>
+<p>Direct differentiation gives</p>
+<p><span class="math display">\[
+\frac{d\mathcal L}{dx}
+=2\big[(x^2+1)^3-2\big]\,3(x^2+1)^2\,2x,
+\]</span></p>
+<p>and therefore</p>
+<p><span class="math display">\[
+\left.\frac{d\mathcal L}{dx}\right|_{x=1}=288.
+\]</span></p>
+<p>This is correct, but the nested algebra hides the reusable structure. Introduce intermediate values instead:</p>
+<p><span class="math display">\[
+a=x^2,\qquad b=a+1,\qquad c=b^3,\qquad d=c-2,\qquad \mathcal L=d^2.
+\]</span></p>
+<div id="fig-scalar-forward" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-scalar-forward-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/03-backpropagation/assets/scalar-chain-forward.svg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-scalar-forward-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: The forward graph evaluates the expression as five small operations and stores the intermediate values.
+</figcaption>
+</figure>
+</div>
+<p>Each operation now knows one local derivative:</p>
+<p><span class="math display">\[
+\frac{da}{dx}=2x,\qquad
+\frac{db}{da}=1,\qquad
+\frac{dc}{db}=3b^2,\qquad
+\frac{dd}{dc}=1,\qquad
+\frac{d\mathcal L}{dd}=2d.
+\]</span></p>
+<div id="fig-scalar-local" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-scalar-local-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/03-backpropagation/assets/scalar-chain-local.svg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-scalar-local-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Every operation differentiates only its own input-output relationship.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="backward-messages" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="backward-messages"><span class="header-section-number">2.3</span> Backward messages</h3>
+<p>Seed the final scalar with</p>
+<p><span class="math display">\[
+\frac{d\mathcal L}{d\mathcal L}=1.
+\]</span></p>
+<p>Then move right to left. At every operation,</p>
+<p><span class="math display">\[
+\boxed{\text{outgoing message}
+=\text{incoming message}\times\text{local derivative}.}
+\]</span></p>
+<p>For the example,</p>
+<p><span class="math display">\[
+\begin{aligned}
+\frac{d\mathcal L}{dd} &amp;= 1\cdot2d=12,\\
+\frac{d\mathcal L}{dc} &amp;= 12\cdot1=12,\\
+\frac{d\mathcal L}{db} &amp;= 12\cdot3b^2=144,\\
+\frac{d\mathcal L}{da} &amp;= 144\cdot1=144,\\
+\frac{d\mathcal L}{dx} &amp;= 144\cdot2x=288.
+\end{aligned}
+\]</span></p>
+<div id="fig-scalar-backward" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-scalar-backward-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/03-backpropagation/assets/scalar-backprop-step-5.svg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-scalar-backward-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: The final backward state highlights the local computation that sends the derivative 288 to x.
+</figcaption>
+</figure>
+</div>
+<p>The result matches direct algebra, but the computation was assembled from local rules. This is the mechanism that scales.</p>
+</section>
+<section id="practice-draw-first-differentiate-second" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="practice-draw-first-differentiate-second"><span class="header-section-number">2.4</span> Practice: draw first, differentiate second</h3>
+<p>For one sigmoid neuron,</p>
+<p><span class="math display">\[
+z=wx+b,\qquad \hat y=\sigma(z),\qquad
+\mathcal L=\frac12(\hat y-y)^2,
+\]</span></p>
+<p>with <span class="math inline">\(x=2\)</span>, <span class="math inline">\(w=1\)</span>, <span class="math inline">\(b=-1\)</span>, and <span class="math inline">\(y=1\)</span>:</p>
+<ol type="1">
+<li>Draw the computation graph.</li>
+<li>Compute the stored forward values.</li>
+<li>Backpropagate to <span class="math inline">\(w\)</span>, <span class="math inline">\(b\)</span>, and <span class="math inline">\(x\)</span>.</li>
+</ol>
+<details>
+<summary>
+Show the graph and solution
+</summary>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../lectures/03-backpropagation/assets/neuron-exercise-forward.svg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>The completed sigmoid-neuron graph.</figcaption>
+</figure>
+</div>
+<p>The forward values are <span class="math inline">\(z=1\)</span>, <span class="math inline">\(\hat y\approx0.731\)</span>, and <span class="math inline">\(\mathcal L\approx0.036\)</span>. The backward messages are</p>
+<p><span class="math display">\[
+g_{\hat y}=\hat y-y\approx-0.269,\qquad
+g_z=g_{\hat y}\hat y(1-\hat y)\approx-0.0529,
+\]</span></p>
+<p>so</p>
+<span class="math display">\[
+\frac{\partial\mathcal L}{\partial w}=g_zx\approx-0.1058,\qquad
+\frac{\partial\mathcal L}{\partial b}=g_z\approx-0.0529,\qquad
+\frac{\partial\mathcal L}{\partial x}=g_zw\approx-0.0529.
+\]</span>
+</details>
+</section>
+</section>
+<section id="several-paths-add-the-contributions" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="several-paths-add-the-contributions"><span class="header-section-number">3</span> Several paths: add the contributions</h2>
+<p>Suppose <span class="math inline">\(f\)</span> depends on <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>, while both <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> depend on <span class="math inline">\(t\)</span>. Then <span class="math inline">\(t\)</span> reaches <span class="math inline">\(f\)</span> through two paths:</p>
+<p><span class="math display">\[
+\boxed{
+\frac{df}{dt}
+=\frac{\partial f}{\partial x}\frac{dx}{dt}
++\frac{\partial f}{\partial y}\frac{dy}{dt}.}
+\]</span></p>
+<div id="fig-two-path-rule" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-two-path-rule-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/03-backpropagation/assets/two-path-chain-rule.svg" class="img-fluid figure-img" style="width:48.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-two-path-rule-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: Two paths connect t to f.&nbsp;Each path contributes one product of local derivatives.
+</figcaption>
+</figure>
+</div>
+<p>For</p>
+<p><span class="math display">\[
+f(x,y)=y+e^{xy},\qquad x(t)=\cos t,\qquad y(t)=t^2,
+\]</span></p>
+<p>the local derivatives are</p>
+<p><span class="math display">\[
+\frac{\partial f}{\partial x}=ye^{xy},\qquad
+\frac{\partial f}{\partial y}=1+xe^{xy},\qquad
+\frac{dx}{dt}=-\sin t,\qquad
+\frac{dy}{dt}=2t.
+\]</span></p>
+<p>Therefore</p>
+<p><span class="math display">\[
+\frac{df}{dt}
+=-t^2e^{t^2\cos t}\sin t
++2t\left(1+\cos t\,e^{t^2\cos t}\right).
+\]</span></p>
+<p>The plus sign is structural: when several paths connect a value to the loss, backpropagation adds their messages.</p>
+<section id="regularization-creates-another-path" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="regularization-creates-another-path"><span class="header-section-number">3.1</span> Regularization creates another path</h3>
+<p>For</p>
+<p><span class="math display">\[
+\mathcal L_{\text{total}}
+=\mathcal L_{\text{data}}+\frac{\lambda}{2}w^2,
+\]</span></p>
+<p>the weight reaches the total loss through the prediction and through the penalty.</p>
+<div id="fig-regularization-path" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-regularization-path-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/03-backpropagation/assets/neuron-with-regularization.svg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-regularization-path-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: The weight w reaches the total loss through the data-loss path and the regularization path.
+</figcaption>
+</figure>
+</div>
+<p>Hence</p>
+<p><span class="math display">\[
+\frac{\partial\mathcal L_{\text{total}}}{\partial w}
+=\frac{\partial\mathcal L_{\text{data}}}{\partial w}+\lambda w.
+\]</span></p>
+<p>Using the preceding neuron example with <span class="math inline">\(\lambda=0.1\)</span> and <span class="math inline">\(w=1\)</span> gives</p>
+<p><span class="math display">\[
+-0.1058+0.1=-0.0058.
+\]</span></p>
+<p>The regularizer did not replace the data gradient. It contributed another message.</p>
+</section>
+</section>
+<section id="from-one-neuron-to-a-linear-layer" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="from-one-neuron-to-a-linear-layer"><span class="header-section-number">4</span> From one neuron to a linear layer</h2>
+<p>Consider a four-input, three-output affine layer followed by a scalar loss. Focus first on</p>
+<p><span class="math display">\[
+h_1=w_{11}x_1+w_{12}x_2+w_{13}x_3+w_{14}x_4+b_1.
+\]</span></p>
+<div id="fig-linear-layer-focus" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-linear-layer-focus-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/03-backpropagation/assets/linear-layer-4x3.svg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-linear-layer-focus-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: A four-to-three linear layer. The four edges that produce h1 and the incoming message from the loss are highlighted.
+</figcaption>
+</figure>
+</div>
+<p>Let</p>
+<p><span class="math display">\[
+g_1=\frac{\partial\mathcal L}{\partial h_1}.
+\]</span></p>
+<p>The messages sent by <span class="math inline">\(h_1\)</span> are</p>
+<p><span class="math display">\[
+\frac{\partial\mathcal L}{\partial w_{1j}}=g_1x_j,\qquad
+\left.\frac{\partial\mathcal L}{\partial x_j}\right|_{h_1}=g_1w_{1j},\qquad
+\frac{\partial\mathcal L}{\partial b_1}=g_1.
+\]</span></p>
+<p>The input <span class="math inline">\(x_j\)</span> is used by all three output neurons, so it adds three contributions:</p>
+<p><span class="math display">\[
+\frac{\partial\mathcal L}{\partial x_j}
+=\sum_{i=1}^{3}\frac{\partial\mathcal L}{\partial h_i}w_{ij}.
+\]</span></p>
+<section id="matrix-form" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="matrix-form"><span class="header-section-number">4.1</span> Matrix form</h3>
+<p>For</p>
+<p><span class="math display">\[
+\mathbf h=W\mathbf x+\mathbf b,
+\]</span></p>
+<p>with incoming gradient <span class="math inline">\(\mathbf g_h=\partial\mathcal L/\partial\mathbf h\)</span>, the linear-layer rules are</p>
+<p><span class="math display">\[
+\boxed{\frac{\partial\mathcal L}{\partial\mathbf x}=W^\top\mathbf g_h},
+\qquad
+\boxed{\frac{\partial\mathcal L}{\partial W}=\mathbf g_h\mathbf x^\top},
+\qquad
+\boxed{\frac{\partial\mathcal L}{\partial\mathbf b}=\mathbf g_h}.
+\]</span></p>
+<p>The dimensions explain the forms:</p>
+<ul>
+<li>transpose to send one accumulated message to each input;</li>
+<li>outer product to create one gradient for every weight;</li>
+<li>copy the incoming vector because each bias has local derivative one.</li>
+</ul>
+</section>
+</section>
+<section id="backpropagation-as-message-passing" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="backpropagation-as-message-passing"><span class="header-section-number">5</span> Backpropagation as message passing</h2>
+<p>In the forward graph, the <strong>parents</strong> of a node produced its value and its <strong>children</strong> consumed it. Backpropagation reverses this direction.</p>
+<div id="fig-message-passing" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-message-passing-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/03-backpropagation/assets/gradient-message-passing.svg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-message-passing-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9: A node receives messages from its children, adds them, and sends locally transformed messages to its parents.
+</figcaption>
+</figure>
+</div>
+<p>At a node <span class="math inline">\(v\)</span>:</p>
+<ol type="1">
+<li>receive messages from every child;</li>
+<li>add them to form <span class="math inline">\(g_v\)</span>;</li>
+<li>for each parent <span class="math inline">\(p_i\)</span>, compute</li>
+</ol>
+<p><span class="math display">\[
+\operatorname{message}(p_i)=g_v\frac{\partial v}{\partial p_i};
+\]</span></p>
+<ol start="4" type="1">
+<li>add that message to the parent’s gradient accumulator.</li>
+</ol>
+<p>This language unifies scalar calculus, matrix layers, and automatic differentiation.</p>
+</section>
+<section id="a-backward-rule-toolbox" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="a-backward-rule-toolbox"><span class="header-section-number">6</span> A backward-rule toolbox</h2>
+<p>Let <span class="math inline">\(g_y\)</span> denote the gradient arriving at a block’s output. The following rules are worth recognizing:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Block</th>
+<th>Forward</th>
+<th>Backward message</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Linear</td>
+<td><span class="math inline">\(\mathbf y=W\mathbf x+\mathbf b\)</span></td>
+<td><span class="math inline">\(\mathbf g_x=W^\top\mathbf g_y\)</span>, <span class="math inline">\(\nabla_W\mathcal L=\mathbf g_y\mathbf x^\top\)</span>, <span class="math inline">\(\nabla_b\mathcal L=\mathbf g_y\)</span></td>
+</tr>
+<tr class="even">
+<td>Sigmoid</td>
+<td><span class="math inline">\(y=\sigma(x)\)</span></td>
+<td><span class="math inline">\(g_x=g_y\,y(1-y)\)</span></td>
+</tr>
+<tr class="odd">
+<td>Tanh</td>
+<td><span class="math inline">\(y=\tanh(x)\)</span></td>
+<td><span class="math inline">\(g_x=g_y(1-y^2)\)</span></td>
+</tr>
+<tr class="even">
+<td>ReLU</td>
+<td><span class="math inline">\(y=\max(0,x)\)</span></td>
+<td><span class="math inline">\(g_x=g_y\mathbf1[x&gt;0]\)</span></td>
+</tr>
+<tr class="odd">
+<td>Softmax</td>
+<td><span class="math inline">\(p_i=e^{z_i}/\sum_j e^{z_j}\)</span></td>
+<td><span class="math inline">\(\mathbf g_z=\mathbf p\odot(\mathbf g_p-\mathbf p^\top\mathbf g_p)\)</span></td>
+</tr>
+<tr class="even">
+<td>Cross-entropy</td>
+<td><span class="math inline">\(\mathcal L=-\sum_i y_i\log p_i\)</span></td>
+<td><span class="math inline">\(\mathbf g_p=-\mathbf y/\mathbf p\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Two fused shortcuts occur constantly in classifiers:</p>
+<p><span class="math display">\[
+\boxed{\text{softmax + cross-entropy: }\mathbf g_z=\mathbf p-\mathbf y}
+\]</span></p>
+<p>and</p>
+<p><span class="math display">\[
+\boxed{\text{sigmoid + binary cross-entropy: }g_z=\hat y-y.}
+\]</span></p>
+<p>Softmax differs from sigmoid, tanh, and ReLU because its outputs interact: changing one logit changes every probability.</p>
+</section>
+<section id="complete-two-layer-binary-classifier" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="complete-two-layer-binary-classifier"><span class="header-section-number">7</span> Complete two-layer binary classifier</h2>
+<p>For a hidden sigmoid layer and sigmoid binary output,</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathbf z_1 &amp;= W_1\mathbf x+\mathbf b_1,\\
+\mathbf h &amp;= \sigma(\mathbf z_1),\\
+z_2 &amp;= W_2\mathbf h+b_2,\\
+\hat y &amp;= \sigma(z_2),\\
+\mathcal L &amp;= -[y\log\hat y+(1-y)\log(1-\hat y)].
+\end{aligned}
+\]</span></p>
+<p>The backward pass is</p>
+<p><span class="math display">\[
+\begin{aligned}
+g_{z_2} &amp;= \hat y-y,\\
+\nabla_{W_2}\mathcal L &amp;= g_{z_2}\mathbf h^\top,
+&amp;\nabla_{b_2}\mathcal L &amp;= g_{z_2},\\
+\mathbf g_h &amp;= W_2^\top g_{z_2},\\
+\mathbf g_{z_1} &amp;= \mathbf g_h\odot\mathbf h\odot(1-\mathbf h),\\
+\nabla_{W_1}\mathcal L &amp;= \mathbf g_{z_1}\mathbf x^\top,
+&amp;\nabla_{\mathbf b_1}\mathcal L &amp;= \mathbf g_{z_1},\\
+\mathbf g_x &amp;= W_1^\top\mathbf g_{z_1}.
+\end{aligned}
+\]</span></p>
+<p>The <a href="../../notes/03-backpropagation/two-layer-derivation.html">complete companion derivation</a> expands every step, checks all tensor shapes, explains the stable sigmoid–BCE simplification, and covers mini-batches. A <a href="two-layer-derivation.pdf">PDF version</a> is available for offline study.</p>
+</section>
+<section id="automatic-differentiation" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="automatic-differentiation"><span class="header-section-number">8</span> Automatic differentiation</h2>
+<p>Automatic differentiation does not replace the chain rule. It records enough information during the forward pass to execute these local rules automatically in reverse order.</p>
+<p>Karpathy’s micrograd is a deliberately small scalar reverse-mode autodiff engine. It builds a dynamic directed acyclic graph and provides a PyTorch-like <code>Value</code> interface suitable for study.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> micrograd.engine <span class="im">import</span> Value</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> Value(<span class="fl">1.0</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> x<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> a <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> b<span class="op">**</span><span class="dv">3</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> c <span class="op">-</span> <span class="dv">2</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> d<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>L.backward()</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> x.grad <span class="op">==</span> <span class="fl">288.0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Each <code>Value</code> stores conceptually:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Property</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>data</code></td>
+<td>forward value</td>
+</tr>
+<tr class="even">
+<td><code>grad</code></td>
+<td>accumulated gradient messages</td>
+</tr>
+<tr class="odd">
+<td><code>_prev</code></td>
+<td>parent nodes</td>
+</tr>
+<tr class="even">
+<td><code>_op</code></td>
+<td>operation that created the value</td>
+</tr>
+<tr class="odd">
+<td><code>_backward</code></td>
+<td>operation-specific local backward rule</td>
+</tr>
+</tbody>
+</table>
+<p>For example,</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>x, y, z <span class="op">=</span> Value(<span class="fl">2.0</span>), Value(<span class="fl">3.0</span>), Value(<span class="fl">1.0</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> x <span class="op">*</span> y       <span class="co"># data=6,  _op='*',   _prev={x, y}</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> a <span class="op">+</span> z       <span class="co"># data=7,  _op='+',   _prev={a, z}</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> b <span class="op">**</span> <span class="dv">2</span>      <span class="co"># data=49, _op='**2', _prev={b}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Calling <code>backward()</code> seeds <code>L.grad = 1</code>, computes a topological ordering, and visits the nodes in reverse. The central update is</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>parent.grad <span class="op">+=</span> node.grad <span class="op">*</span> local_derivative</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The <code>+=</code> is essential. Assignment would erase previous contributions whenever a value is reused through several paths. The coding session will implement this <code>Value</code> abstraction from scratch; no framework machinery is required.</p>
+</section>
+<section id="what-gradients-reveal" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="what-gradients-reveal"><span class="header-section-number">9</span> What gradients reveal</h2>
+<p>A gradient should be interpreted before it is used:</p>
+<ul>
+<li><strong>Sign:</strong> which local direction raises the loss?</li>
+<li><strong>Magnitude:</strong> how sensitive is the loss to a small change?</li>
+<li><strong>Near zero:</strong> possible local irrelevance, saturation, or cancellation between paths.</li>
+</ul>
+<p>A near-zero gradient is a clue, not a complete diagnosis. Forward activations and the graph structure provide the missing context.</p>
+<p>Across layers, gradient magnitudes can reveal qualitative patterns:</p>
+<ul>
+<li><strong>healthy flow:</strong> earlier layers continue to receive measurable messages;</li>
+<li><strong>vanishing gradients:</strong> repeated small local derivatives progressively shrink messages;</li>
+<li><strong>exploding gradients:</strong> repeated large transformations progressively amplify them.</li>
+</ul>
+<p>Gradients expose symptoms. Initialization, architecture, normalization, and optimization determine what to do about them in later chapters.</p>
+</section>
+<section id="backpropagation-in-five-moves" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="backpropagation-in-five-moves"><span class="header-section-number">10</span> Backpropagation in five moves</h2>
+<ol type="1">
+<li><strong>Compute forward:</strong> store the values needed by local rules.</li>
+<li><strong>Seed the loss:</strong> set <span class="math inline">\(g_{\mathcal L}=1\)</span>.</li>
+<li><strong>Move backward:</strong> visit nodes in reverse topological order.</li>
+<li><strong>Transform locally:</strong> incoming gradient times local derivative.</li>
+<li><strong>Add paths:</strong> accumulate every contribution; never overwrite.</li>
+</ol>
+<div class="callout callout-style-simple callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>The whole idea
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Receive messages. Add them. Apply the local rule. Send messages to parents.</strong></p>
+</div>
+</div>
+</section>
+<section id="exercises" class="level2" data-number="11">
+<h2 data-number="11" class="anchored" data-anchor-id="exercises"><span class="header-section-number">11</span> Exercises</h2>
+<section id="exercise-1-shared-paths" class="level3" data-number="11.1">
+<h3 data-number="11.1" class="anchored" data-anchor-id="exercise-1-shared-paths"><span class="header-section-number">11.1</span> Exercise 1: shared paths</h3>
+<p>Let</p>
+<p><span class="math display">\[
+u=xy,\qquad v=x+y,\qquad \mathcal L=u^2+v^2.
+\]</span></p>
+<p>Draw the graph and compute <span class="math inline">\(\partial\mathcal L/\partial x\)</span> and <span class="math inline">\(\partial\mathcal L/\partial y\)</span> at <span class="math inline">\(x=2\)</span>, <span class="math inline">\(y=3\)</span>. Identify where messages must be added.</p>
+<details>
+<summary>
+Show solution
+</summary>
+<p>The two paths give</p>
+<p><span class="math display">\[
+\frac{\partial\mathcal L}{\partial x}=2u\,y+2v=2(6)(3)+2(5)=46,
+\]</span></p>
+<span class="math display">\[
+\frac{\partial\mathcal L}{\partial y}=2u\,x+2v=2(6)(2)+2(5)=34.
+\]</span>
+</details>
+</section>
+<section id="exercise-2-linear-layer-shapes" class="level3" data-number="11.2">
+<h3 data-number="11.2" class="anchored" data-anchor-id="exercise-2-linear-layer-shapes"><span class="header-section-number">11.2</span> Exercise 2: linear-layer shapes</h3>
+<p>Suppose <span class="math inline">\(W\in\mathbb R^{5\times3}\)</span>, <span class="math inline">\(\mathbf x\in\mathbb R^3\)</span>, and <span class="math inline">\(\mathbf h=W\mathbf x+\mathbf b\)</span>. If <span class="math inline">\(\mathbf g_h\in\mathbb R^5\)</span>, state the expression and shape of the gradients with respect to <span class="math inline">\(W\)</span>, <span class="math inline">\(\mathbf b\)</span>, and <span class="math inline">\(\mathbf x\)</span>.</p>
+<details>
+<summary>
+Show solution
+</summary>
+<span class="math display">\[
+\nabla_W\mathcal L=\mathbf g_h\mathbf x^\top\in\mathbb R^{5\times3},
+\quad
+\nabla_{\mathbf b}\mathcal L=\mathbf g_h\in\mathbb R^5,
+\quad
+\mathbf g_x=W^\top\mathbf g_h\in\mathbb R^3.
+\]</span>
+</details>
+</section>
+<section id="exercise-3-accumulation-bug" class="level3" data-number="11.3">
+<h3 data-number="11.3" class="anchored" data-anchor-id="exercise-3-accumulation-bug"><span class="header-section-number">11.3</span> Exercise 3: accumulation bug</h3>
+<p>A student implements</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>parent.grad <span class="op">=</span> node.grad <span class="op">*</span> local_derivative</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>instead of using <code>+=</code>. Give the smallest computation graph for which this produces a wrong result, and explain which message is lost.</p>
+<details>
+<summary>
+Show solution
+</summary>
+Use <span class="math inline">\(\mathcal L=x+x\)</span>. Both addition inputs refer to the same <code>Value</code>. The correct derivative is <span class="math inline">\(2\)</span>, but assignment stores one contribution of <span class="math inline">\(1\)</span> and overwrites the other. Accumulation produces <span class="math inline">\(1+1=2\)</span>.
+</details>
+</section>
+</section>
+<section id="further-reading" class="level2" data-number="12">
+<h2 data-number="12" class="anchored" data-anchor-id="further-reading"><span class="header-section-number">12</span> Further reading</h2>
+<ul>
+<li>Rumelhart, Hinton, and Williams introduced the influential modern presentation of learning representations through back-propagated errors <span class="citation" data-cites="rumelhart1986backprop">(<a href="#ref-rumelhart1986backprop" role="doc-biblioref">Rumelhart et al. 1986</a>)</span>.</li>
+<li>Roger Grosse’s <a href="https://www.cs.toronto.edu/~rgrosse/courses/csc321_2017/slides/lec6.pdf">CSC321 Lecture 6</a> develops the same scalar-to-network progression used in this chapter.</li>
+<li>Stanford CS231n’s <a href="https://cs231n.github.io/optimization-2/">Backpropagation, Intuitions</a> emphasizes computation graphs, local gradients, and reusable gate patterns.</li>
+<li>Karpathy’s <a href="https://github.com/karpathy/micrograd">micrograd</a> is a compact reference implementation of scalar reverse-mode autodiff.</li>
+</ul>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-rumelhart1986backprop" class="csl-entry" role="listitem">
+Rumelhart, David E., Geoffrey E. Hinton, and Ronald J. Williams. 1986. <span>“Learning Representations by Back-Propagating Errors.”</span> <em>Nature</em> 323: 533–36. <a href="https://doi.org/10.1038/323533a0">https://doi.org/10.1038/323533a0</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Deep Learning · ENSA Tétouan</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

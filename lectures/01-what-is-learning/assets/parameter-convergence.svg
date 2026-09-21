@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="430" viewBox="0 0 760 430" role="img" aria-labelledby="title desc">
+  <title id="title">Parameters converging toward a minimum</title>
+  <desc id="desc">Nested loss contours with successive parameter updates moving from theta zero toward theta star at the minimum.</desc>
+  <rect width="760" height="430" rx="20" fill="#fffdf7"/>
+  <g transform="translate(400 218) rotate(-15)" fill="none" stroke="#9b86c7">
+    <ellipse rx="300" ry="150" stroke-width="3" opacity=".32"/>
+    <ellipse rx="240" ry="118" stroke-width="4" opacity=".44"/>
+    <ellipse rx="178" ry="84" stroke-width="5" opacity=".58"/>
+    <ellipse rx="112" ry="50" stroke-width="6" opacity=".76"/>
+    <ellipse rx="46" ry="19" stroke-width="7"/>
+  </g>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0 0L9 3L0 6Z" fill="#ef5b45"/></marker></defs>
+  <path d="M95 92 C180 75 188 164 263 145 S327 239 395 207 S458 252 510 224 S548 235 583 218" fill="none" stroke="#ef5b45" stroke-width="8" stroke-linecap="round" stroke-dasharray="2 16" marker-end="url(#arrow)"/>
+  <g font-family="ui-monospace,monospace" font-size="22" font-weight="700">
+    <circle cx="95" cy="92" r="11" fill="#17212b"/><text x="55" y="68" fill="#17212b">θ₀</text>
+    <circle cx="263" cy="145" r="10" fill="#ef5b45"/><text x="235" y="119" fill="#ef5b45">θ₁</text>
+    <circle cx="395" cy="207" r="10" fill="#ef5b45"/><text x="365" y="181" fill="#ef5b45">θ₂</text>
+    <circle cx="510" cy="224" r="10" fill="#ef5b45"/><text x="480" y="198" fill="#ef5b45">θ₃</text>
+    <circle cx="596" cy="215" r="15" fill="#38865a"/><text x="616" y="222" fill="#38865a">θ*</text>
+  </g>
+  <text x="380" y="395" text-anchor="middle" font-family="system-ui,sans-serif" font-size="24" font-weight="700" fill="#17212b">each update seeks a lower loss contour</text>
+</svg>

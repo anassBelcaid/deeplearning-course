@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dr.&nbsp;A. Belcaid">
+<meta name="description" content="How gradients become reliable parameter updates and how to read the resulting training trajectory">
+
+<title>Optimization: Making Learning Move – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e90830a6c3a870e8aa2cd7457ccbff49.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../schedule.html"> 
+<span class="menu-text">Schedule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../logistics.html"> 
+<span class="menu-text">Logistics</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#from-a-model-to-a-landscape" id="toc-from-a-model-to-a-landscape" class="nav-link active" data-scroll-target="#from-a-model-to-a-landscape"><span class="header-section-number">1</span> From a model to a landscape</a></li>
+  <li><a href="#gradient-descent-direction-and-distance" id="toc-gradient-descent-direction-and-distance" class="nav-link" data-scroll-target="#gradient-descent-direction-and-distance"><span class="header-section-number">2</span> Gradient descent: direction and distance</a>
+  <ul class="collapse">
+  <li><a href="#practice-execute-one-update" id="toc-practice-execute-one-update" class="nav-link" data-scroll-target="#practice-execute-one-update"><span class="header-section-number">2.1</span> Practice: execute one update</a></li>
+  <li><a href="#learning-rate-regimes" id="toc-learning-rate-regimes" class="nav-link" data-scroll-target="#learning-rate-regimes"><span class="header-section-number">2.2</span> Learning-rate regimes</a></li>
+  </ul></li>
+  <li><a href="#three-gradient-regimes" id="toc-three-gradient-regimes" class="nav-link" data-scroll-target="#three-gradient-regimes"><span class="header-section-number">3</span> Three gradient regimes</a></li>
+  <li><a href="#difficult-terrain" id="toc-difficult-terrain" class="nav-link" data-scroll-target="#difficult-terrain"><span class="header-section-number">4</span> Difficult terrain</a>
+  <ul class="collapse">
+  <li><a href="#ravines-and-unequal-curvature" id="toc-ravines-and-unequal-curvature" class="nav-link" data-scroll-target="#ravines-and-unequal-curvature"><span class="header-section-number">4.1</span> Ravines and unequal curvature</a></li>
+  <li><a href="#plateaus-and-small-gradients" id="toc-plateaus-and-small-gradients" class="nav-link" data-scroll-target="#plateaus-and-small-gradients"><span class="header-section-number">4.2</span> Plateaus and small gradients</a></li>
+  <li><a href="#curvature-changes-the-safe-step" id="toc-curvature-changes-the-safe-step" class="nav-link" data-scroll-target="#curvature-changes-the-safe-step"><span class="header-section-number">4.3</span> Curvature changes the safe step</a></li>
+  </ul></li>
+  <li><a href="#momentum-remember-consistent-directions" id="toc-momentum-remember-consistent-directions" class="nav-link" data-scroll-target="#momentum-remember-consistent-directions"><span class="header-section-number">5</span> Momentum: remember consistent directions</a>
+  <ul class="collapse">
+  <li><a href="#practice-update-momentum-state" id="toc-practice-update-momentum-state" class="nav-link" data-scroll-target="#practice-update-momentum-state"><span class="header-section-number">5.1</span> Practice: update momentum state</a></li>
+  <li><a href="#nesterov-look-ahead" id="toc-nesterov-look-ahead" class="nav-link" data-scroll-target="#nesterov-look-ahead"><span class="header-section-number">5.2</span> Nesterov look-ahead</a></li>
+  </ul></li>
+  <li><a href="#adaptive-coordinate-wise-scaling" id="toc-adaptive-coordinate-wise-scaling" class="nav-link" data-scroll-target="#adaptive-coordinate-wise-scaling"><span class="header-section-number">6</span> Adaptive coordinate-wise scaling</a>
+  <ul class="collapse">
+  <li><a href="#adagrad" id="toc-adagrad" class="nav-link" data-scroll-target="#adagrad"><span class="header-section-number">6.1</span> AdaGrad</a></li>
+  <li><a href="#rmsprop" id="toc-rmsprop" class="nav-link" data-scroll-target="#rmsprop"><span class="header-section-number">6.2</span> RMSProp</a></li>
+  <li><a href="#adam" id="toc-adam" class="nav-link" data-scroll-target="#adam"><span class="header-section-number">6.3</span> Adam</a></li>
+  </ul></li>
+  <li><a href="#learning-rate-schedules" id="toc-learning-rate-schedules" class="nav-link" data-scroll-target="#learning-rate-schedules"><span class="header-section-number">7</span> Learning-rate schedules</a></li>
+  <li><a href="#read-the-training-run" id="toc-read-the-training-run" class="nav-link" data-scroll-target="#read-the-training-run"><span class="header-section-number">8</span> Read the training run</a>
+  <ul class="collapse">
+  <li><a href="#practice-optimization-failure-or-overfitting" id="toc-practice-optimization-failure-or-overfitting" class="nav-link" data-scroll-target="#practice-optimization-failure-or-overfitting"><span class="header-section-number">8.1</span> Practice: optimization failure or overfitting?</a></li>
+  </ul></li>
+  <li><a href="#a-durable-optimization-routine" id="toc-a-durable-optimization-routine" class="nav-link" data-scroll-target="#a-durable-optimization-routine"><span class="header-section-number">9</span> A durable optimization routine</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Optimization: Making Learning Move</h1>
+<p class="subtitle lead">Chapter 4 · Gradient descent, difficult terrain, momentum, adaptive methods, and diagnosis</p>
+</div>
+
+<div>
+  <div class="description">
+    How gradients become reliable parameter updates and how to read the resulting training trajectory
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dr.&nbsp;A. Belcaid </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="chapter-opening">
+<div class="chapter-kicker">
+<p>PART III · OPTIMIZATION AND GENERALIZATION</p>
+</div>
+<div class="chapter-cover">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="assets/chapter-cover.png" class="img-fluid figure-img" alt="A dark three-dimensional loss landscape with coral, cyan, violet, and gold optimization trajectories descending through different terrain."></p>
+<figcaption>Several optimization trajectories descend through a contoured loss landscape toward a shared basin. Original course illustration generated for this chapter.</figcaption>
+</figure>
+</div>
+</div>
+<p>Backpropagation computes how the loss changes with every parameter. It does not decide what to do with that information. <strong>Optimization is the rule that turns local gradient evidence into a trajectory through parameter space.</strong></p>
+</div>
+<section id="by-the-end-of-this-chapter-you-should-be-able-to" class="level3 unnumbered unlisted learning-objectives">
+<h3 class="unnumbered unlisted anchored" data-anchor-id="by-the-end-of-this-chapter-you-should-be-able-to">By the end of this chapter, you should be able to</h3>
+<ol type="1">
+<li>Interpret a parameter setting as a point on a loss landscape.</li>
+<li>Separate the direction and step-size decisions in gradient descent.</li>
+<li>Explain failures caused by ravines, plateaus, noise, and curvature.</li>
+<li>Derive classical momentum and explain Nesterov look-ahead.</li>
+<li>Compare AdaGrad, RMSProp, and Adam by the state they store.</li>
+<li>Distinguish stochastic, minibatch, and full-batch gradient regimes.</li>
+<li>Diagnose training runs from aligned loss, learning-rate, and gradient traces.</li>
+</ol>
+</section>
+<section id="from-a-model-to-a-landscape" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="from-a-model-to-a-landscape"><span class="header-section-number">1</span> From a model to a landscape</h2>
+<p>Consider the same two-parameter binary classifier used in the lecture:</p>
+<p><span class="math display">\[
+z=w_1x_1+w_2x_2,\qquad \hat y=\sigma(z),\qquad
+\theta=\begin{bmatrix}w_1\\w_2\end{bmatrix}.
+\]</span></p>
+<p>Each choice of <span class="math inline">\((w_1,w_2)\)</span> defines a complete classifier. It produces predictions on the training set and therefore receives one loss:</p>
+<p><span class="math display">\[
+(w_1,w_2)\longmapsto \mathcal L(w_1,w_2).
+\]</span></p>
+<div id="fig-boundary-candidates" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-boundary-candidates-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/04-optimization/assets/boundary-candidates.svg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-boundary-candidates-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Three parameter settings produce three decision boundaries and three losses for the same data and model family.
+</figcaption>
+</figure>
+</div>
+<p>A <strong>loss landscape</strong> is simply the loss evaluated across parameter settings. For two parameters we can draw it exactly as contours or height. A real network with <span class="math inline">\(P\)</span> parameters lives in <span class="math inline">\(P\)</span> dimensions; a published two-dimensional landscape is normally a slice through that space, not the complete object.</p>
+<div id="fig-landscape-construction" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-landscape-construction-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/04-optimization/assets/landscape-construction.svg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-landscape-construction-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Sampled parameter settings, contours, and a surface are three representations of the same loss function.
+</figcaption>
+</figure>
+</div>
+<p>The optimizer never sees the complete map. At step <span class="math inline">\(t\)</span>, it has the current parameters, a loss estimate, and a local gradient:</p>
+<p><span class="math display">\[
+\theta_t,\qquad \mathcal L(\theta_t),\qquad
+g_t=\nabla_\theta\mathcal L(\theta_t).
+\]</span></p>
+<p>Its task is to choose the next point.</p>
+</section>
+<section id="gradient-descent-direction-and-distance" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="gradient-descent-direction-and-distance"><span class="header-section-number">2</span> Gradient descent: direction and distance</h2>
+<p>For the scalar loss</p>
+<p><span class="math display">\[
+\mathcal L(w)=(w-1)^2,\qquad w_t=3,
+\]</span></p>
+<p>the derivative is <span class="math inline">\(\nabla_w\mathcal L(3)=4\)</span>. A positive derivative says that increasing <span class="math inline">\(w\)</span> raises the loss locally, so decreasing <span class="math inline">\(w\)</span> lowers it.</p>
+<div id="fig-local-slope" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-local-slope-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/04-optimization/assets/local-slope.svg" class="img-fluid figure-img" style="width:75.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-local-slope-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: At the current point, the gradient follows the increasing tangent direction and the negative gradient points downhill.
+</figcaption>
+</figure>
+</div>
+<p>In several dimensions, the gradient is the direction of steepest infinitesimal increase under the usual Euclidean geometry. Gradient descent moves in the opposite direction:</p>
+<p><span id="eq-gradient-descent"><span class="math display">\[
+\boxed{\theta_{t+1}=\theta_t-\eta\nabla_\theta\mathcal L(\theta_t).}
+\tag{1}\]</span></span></p>
+<p>This rule contains two decisions:</p>
+<ul>
+<li><span class="math inline">\(-\nabla_\theta\mathcal L\)</span> chooses a <strong>local direction</strong>;</li>
+<li>the learning rate <span class="math inline">\(\eta&gt;0\)</span> chooses the <strong>distance</strong> traveled.</li>
+</ul>
+<p>The word <em>local</em> matters. The gradient predicts improvement for an infinitesimal move. A finite step can cross a valley and increase the loss.</p>
+<section id="practice-execute-one-update" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="practice-execute-one-update"><span class="header-section-number">2.1</span> Practice: execute one update</h3>
+<p>Given</p>
+<p><span class="math display">\[
+\theta_t=\begin{bmatrix}0.25\\0.35\end{bmatrix},\qquad
+g_t=\begin{bmatrix}0.40\\-0.20\end{bmatrix},\qquad \eta=0.5,
+\]</span></p>
+<p>compute <span class="math inline">\(\theta_{t+1}\)</span> and state how each parameter moves.</p>
+<details>
+<summary>
+Show the worked solution
+</summary>
+<p><span class="math display">\[
+\theta_{t+1}
+=\begin{bmatrix}0.25\\0.35\end{bmatrix}
+-0.5\begin{bmatrix}0.40\\-0.20\end{bmatrix}
+=\begin{bmatrix}0.05\\0.45\end{bmatrix}.
+\]</span></p>
+Thus <span class="math inline">\(w_1\)</span> decreases by <span class="math inline">\(0.20\)</span>, while subtracting the negative second gradient increases <span class="math inline">\(w_2\)</span> by <span class="math inline">\(0.10\)</span>.
+</details>
+</section>
+<section id="learning-rate-regimes" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="learning-rate-regimes"><span class="header-section-number">2.2</span> Learning-rate regimes</h3>
+<p>The following paths use the same landscape, starting point, and update rule. Only <span class="math inline">\(\eta\)</span> changes.</p>
+<div class="columns">
+<div class="column" style="width:33%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../lectures/04-optimization/assets/rate-too-small.svg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>A small learning rate makes safe but slow progress.</figcaption>
+</figure>
+</div>
+</div><div class="column" style="width:33%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../lectures/04-optimization/assets/rate-useful.svg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>A useful learning rate reaches the low-loss center efficiently.</figcaption>
+</figure>
+</div>
+</div><div class="column" style="width:33%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../lectures/04-optimization/assets/rate-too-large.svg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>A large learning rate repeatedly overshoots the basin.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Small is not <em>wrong</em>: it trades time for conservative movement. Large is not automatically <em>fast</em>: oscillation or divergence may prevent useful progress.</p>
+</section>
+</section>
+<section id="three-gradient-regimes" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="three-gradient-regimes"><span class="header-section-number">3</span> Three gradient regimes</h2>
+<p>Let a training set contain <span class="math inline">\(N\)</span> examples and let <span class="math inline">\(B_t\)</span> be the examples used at update <span class="math inline">\(t\)</span>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 30%">
+<col style="width: 23%">
+<col style="width: 23%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Regime</th>
+<th style="text-align: right;">Batch size</th>
+<th>Gradient</th>
+<th>Main tradeoff</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Stochastic gradient descent</td>
+<td style="text-align: right;"><span class="math inline">\(|B_t|=1\)</span></td>
+<td>one-example estimate</td>
+<td>very noisy, very frequent updates</td>
+</tr>
+<tr class="even">
+<td>Minibatch SGD</td>
+<td style="text-align: right;"><span class="math inline">\(1&lt;|B_t|&lt;N\)</span></td>
+<td>subset estimate</td>
+<td>efficient parallel work with moderate noise</td>
+</tr>
+<tr class="odd">
+<td>Full-batch gradient descent</td>
+<td style="text-align: right;"><span class="math inline">\(|B_t|=N\)</span></td>
+<td>exact finite-dataset gradient</td>
+<td>expensive updates, low sampling variation</td>
+</tr>
+</tbody>
+</table>
+<p>In deep learning, <strong>SGD usually means minibatch SGD</strong>, even though the strict stochastic case uses one example. The word <em>batch</em> is ambiguous; say <em>minibatch</em> or <em>full batch</em>.</p>
+<p>The minibatch gradient</p>
+<p><span class="math display">\[
+g_t=\nabla_\theta\mathcal L_{B_t}(\theta_t)
+\]</span></p>
+<p>is an estimate of the full-training-set gradient. Different minibatches produce different estimates at the same parameter point.</p>
+<div id="fig-minibatch-noise" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-minibatch-noise-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/04-optimization/assets/noisy-gradients.svg" class="img-fluid figure-img" style="width:70.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-minibatch-noise-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Several minibatches propose different negative-gradient update directions; their average follows the full-data tendency.
+</figcaption>
+</figure>
+</div>
+<p>Larger minibatches usually reduce gradient variance, but they cost more computation per update and change hardware and generalization tradeoffs. “Exact dataset gradient” also does not mean the unknown population gradient is known.</p>
+</section>
+<section id="difficult-terrain" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="difficult-terrain"><span class="header-section-number">4</span> Difficult terrain</h2>
+<section id="ravines-and-unequal-curvature" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="ravines-and-unequal-curvature"><span class="header-section-number">4.1</span> Ravines and unequal curvature</h3>
+<p>A ravine is steep across one direction and shallow along another. The across-valley gradient dominates, flips sign on the opposite wall, and produces a zig-zag.</p>
+<div id="fig-ravine-components" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ravine-components-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/04-optimization/assets/ravine-components.svg" class="img-fluid figure-img" style="width:72.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ravine-components-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: The long across-valley component dominates the small along-valley component.
+</figcaption>
+</figure>
+</div>
+<p>Reducing <span class="math inline">\(\eta\)</span> suppresses bouncing, but also slows progress along the shallow direction. One scalar learning rate must compromise between incompatible scales.</p>
+</section>
+<section id="plateaus-and-small-gradients" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="plateaus-and-small-gradients"><span class="header-section-number">4.2</span> Plateaus and small gradients</h3>
+<p>A small gradient is not sufficient evidence that training has succeeded.</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../lectures/04-optimization/assets/small-gradient-minimum.svg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>At a minimum, the gradient and loss are both small.</figcaption>
+</figure>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../lectures/04-optimization/assets/small-gradient-plateau.svg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>On a high plateau, the gradient is small although the loss remains high.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Use the loss level and recent trajectory together with <span class="math inline">\(\lVert g_t\rVert\)</span>. In high-dimensional networks, saddle-like regions provide another reason for weak local gradients.</p>
+</section>
+<section id="curvature-changes-the-safe-step" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="curvature-changes-the-safe-step"><span class="header-section-number">4.3</span> Curvature changes the safe step</h3>
+<p>The same learning rate can be safe on a gentle quadratic and overshoot on a sharper one.</p>
+<p><img src="../../lectures/04-optimization/assets/curvature-gentle.svg" class="img-fluid" style="width:48.0%" alt="A fixed learning rate stays within a gentle bowl."> <img src="../../lectures/04-optimization/assets/curvature-sharp.svg" class="img-fluid" style="width:48.0%" alt="The same rate overshoots a sharper bowl."></p>
+<p>The practical conclusion is not that curvature must be computed exactly. It is that a useful step scale can differ across directions and change during training.</p>
+</section>
+</section>
+<section id="momentum-remember-consistent-directions" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="momentum-remember-consistent-directions"><span class="header-section-number">5</span> Momentum: remember consistent directions</h2>
+<p>Plain gradient descent is memoryless. Classical momentum stores a running gradient direction:</p>
+<p><span id="eq-classical-momentum"><span class="math display">\[
+v_{t+1}=\beta v_t+g_t,\qquad
+\theta_{t+1}=\theta_t-\eta v_{t+1},\qquad 0\leq\beta&lt;1.
+\tag{2}\]</span></span></p>
+<p>Consistent components reinforce; alternating components cancel. This is why momentum can damp ravine oscillation while accumulating progress along the valley.</p>
+<p><img src="../../lectures/04-optimization/assets/ravine-gd-path.svg" class="img-fluid" style="width:48.0%" alt="Plain gradient descent zig-zags strongly in the ravine."> <img src="../../lectures/04-optimization/assets/ravine-momentum-path.svg" class="img-fluid" style="width:48.0%" alt="Momentum damps oscillation and advances farther along the same ravine."></p>
+<p>Larger <span class="math inline">\(\beta\)</span> preserves history longer. This smooths noise and strengthens persistence, but makes the optimizer slower to respond when the useful direction changes. Some references use</p>
+<p><span class="math display">\[
+v_{t+1}=\beta v_t+(1-\beta)g_t.
+\]</span></p>
+<p>The stored variable then has a different scale; the memory idea is unchanged.</p>
+<section id="practice-update-momentum-state" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="practice-update-momentum-state"><span class="header-section-number">5.1</span> Practice: update momentum state</h3>
+<p>Let</p>
+<p><span class="math display">\[
+\theta_t=\begin{bmatrix}1.00\\-0.50\end{bmatrix},\quad
+v_t=\begin{bmatrix}0.60\\-0.20\end{bmatrix},\quad
+g_t=\begin{bmatrix}0.20\\0.40\end{bmatrix},\quad
+\beta=0.9,\quad\eta=0.1.
+\]</span></p>
+<p>Compute <span class="math inline">\(v_{t+1}\)</span> and <span class="math inline">\(\theta_{t+1}\)</span>.</p>
+<details>
+<summary>
+Show the worked solution
+</summary>
+<span class="math display">\[
+v_{t+1}=0.9v_t+g_t
+=\begin{bmatrix}0.74\\0.22\end{bmatrix},\qquad
+\theta_{t+1}=\theta_t-0.1v_{t+1}
+=\begin{bmatrix}0.926\\-0.522\end{bmatrix}.
+\]</span>
+</details>
+</section>
+<section id="nesterov-look-ahead" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="nesterov-look-ahead"><span class="header-section-number">5.2</span> Nesterov look-ahead</h3>
+<p>Nesterov momentum evaluates the new gradient where stored momentum is about to take the parameters:</p>
+<p><span class="math display">\[
+\theta_t^{\mathrm{look}}=\theta_t-\eta\beta v_t,
+\]</span></p>
+<p><span class="math display">\[
+v_{t+1}=\beta v_t+\nabla\mathcal L(\theta_t^{\mathrm{look}}),\qquad
+\theta_{t+1}=\theta_t-\eta v_{t+1}.
+\]</span></p>
+<div id="fig-nesterov" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-nesterov-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/04-optimization/assets/nesterov-lookahead.svg" class="img-fluid figure-img" style="width:72.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-nesterov-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: Nesterov follows momentum to a provisional point, measures the gradient there, and forms a corrected destination.
+</figcaption>
+</figure>
+</div>
+<p>Equivalent formulas appear because implementations store and scale velocity differently. The conceptual distinction is stable: <strong>look where momentum is taking you, then correct using evidence there</strong>.</p>
+</section>
+</section>
+<section id="adaptive-coordinate-wise-scaling" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="adaptive-coordinate-wise-scaling"><span class="header-section-number">6</span> Adaptive coordinate-wise scaling</h2>
+<p>Momentum remembers direction, but a global <span class="math inline">\(\eta\)</span> still scales every coordinate equally. Adaptive methods store a separate magnitude estimate for every parameter.</p>
+<section id="adagrad" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="adagrad"><span class="header-section-number">6.1</span> AdaGrad</h3>
+<p>AdaGrad accumulates squared gradients <span class="citation" data-cites="duchi2011adagrad">(<a href="#ref-duchi2011adagrad" role="doc-biblioref">Duchi et al. 2011</a>)</span>:</p>
+<p><span class="math display">\[
+s_t=s_{t-1}+g_t\odot g_t,\qquad
+\theta_{t+1}=\theta_t-
+\frac{\eta}{\sqrt{s_t}+\varepsilon}\odot g_t.
+\]</span></p>
+<p>All operations are element-wise. Squaring removes sign because <span class="math inline">\(s_t\)</span> measures scale, not direction. Repeatedly large coordinates develop larger denominators and smaller effective steps.</p>
+<p>AdaGrad’s strength is also its limitation: <span class="math inline">\(s_t\)</span> can only increase, so <span class="math inline">\(\eta/\sqrt{s_t}\)</span> can only decrease. Early large gradients can permanently suppress later updates.</p>
+<div id="fig-adagrad-decay" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-adagrad-decay-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/04-optimization/assets/adagrad-shrinking.svg" class="img-fluid figure-img" style="width:75.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-adagrad-decay-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: AdaGrad’s accumulator rises while its effective learning rate shrinks after an early gradient burst.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="rmsprop" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="rmsprop"><span class="header-section-number">6.2</span> RMSProp</h3>
+<p>RMSProp replaces the permanent sum with an exponentially weighted moving average <span class="citation" data-cites="tieleman2012rmsprop">(<a href="#ref-tieleman2012rmsprop" role="doc-biblioref">Tieleman and Hinton 2012</a>)</span>:</p>
+<p><span class="math display">\[
+s_t=\rho s_{t-1}+(1-\rho)g_t\odot g_t,\qquad
+\theta_{t+1}=\theta_t-
+\frac{\eta}{\sqrt{s_t}+\varepsilon}\odot g_t.
+\]</span></p>
+<p>Old squared gradients fade, allowing the coordinate scale to adapt when the recent regime changes.</p>
+<div id="fig-rmsprop-memory" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-rmsprop-memory-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/04-optimization/assets/rmsprop-memory.svg" class="img-fluid figure-img" style="width:72.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-rmsprop-memory-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: RMSProp emphasizes recent squared gradients while older observations fade.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="adam" class="level3" data-number="6.3">
+<h3 data-number="6.3" class="anchored" data-anchor-id="adam"><span class="header-section-number">6.3</span> Adam</h3>
+<p>Adam combines two exponential memories <span class="citation" data-cites="kingma2015adam">(<a href="#ref-kingma2015adam" role="doc-biblioref">Kingma and Ba 2015</a>)</span>:</p>
+<p><span class="math display">\[
+m_t=\beta_1m_{t-1}+(1-\beta_1)g_t,\qquad
+v_t=\beta_2v_{t-1}+(1-\beta_2)g_t^2.
+\]</span></p>
+<p>Here <span class="math inline">\(m_t\)</span> stores direction and <span class="math inline">\(v_t\)</span> stores squared-gradient scale. The symbol <span class="math inline">\(v\)</span> is overloaded: it is <strong>not</strong> the classical-momentum velocity used earlier. Because both states start at zero, Adam applies bias corrections</p>
+<p><span class="math display">\[
+\hat m_t=\frac{m_t}{1-\beta_1^t},\qquad
+\hat v_t=\frac{v_t}{1-\beta_2^t},
+\]</span></p>
+<p>then updates</p>
+<p><span class="math display">\[
+\theta_{t+1}=\theta_t-\eta
+\frac{\hat m_t}{\sqrt{\hat v_t}+\varepsilon}.
+\]</span></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Optimizer</th>
+<th>Direction memory</th>
+<th>Scale memory</th>
+<th>Main tradeoff</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Gradient descent</td>
+<td>none</td>
+<td>none</td>
+<td>simple, one global scale</td>
+</tr>
+<tr class="even">
+<td>Momentum</td>
+<td>yes</td>
+<td>none</td>
+<td>steadier path, can overshoot turns</td>
+</tr>
+<tr class="odd">
+<td>AdaGrad</td>
+<td>none</td>
+<td>all past squares</td>
+<td>effective steps may decay too far</td>
+</tr>
+<tr class="even">
+<td>RMSProp</td>
+<td>none</td>
+<td>recent squares</td>
+<td>adaptive scale without direction memory</td>
+</tr>
+<tr class="odd">
+<td>Adam</td>
+<td>yes</td>
+<td>recent squares</td>
+<td>convenient strong baseline with more state</td>
+</tr>
+</tbody>
+</table>
+<p>This table organizes information, not a universal ranking. Adam still requires a suitable learning rate and careful evaluation.</p>
+</section>
+</section>
+<section id="learning-rate-schedules" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="learning-rate-schedules"><span class="header-section-number">7</span> Learning-rate schedules</h2>
+<p>A schedule changes the global learning rate over training while the optimizer defines how the current gradient and stored state become an update.</p>
+<div id="fig-lr-schedules" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-lr-schedules-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/04-optimization/assets/lr-schedules.svg" class="img-fluid figure-img" style="width:75.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lr-schedules-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9: Constant, step-decay, cosine-decay, and warmup-plus-decay schedules.
+</figcaption>
+</figure>
+</div>
+<ul>
+<li><strong>Constant:</strong> useful for a controlled baseline.</li>
+<li><strong>Step decay:</strong> reduces the rate at chosen milestones.</li>
+<li><strong>Cosine decay:</strong> decreases smoothly toward a small final rate.</li>
+<li><strong>Warmup plus decay:</strong> approaches the target rate gradually when early updates are fragile, then refines with decay.</li>
+</ul>
+<p>No schedule is automatically best. The recurring rationale is coarse early movement followed by finer late adjustment.</p>
+</section>
+<section id="read-the-training-run" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="read-the-training-run"><span class="header-section-number">8</span> Read the training run</h2>
+<p>Training produces aligned traces. Interpret them together:</p>
+<ul>
+<li>training loss: is optimization improving its objective?</li>
+<li>validation loss: does improvement generalize?</li>
+<li>learning rate: what global step scale was applied?</li>
+<li>gradient norm: was the local signal weak, ordinary, or explosive?</li>
+</ul>
+<div id="fig-training-dashboard" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-training-dashboard-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/04-optimization/assets/training-dashboard.svg" class="img-fluid figure-img" style="width:80.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-training-dashboard-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10: Training loss, validation loss, learning rate, and gradient norm aligned over epochs.
+</figcaption>
+</figure>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Visible evidence</th>
+<th>First hypothesis</th>
+<th>Next controlled test</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Loss decreases painfully slowly</td>
+<td>step scale may be too small</td>
+<td>increase <span class="math inline">\(\eta\)</span> modestly; hold other factors fixed</td>
+</tr>
+<tr class="even">
+<td>Loss oscillates or becomes non-finite</td>
+<td>steps or gradients may be too large</td>
+<td>lower <span class="math inline">\(\eta\)</span>; inspect gradient norm and numerics</td>
+</tr>
+<tr class="odd">
+<td>Loss is high and gradients are near zero</td>
+<td>plateau, saturation, or dead path</td>
+<td>inspect activations and initialization</td>
+</tr>
+<tr class="even">
+<td>Training improves while validation worsens</td>
+<td>overfitting</td>
+<td>retain best checkpoint; test regularization</td>
+</tr>
+</tbody>
+</table>
+<section id="practice-optimization-failure-or-overfitting" class="level3" data-number="8.1">
+<h3 data-number="8.1" class="anchored" data-anchor-id="practice-optimization-failure-or-overfitting"><span class="header-section-number">8.1</span> Practice: optimization failure or overfitting?</h3>
+<div id="fig-overfit-diagnosis" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-overfit-diagnosis-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/04-optimization/assets/diagnosis-overfit.svg" class="img-fluid figure-img" style="width:72.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-overfit-diagnosis-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11: Training loss continues downward while validation loss turns upward after its best point.
+</figcaption>
+</figure>
+</div>
+<p>Choose the best diagnosis: learning rate too small, learning rate too large, or overfitting.</p>
+<details>
+<summary>
+Show the diagnosis
+</summary>
+This is <strong>overfitting</strong>. Optimization continues to improve the training objective, while generalization worsens after the validation minimum. Keep the best validation checkpoint, then consider regularization, augmentation, more data, or earlier stopping.
+</details>
+</section>
+</section>
+<section id="a-durable-optimization-routine" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="a-durable-optimization-routine"><span class="header-section-number">9</span> A durable optimization routine</h2>
+<ol type="1">
+<li>Establish a simple baseline with recorded hyperparameters and seeds.</li>
+<li>Inspect aligned training, validation, learning-rate, and gradient traces.</li>
+<li>Form a hypothesis from visible evidence.</li>
+<li>Change one factor and rerun under comparable conditions.</li>
+<li>Judge the result with held-out evaluation, not training loss alone.</li>
+</ol>
+<p>Optimization sits inside the five-part learning frame:</p>
+<p><span class="math display">\[
+\text{data}\rightarrow\text{hypothesis}\rightarrow\text{loss}
+\rightarrow\boxed{\text{optimization}}\rightarrow\text{evaluation}.
+\]</span></p>
+<p>An optimizer is not a magic model chooser. It is a rule for turning local evidence into a training trajectory.</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-duchi2011adagrad" class="csl-entry" role="listitem">
+Duchi, John, Elad Hazan, and Yoram Singer. 2011. <span>“Adaptive Subgradient Methods for Online Learning and Stochastic Optimization.”</span> <em>Journal of Machine Learning Research</em> 12: 2121–59. <a href="https://jmlr.org/papers/v12/duchi11a.html">https://jmlr.org/papers/v12/duchi11a.html</a>.
+</div>
+<div id="ref-kingma2015adam" class="csl-entry" role="listitem">
+Kingma, Diederik P., and Jimmy Ba. 2015. <span>“Adam: A Method for Stochastic Optimization.”</span> <em>International Conference on Learning Representations</em>. <a href="https://arxiv.org/abs/1412.6980">https://arxiv.org/abs/1412.6980</a>.
+</div>
+<div id="ref-tieleman2012rmsprop" class="csl-entry" role="listitem">
+Tieleman, Tijmen, and Geoffrey Hinton. 2012. <em>Lecture 6.5—RMSProp: Divide the Gradient by a Running Average of Its Recent Magnitude</em>. COURSERA: Neural Networks for Machine Learning. <a href="https://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf">https://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Deep Learning · ENSA Tétouan</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

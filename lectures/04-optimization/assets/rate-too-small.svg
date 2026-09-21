@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 410 330" role="img" aria-labelledby="title desc">
+  <title id="title">Learning rate too small</title><desc id="desc">Concentric loss contours and ten short gradient steps that remain far from the minimum.</desc>
+  <rect width="410" height="330" rx="18" fill="#f8fbfd"/>
+  <g fill="none" stroke="#b8d8ef" stroke-width="2"><ellipse cx="205" cy="165" rx="178" ry="128"/><ellipse cx="205" cy="165" rx="137" ry="98"/><ellipse cx="205" cy="165" rx="96" ry="68"/><ellipse cx="205" cy="165" rx="53" ry="37"/></g>
+  <ellipse cx="205" cy="165" rx="23" ry="15" fill="#d9f0e2"/><circle cx="205" cy="165" r="7" fill="#29845a"/>
+  <polyline points="55,63 66,69 77,75 88,81 99,87 110,93 121,99 132,105 143,111 154,117 165,123" fill="none" stroke="#2377c9" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="#2377c9"><circle cx="55" cy="63" r="8"/><circle cx="77" cy="75" r="5"/><circle cx="99" cy="87" r="5"/><circle cx="121" cy="99" r="5"/><circle cx="143" cy="111" r="5"/><circle cx="165" cy="123" r="7"/></g>
+  <text x="38" y="42" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#657687">START</text>
+</svg>

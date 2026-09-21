@@ -1,0 +1,2474 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dr.&nbsp;A. Belcaid">
+
+<title>Making Networks Train Reliably – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2e7c9b518fe54fcaa4a8b379123416fc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../schedule.html"> 
+<span class="menu-text">Schedule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../logistics.html"> 
+<span class="menu-text">Logistics</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#making-networks-train-reliably" id="toc-making-networks-train-reliably" class="nav-link active" data-scroll-target="#making-networks-train-reliably">Making networks train reliably</a></li>
+  <li><a href="#todays-journey" id="toc-todays-journey" class="nav-link" data-scroll-target="#todays-journey">Today’s journey</a></li>
+  <li><a href="#why-initialization-matters-1" id="toc-why-initialization-matters-1" class="nav-link" data-scroll-target="#why-initialization-matters-1">01 · Why initialization matters</a>
+  <ul class="collapse">
+  <li><a href="#same-network-different-first-forward-pass" id="toc-same-network-different-first-forward-pass" class="nav-link" data-scroll-target="#same-network-different-first-forward-pass">Same network, different first forward pass</a></li>
+  <li><a href="#one-layer-rescales-a-signal" id="toc-one-layer-rescales-a-signal" class="nav-link" data-scroll-target="#one-layer-rescales-a-signal">One layer rescales a signal</a></li>
+  <li><a href="#depth-repeats-the-rescaling" id="toc-depth-repeats-the-rescaling" class="nav-link" data-scroll-target="#depth-repeats-the-rescaling">Depth repeats the rescaling</a></li>
+  <li><a href="#your-turn-diagnose-the-activation-histograms" id="toc-your-turn-diagnose-the-activation-histograms" class="nav-link" data-scroll-target="#your-turn-diagnose-the-activation-histograms">Your turn: diagnose the activation histograms</a></li>
+  <li><a href="#the-backward-pass-inherits-the-same-problem" id="toc-the-backward-pass-inherits-the-same-problem" class="nav-link" data-scroll-target="#the-backward-pass-inherits-the-same-problem">The backward pass inherits the same problem</a></li>
+  <li><a href="#what-should-initialization-accomplish" id="toc-what-should-initialization-accomplish" class="nav-link" data-scroll-target="#what-should-initialization-accomplish">What should initialization accomplish?</a></li>
+  </ul></li>
+  <li><a href="#xavier-he-and-alternatives-1" id="toc-xavier-he-and-alternatives-1" class="nav-link" data-scroll-target="#xavier-he-and-alternatives-1">02 · Xavier, He, and alternatives</a>
+  <ul class="collapse">
+  <li><a href="#a-wider-layer-adds-more-random-terms" id="toc-a-wider-layer-adds-more-random-terms" class="nav-link" data-scroll-target="#a-wider-layer-adds-more-random-terms">A wider layer adds more random terms</a></li>
+  <li><a href="#xavier-balances-both-directions" id="toc-xavier-balances-both-directions" class="nav-link" data-scroll-target="#xavier-balances-both-directions">Xavier balances both directions</a></li>
+  <li><a href="#relu-changes-the-calculation" id="toc-relu-changes-the-calculation" class="nav-link" data-scroll-target="#relu-changes-the-calculation">ReLU changes the calculation</a></li>
+  <li><a href="#choose-initialization-with-the-activation" id="toc-choose-initialization-with-the-activation" class="nav-link" data-scroll-target="#choose-initialization-with-the-activation">Choose initialization with the activation</a></li>
+  <li><a href="#check-the-distributionsnot-only-the-name" id="toc-check-the-distributionsnot-only-the-name" class="nav-link" data-scroll-target="#check-the-distributionsnot-only-the-name">Check the distributions—not only the name</a></li>
+  </ul></li>
+  <li><a href="#batch-normalization-1" id="toc-batch-normalization-1" class="nav-link" data-scroll-target="#batch-normalization-1">03 · Batch normalization</a>
+  <ul class="collapse">
+  <li><a href="#initialization-is-a-promise-made-at-step-0" id="toc-initialization-is-a-promise-made-at-step-0" class="nav-link" data-scroll-target="#initialization-is-a-promise-made-at-step-0">Initialization is a promise made at step 0</a></li>
+  <li><a href="#make-stabilization-part-of-the-network" id="toc-make-stabilization-part-of-the-network" class="nav-link" data-scroll-target="#make-stabilization-part-of-the-network">Make stabilization part of the network</a></li>
+  <li><a href="#batch-normalization-follows-the-tensor" id="toc-batch-normalization-follows-the-tensor" class="nav-link" data-scroll-target="#batch-normalization-follows-the-tensor">Batch normalization follows the tensor</a></li>
+  <li><a href="#the-original-evidence-activations-drift-less" id="toc-the-original-evidence-activations-drift-less" class="nav-link" data-scroll-target="#the-original-evidence-activations-drift-less">The original evidence: activations drift less</a></li>
+  <li><a href="#stable-distributions-are-not-the-whole-explanation" id="toc-stable-distributions-are-not-the-whole-explanation" class="nav-link" data-scroll-target="#stable-distributions-are-not-the-whole-explanation">Stable distributions are not the whole explanation</a></li>
+  <li><a href="#what-should-batchnorm-do-at-evaluation-time" id="toc-what-should-batchnorm-do-at-evaluation-time" class="nav-link" data-scroll-target="#what-should-batchnorm-do-at-evaluation-time">What should BatchNorm do at evaluation time?</a></li>
+  <li><a href="#batchnorm-powerful-but-not-free" id="toc-batchnorm-powerful-but-not-free" class="nav-link" data-scroll-target="#batchnorm-powerful-but-not-free">BatchNorm: powerful, but not free</a></li>
+  <li><a href="#generalization-begins-where-training-loss-ends" id="toc-generalization-begins-where-training-loss-ends" class="nav-link" data-scroll-target="#generalization-begins-where-training-loss-ends">Generalization begins where training loss ends</a></li>
+  <li><a href="#which-evidence-may-choose-the-model" id="toc-which-evidence-may-choose-the-model" class="nav-link" data-scroll-target="#which-evidence-may-choose-the-model">Which evidence may choose the model?</a></li>
+  <li><a href="#perfect-training-fit-leaves-the-boundary-undecided" id="toc-perfect-training-fit-leaves-the-boundary-undecided" class="nav-link" data-scroll-target="#perfect-training-fit-leaves-the-boundary-undecided">Perfect training fit leaves the boundary undecided</a></li>
+  <li><a href="#regularization-writes-that-preference-into-the-objective" id="toc-regularization-writes-that-preference-into-the-objective" class="nav-link" data-scroll-target="#regularization-writes-that-preference-into-the-objective">Regularization writes that preference into the objective</a></li>
+  <li><a href="#choose-where-the-constraint-enters" id="toc-choose-where-the-constraint-enters" class="nav-link" data-scroll-target="#choose-where-the-constraint-enters">Choose where the constraint enters</a></li>
+  <li><a href="#a-classifier-can-lean-too-heavily-on-one-feature" id="toc-a-classifier-can-lean-too-heavily-on-one-feature" class="nav-link" data-scroll-target="#a-classifier-can-lean-too-heavily-on-one-feature">A classifier can lean too heavily on one feature</a></li>
+  <li><a href="#each-training-pass-samples-a-different-subnetwork" id="toc-each-training-pass-samples-a-different-subnetwork" class="nav-link" data-scroll-target="#each-training-pass-samples-a-different-subnetwork">Each training pass samples a different subnetwork</a></li>
+  <li><a href="#masking-changes-the-scaleunless-we-compensate" id="toc-masking-changes-the-scaleunless-we-compensate" class="nav-link" data-scroll-target="#masking-changes-the-scaleunless-we-compensate">Masking changes the scale—unless we compensate</a></li>
+  <li><a href="#dropout-has-two-forward-pass-behaviors" id="toc-dropout-has-two-forward-pass-behaviors" class="nav-link" data-scroll-target="#dropout-has-two-forward-pass-behaviors">Dropout has two forward-pass behaviors</a></li>
+  <li><a href="#a-correct-numpy-implementation-has-one-mode-branch" id="toc-a-correct-numpy-implementation-has-one-mode-branch" class="nav-link" data-scroll-target="#a-correct-numpy-implementation-has-one-mode-branch">A correct NumPy implementation has one mode branch</a></li>
+  <li><a href="#early-stopping-keeps-an-earlier-checkpoint" id="toc-early-stopping-keeps-an-earlier-checkpoint" class="nav-link" data-scroll-target="#early-stopping-keeps-an-earlier-checkpoint">Early stopping keeps an earlier checkpoint</a></li>
+  <li><a href="#early-stopping-is-a-four-rule-controller" id="toc-early-stopping-is-a-four-rule-controller" class="nav-link" data-scroll-target="#early-stopping-is-a-four-rule-controller">Early stopping is a four-rule controller</a></li>
+  <li><a href="#four-classical-learning-rate-schedules" id="toc-four-classical-learning-rate-schedules" class="nav-link" data-scroll-target="#four-classical-learning-rate-schedules">Four classical learning-rate schedules</a></li>
+  <li><a href="#case-study-rescue-a-small-image-classifier" id="toc-case-study-rescue-a-small-image-classifier" class="nav-link" data-scroll-target="#case-study-rescue-a-small-image-classifier">Case study: rescue a small image classifier</a></li>
+  <li><a href="#recent-techniques-extend-the-training-control-panel" id="toc-recent-techniques-extend-the-training-control-panel" class="nav-link" data-scroll-target="#recent-techniques-extend-the-training-control-panel">Recent techniques extend the training control panel</a></li>
+  <li><a href="#next-week-prepare-for-pytorch" id="toc-next-week-prepare-for-pytorch" class="nav-link" data-scroll-target="#next-week-prepare-for-pytorch">Next week: prepare for PyTorch</a></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.html"><i class="bi bi-file-slides"></i>RevealJS</a></li></ul></div></nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Making Networks Train Reliably</h1>
+<p class="subtitle lead">Initialization, normalization, and generalization</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dr.&nbsp;A. Belcaid </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="making-networks-train-reliably" class="level2 deck-title">
+<h2 class="deck-title anchored" data-anchor-id="making-networks-train-reliably">Making networks train reliably</h2>
+<div class="deck-title-grid">
+<div class="deck-title-copy">
+<p><span class="eyebrow">CHAPTER 05 · RELIABLE TRAINING</span></p>
+<section id="initialization-normalization-and-generalization" class="level3">
+<h3 class="anchored" data-anchor-id="initialization-normalization-and-generalization">Initialization, normalization, and generalization</h3>
+<p>A network must first preserve useful signals through its layers—then learn patterns that survive beyond its training data.</p>
+<p><span class="deck-author">Dr.&nbsp;A. Belcaid</span></p>
+</section>
+</div>
+<div class="deck-title-art reliable-training-hero">
+<p><img src="assets/training-reliably-hero.png" class="img-fluid" alt="A neural network transforms chaotic signals into stable internal flows and a focused output path."></p>
+</div>
+</div>
+<div class="notes">
+<p>Open with one recurring network rather than a catalogue of tricks. At first, its activations collapse or explode. Initialization and normalization make optimization possible; validation evidence then reveals whether training success generalizes. Dropout and early stopping respond to that second problem. The hero previews this progression from unstable signals to stable computation and finally a focused generalizing path.</p>
+</div>
+</section>
+<section id="todays-journey" class="level2">
+<h2 class="anchored" data-anchor-id="todays-journey">Today’s journey</h2>
+<div class="reliable-roadmap">
+<div class="reliable-stop why-stop">
+<p><span>01</span></p>
+<section id="why-initialization-matters" class="level3">
+<h3 class="anchored" data-anchor-id="why-initialization-matters">Why initialization matters</h3>
+<p>Follow signals through depth</p>
+</section>
+</div>
+<div class="reliable-stop init-stop">
+<p><span>02</span></p>
+<section id="xavier-he-and-alternatives" class="level3">
+<h3 class="anchored" data-anchor-id="xavier-he-and-alternatives">Xavier, He, and alternatives</h3>
+<p>Match scale to the activation</p>
+</section>
+</div>
+<div class="reliable-stop batchnorm-stop">
+<p><span>03</span></p>
+<section id="batch-normalization" class="level3">
+<h3 class="anchored" data-anchor-id="batch-normalization">Batch normalization</h3>
+<p>Why distributions drift · normalize, scale, and shift</p>
+</section>
+</div>
+<div class="reliable-stop generalization-stop">
+<p><span>04</span></p>
+<section id="generalization-and-regularization" class="level3">
+<h3 class="anchored" data-anchor-id="generalization-and-regularization">Generalization and regularization</h3>
+<p>Training success versus new data</p>
+</section>
+</div>
+<div class="reliable-stop regularizer-stop">
+<p><span>05</span></p>
+<section id="dropout-and-early-stopping" class="level3">
+<h3 class="anchored" data-anchor-id="dropout-and-early-stopping">Dropout and early stopping</h3>
+<p>Two practical controls</p>
+</section>
+</div>
+<div class="reliable-stop case-stop">
+<p><span>06</span></p>
+<section id="practical-case-study" class="level3">
+<h3 class="anchored" data-anchor-id="practical-case-study">Practical case study</h3>
+<p>Stabilize, train, and generalize</p>
+</section>
+</div>
+</div>
+<div class="roadmap-question fragment">
+<p><span>Our recurring experiment:</span> <strong>same network · inspect activations · change one mechanism · measure validation</strong></p>
+</div>
+<div class="notes">
+<p>This is the complete 1h30 path. Sections 1–4 solve a trainability problem: preserving usable forward activations and backward gradients. Sections 5–6 solve a generalization problem: selecting a model that performs on unseen data. Section 7 combines the decisions in one controlled case study. Keep these two problems distinct throughout the lecture.</p>
+</div>
+</section>
+<section id="why-initialization-matters-1" class="level1 section-slide why-section" data-section-progress="1 / 6" style="--section-progress:16.667%">
+<h1 class="section-slide why-section" data-section-progress="1 / 6" style="--section-progress:16.667%">01 · Why initialization matters</h1>
+<section id="same-network-different-first-forward-pass" class="level2">
+<h2 class="anchored" data-anchor-id="same-network-different-first-forward-pass">Same network, different first forward pass</h2>
+<div class="first-pass-setup">
+<span>CONTROLLED EXPERIMENT</span><strong>8-layer tanh classifier</strong><small>same standardized batch · same architecture · no training yet</small>
+</div>
+<div class="initialization-histogram-figure">
+<p><img src="assets/initialization-activation-histograms.svg" class="img-fluid" alt="Three normalized histograms compare layer-eight tanh activations under very small, moderate, and very large initial weight scales."></p>
+</div>
+<div class="histogram-conclusions">
+<div class="histogram-conclusion tiny-conclusion fragment">
+<p><strong>Very small</strong><span>activations collapse near zero</span></p>
+</div>
+<div class="histogram-conclusion moderate-conclusion fragment">
+<p><strong>Moderate</strong><span>variation survives through depth</span></p>
+</div>
+<div class="histogram-conclusion large-conclusion fragment">
+<p><strong>Very large</strong><span>tanh saturates near −1 and +1</span></p>
+</div>
+</div>
+<div class="first-pass-question fragment">
+<span>Nothing has learned yet.</span><strong>The initial weights already determine what information reaches layer 8.</strong>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Establish the controlled comparison before revealing any outcome: architecture, input batch, and activation are fixed; only the scale of the sampled weights changes. Reveal the three conclusions from left to right. “Moderate” is intentionally unnamed—we have not derived Xavier or He initialization yet. Initialization affects the very first forward and backward pass, before the optimizer has an opportunity to repair anything.</p>
+</div>
+</section>
+<section id="one-layer-rescales-a-signal" class="level2">
+<h2 class="anchored" data-anchor-id="one-layer-rescales-a-signal">One layer rescales a signal</h2>
+<div class="box-sizing-demo">
+<div class="box-sizing-row">
+<div class="course-box layer-formula-box" style="--box-width:calc(40% - 18px);--box-bg:#dceeff">
+<span class="box-title">LAYER ℓ</span>
+<div class="box-formula">
+<div>
+<i>z</i><sup>(ℓ)</sup> = <i>W</i><sup>(ℓ)</sup><i>h</i><sup>(ℓ−1)</sup>
+</div>
+<div>
+<i>h</i><sup>(ℓ)</sup> = tanh(<i>z</i><sup>(ℓ)</sup>)
+</div>
+</div>
+</div>
+<div class="course-box signal-cases-box" style="--box-width:calc(60% - 18px);--box-bg:#ffffff">
+<div class="signal-case signal-case-small fragment">
+<div class="mini-distribution">
+<i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+<div>
+<strong>Too narrow</strong><span>Most activations become nearly identical.</span>
+</div>
+</div>
+<div class="signal-case signal-case-balanced fragment">
+<div class="mini-distribution">
+<i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+<div>
+<strong>Useful spread</strong><span>Differences between examples remain visible.</span>
+</div>
+</div>
+<div class="signal-case signal-case-wide fragment">
+<div class="mini-distribution">
+<i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+<div>
+<strong>Too wide</strong><span>tanh outputs collect near −1 and +1.</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bottom-text-box layer-scale-explanation fragment">
+<span>THE INITIALIZATION DECISION</span><strong>The scale of <i>W</i><sup>(ℓ)</sup> should preserve a useful spread of activations—not collapse it and not push tanh into saturation.</strong>
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Use the concrete layer equation only after students have seen the eight-layer outcome. “Spread” refers to the distribution across units and examples, not one scalar activation. Avoid claiming that variance alone completely characterizes a representation; it is a useful first diagnostic. Tanh makes both failure modes visible: narrow inputs collapse toward zero, while very wide inputs land in saturated tails.</p>
+</div>
+</section>
+<section id="depth-repeats-the-rescaling" class="level2">
+<h2 class="anchored" data-anchor-id="depth-repeats-the-rescaling">Depth repeats the rescaling</h2>
+<div class="depth-scale-story">
+<div class="depth-chart">
+<p><span>ACTIVATION STANDARD DEVIATION BY LAYER</span> <svg viewbox="0 0 760 420" role="img" aria-label="Activation spread collapses for small weights, remains stable for a moderate scale, and grows into saturation for large weights across eight layers."> <line x1="70" y1="350" x2="720" y2="350" class="chart-axis"></line> <line x1="70" y1="40" x2="70" y2="350" class="chart-axis"></line> <g class="chart-grid"><line x1="70" y1="250" x2="720" y2="250"></line><line x1="70" y1="150" x2="720" y2="150"></line><line x1="70" y1="50" x2="720" y2="50"></line></g> <polyline points="75,160 165,238 255,287 345,318 435,335 525,343 615,347 705,349" class="scale-line collapse-line"></polyline> <polyline points="75,160 165,165 255,158 345,168 435,162 525,166 615,160 705,164" class="scale-line stable-line"></polyline> <polyline points="75,160 165,112 255,84 345,68 435,59 525,55 615,52 705,50" class="scale-line saturate-line"></polyline> <g class="layer-labels"><text x="68" y="382">1</text><text x="158" y="382">2</text><text x="248" y="382">3</text><text x="338" y="382">4</text><text x="428" y="382">5</text><text x="518" y="382">6</text><text x="608" y="382">7</text><text x="698" y="382">8</text></g> <text x="630" y="43" class="saturate-text">SATURATING</text><text x="625" y="151" class="stable-text">PRESERVED</text><text x="625" y="337" class="collapse-text">COLLAPSING</text> </svg></p>
+</div>
+<div class="repeated-effect">
+<p><span>REPEATED COMPOSITION</span></p>
+<p><span class="math display">\[
+h^{(8)}=f\!\left(W^{(8)}f\!\left(\cdots f\!\left(W^{(1)}x\right)\right)\right)
+\]</span></p>
+<div class="effect-step fragment">
+<b>1</b>
+<p>
+A small scale error appears in one layer.
+</p>
+</div>
+<div class="effect-step fragment">
+<b>2</b>
+<p>
+The next layer receives the changed distribution.
+</p>
+</div>
+<div class="effect-step fragment">
+<b>3</b>
+<p>
+Depth compounds the effect.
+</p>
+</div>
+</div>
+</div>
+<div class="depth-takeaway fragment">
+<p><strong>Deep networks multiply scale decisions—they do not average them away.</strong></p>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Read the graph horizontally. These curves are schematic signatures of the controlled experiment, not universal numerical thresholds. Each layer consumes the distribution produced by the previous layer; therefore a modest mismatch can become a severe deep-layer problem. This is why a generic small random number is not a sufficient initialization rule.</p>
+</div>
+</section>
+<section id="your-turn-diagnose-the-activation-histograms" class="level2">
+<h2 class="anchored" data-anchor-id="your-turn-diagnose-the-activation-histograms">Your turn: diagnose the activation histograms</h2>
+<div class="activation-exercise">
+<div class="histogram-evidence">
+<div class="hist-panel histogram-a">
+<span>A · LAYER 8</span>
+<div class="hist-bars">
+<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+<small>−1 <em>activation</em> +1</small>
+</div>
+<div class="hist-panel histogram-b">
+<span>B · LAYER 8</span>
+<div class="hist-bars">
+<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+<small>−1 <em>activation</em> +1</small>
+</div>
+<div class="hist-panel histogram-c">
+<span>C · LAYER 8</span>
+<div class="hist-bars">
+<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+<small>−1 <em>activation</em> +1</small>
+</div>
+</div>
+<div class="activation-task">
+<p><span>GIVEN</span></p>
+<p>The same eight-layer tanh network under three initial weight scales.</p>
+<p><strong>Match A, B, and C to:</strong></p>
+<ul>
+<li>collapsed near zero</li>
+<li>useful spread</li>
+<li>saturated at the extremes</li>
+</ul>
+<div class="pause-panel">
+<p><strong>PAUSE · 45 seconds</strong> <span>Describe the visible evidence—not just the label.</span></p>
+</div>
+<div class="histogram-solution fragment">
+<p><span>WORKED SOLUTION</span> <strong>A: useful · B: collapsed · C: saturated</strong> <small>A spans the active tanh region; B concentrates at zero; C piles mass near −1 and +1.</small></p>
+</div>
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes including the pause. Require evidence from distribution shape. A is not “perfect”; it simply preserves a useful range. B indicates that distinct inputs are becoming nearly indistinguishable. C indicates that many tanh derivatives will be close to zero because outputs lie near the flat tails. Advance once to reveal the worked solution.</p>
+</div>
+</section>
+<section id="the-backward-pass-inherits-the-same-problem" class="level2">
+<h2 class="anchored" data-anchor-id="the-backward-pass-inherits-the-same-problem">The backward pass inherits the same problem</h2>
+<div class="forward-backward-scale">
+<div class="signal-direction forward-direction">
+<span>FORWARD</span> <strong>activations</strong>
+<div class="direction-network">
+<i></i><i></i><i></i><i></i><i></i><i></i><b>→</b>
+</div>
+<p><small>Repeated matrices and nonlinearities can collapse or saturate the signal.</small></p>
+</div>
+<div class="signal-core">
+<p><span>SAME INITIAL<br>WEIGHTS</span> <strong>W¹ · W² · … · W⁸</strong></p>
+</div>
+<div class="signal-direction backward-direction fragment">
+<span>BACKWARD</span> <strong>gradients</strong>
+<div class="direction-network">
+<b>←</b><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+<p><small>The chain rule repeatedly multiplies by weights and activation derivatives.</small></p>
+</div>
+</div>
+<div class="gradient-consequence fragment">
+<p><span>CONSEQUENCE</span> <strong>Poor initialization can make early-layer gradients tiny or unstable before learning begins.</strong></p>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Connect to backpropagation without re-deriving it. The same sampled weights participate in both passes. For tanh saturation, the derivative factor is near zero; repeated products can then attenuate gradients strongly. Do not claim that all large weights always create exploding gradients—activation derivatives and architecture matter. The central point is that initialization controls both information flow directions.</p>
+</div>
+</section>
+<section id="what-should-initialization-accomplish" class="level2">
+<h2 class="anchored" data-anchor-id="what-should-initialization-accomplish">What should initialization accomplish?</h2>
+<div class="initialization-targets">
+<div class="initialization-target scale-target">
+<span>01 · SIGNAL SCALE</span>
+<div class="target-hist-comparison scale-hist-comparison">
+<div class="target-hist">
+<small>INPUT</small>
+<div class="target-bars balanced-bars">
+<i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+</div>
+<b>→</b>
+<div class="target-hist">
+<small>NEXT LAYER</small>
+<div class="target-bars balanced-bars">
+<i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+</div>
+</div>
+<section id="preserve-useful-variation" class="level3">
+<h3 class="anchored" data-anchor-id="preserve-useful-variation">Preserve useful variation</h3>
+<p>Keep forward activations and backward gradients from systematically shrinking or growing across layers.</p>
+</section>
+</div>
+<div class="initialization-target symmetry-target fragment">
+<span>02 · SYMMETRY</span>
+<div class="target-hist-comparison symmetry-hist-comparison">
+<div class="target-hist constant-target">
+<small>CONSTANT</small>
+<div class="target-bars constant-bars">
+<i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+</div>
+<b>→</b>
+<div class="target-hist random-target">
+<small>RANDOM</small>
+<div class="target-bars random-bars">
+<i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+</div>
+</div>
+<section id="let-units-learn-differently" class="level3">
+<h3 class="anchored" data-anchor-id="let-units-learn-differently">Let units learn differently</h3>
+<p>If every unit begins identically, it receives the same gradient and remains identical.</p>
+</section>
+</div>
+</div>
+<div class="initialization-boundary fragment">
+<p><span>DESIGN QUESTION</span> <strong>How should the weight variance depend on layer width and activation?</strong> <small>That question leads to Xavier and He initialization.</small></p>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Separate two jobs. Randomness breaks symmetry; appropriate scale supports signal propagation. Random is therefore necessary but not sufficient. End on the design question, not a formula. Section 2 will derive how fan-in, fan-out, and the activation function determine practical initialization rules.</p>
+</div>
+</section>
+</section>
+<section id="xavier-he-and-alternatives-1" class="level1 section-slide init-section" data-section-progress="2 / 6" style="--section-progress:33.333%">
+<h1 class="section-slide init-section" data-section-progress="2 / 6" style="--section-progress:33.333%">02 · Xavier, He, and alternatives</h1>
+<section id="a-wider-layer-adds-more-random-terms" class="level2">
+<h2 class="anchored" data-anchor-id="a-wider-layer-adds-more-random-terms">A wider layer adds more random terms</h2>
+<div class="fan-network-stage">
+<svg viewbox="0 0 1080 255" role="img" aria-label="A fully connected network with four input units, five hidden units, and three output units; incoming and outgoing connections of one hidden unit are highlighted.">
+<g class="fan-all-edges"><line x1="150" y1="40" x2="500" y2="28"></line><line x1="150" y1="40" x2="500" y2="78"></line><line x1="150" y1="40" x2="500" y2="128"></line><line x1="150" y1="40" x2="500" y2="178"></line><line x1="150" y1="40" x2="500" y2="228"></line><line x1="150" y1="98" x2="500" y2="28"></line><line x1="150" y1="98" x2="500" y2="78"></line><line x1="150" y1="98" x2="500" y2="128"></line><line x1="150" y1="98" x2="500" y2="178"></line><line x1="150" y1="98" x2="500" y2="228"></line><line x1="150" y1="157" x2="500" y2="28"></line><line x1="150" y1="157" x2="500" y2="78"></line><line x1="150" y1="157" x2="500" y2="128"></line><line x1="150" y1="157" x2="500" y2="178"></line><line x1="150" y1="157" x2="500" y2="228"></line><line x1="150" y1="215" x2="500" y2="28"></line><line x1="150" y1="215" x2="500" y2="78"></line><line x1="150" y1="215" x2="500" y2="128"></line><line x1="150" y1="215" x2="500" y2="178"></line><line x1="150" y1="215" x2="500" y2="228"></line><line x1="500" y1="28" x2="840" y2="63"></line><line x1="500" y1="28" x2="840" y2="128"></line><line x1="500" y1="28" x2="840" y2="193"></line><line x1="500" y1="78" x2="840" y2="63"></line><line x1="500" y1="78" x2="840" y2="128"></line><line x1="500" y1="78" x2="840" y2="193"></line><line x1="500" y1="128" x2="840" y2="63"></line><line x1="500" y1="128" x2="840" y2="128"></line><line x1="500" y1="128" x2="840" y2="193"></line><line x1="500" y1="178" x2="840" y2="63"></line><line x1="500" y1="178" x2="840" y2="128"></line><line x1="500" y1="178" x2="840" y2="193"></line><line x1="500" y1="228" x2="840" y2="63"></line><line x1="500" y1="228" x2="840" y2="128"></line><line x1="500" y1="228" x2="840" y2="193"></line></g><g class="fan-highlight-in"><line x1="150" y1="40" x2="500" y2="128"></line><line x1="150" y1="98" x2="500" y2="128"></line><line x1="150" y1="157" x2="500" y2="128"></line><line x1="150" y1="215" x2="500" y2="128"></line></g><g class="fan-highlight-out"><line x1="500" y1="128" x2="840" y2="63"></line><line x1="500" y1="128" x2="840" y2="128"></line><line x1="500" y1="128" x2="840" y2="193"></line></g><g class="fan-nodes input-nodes"><circle cx="150" cy="40" r="17"></circle><circle cx="150" cy="98" r="17"></circle><circle cx="150" cy="157" r="17"></circle><circle cx="150" cy="215" r="17"></circle></g><g class="fan-nodes hidden-nodes"><circle cx="500" cy="28" r="17"></circle><circle cx="500" cy="78" r="17"></circle><circle class="focus-node" cx="500" cy="128" r="21"></circle><circle cx="500" cy="178" r="17"></circle><circle cx="500" cy="228" r="17"></circle></g><g class="fan-nodes output-nodes"><circle cx="840" cy="63" r="17"></circle><circle cx="840" cy="128" r="17"></circle><circle cx="840" cy="193" r="17"></circle></g><text x="107" y="249">INPUT</text><text x="451" y="249">HIDDEN</text><text x="793" y="249">OUTPUT</text>
+</svg>
+<div class="fan-definition fan-in-definition">
+<span>FAN-IN</span><strong>4 incoming connections</strong>
+</div>
+<div class="fan-definition fan-out-definition">
+<span>FAN-OUT</span><strong>3 outgoing connections</strong>
+</div>
+</div>
+<div class="variance-reveal-stage">
+<div class="course-question-box variance-question-box fragment fade-out" data-fragment-index="1">
+<span>QUESTION</span><strong>As fan-in grows, what happens to the variance of <i>z</i>—and how should the weights compensate?</strong>
+</div>
+<div class="course-answer-row variance-answer-row">
+<div class="course-answer-box variance-answer-box fragment" data-fragment-index="1">
+<span>THE SPREAD GROWS</span><strong>Var(<i>z</i>) ≈ fan-in · Var(<i>w</i>) · Var(<i>h</i>)</strong>
+</div>
+<div class="course-answer-box variance-answer-box fragment" data-fragment-index="2">
+<span>THE FIX</span><strong>Choose Var(<i>w</i>) ≈ 1 / fan-in</strong>
+</div>
+</div>
+</div>
+<div class="course-takeaway-dark bottom-text-box fan-width-takeaway fragment" data-fragment-index="3">
+<span>WIDTH MATTERS</span><strong>More incoming connections require smaller individual weights.</strong>
+</div>
+<div class="notes">
+<p>Budget about three minutes. First identify fan-in and fan-out on the highlighted hidden unit. The pale-yellow question then asks students to predict the effect of increasing fan-in. Advance once: the question disappears and the variance relation replaces it. Advance again for the compensating weight variance, then reveal the takeaway. State the assumptions—approximately independent, zero-centered terms—and present variance preservation as a design heuristic rather than an exact law for trained networks.</p>
+</div>
+</section>
+<section id="xavier-balances-both-directions" class="level2">
+<h2 class="anchored" data-anchor-id="xavier-balances-both-directions">Xavier balances both directions</h2>
+<div class="initializer-rule-layout">
+<div class="xavier-left-column">
+<div class="initializer-rule-card xavier-rule-card">
+<p><span>XAVIER / GLOROT</span></p>
+<p><span class="math display">\[
+\operatorname{Var}(W)=\frac{2}{\mathrm{fan}_{in}+\mathrm{fan}_{out}}
+\]</span></p>
+<div class="rule-distribution">
+<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+</div>
+<div class="rule-takeaway xavier-paper-note fragment" data-fragment-index="2">
+<p>Xavier is a compromise: it approximately preserves variance in both the forward and backward passes. <a href="https://proceedings.mlr.press/v9/glorot10a.html">Glorot &amp; Bengio, 2010</a></p>
+</div>
+</div>
+<div class="initializer-explanation">
+<div class="direction-balance forward-balance fragment" data-fragment-index="0">
+<b>→</b>
+<div>
+<strong>Forward signal</strong><span>fan-in controls how many terms are added.</span>
+</div>
+</div>
+<div class="direction-balance backward-balance fragment" data-fragment-index="1">
+<b>←</b>
+<div>
+<strong>Backward signal</strong><span>fan-out controls how many gradient paths return.</span>
+</div>
+</div>
+<div class="activation-fit-stage">
+<div class="course-question-box activation-fit-question fragment fade-in-then-out" data-fragment-index="3">
+<span>QUESTION</span><strong>Which activations best match Xavier’s assumptions?</strong>
+</div>
+<div class="activation-fit fragment" data-fragment-index="4">
+<span>BEST STARTING POINT</span><strong>tanh, sigmoid, or linear layers</strong><small>especially when activations are roughly symmetric around zero</small>
+</div>
+</div>
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Begin with the Xavier card. Reveal the forward explanation and then the backward explanation. Next reveal the blue paper-backed confirmation beneath the Xavier visual. The yellow activation question follows; on the next advancement it disappears and the green response takes its place. Xavier averages fan-in and fan-out because the two passes impose related but not identical scale requirements. Mention the common normal and uniform implementations without making students memorize interval endpoints. The important decision is the variance and its compatibility with the activation. <span class="citation" data-cites="glorot2010understanding">(Glorot and Bengio 2010)</span></p>
+</div>
+</section>
+<section id="relu-changes-the-calculation" class="level2">
+<h2 class="anchored" data-anchor-id="relu-changes-the-calculation">ReLU changes the calculation</h2>
+<div class="relu-change-layout">
+<div class="relu-before course-box" style="--box-width:48%;--box-bg:#ffffff">
+<span class="module-label">BEFORE RELU</span>
+<div class="signed-distribution">
+<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+<p><small>positive and negative pre-activations</small></p>
+</div>
+<div class="relu-after course-box fragment" style="--box-width:52%;--box-bg:#fff4ec">
+<span class="module-label">AFTER RELU</span>
+<div class="relu-gate-visual">
+<div class="zero-mass">
+<i></i><i></i><i></i><i></i>
+</div>
+<div class="positive-mass">
+<i></i><i></i><i></i><i></i><i></i>
+</div>
+</div>
+<p><small>roughly half the symmetric signal becomes zero</small></p>
+</div>
+</div>
+<div class="he-rule-reveal fragment">
+<div>
+<span>COMPENSATE FOR THE GATE</span><strong>He initialization</strong>
+</div>
+<div class="he-formula">
+Var(<i>W</i>) = <b>2</b> / fan<sub>in</sub>
+</div>
+<div>
+<span>USE WITH</span><strong>ReLU and its close variants</strong>
+</div>
+</div>
+<div class="he-correction-result fragment">
+<div class="he-result-label">
+<span>AFTER THE FIX</span><strong>Useful spread survives</strong>
+</div>
+<div class="he-result-histograms">
+<div class="he-depth-hist">
+<small>LAYER 1</small>
+<div>
+<i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+</div>
+<b>→</b>
+<div class="he-depth-hist">
+<small>LAYER 4</small>
+<div>
+<i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+</div>
+<b>→</b>
+<div class="he-depth-hist">
+<small>LAYER 8</small>
+<div>
+<i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+</div>
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Let students see the symmetric pre-activation distribution before revealing the ReLU output. ReLU removes the negative half, reducing the propagated second moment. The factor of two compensates for that loss under the derivation assumptions. After the He rule, reveal the third layer and read the three histograms from left to right: their useful spread is approximately preserved rather than progressively collapsing. Cite the original rectifier-aware initialization and connect it to the previous fan-in argument. <span class="citation" data-cites="he2015delving">(He et al. 2015)</span></p>
+</div>
+</section>
+<section id="choose-initialization-with-the-activation" class="level2">
+<h2 class="anchored" data-anchor-id="choose-initialization-with-the-activation">Choose initialization with the activation</h2>
+<div class="activation-choice-principle">
+<div class="activation-choice-visual">
+<div class="choice-mini-curve choice-tanh">
+<i></i>
+</div>
+<div class="choice-mini-curve choice-relu">
+<i></i>
+</div>
+<div class="choice-mini-curve choice-selu">
+<i></i>
+</div>
+</div>
+<div>
+<span>THE DECISION RULE</span><strong>Choose initialization with respect to the activation.</strong><small>The activation changes how much of the incoming signal survives.</small>
+</div>
+</div>
+<div class="choice-question-stage">
+<div class="course-question-box choice-question fragment fade-in-then-out" data-fragment-index="0">
+<span>CASE A · PAUSE 20 SECONDS</span><strong>A dense 784 → 256 layer uses tanh. Which initialization would you choose—and why?</strong>
+</div>
+<div class="choice-answer choice-answer-xavier fragment fade-in-then-out" data-fragment-index="1">
+<span>CASE A · ANSWER</span><strong>Xavier initialization</strong><small>tanh is approximately symmetric around zero, so balancing fan-in and fan-out helps preserve forward activations and backward gradients.</small>
+</div>
+<div class="course-question-box choice-question fragment fade-in-then-out" data-fragment-index="2">
+<span>CASE B · PAUSE 20 SECONDS</span><strong>A 3×3 convolution with 64 input channels uses ReLU. Which initialization would you choose—and why?</strong>
+</div>
+<div class="choice-answer choice-answer-he fragment fade-in-then-out" data-fragment-index="3">
+<span>CASE B · ANSWER</span><strong>He initialization</strong><small>ReLU removes the negative half of a roughly symmetric signal; the factor 2 / fan-in compensates for that loss.</small>
+</div>
+<div class="course-question-box choice-question fragment fade-in-then-out" data-fragment-index="4">
+<span>CASE C · PAUSE 20 SECONDS</span><strong>A dense 128 → 128 layer starts with every weight equal to zero. Is its main problem scale or symmetry?</strong>
+</div>
+<div class="choice-answer choice-answer-symmetry fragment" data-fragment-index="5">
+<span>CASE C · ANSWER</span><strong>Symmetry failure</strong><small>Identical units receive identical gradients and remain identical. Randomness must break the symmetry before a variance rule can help.</small>
+</div>
+</div>
+<div class="notes">
+<p>Budget about five minutes including three short pauses. Begin with the blue principle and connect each activation sketch to how it transforms a distribution. For each case, require a prediction before advancing. The question disappears when its explained answer appears, and the full answer disappears when the next case replaces it. A points to Xavier, B to He, and C is a symmetry failure rather than a choice between variance formulas.</p>
+</div>
+</section>
+<section id="check-the-distributionsnot-only-the-name" class="level2">
+<h2 class="anchored" data-anchor-id="check-the-distributionsnot-only-the-name">Check the distributions—not only the name</h2>
+<div class="initializer-check-grid">
+<div class="initializer-check-card check-small fragment">
+<span>TOO SMALL</span>
+<div class="depth-mini-hists">
+<div>
+<i></i><i></i><i></i><i></i><i></i>
+</div>
+<b>→</b>
+<div>
+<i></i><i></i><i></i><i></i><i></i>
+</div>
+<b>→</b>
+<div>
+<i></i><i></i><i></i><i></i><i></i>
+</div>
+</div>
+<p><strong>collapsing</strong></p>
+</div>
+<div class="initializer-check-card check-matched fragment">
+<span>MATCHED RULE</span>
+<div class="depth-mini-hists">
+<div>
+<i></i><i></i><i></i><i></i><i></i>
+</div>
+<b>→</b>
+<div>
+<i></i><i></i><i></i><i></i><i></i>
+</div>
+<b>→</b>
+<div>
+<i></i><i></i><i></i><i></i><i></i>
+</div>
+</div>
+<p><strong>preserved</strong></p>
+</div>
+<div class="initializer-check-card check-large fragment">
+<span>TOO LARGE</span>
+<div class="depth-mini-hists">
+<div>
+<i></i><i></i><i></i><i></i><i></i>
+</div>
+<b>→</b>
+<div>
+<i></i><i></i><i></i><i></i><i></i>
+</div>
+<b>→</b>
+<div>
+<i></i><i></i><i></i><i></i><i></i>
+</div>
+</div>
+<p><strong>unstable / saturated</strong></p>
+</div>
+</div>
+<div class="bottom-text-box empirical-check fragment">
+<p><span>PRACTICAL CHECK</span><strong>Run one batch before training and inspect activation and gradient distributions by layer.</strong></p>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Close the section by returning to evidence. An initializer name is not a guarantee: residual connections, normalization, unusual nonlinearities, and depth change the dynamics. A single diagnostic batch can reveal collapse, saturation, or unstable growth before a long training run begins.</p>
+</div>
+</section>
+</section>
+<section id="batch-normalization-1" class="level1 section-slide batchnorm-section" data-section-progress="3 / 6" style="--section-progress:50%">
+<h1 class="section-slide batchnorm-section" data-section-progress="3 / 6" style="--section-progress:50%">03 · Batch normalization</h1>
+<section id="initialization-is-a-promise-made-at-step-0" class="level2">
+<h2 class="anchored" data-anchor-id="initialization-is-a-promise-made-at-step-0">Initialization is a promise made at step 0</h2>
+<div class="bn-manual-iteration-stage" style="position:relative;height:510px;margin-top:26px">
+<div class="bn-manual-frame fragment fade-out" data-fragment-index="0" style="position:absolute;inset:0">
+<div class="bn-step-label" style="color:#17212b;font:700 16px/1 'JetBrains Mono',monospace;letter-spacing:.06em">
+STEP 0 <span style="margin-left:24px;color:#657687;font:500 15px/1 'JetBrains Mono',monospace">balanced Xavier start</span>
+</div>
+<div class="bn-three-box-check" style="display:flex;gap:5%;width:100%;margin-top:16px;align-items:flex-start">
+<div class="course-box" style="display:flex;width:30%;height:450px;min-height:0;padding:24px;flex:0 0 30%;background:#eaf7ef;flex-direction:column">
+<span style="color:#29845a;font:700 13px/1 'JetBrains Mono',monospace">LAYER 1</span>
+<div style="display:flex;height:340px;margin-top:20px;border-bottom:3px solid #8ca2b2;align-items:flex-end;justify-content:center;gap:11px">
+<i style="width:27px;height:20px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:58px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:135px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:240px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:315px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:240px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:135px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:58px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:20px;border-radius:6px 6px 0 0;background:#29845a"></i>
+</div>
+</div>
+<div class="course-box" style="display:flex;width:30%;height:450px;min-height:0;padding:24px;flex:0 0 30%;background:#dceeff;flex-direction:column">
+<span style="color:#2377c9;font:700 13px/1 'JetBrains Mono',monospace">LAYER 2</span>
+<div style="display:flex;height:340px;margin-top:20px;border-bottom:3px solid #8ca2b2;align-items:flex-end;justify-content:center;gap:11px">
+<i style="width:27px;height:14px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:45px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:112px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:225px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:320px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:255px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:145px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:64px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:22px;border-radius:6px 6px 0 0;background:#2377c9"></i>
+</div>
+</div>
+<div class="course-box" style="display:flex;width:30%;height:450px;min-height:0;padding:24px;flex:0 0 30%;background:#fff4dc;flex-direction:column">
+<span style="color:#d89021;font:700 13px/1 'JetBrains Mono',monospace">LAYER 3</span>
+<div style="display:flex;height:340px;margin-top:20px;border-bottom:3px solid #8ca2b2;align-items:flex-end;justify-content:center;gap:11px">
+<i style="width:27px;height:24px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:70px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:155px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:260px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:310px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:218px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:120px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:48px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:16px;border-radius:6px 6px 0 0;background:#d89021"></i>
+</div>
+</div>
+</div>
+</div>
+<div class="bn-manual-frame fragment fade-in-then-out" data-fragment-index="0" style="position:absolute;inset:0">
+<div class="bn-step-label" style="color:#17212b;font:700 16px/1 'JetBrains Mono',monospace;letter-spacing:.06em">
+STEP 1 <span style="margin-left:24px;color:#657687;font:500 15px/1 'JetBrains Mono',monospace">the distributions begin to move</span>
+</div>
+<div class="bn-three-box-check" style="display:flex;gap:5%;width:100%;margin-top:16px;align-items:flex-start">
+<div class="course-box" style="display:flex;width:30%;height:450px;min-height:0;padding:24px;flex:0 0 30%;background:#eaf7ef;flex-direction:column">
+<span style="color:#29845a;font:700 13px/1 'JetBrains Mono',monospace">LAYER 1</span>
+<div style="display:flex;height:340px;margin-top:20px;border-bottom:3px solid #8ca2b2;align-items:flex-end;justify-content:center;gap:11px">
+<i style="width:27px;height:10px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:32px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:95px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:190px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:300px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:270px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:170px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:85px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:30px;border-radius:6px 6px 0 0;background:#29845a"></i>
+</div>
+</div>
+<div class="course-box" style="display:flex;width:30%;height:450px;min-height:0;padding:24px;flex:0 0 30%;background:#dceeff;flex-direction:column">
+<span style="color:#2377c9;font:700 13px/1 'JetBrains Mono',monospace">LAYER 2</span>
+<div style="display:flex;height:340px;margin-top:20px;border-bottom:3px solid #8ca2b2;align-items:flex-end;justify-content:center;gap:11px">
+<i style="width:27px;height:8px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:28px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:85px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:205px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:330px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:205px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:85px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:28px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:8px;border-radius:6px 6px 0 0;background:#2377c9"></i>
+</div>
+</div>
+<div class="course-box" style="display:flex;width:30%;height:450px;min-height:0;padding:24px;flex:0 0 30%;background:#fff4dc;flex-direction:column">
+<span style="color:#d89021;font:700 13px/1 'JetBrains Mono',monospace">LAYER 3</span>
+<div style="display:flex;height:340px;margin-top:20px;border-bottom:3px solid #8ca2b2;align-items:flex-end;justify-content:center;gap:11px">
+<i style="width:27px;height:40px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:95px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:175px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:250px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:290px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:240px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:165px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:90px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:38px;border-radius:6px 6px 0 0;background:#d89021"></i>
+</div>
+</div>
+</div>
+</div>
+<div class="bn-manual-frame fragment fade-in-then-out" data-fragment-index="1" style="position:absolute;inset:0">
+<div class="bn-step-label" style="color:#17212b;font:700 16px/1 'JetBrains Mono',monospace;letter-spacing:.06em">
+STEP 2 <span style="margin-left:24px;color:#657687;font:500 15px/1 'JetBrains Mono',monospace">the drift compounds</span>
+</div>
+<div class="bn-three-box-check" style="display:flex;gap:5%;width:100%;margin-top:16px;align-items:flex-start">
+<div class="course-box" style="display:flex;width:30%;height:450px;min-height:0;padding:24px;flex:0 0 30%;background:#eaf7ef;flex-direction:column">
+<span style="color:#29845a;font:700 13px/1 'JetBrains Mono',monospace">LAYER 1</span>
+<div style="display:flex;height:340px;margin-top:20px;border-bottom:3px solid #8ca2b2;align-items:flex-end;justify-content:center;gap:11px">
+<i style="width:27px;height:35px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:75px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:145px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:230px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:305px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:275px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:190px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:120px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:65px;border-radius:6px 6px 0 0;background:#29845a"></i>
+</div>
+</div>
+<div class="course-box" style="display:flex;width:30%;height:450px;min-height:0;padding:24px;flex:0 0 30%;background:#dceeff;flex-direction:column">
+<span style="color:#2377c9;font:700 13px/1 'JetBrains Mono',monospace">LAYER 2</span>
+<div style="display:flex;height:340px;margin-top:20px;border-bottom:3px solid #8ca2b2;align-items:flex-end;justify-content:center;gap:11px">
+<i style="width:27px;height:4px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:10px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:35px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:140px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:335px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:140px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:35px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:10px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:4px;border-radius:6px 6px 0 0;background:#2377c9"></i>
+</div>
+</div>
+<div class="course-box" style="display:flex;width:30%;height:450px;min-height:0;padding:24px;flex:0 0 30%;background:#fff4dc;flex-direction:column">
+<span style="color:#d89021;font:700 13px/1 'JetBrains Mono',monospace">LAYER 3</span>
+<div style="display:flex;height:340px;margin-top:20px;border-bottom:3px solid #8ca2b2;align-items:flex-end;justify-content:center;gap:11px">
+<i style="width:27px;height:5px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:10px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:25px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:65px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:140px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:250px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:330px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:180px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:60px;border-radius:6px 6px 0 0;background:#d89021"></i>
+</div>
+</div>
+</div>
+</div>
+<div class="bn-manual-frame fragment fade-in-then-out" data-fragment-index="2" style="position:absolute;inset:0">
+<div class="bn-step-label" style="color:#17212b;font:700 16px/1 'JetBrains Mono',monospace;letter-spacing:.06em">
+STEP 3 <span style="margin-left:24px;color:#657687;font:500 15px/1 'JetBrains Mono',monospace">useful variation is being lost</span>
+</div>
+<div class="bn-three-box-check" style="display:flex;gap:5%;width:100%;margin-top:16px;align-items:flex-start">
+<div class="course-box" style="display:flex;width:30%;height:450px;min-height:0;padding:24px;flex:0 0 30%;background:#eaf7ef;flex-direction:column">
+<span style="color:#29845a;font:700 13px/1 'JetBrains Mono',monospace">LAYER 1</span>
+<div style="display:flex;height:340px;margin-top:20px;border-bottom:3px solid #8ca2b2;align-items:flex-end;justify-content:center;gap:11px">
+<i style="width:27px;height:140px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:180px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:210px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:160px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:90px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:150px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:220px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:195px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:155px;border-radius:6px 6px 0 0;background:#29845a"></i>
+</div>
+</div>
+<div class="course-box" style="display:flex;width:30%;height:450px;min-height:0;padding:24px;flex:0 0 30%;background:#dceeff;flex-direction:column">
+<span style="color:#2377c9;font:700 13px/1 'JetBrains Mono',monospace">LAYER 2</span>
+<div style="display:flex;height:340px;margin-top:20px;border-bottom:3px solid #8ca2b2;align-items:flex-end;justify-content:center;gap:11px">
+<i style="width:27px;height:3px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:4px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:12px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:75px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:338px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:75px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:12px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:4px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:3px;border-radius:6px 6px 0 0;background:#2377c9"></i>
+</div>
+</div>
+<div class="course-box" style="display:flex;width:30%;height:450px;min-height:0;padding:24px;flex:0 0 30%;background:#fff4dc;flex-direction:column">
+<span style="color:#d89021;font:700 13px/1 'JetBrains Mono',monospace">LAYER 3</span>
+<div style="display:flex;height:340px;margin-top:20px;border-bottom:3px solid #8ca2b2;align-items:flex-end;justify-content:center;gap:11px">
+<i style="width:27px;height:3px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:3px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:5px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:10px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:30px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:90px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:340px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:45px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:10px;border-radius:6px 6px 0 0;background:#d89021"></i>
+</div>
+</div>
+</div>
+</div>
+<div class="bn-manual-frame fragment" data-fragment-index="3" style="position:absolute;inset:0">
+<div class="bn-step-label" style="color:#17212b;font:700 16px/1 'JetBrains Mono',monospace;letter-spacing:.06em">
+STEP 4 <span style="margin-left:24px;color:#657687;font:500 15px/1 'JetBrains Mono',monospace">unacceptable distributions</span>
+</div>
+<div class="bn-three-box-check" style="display:flex;gap:5%;width:100%;margin-top:16px;align-items:flex-start">
+<div class="course-box" style="display:flex;width:30%;height:450px;min-height:0;padding:24px;flex:0 0 30%;background:#eaf7ef;flex-direction:column">
+<span style="color:#29845a;font:700 13px/1 'JetBrains Mono',monospace">LAYER 1</span>
+<div style="display:flex;height:340px;margin-top:20px;border-bottom:3px solid #8ca2b2;align-items:flex-end;justify-content:center;gap:11px">
+<i style="width:27px;height:315px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:260px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:150px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:60px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:20px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:65px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:155px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:265px;border-radius:6px 6px 0 0;background:#29845a"></i><i style="width:27px;height:320px;border-radius:6px 6px 0 0;background:#29845a"></i>
+</div>
+</div>
+<div class="course-box" style="display:flex;width:30%;height:450px;min-height:0;padding:24px;flex:0 0 30%;background:#dceeff;flex-direction:column">
+<span style="color:#2377c9;font:700 13px/1 'JetBrains Mono',monospace">LAYER 2</span>
+<div style="display:flex;height:340px;margin-top:20px;border-bottom:3px solid #8ca2b2;align-items:flex-end;justify-content:center;gap:11px">
+<i style="width:27px;height:3px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:3px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:4px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:15px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:338px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:15px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:4px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:3px;border-radius:6px 6px 0 0;background:#2377c9"></i><i style="width:27px;height:3px;border-radius:6px 6px 0 0;background:#2377c9"></i>
+</div>
+</div>
+<div class="course-box" style="display:flex;width:30%;height:450px;min-height:0;padding:24px;flex:0 0 30%;background:#fff4dc;flex-direction:column">
+<span style="color:#d89021;font:700 13px/1 'JetBrains Mono',monospace">LAYER 3</span>
+<div style="display:flex;height:340px;margin-top:20px;border-bottom:3px solid #8ca2b2;align-items:flex-end;justify-content:center;gap:11px">
+<i style="width:27px;height:3px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:3px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:3px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:4px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:6px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:12px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:340px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:10px;border-radius:6px 6px 0 0;background:#d89021"></i><i style="width:27px;height:4px;border-radius:6px 6px 0 0;background:#d89021"></i>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="course-takeaway-dark bn-initialization-takeaway fragment" data-fragment-index="4" style="display:grid;grid-template-columns:260px minmax(0,1fr);gap:26px;width:100%;min-height:96px;margin-top:22px;padding:18px 24px;align-items:center;background:#17212b">
+<span style="color:#8fd0ff;font:700 13px/1.2 'JetBrains Mono',monospace">INITIALIZATION IS ONLY THE START</span><strong style="margin:0;color:#ffffff;font-size:21px;line-height:1.32">Good initialization does not ensure that activation distributions remain well behaved after the weights begin to change.</strong>
+</div>
+<div class="notes">
+<p>At step 0, show three slightly different but balanced activation histograms produced by a Xavier-initialized network. Green, blue, and amber consistently identify layers 1, 2, and 3. Each advancement replaces the complete previous frame in the same space. Steps 1–3 progressively compound the drift. At step 4, layer 1 has an excessively wide, edge-heavy distribution; layer 2 has collapsed around zero; and layer 3 is concentrated around nearly one value. Treat these as three illustrative failure signatures, not one literal training trajectory. Reveal the blue takeaway only after students have seen the unacceptable Step 4 distributions.</p>
+</div>
+</section>
+<section id="make-stabilization-part-of-the-network" class="level2">
+<h2 class="anchored" data-anchor-id="make-stabilization-part-of-the-network">Make stabilization part of the network</h2>
+<div class="bn-paper-layout" style="display:grid;grid-template-columns:46% 1fr;gap:4%;width:100%;margin-top:24px;align-items:stretch">
+<div class="bn-idea-stack" style="display:flex;min-height:500px;gap:18px;flex-direction:column;justify-content:center">
+<div class="direction-balance bn-concept-card fragment" data-fragment-index="0">
+<b>1</b>
+<div>
+<strong>Measure the mini-batch</strong><span>Estimate one mean and variance for each activation feature.</span>
+</div>
+</div>
+<div class="direction-balance bn-concept-card fragment" data-fragment-index="1">
+<b>2</b>
+<div>
+<strong>Normalize the activations</strong><span>Recenter them near zero and rescale them near unit variance.</span>
+</div>
+</div>
+<div class="direction-balance bn-concept-card fragment" data-fragment-index="2">
+<b>3</b>
+<div>
+<strong>Restore flexibility</strong><span>Learn γ and β so the layer can choose its useful scale and shift.</span>
+</div>
+</div>
+</div>
+<div style="display:flex;min-width:0;flex-direction:column">
+<div class="bn-algorithm-box" style="min-height:440px;padding:22px;border:2px solid #d7e2eb;border-radius:20px;background:#ffffff;display:flex;align-items:center;justify-content:center">
+<img src="assets/ioffe-szegedy-bn-algorithm-1.png" alt="Algorithm 1, the Batch Normalizing Transform, from Ioffe and Szegedy (2015)" style="display:block;width:100%;height:auto;max-height:396px;object-fit:contain">
+</div>
+<div class="bn-paper-strip" style="margin-top:10px;font-size:11px">
+<span style="font-size:10px">SOURCE</span>
+<div>
+<a style="font-size:11px;line-height:1.25" href="https://proceedings.mlr.press/v37/ioffe15.html">Ioffe &amp; Szegedy (2015) · <strong style="font-size:11px">Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift</strong></a>
+</div>
+</div>
+</div>
+</div>
+<div class="notes">
+<p>This slide is being constructed one component at a time. The left panel is intentionally empty. The right panel reproduces Algorithm 1 from the original paper. <span class="citation" data-cites="ioffe2015batch">(Ioffe and Szegedy 2015)</span></p>
+</div>
+</section>
+<section id="batch-normalization-follows-the-tensor" class="level2">
+<h2 class="anchored" data-anchor-id="batch-normalization-follows-the-tensor">Batch normalization follows the tensor</h2>
+<div class="bn-tensor-visual">
+<svg class="nostretch" viewbox="0 0 1300 560" role="img" aria-label="A batch tensor of shape B by C by W is reduced over the batch dimension to mean and variance tensors of shape C by W, then normalized and adapted by learnable gamma and beta parameters.">
+  <defs>
+    <marker id="bn-arrow-blue" markerwidth="8" markerheight="8" refx="7" refy="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#2377c9"></path></marker>
+    <marker id="bn-arrow-purple" markerwidth="8" markerheight="8" refx="7" refy="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#7258a8"></path></marker>
+    <pattern id="bn-grid-blue" width="38" height="38" patternunits="userSpaceOnUse"><rect width="38" height="38" fill="#dceeff" stroke="#91bddc" stroke-width="2"></rect></pattern>
+    <pattern id="bn-grid-purple" width="38" height="38" patternunits="userSpaceOnUse"><rect width="38" height="38" fill="#eee8f8" stroke="#b7a5d5" stroke-width="2"></rect></pattern>
+    <pattern id="bn-grid-amber" width="29" height="56" patternunits="userSpaceOnUse"><rect width="29" height="56" fill="#fff1cf" stroke="#e0b45c" stroke-width="2"></rect></pattern>
+  </defs>
+
+  <g class="bn-tensor-input">
+    <text x="150" y="55" text-anchor="middle" class="bn-svg-kicker">INPUT ACTIVATIONS</text>
+    <rect x="65" y="150" width="190" height="152" rx="8" fill="#b8d9ef" stroke="#2377c9" stroke-width="3"></rect>
+    <rect x="83" y="132" width="190" height="152" rx="8" fill="#cce5f5" stroke="#2377c9" stroke-width="3"></rect>
+    <rect x="101" y="114" width="190" height="152" rx="8" fill="url(#bn-grid-blue)" stroke="#2377c9" stroke-width="4"></rect>
+    <text x="196" y="342" text-anchor="middle" class="bn-svg-shape">X : (B, C, W)</text>
+    <text x="196" y="372" text-anchor="middle" class="bn-svg-note">B examples</text>
+  </g>
+
+  <g class="fragment" data-fragment-index="0">
+    <path d="M305 178 C370 178, 380 120, 445 120" class="bn-svg-arrow" marker-end="url(#bn-arrow-blue)"></path>
+    <path d="M305 238 C370 238, 380 342, 445 342" class="bn-svg-arrow" marker-end="url(#bn-arrow-blue)"></path>
+    <text x="372" y="151" text-anchor="middle" class="bn-svg-reduce">reduce B, W</text>
+    <text x="374" y="301" text-anchor="middle" class="bn-svg-reduce">reduce B, W</text>
+
+    <g>
+           <text x="540" y="55" text-anchor="middle" class="bn-svg-kicker">BATCH MEAN</text>
+      <rect x="445" y="78" width="190" height="114" rx="8" fill="url(#bn-grid-blue)" stroke="#2377c9" stroke-width="4"></rect>
+      <text x="540" y="225" text-anchor="middle" class="bn-svg-shape">μ<tspan baseline-shift="sub" font-size="14">B</tspan> : (C) → (1, C, 1)</text>
+    </g>
+    <g>
+      <text x="540" y="277" text-anchor="middle" class="bn-svg-kicker">BATCH VARIANCE</text>
+      <rect x="445" y="300" width="190" height="114" rx="8" fill="url(#bn-grid-purple)" stroke="#7258a8" stroke-width="4"></rect>
+      <text x="540" y="447" text-anchor="middle" class="bn-svg-shape">σ²<tspan baseline-shift="sub" font-size="14">B</tspan> : (C) → (1, C, 1)</text>
+    </g>
+  </g>
+
+  <g class="fragment" data-fragment-index="1">
+    <path d="M650 135 C715 135, 705 222, 765 222" class="bn-svg-arrow" marker-end="url(#bn-arrow-blue)"></path>
+    <path d="M650 357 C715 357, 705 272, 765 272" class="bn-svg-arrow purple" marker-end="url(#bn-arrow-purple)"></path>
+    <rect x="765" y="170" width="238" height="144" rx="18" fill="#17212b"></rect>
+    <text x="884" y="205" text-anchor="middle" class="bn-svg-dark-kicker">BROADCAST OVER B AND W</text>
+    <text x="884" y="259" text-anchor="middle" class="bn-svg-formula">x̂ = (X − μ<tspan baseline-shift="sub" font-size="16">B</tspan>) / √(σ²<tspan baseline-shift="sub" font-size="16">B</tspan> + ε)</text>
+    <text x="884" y="292" text-anchor="middle" class="bn-svg-dark-note">shape remains (B, C, W)</text>
+  </g>
+
+  <g class="fragment" data-fragment-index="2">
+    <path d="M1018 242 L1070 242" class="bn-svg-arrow" marker-end="url(#bn-arrow-blue)"></path>
+    <rect x="1038" y="62" width="116" height="56" rx="15" fill="url(#bn-grid-amber)" stroke="#d89021" stroke-width="3"></rect>
+    <text x="1096" y="97" text-anchor="middle" class="bn-svg-param">γ : (1,C,1)</text>
+    <rect x="1170" y="62" width="116" height="56" rx="15" fill="url(#bn-grid-amber)" stroke="#d89021" stroke-width="3"></rect>
+    <text x="1228" y="97" text-anchor="middle" class="bn-svg-param">β : (1,C,1)</text>
+    <path d="M1096 122 L1124 179" class="bn-svg-learn-arrow" marker-end="url(#bn-arrow-purple)"></path>
+    <path d="M1228 122 L1198 179" class="bn-svg-learn-arrow" marker-end="url(#bn-arrow-purple)"></path>
+    <text x="1162" y="151" text-anchor="middle" class="bn-svg-broadcast-note">broadcast over B, W</text>
+    <rect x="1070" y="178" width="216" height="128" rx="18" fill="#fff" stroke="#d89021" stroke-width="4"></rect>
+    <text x="1178" y="226" text-anchor="middle" class="bn-svg-kicker amber">LEARNED ADAPTATION</text>
+    <text x="1178" y="270" text-anchor="middle" class="bn-svg-output">Y = γ ⊙ x̂ + β</text>
+    <text x="1178" y="342" text-anchor="middle" class="bn-svg-shape">Y : (B, C, W)</text>
+  </g>
+</svg>
+</div>
+<div class="course-question-box bn-learnable-hint fragment" data-fragment-index="3">
+<span>HINT</span><strong>γ and β are trainable: normalization fixes the reference scale; the network learns the scale and shift it actually needs.</strong>
+</div>
+<div class="notes">
+<p>Read the diagram from left to right. For a BatchNorm1d input with shape B by C by W, statistics are computed over the batch and width axes, leaving one mean and variance per channel. They may be represented as C-vectors and reshaped to 1 by C by 1 for broadcasting. Gamma and beta are likewise learned per channel and broadcast across B and W. For dense input B by C, the same rule reduces only B; for BatchNorm2d input B by C by H by W, it reduces B, H, and W.</p>
+</div>
+</section>
+<section id="the-original-evidence-activations-drift-less" class="level2">
+<h2 class="anchored" data-anchor-id="the-original-evidence-activations-drift-less">The original evidence: activations drift less</h2>
+<div class="bn-evidence-figure">
+<img src="assets/ioffe-szegedy-figure-1.png" alt="Figure 1 from the original Batch Normalization paper: MNIST accuracy and the evolution of pre-sigmoid activation percentiles without and with BatchNorm.">
+</div>
+<div class="bn-evidence-reading">
+<div class="bn-reading-card">
+<span>(a) TRAINING EFFECT</span><strong>The BN model reaches high test accuracy in fewer training steps.</strong>
+</div>
+<div class="bn-reading-card fragment" data-fragment-index="0">
+<span>(b) WITHOUT BN</span><strong>The median and outer percentiles bend and drift: the neuron’s input distribution keeps changing.</strong>
+</div>
+<div class="bn-reading-card fragment" data-fragment-index="1">
+<span>(c) WITH BN</span><strong>The three percentile curves remain separated and nearly parallel: center and spread stay much steadier.</strong>
+</div>
+</div>
+<div class="course-takeaway-dark bn-evidence-takeaway fragment" data-fragment-index="2">
+<span>2015 INTERPRETATION</span><strong>Less “internal covariate shift” helps the next layer learn a less-changing problem.</strong>
+</div>
+<div class="bn-figure-source">
+Source: <a href="https://proceedings.mlr.press/v37/ioffe15.html">Ioffe &amp; Szegedy (2015), Figure 1</a>. Curves show the 15th, 50th, and 85th percentiles of one pre-sigmoid activation.
+</div>
+<div class="notes">
+<p>First read panel a: BatchNorm trains faster on this MNIST experiment. Then compare panels b and c.&nbsp;These are not histograms; they trace three percentiles of one typical pre-sigmoid input as training proceeds. The original interpretation was that stabilizing this distribution reduces internal covariate shift. Present that as the 2015 hypothesis, not yet as settled mechanism.</p>
+</div>
+</section>
+<section id="stable-distributions-are-not-the-whole-explanation" class="level2">
+<h2 class="anchored" data-anchor-id="stable-distributions-are-not-the-whole-explanation">Stable distributions are not the whole explanation</h2>
+<div class="bn-challenge-layout">
+<div class="bn-challenge-figure">
+<img src="assets/santurkar-figure-2.png" alt="Figure 2 from Santurkar and colleagues: standard, BatchNorm, and noisy BatchNorm networks compared through training accuracy and activation distributions.">
+</div>
+<div class="bn-challenge-logic">
+<div class="course-question-box bn-challenge-question">
+<span>THE TEST</span><strong>What if we deliberately make BatchNorm activations unstable again?</strong>
+</div>
+<div class="bn-noise-card fragment" data-fragment-index="0">
+<span>NOISY BATCHNORM</span><strong>Add time-varying noise with non-zero mean and non-unit variance after BN.</strong>
+</div>
+<div class="bn-result-card fragment" data-fragment-index="1">
+<span>RESULT</span><strong>The distributions shift strongly—yet training nearly matches ordinary BatchNorm.</strong>
+</div>
+</div>
+</div>
+<div class="course-takeaway-dark bn-evidence-takeaway fragment" data-fragment-index="2">
+<span>REVISED VIEW</span><strong>BatchNorm’s benefit cannot be explained only by stable activation distributions; smoother, more predictable optimization is a stronger candidate.</strong>
+</div>
+<div class="bn-figure-source">
+Source: <a href="https://papers.nips.cc/paper_files/paper/2018/hash/905056c1ac1dad141560467e0a99e1cf-Abstract.html">Santurkar, Tsipras, Ilyas &amp; Madry (2018), Figure 2</a>.
+</div>
+<div class="notes">
+<p>Explain the intervention, not merely the correlation. The noisy-BatchNorm model deliberately reintroduces changing means and variances after normalization. Its activation distributions are visibly unstable, but its optimization remains close to standard BatchNorm and far better than the unnormalized network. Therefore distributional stability is neither a sufficient causal explanation nor the complete story. The paper argues that BatchNorm makes the loss landscape and gradients smoother and more predictive. <span class="citation" data-cites="santurkar2018how">(Santurkar et al. 2018)</span></p>
+</div>
+</section>
+<section id="what-should-batchnorm-do-at-evaluation-time" class="level2">
+<h2 class="anchored" data-anchor-id="what-should-batchnorm-do-at-evaluation-time">What should BatchNorm do at evaluation time?</h2>
+<div class="bn-mode-stage">
+<div class="course-question-box bn-mode-question fragment fade-out" data-fragment-index="0">
+<span>QUESTION</span><strong>Training provides a mini-batch mean and variance. For one new example at evaluation time, which statistics should BatchNorm use?</strong><small>Predict the behavior before revealing the two designs.</small>
+</div>
+<div class="bn-mode-answer bn-mode-scaffold fragment fade-in-then-out" data-fragment-index="0">
+<div class="bn-mode-empty-box bn-mode-empty-left">
+<h3 class="anchored">
+TRAINING
+</h3>
+<div class="bn-code-caption">
+Use the current mini-batch
+</div>
+<pre><code><span class="py-kw">def</span> <span class="py-fn">batch_norm_train</span>(x, gamma, beta,
+                     eps=<span class="py-num">1e-5</span>):
+    <span class="py-comment"># x: (B, C, W)</span>
+    <span class="py-comment"># Reduce batch and width.</span>
+    mean = x.<span class="py-fn">mean</span>(
+        axis=(<span class="py-num">0</span>, <span class="py-num">2</span>), keepdims=<span class="py-kw">True</span>
+    )
+    var = x.<span class="py-fn">var</span>(
+        axis=(<span class="py-num">0</span>, <span class="py-num">2</span>), keepdims=<span class="py-kw">True</span>
+    )
+
+    x_hat = (x - mean) / np.<span class="py-fn">sqrt</span>(
+        var + eps
+    )
+    <span class="py-kw">return</span> gamma * x_hat + beta</code></pre>
+<div class="bn-no-running-note">
+NOTHING IS SAVED AFTER THE CALL
+</div>
+</div>
+<div class="bn-mode-empty-box bn-mode-empty-right">
+<h3 class="anchored">
+VALIDATION
+</h3>
+<div class="bn-code-caption">
+Recover population statistics first
+</div>
+<pre><code><span class="py-kw">def</span> <span class="py-fn">batch_norm_eval</span>(x, train_x,
+                    gamma, beta,
+                    eps=<span class="py-num">1e-5</span>):
+    <span class="py-comment"># train_x: activations from</span>
+    <span class="py-comment"># ALL training examples.</span>
+<span class="py-costly-block">    mean = train_x.<span class="py-fn">mean</span>(
+        axis=(<span class="py-num">0</span>, <span class="py-num">2</span>), keepdims=<span class="py-kw">True</span>
+    )
+    var = train_x.<span class="py-fn">var</span>(
+        axis=(<span class="py-num">0</span>, <span class="py-num">2</span>), keepdims=<span class="py-kw">True</span>
+    )</span>
+
+    x_hat = (x - mean) / np.<span class="py-fn">sqrt</span>(
+        var + eps
+    )
+    <span class="py-kw">return</span> gamma * x_hat + beta</code></pre>
+<div class="bn-eval-cost">
+<span>BOTTLENECK</span><strong>Every evaluation repeats a full pass over all training activations.</strong>
+</div>
+</div>
+</div>
+<div class="bn-mode-answer bn-mode-scaffold bn-practical fragment" data-fragment-index="1">
+<div class="bn-mode-empty-box bn-mode-empty-left bn-practical-box">
+<h3 class="anchored">
+TRAINING
+</h3>
+<div class="bn-code-caption">
+Normalize now—and update the memory
+</div>
+<pre><code><span class="py-kw">def</span> <span class="py-fn">batch_norm_train</span>(x, gamma, beta,
+                     running_mean,
+                     running_var,
+                     momentum=<span class="py-num">0.1</span>, eps=<span class="py-num">1e-5</span>):
+    mean = x.<span class="py-fn">mean</span>(axis=(<span class="py-num">0</span>, <span class="py-num">2</span>), keepdims=<span class="py-kw">True</span>)
+    var = x.<span class="py-fn">var</span>(axis=(<span class="py-num">0</span>, <span class="py-num">2</span>), keepdims=<span class="py-kw">True</span>)
+
+<span class="py-running-block">    running_mean *= <span class="py-num">1</span> - momentum
+    running_mean += momentum * mean
+    running_var  *= <span class="py-num">1</span> - momentum
+    running_var  += momentum * var</span>
+
+    x_hat = (x - mean) / np.<span class="py-fn">sqrt</span>(var + eps)
+    <span class="py-kw">return</span> gamma * x_hat + beta</code></pre>
+<div class="bn-running-note">
+EXPONENTIAL UPDATE AFTER EVERY MINI-BATCH
+</div>
+</div>
+<div class="bn-mode-empty-box bn-mode-empty-right bn-practical-box">
+<h3 class="anchored">
+VALIDATION
+</h3>
+<div class="bn-code-caption">
+Reuse the frozen running statistics
+</div>
+<pre><code><span class="py-kw">def</span> <span class="py-fn">batch_norm_eval</span>(x, gamma, beta,
+                    running_mean,
+                    running_var,
+                    eps=<span class="py-num">1e-5</span>):
+<span class="py-constant-block">    x_hat = (x - running_mean) / np.<span class="py-fn">sqrt</span>(
+        running_var + eps
+    )
+    <span class="py-kw">return</span> gamma * x_hat + beta</span></code></pre>
+<div class="bn-eval-fast">
+<span>CONSTANT-SIZE STATE</span><strong>No training data and no batch statistics: evaluation reads μ̄ and v̄ directly.</strong><small>Cost is independent of the training-set size.</small>
+</div>
+</div>
+</div>
+</div>
+<div class="notes">
+<p>Pause on the yellow question because this is the course’s first layer whose forward behavior changes between training and evaluation. The first answer deliberately stores no running statistics, forcing evaluation to recover population statistics from all training activations. On the next advancement, replace it with the practical implementation. Training still normalizes with current-batch statistics, while exponential updates maintain running estimates. Evaluation reads those frozen arrays directly. “Constant” means independent of training-set size; the elementwise transform still scales with the number of activations. Frameworks differ in whether their momentum argument denotes the old-statistic or new-batch coefficient.</p>
+</div>
+</section>
+<section id="batchnorm-powerful-but-not-free" class="level2">
+<h2 class="anchored" data-anchor-id="batchnorm-powerful-but-not-free">BatchNorm: powerful, but not free</h2>
+<div class="bn-progress-banner">
+<span>SECTION CHECKPOINT</span><strong>We can now explain what BatchNorm buys—and what complexity it introduces.</strong>
+</div>
+<div class="bn-progress-grid">
+<div class="bn-progress-card bn-progress-value fragment" data-fragment-index="0">
+<div class="bn-progress-icon">
+↗
+</div>
+<span>WHY USE IT?</span><strong>Easier optimization</strong>
+<ul>
+<li>
+Supports larger learning rates
+</li>
+<li>
+Reduces sensitivity to initialization
+</li>
+<li>
+Keeps activation scales manageable
+</li>
+<li>
+Adds useful mini-batch noise
+</li>
+</ul>
+</div>
+<div class="bn-progress-card bn-progress-state fragment" data-fragment-index="1">
+<div class="bn-progress-icon">
+⚙
+</div>
+<span>IMPLEMENT IT CAREFULLY</span><strong>A stateful layer</strong>
+<ul>
+<li>
+Reduce over the correct tensor axes
+</li>
+<li>
+Learn γ and β by backpropagation
+</li>
+<li>
+Track running mean and variance
+</li>
+<li>
+Switch explicitly between train and eval
+</li>
+</ul>
+</div>
+<div class="bn-progress-card bn-progress-cost fragment" data-fragment-index="2">
+<div class="bn-progress-icon">
+!
+</div>
+<span>WHERE CAN IT HURT?</span><strong>The batch becomes part of the model</strong>
+<ul>
+<li>
+Small batches give noisy statistics
+</li>
+<li>
+Examples influence one another
+</li>
+<li>
+Stale running statistics create eval gaps
+</li>
+<li>
+Distributed training may require synchronization
+</li>
+</ul>
+</div>
+</div>
+<div class="course-takeaway-dark bn-progress-takeaway fragment" data-fragment-index="3">
+<span>TAKEAWAY</span><strong>BatchNorm improves the optimization problem, but it introduces batch dependence, persistent state, and two forward-pass behaviors.</strong>
+</div>
+<div class="bn-figure-source">
+Further study: <a href="https://github.com/karpathy/nn-zero-to-hero">Karpathy, Neural Networks: Zero to Hero · Lecture 4</a> · <a href="https://proceedings.mlr.press/v37/ioffe15.html">Ioffe &amp; Szegedy (2015)</a> · <a href="https://papers.nips.cc/paper_files/paper/2018/hash/905056c1ac1dad141560467e0a99e1cf-Abstract.html">Santurkar et al.&nbsp;(2018)</a>
+</div>
+<div class="notes">
+<p>Use this as the BatchNorm section checkpoint. The left card summarizes the empirical reasons BatchNorm became influential. The middle card names the details students must implement correctly: axes, affine parameters, running buffers, and modes. The right card names the practical objections often emphasized in implementation-focused teaching such as Karpathy’s Zero to Hero lecture: examples become coupled through batch statistics, small batches are unreliable, and the train/eval split creates opportunities for bugs. Add that SyncBatchNorm can improve global statistics in distributed training but introduces communication cost. The mechanism behind the optimization benefit should remain stated cautiously after the Santurkar et al.&nbsp;result.</p>
+</div>
+</section>
+<section id="generalization-begins-where-training-loss-ends" class="level2">
+<h2 class="anchored" data-anchor-id="generalization-begins-where-training-loss-ends">Generalization begins where training loss ends</h2>
+<div class="generalization-section-tag">
+<span>04 / 06</span><strong>GENERALIZATION &amp; REGULARIZATION</strong>
+</div>
+<div class="generalization-curve-stage">
+<svg class="nostretch" viewbox="0 0 1260 500" role="img" aria-label="Training loss keeps falling while validation loss eventually rises, creating a generalization gap.">
+  <defs><marker id="gen-arrow" markerwidth="8" markerheight="8" refx="7" refy="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#ef5b3f"></path></marker></defs>
+  <line x1="105" y1="430" x2="1170" y2="430" class="gen-axis"></line>
+  <line x1="105" y1="430" x2="105" y2="55" class="gen-axis"></line>
+  <text x="638" y="478" text-anchor="middle" class="gen-axis-label">training time →</text>
+  <text x="35" y="245" text-anchor="middle" transform="rotate(-90 35 245)" class="gen-axis-label">loss</text>
+
+  <g class="fragment" data-fragment-index="0">
+    <path d="M115 95 C250 160,340 245,470 305 C650 382,860 405,1155 416" class="gen-train-curve"></path>
+    <rect x="785" y="365" width="230" height="47" rx="12" class="gen-train-label-bg"></rect>
+    <text x="900" y="395" text-anchor="middle" class="gen-train-label">TRAINING LOSS</text>
+  </g>
+
+  <g class="fragment fade-in-then-out" data-fragment-index="1">
+    <rect x="690" y="72" width="420" height="132" rx="18" class="gen-question-bg"></rect>
+    <text x="720" y="106" class="gen-question-kicker">QUESTION</text>
+    <text x="720" y="145" class="gen-question-text">If this curve keeps improving,</text>
+    <text x="720" y="177" class="gen-question-text">is the model necessarily getting better?</text>
+  </g>
+
+  <g class="fragment" data-fragment-index="2">
+    <path d="M115 120 C250 190,360 286,505 326 C625 355,705 338,775 300 C895 235,1010 170,1155 112" class="gen-val-curve"></path>
+    <line x1="625" y1="70" x2="625" y2="430" class="gen-best-line"></line>
+    <circle cx="625" cy="349" r="11" class="gen-best-dot"></circle>
+    <text x="625" y="48" text-anchor="middle" class="gen-best-label">BEST VALIDATION POINT</text>
+    <rect x="875" y="115" width="230" height="47" rx="12" class="gen-val-label-bg"></rect>
+    <text x="990" y="145" text-anchor="middle" class="gen-val-label">VALIDATION LOSS</text>
+    <path d="M965 222 C930 270,890 315,845 352" class="gen-gap-arrow" marker-end="url(#gen-arrow)"></path>
+    <text x="975" y="250" class="gen-gap-label">generalization gap grows</text>
+  </g>
+</svg>
+</div>
+<div class="course-takeaway-dark generalization-first-takeaway fragment" data-fragment-index="3">
+<span>THE NEW PROBLEM</span><strong>Optimization asks, “Can we fit the training data?” Generalization asks, “Will what we learned survive new data?”</strong>
+</div>
+<div class="notes">
+<p>This is the single opening slide for the new section. Begin with the training curve only, then ask students whether continued improvement guarantees a better model. Reveal the validation curve: it improves at first, reaches a minimum, and then worsens while training loss continues to fall. Name the widening separation the generalization gap. This concrete observation motivates regularization; do not define a catalogue of methods yet.</p>
+</div>
+</section>
+<section id="which-evidence-may-choose-the-model" class="level2">
+<h2 class="anchored" data-anchor-id="which-evidence-may-choose-the-model">Which evidence may choose the model?</h2>
+<div class="course-question-box split-role-question">
+<span>RETRIEVAL · PAUSE 20 SECONDS</span><strong>We saved three checkpoints. Which dataset is allowed to choose the one we keep?</strong>
+</div>
+<div class="model-selection-flow">
+<div class="selection-stage selection-train fragment" data-fragment-index="0">
+<span>TRAIN</span><strong>Fit the weights</strong><small>Produce candidate checkpoints</small>
+<div class="checkpoint-stack" aria-label="Three candidate model checkpoints">
+<i>θ₁</i><i>θ₂</i><i>θ₃</i>
+</div>
+</div>
+<div class="selection-arrow fragment" data-fragment-index="1" aria-hidden="true">
+<i></i><b>compare</b>
+</div>
+<div class="selection-stage selection-validation fragment" data-fragment-index="1">
+<span>VALIDATION</span><strong>Choose θ₂</strong><small>Lowest validation loss</small>
+<div class="validation-scores">
+<i><b>θ₁</b><em>0.42</em></i><i class="selected"><b>θ₂</b><em>0.31</em></i><i><b>θ₃</b><em>0.39</em></i>
+</div>
+</div>
+<div class="selection-arrow fragment" data-fragment-index="2" aria-hidden="true">
+<i></i><b>once</b>
+</div>
+<div class="selection-stage selection-test fragment" data-fragment-index="2">
+<span>TEST</span><strong>Report θ₂</strong><small>Final unbiased estimate</small>
+<div class="test-seal">
+OPEN<br>ONCE
+</div>
+</div>
+</div>
+<div class="course-takeaway-dark split-role-takeaway fragment" data-fragment-index="3">
+<span>THE BOUNDARY</span><strong>If test performance changes which checkpoint we keep, the test set has joined the training process.</strong>
+</div>
+<div class="notes">
+<p>Budget about two minutes. This retrieves the train/validation/test distinction introduced in Lecture 1 and applies it to the curve on the previous slide. Ask for the decision before revealing the flow. Training produces candidate parameter states; validation evidence chooses among them; the untouched test set is opened only after all model and checkpoint decisions are fixed. “Unbiased” here means with respect to this selection process, assuming the test examples represent the target distribution. Repeatedly checking the test score and revising the model leaks information even if no gradient is computed on test examples.</p>
+</div>
+</section>
+<section id="perfect-training-fit-leaves-the-boundary-undecided" class="level2">
+<h2 class="anchored" data-anchor-id="perfect-training-fit-leaves-the-boundary-undecided">Perfect training fit leaves the boundary undecided</h2>
+<div class="boundary-comparison">
+<div class="boundary-candidate fragment" data-fragment-index="0">
+<span>MODEL A · TRAIN 100%</span><strong>A smooth boundary</strong><svg viewbox="0 0 500 310" role="img" aria-label="Training points separated by a smooth decision boundary, with validation points revealed later."><rect x="4" y="4" width="492" height="302" rx="18" class="boundary-canvas"></rect><path d="M65 270 C155 190 195 202 265 145 C330 93 380 104 445 42" class="candidate-line smooth-line"></path><g class="class-a-points"><circle cx="80" cy="72" r="10"></circle><circle cx="125" cy="105" r="10"></circle><circle cx="157" cy="72" r="10"></circle><circle cx="195" cy="128" r="10"></circle><circle cx="236" cy="96" r="10"></circle><circle cx="280" cy="67" r="10"></circle></g><g class="class-b-points"><path d="M205 244 l11 20 h-22 z"></path><path d="M256 220 l11 20 h-22 z"></path><path d="M310 246 l11 20 h-22 z"></path><path d="M351 191 l11 20 h-22 z"></path><path d="M402 222 l11 20 h-22 z"></path><path d="M432 164 l11 20 h-22 z"></path></g><g class="validation-points fragment" data-fragment-index="2"><circle cx="105" cy="151" r="10"></circle><circle cx="226" cy="162" r="10"></circle><circle cx="331" cy="117" r="10"></circle><path d="M151 197 l11 20 h-22 z"></path><path d="M286 186 l11 20 h-22 z"></path><path d="M390 142 l11 20 h-22 z"></path></g></svg><small class="boundary-result fragment" data-fragment-index="2">VALIDATION · 6 / 6 correct</small>
+</div>
+<div class="boundary-candidate fragment" data-fragment-index="0">
+<span>MODEL B · TRAIN 100%</span><strong>A boundary that bends around examples</strong><svg viewbox="0 0 500 310" role="img" aria-label="The same training points separated by a highly irregular decision boundary, with validation points revealed later."><rect x="4" y="4" width="492" height="302" rx="18" class="boundary-canvas"></rect><path d="M44 252 C105 215 100 151 153 165 C205 179 157 225 221 211 C275 199 242 122 305 139 C352 151 326 81 385 104 C420 118 421 75 462 44" class="candidate-line jagged-line"></path><g class="class-a-points"><circle cx="80" cy="72" r="10"></circle><circle cx="125" cy="105" r="10"></circle><circle cx="157" cy="72" r="10"></circle><circle cx="195" cy="128" r="10"></circle><circle cx="236" cy="96" r="10"></circle><circle cx="280" cy="67" r="10"></circle></g><g class="class-b-points"><path d="M205 244 l11 20 h-22 z"></path><path d="M256 220 l11 20 h-22 z"></path><path d="M310 246 l11 20 h-22 z"></path><path d="M351 191 l11 20 h-22 z"></path><path d="M402 222 l11 20 h-22 z"></path><path d="M432 164 l11 20 h-22 z"></path></g><g class="validation-points fragment" data-fragment-index="2"><circle cx="105" cy="151" r="10"></circle><circle cx="226" cy="162" r="10"></circle><circle cx="331" cy="117" r="10"></circle><path d="M151 197 l11 20 h-22 z"></path><path d="M286 186 l11 20 h-22 z"></path><path d="M390 142 l11 20 h-22 z"></path></g></svg><small class="boundary-result boundary-result-poor fragment" data-fragment-index="2">VALIDATION · 3 / 6 correct</small>
+</div>
+</div>
+<div class="course-question-box boundary-choice-question fragment fade-in-then-out" data-fragment-index="1">
+<span>PREDICT BEFORE REVEALING VALIDATION</span><strong>Both models classify every training example correctly. Which one should we trust—and what evidence is still missing?</strong>
+</div>
+<div class="course-takeaway-dark boundary-choice-takeaway fragment" data-fragment-index="3">
+<span>THE UNDERSPECIFICATION</span><strong>Training fit does not uniquely determine the rule between examples; generalization requires a preference among fitting solutions.</strong>
+</div>
+<div class="notes">
+<p>Budget about three minutes. Reveal both candidate boundaries with training points only. They have identical training accuracy, so the observed training data cannot decide between them. Pause on the overlaid question before revealing the six validation points in each panel. Model A classifies all six correctly; Model B fails on half because its local bends followed the particular training sample rather than the broader separation. The picture is schematic: smoothness is a useful low-dimensional intuition, not a universal definition of generalization in neural networks. End by naming the new need—a preference among solutions—which motivates regularization on the next slide.</p>
+</div>
+</section>
+<section id="regularization-writes-that-preference-into-the-objective" class="level2">
+<h2 class="anchored" data-anchor-id="regularization-writes-that-preference-into-the-objective">Regularization writes that preference into the objective</h2>
+<div class="regularization-choice">
+<div class="regularization-candidate candidate-a">
+<span>MODEL A · SMOOTHER RULE</span>
+<div>
+<b>training loss</b><strong>0.08</strong>
+</div>
+<div class="fragment" data-fragment-index="1">
+<b>complexity score Ω</b><strong>0.60</strong>
+</div>
+</div>
+<div class="regularization-candidate candidate-b">
+<span>MODEL B · MORE BENDS</span>
+<div>
+<b>training loss</b><strong>0.08</strong>
+</div>
+<div class="fragment" data-fragment-index="1">
+<b>complexity score Ω</b><strong>2.40</strong>
+</div>
+</div>
+</div>
+<div class="course-question-box regularization-question fragment fade-in-then-out" data-fragment-index="0">
+<span>THE TRAINING LOSS SEES A TIE</span><strong>How can the optimization objective express our preference for Model A?</strong>
+</div>
+<div class="regularized-objective fragment" data-fragment-index="1">
+<div class="objective-fit">
+<span>FIT THE OBSERVED DATA</span><strong>training loss</strong><small>0.08</small>
+</div>
+<b>+</b>
+<div class="objective-control">
+<span>CONTROL THE SOLUTION</span><strong>λ · Ω(θ)</strong><small>preference strength × penalty</small>
+</div>
+<b>=</b>
+<div class="objective-total">
+<span>OBJECTIVE TO MINIMIZE</span><strong>regularized loss</strong><small>fit + preference</small>
+</div>
+</div>
+<div class="lambda-comparison fragment" data-fragment-index="2">
+<div>
+<span>WITH λ = 0.10</span><strong>Model A: 0.08 + 0.10(0.60) = <b>0.14</b></strong>
+</div>
+<div>
+<span>SAME TRAINING FIT</span><strong>Model B: 0.08 + 0.10(2.40) = <b>0.32</b></strong>
+</div>
+</div>
+<div class="course-takeaway-dark regularization-takeaway fragment" data-fragment-index="3">
+<span>REGULARIZATION</span><strong>Do not merely ask for a solution that fits—state which fitting solutions the learning process should prefer.</strong>
+</div>
+<div class="notes">
+<p>Budget about three minutes. Start from the two boundaries on the previous slide: both receive the same training loss, so that objective alone is indifferent. Ask how to encode the desired preference before revealing the penalty scores and formula. Ω is deliberately generic here; it measures whatever property we choose to discourage, and smaller is preferred. Work the numbers with λ = 0.10 so students see that the additional term breaks the tie. Stress that λ controls the trade-off and that validation evidence, not the training objective itself, tells us whether the chosen preference improves generalization. The next slide can make Ω concrete with an L2 weight penalty.</p>
+</div>
+</section>
+<section id="choose-where-the-constraint-enters" class="level2">
+<h2 class="anchored" data-anchor-id="choose-where-the-constraint-enters">Choose where the constraint enters</h2>
+<div class="regularization-system-map">
+<div class="generalization-gap-core">
+<span>OBSERVED SYMPTOM</span><strong>training improves</strong><i></i><strong>validation worsens</strong><small>one gap · several possible interventions</small>
+</div>
+<div class="regularization-lever lever-weights fragment" data-fragment-index="0">
+<b>01</b>
+<div>
+<span>PARAMETERS</span><strong>L2 / weight decay</strong><small>Prefer solutions that rely less on large weights.</small>
+</div>
+</div>
+<div class="regularization-lever lever-data fragment" data-fragment-index="1">
+<b>02</b>
+<div>
+<span>DATA</span><strong>Augmentation</strong><small>Encode useful invariances and expose more variation.</small>
+</div>
+</div>
+<div class="regularization-lever lever-capacity fragment" data-fragment-index="2">
+<b>03</b>
+<div>
+<span>HYPOTHESIS</span><strong>Model capacity</strong><small>Use an architecture whose flexibility matches the evidence.</small>
+</div>
+</div>
+<div class="regularization-lever lever-training fragment" data-fragment-index="3">
+<b>04</b>
+<div>
+<span>TRAINING DYNAMICS</span><strong>Dropout · early stopping</strong><small>Intervene in the computation or in how long fitting continues.</small>
+</div>
+</div>
+</div>
+<div class="course-takeaway-dark regularization-checkpoint fragment" data-fragment-index="4">
+<span>SECTION CHECKPOINT</span><strong>Regularization proposes a bias; validation evidence decides whether that bias improves generalization.</strong><small>NEXT · Dropout and early stopping</small>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Treat this as synthesis, not a survey lecture: students already know the individual regularization families. Start from the shared symptom in the center and reveal the intervention points clockwise. Emphasize that these methods act on different parts of the five-part learning system: parameters, data, hypothesis, and optimization trajectory. They are therefore not interchangeable, and stacking more of them is not automatically better. Validation evidence chooses both the intervention and its strength. End on the fourth card; dropout and early stopping now become the next section’s concrete mechanisms rather than unexplained names in a catalogue.</p>
+</div>
+</section>
+<section id="a-classifier-can-lean-too-heavily-on-one-feature" class="level2">
+<h2 class="anchored" data-anchor-id="a-classifier-can-lean-too-heavily-on-one-feature">A classifier can lean too heavily on one feature</h2>
+<div class="dropout-section-tag">
+<span>05 / 06</span><strong>DROPOUT &amp; EARLY STOPPING</strong>
+</div>
+<div class="feature-dependence-layout">
+<div class="cifar-evidence">
+<img src="../01-what-is-learning/assets/cs231n-cifar10-classes.jpg" alt="Examples from all ten CIFAR-10 classes, including dogs photographed against varied backgrounds.">
+<div class="dog-row-highlight" aria-hidden="true">
+
+</div>
+<span>TRAINING EVIDENCE · DOG CLASS</span><small>Many cues may correlate with the label.</small>
+</div>
+<div class="feature-vote-stage">
+<div class="feature-vote vote-shape fragment" data-fragment-index="0">
+<i></i>
+<div>
+<span>MUZZLE SHAPE</span><strong>+1.1</strong>
+</div>
+</div>
+<div class="feature-vote vote-fur fragment" data-fragment-index="0">
+<i></i>
+<div>
+<span>FUR TEXTURE</span><strong>+0.9</strong>
+</div>
+</div>
+<div class="feature-vote vote-background fragment" data-fragment-index="0">
+<i></i>
+<div>
+<span>BACKGROUND CUE</span><strong>+4.8</strong>
+</div>
+<b>DOMINANT PATH</b>
+</div>
+<div class="prediction-meter fragment" data-fragment-index="0">
+<span>DOG SCORE</span>
+<div>
+<i style="--score-width:92%"></i>
+</div>
+<strong>92%</strong>
+</div>
+<div class="feature-ablation fragment" data-fragment-index="1">
+<div>
+<span>NEW IMAGE · BACKGROUND CUE ABSENT</span><strong>The dominant activation disappears.</strong>
+</div>
+<div class="ablated-node">
+<i></i><b>×</b>
+</div>
+<div class="prediction-drop">
+<small>DOG SCORE</small><em>92%</em><b>→</b><strong>41%</strong>
+</div>
+</div>
+</div>
+</div>
+<div class="course-question-box feature-dependence-question fragment fade-in-then-out" data-fragment-index="2">
+<span>PREDICT THE TRAINING INTERVENTION</span><strong>How could we stop one convenient pathway from becoming indispensable?</strong>
+</div>
+<div class="course-takeaway-dark feature-dependence-takeaway fragment" data-fragment-index="3">
+<span>THE DROPOUT IDEA</span><strong>During training, repeatedly remove random activations so the prediction must survive different combinations of evidence.</strong>
+</div>
+<div class="dropout-figure-source">
+Image examples: <a href="https://cs231n.github.io/classification/">Stanford CS231n course notes · Image Classification</a>
+</div>
+<div class="notes">
+<p>Budget about three minutes. Use the CIFAR-10 dog row as the concrete setting, but state that the feature scores are a course-made schematic rather than measurements from these exact images. Reveal the three feature votes together: the classifier is correct, yet most of its confidence comes from one background cue. On the next advancement, remove that activation and show the score collapse. Ask students for an intervention before naming dropout. The intended answer is not “delete the bad feature”—we generally do not know in advance which learned feature will become brittle. Reveal the dropout idea: randomly removing activations during training forces the rest of the network to remain useful. Do not explain masks or scaling yet; those are the next slides.</p>
+</div>
+</section>
+<section id="each-training-pass-samples-a-different-subnetwork" class="level2">
+<h2 class="anchored" data-anchor-id="each-training-pass-samples-a-different-subnetwork">Each training pass samples a different subnetwork</h2>
+<div class="dropout-network-stage">
+<div class="dropout-network-frame frame-full fragment fade-in-then-out" data-fragment-index="0"><div class="network-frame-heading"><span>THE STORED ARCHITECTURE</span><strong>Every unit and weight exists</strong><small>Nothing has been permanently removed.</small></div><svg viewbox="0 0 1180 500" role="img" aria-label="A fully connected network with four input nodes, five hidden nodes, and two output nodes, all active."><g class="network-edges input-edges"><path d="M135 95 L545 65 M135 95 L545 155 M135 95 L545 245 M135 95 L545 335 M135 95 L545 425 M135 200 L545 65 M135 200 L545 155 M135 200 L545 245 M135 200 L545 335 M135 200 L545 425 M135 305 L545 65 M135 305 L545 155 M135 305 L545 245 M135 305 L545 335 M135 305 L545 425 M135 410 L545 65 M135 410 L545 155 M135 410 L545 245 M135 410 L545 335 M135 410 L545 425"></path></g><g class="network-edges output-edges"><path d="M595 65 L1025 175 M595 65 L1025 325 M595 155 L1025 175 M595 155 L1025 325 M595 245 L1025 175 M595 245 L1025 325 M595 335 L1025 175 M595 335 L1025 325 M595 425 L1025 175 M595 425 L1025 325"></path></g><g class="network-column-labels"><text x="110" y="485">INPUT</text><text x="570" y="485">HIDDEN ACTIVATIONS</text><text x="1050" y="485">OUTPUT</text></g><g class="input-nodes"><circle cx="110" cy="95" r="25"></circle><circle cx="110" cy="200" r="25"></circle><circle cx="110" cy="305" r="25"></circle><circle cx="110" cy="410" r="25"></circle></g><g class="hidden-nodes"><circle cx="570" cy="65" r="27"></circle><circle cx="570" cy="155" r="27"></circle><circle cx="570" cy="245" r="27"></circle><circle cx="570" cy="335" r="27"></circle><circle cx="570" cy="425" r="27"></circle></g><g class="output-nodes"><circle cx="1050" cy="175" r="29"></circle><circle cx="1050" cy="325" r="29"></circle></g><g class="node-labels"><text x="110" y="101">x₁</text><text x="110" y="206">x₂</text><text x="110" y="311">x₃</text><text x="110" y="416">x₄</text><text x="570" y="71">h₁</text><text x="570" y="161">h₂</text><text x="570" y="251">h₃</text><text x="570" y="341">h₄</text><text x="570" y="431">h₅</text><text x="1050" y="181">ŷ₁</text><text x="1050" y="331">ŷ₂</text></g></svg></div>
+<div class="dropout-network-frame frame-a fragment fade-in-then-out" data-fragment-index="1"><div class="network-frame-heading"><span>TRAINING PASS A · MASK [1, 0, 1, 1, 0]</span><strong>h₂ and h₅ are inactive for this pass</strong><small>Their incoming and outgoing paths carry no signal.</small></div><svg viewbox="0 0 1180 500" role="img" aria-label="Training pass A with hidden nodes two and five crossed out and their incident connections faded."><g class="network-edges input-edges"><path d="M135 95 L545 65 M135 200 L545 65 M135 305 L545 65 M135 410 L545 65 M135 95 L545 245 M135 200 L545 245 M135 305 L545 245 M135 410 L545 245 M135 95 L545 335 M135 200 L545 335 M135 305 L545 335 M135 410 L545 335"></path></g><g class="network-edges dropped-edges"><path d="M135 95 L545 155 M135 200 L545 155 M135 305 L545 155 M135 410 L545 155 M135 95 L545 425 M135 200 L545 425 M135 305 L545 425 M135 410 L545 425 M595 155 L1025 175 M595 155 L1025 325 M595 425 L1025 175 M595 425 L1025 325"></path></g><g class="network-edges output-edges"><path d="M595 65 L1025 175 M595 65 L1025 325 M595 245 L1025 175 M595 245 L1025 325 M595 335 L1025 175 M595 335 L1025 325"></path></g><g class="network-column-labels"><text x="110" y="485">INPUT</text><text x="570" y="485">HIDDEN ACTIVATIONS</text><text x="1050" y="485">OUTPUT</text></g><g class="input-nodes"><circle cx="110" cy="95" r="25"></circle><circle cx="110" cy="200" r="25"></circle><circle cx="110" cy="305" r="25"></circle><circle cx="110" cy="410" r="25"></circle></g><g class="hidden-nodes"><circle cx="570" cy="65" r="27"></circle><circle class="dropped-node" cx="570" cy="155" r="27"></circle><circle cx="570" cy="245" r="27"></circle><circle cx="570" cy="335" r="27"></circle><circle class="dropped-node" cx="570" cy="425" r="27"></circle></g><g class="dropout-crosses"><path d="M551 136 L589 174 M589 136 L551 174 M551 406 L589 444 M589 406 L551 444"></path></g><g class="output-nodes"><circle cx="1050" cy="175" r="29"></circle><circle cx="1050" cy="325" r="29"></circle></g><g class="node-labels"><text x="110" y="101">x₁</text><text x="110" y="206">x₂</text><text x="110" y="311">x₃</text><text x="110" y="416">x₄</text><text x="570" y="71">h₁</text><text x="570" y="251">h₃</text><text x="570" y="341">h₄</text><text x="1050" y="181">ŷ₁</text><text x="1050" y="331">ŷ₂</text></g></svg></div>
+<div class="dropout-network-frame frame-b fragment" data-fragment-index="2"><div class="network-frame-heading"><span>TRAINING PASS B · MASK [0, 1, 1, 0, 1]</span><strong>A different subnetwork receives the next mini-batch</strong><small>The parameters persist; only the sampled computation changes.</small></div><svg viewbox="0 0 1180 500" role="img" aria-label="Training pass B with hidden nodes one and four crossed out and their incident connections faded."><g class="network-edges input-edges"><path d="M135 95 L545 155 M135 200 L545 155 M135 305 L545 155 M135 410 L545 155 M135 95 L545 245 M135 200 L545 245 M135 305 L545 245 M135 410 L545 245 M135 95 L545 425 M135 200 L545 425 M135 305 L545 425 M135 410 L545 425"></path></g><g class="network-edges dropped-edges"><path d="M135 95 L545 65 M135 200 L545 65 M135 305 L545 65 M135 410 L545 65 M135 95 L545 335 M135 200 L545 335 M135 305 L545 335 M135 410 L545 335 M595 65 L1025 175 M595 65 L1025 325 M595 335 L1025 175 M595 335 L1025 325"></path></g><g class="network-edges output-edges"><path d="M595 155 L1025 175 M595 155 L1025 325 M595 245 L1025 175 M595 245 L1025 325 M595 425 L1025 175 M595 425 L1025 325"></path></g><g class="network-column-labels"><text x="110" y="485">INPUT</text><text x="570" y="485">HIDDEN ACTIVATIONS</text><text x="1050" y="485">OUTPUT</text></g><g class="input-nodes"><circle cx="110" cy="95" r="25"></circle><circle cx="110" cy="200" r="25"></circle><circle cx="110" cy="305" r="25"></circle><circle cx="110" cy="410" r="25"></circle></g><g class="hidden-nodes"><circle class="dropped-node" cx="570" cy="65" r="27"></circle><circle cx="570" cy="155" r="27"></circle><circle cx="570" cy="245" r="27"></circle><circle class="dropped-node" cx="570" cy="335" r="27"></circle><circle cx="570" cy="425" r="27"></circle></g><g class="dropout-crosses"><path d="M551 46 L589 84 M589 46 L551 84 M551 316 L589 354 M589 316 L551 354"></path></g><g class="output-nodes"><circle cx="1050" cy="175" r="29"></circle><circle cx="1050" cy="325" r="29"></circle></g><g class="node-labels"><text x="110" y="101">x₁</text><text x="110" y="206">x₂</text><text x="110" y="311">x₃</text><text x="110" y="416">x₄</text><text x="570" y="161">h₂</text><text x="570" y="251">h₃</text><text x="570" y="431">h₅</text><text x="1050" y="181">ŷ₁</text><text x="1050" y="331">ŷ₂</text></g></svg></div>
+</div>
+<div class="course-takeaway-dark subnetwork-takeaway fragment" data-fragment-index="3">
+<span>ONE MODEL · MANY COMPUTATIONS</span><strong>Dropout samples a new subnetwork for each training pass, so useful pathways must work in changing company.</strong>
+</div>
+<div class="dropout-paper-source">
+Course-made diagram of the dropout mechanism. <span class="citation" data-cites="srivastava2014dropout">(Srivastava et al. 2014)</span>
+</div>
+<div class="notes">
+<p>Budget about three minutes. First reveal the stored architecture and make clear that every node and parameter belongs to one model. Replace it with training pass A: the crossed nodes are inactive and every incident edge is faded because no signal or gradient travels through those paths on this pass. Replace that frame with pass B and ask students to identify what remained the same: the stored parameters and architecture. What changed is the sampled binary mask and therefore the active computation. “Subnetwork” is a useful interpretation, but the implementation is an activation mask rather than repeatedly constructing and destroying model objects. Standard elementwise dropout typically samples masks independently across examples; the diagram isolates one example so its active subnetwork remains readable. The following slide will formalize that mask and explain its scaling.</p>
+</div>
+</section>
+<section id="masking-changes-the-scaleunless-we-compensate" class="level2">
+<h2 class="anchored" data-anchor-id="masking-changes-the-scaleunless-we-compensate">Masking changes the scale—unless we compensate</h2>
+<div class="dropout-expectation-prompt">
+<div class="expectation-column activation-column">
+<span>ACTIVATION</span><strong>X</strong><small>the activation before dropout</small>
+</div>
+<div class="expectation-column mask-column">
+<span>RANDOM MASK</span><strong>M ∼ Bernoulli(q)</strong><small>M is independent of X · E[M] = q</small>
+</div>
+<div class="exercise-pause expectation-pause">
+<span>PAUSE</span><b>45 seconds</b><small>Compare E[X] before masking with E[MX] afterward. What correction would preserve the expectation?</small>
+</div>
+</div>
+<div class="expectation-derivation-stage fragment" data-fragment-index="0">
+<div class="derivation-question">
+<span>1 · WHAT CHANGES?</span><strong>Raw dropout multiplies the expected activation by q.</strong>
+</div>
+<div class="derivation-lines">
+<div>
+<span>BEFORE</span><strong>E[X]</strong>
+</div>
+<b>→</b>
+<div>
+<span>AFTER RAW MASKING</span><strong>E[MX] = E[M]E[X] = qE[X]</strong><small>because M and X are independent</small>
+</div>
+</div>
+<div class="correction-question fragment" data-fragment-index="1">
+<span>2 · CHOOSE A CORRECTION c</span><strong>Find c such that E[cMX] = E[X].</strong>
+</div>
+<div class="correction-work fragment" data-fragment-index="2">
+<strong>E[cMX] = c · q · E[X] = E[X]</strong><b>⟹</b><strong>c = 1 / q</strong>
+</div>
+</div>
+<div class="scaled-example-stage fragment" data-fragment-index="3">
+<div class="example-heading">
+<span>NOW APPLY THE DERIVED RULE</span><strong>h = [2, 4, 6, 8] · q = 0.5 · m = [1, 0, 1, 0]</strong>
+</div>
+<div class="example-formula">
+<div>
+<span>INVERTED DROPOUT</span><strong>h̃ = <b>m ⊙ h</b> / q</strong>
+</div>
+<b>=</b>
+<div class="example-output">
+<i>4</i><i>0</i><i>12</i><i>0</i>
+</div>
+</div>
+<div class="example-verification">
+<span>CHECK h₃ = 6</span>
+<div>
+<i>DROP</i><strong>0</strong><small>probability 0.5</small>
+</div>
+<div>
+<i>KEEP + SCALE</i><strong>12</strong><small>probability 0.5</small>
+</div>
+<b>E[h̃₃] = 0.5(0) + 0.5(12) = 6</b>
+</div>
+</div>
+<div class="course-takeaway-dark expectation-takeaway fragment" data-fragment-index="4">
+<span>THE REASON FOR ÷ q</span><strong>E[(M ⊙ X) / q] = E[X]: evaluation can use every activation without changing the expected scale.</strong><small>q = keep probability · many APIs instead request p = 1 − q</small>
+</div>
+<div class="notes">
+<p>Budget about four minutes including the pause. Keep the two definitions visible and ask students for the expectation before and after raw masking. Reveal the derivation: because the Bernoulli mask is sampled independently of the activation, E[MX] = E[M]E[X] = qE[X]. Next ask for a multiplicative correction c and work from the preservation requirement E[cMX] = E[X] to c = 1/q. On the next advancement, remove the symbolic derivation and replace it with the vector example. Verify one coordinate explicitly: when h₃ = 6 and q = 0.5, inverted dropout produces 0 or 12 with equal probability, so its expectation is 6. A particular masked vector remains noisy; only the expectation is preserved. Close by distinguishing keep probability q from the drop probability p commonly accepted by APIs.</p>
+</div>
+</section>
+<section id="dropout-has-two-forward-pass-behaviors" class="level2">
+<h2 class="anchored" data-anchor-id="dropout-has-two-forward-pass-behaviors">Dropout has two forward-pass behaviors</h2>
+<div class="dropout-mode-stage">
+<div class="dropout-mode-card dropout-train-mode fragment" data-fragment-index="0">
+<div class="mode-heading">
+<span>TRAINING MODE</span><strong>Sample, mask, and scale</strong><small>A new random computation</small>
+</div>
+<svg viewbox="0 0 520 300" role="img" aria-label="A hidden layer in training mode with two of five activation nodes crossed out.">
+<g class="mode-flow-line"><path d="M55 150 L150 150 M370 150 L465 150"></path></g><g class="mode-active-nodes"><circle cx="260" cy="38" r="25"></circle><circle cx="260" cy="150" r="25"></circle><circle cx="260" cy="262" r="25"></circle></g><g class="mode-dropped-nodes"><circle cx="260" cy="94" r="25"></circle><circle cx="260" cy="206" r="25"></circle></g><g class="mode-crosses"><path d="M243 77 L277 111 M277 77 L243 111 M243 189 L277 223 M277 189 L243 223"></path></g><g class="mode-io-nodes"><circle cx="55" cy="150" r="31"></circle><circle cx="465" cy="150" r="31"></circle></g><g class="mode-node-labels"><text x="55" y="156">h</text><text x="465" y="156">h̃</text></g>
+</svg>
+<div class="mode-equation">
+<span>STOCHASTIC</span><strong>h̃ = (M ⊙ h) / q</strong><small>M ∼ Bernoulli(q)</small>
+</div>
+</div>
+<div class="dropout-mode-card dropout-eval-mode fragment" data-fragment-index="2">
+<div class="mode-heading">
+<span>EVALUATION MODE</span><strong>Use every activation</strong><small>One deterministic computation</small>
+</div>
+<svg viewbox="0 0 520 300" role="img" aria-label="The same hidden layer in evaluation mode with all five activation nodes active.">
+<g class="mode-flow-line eval-flow"><path d="M55 150 L150 150 M370 150 L465 150"></path></g><g class="mode-active-nodes eval-nodes"><circle cx="260" cy="38" r="25"></circle><circle cx="260" cy="94" r="25"></circle><circle cx="260" cy="150" r="25"></circle><circle cx="260" cy="206" r="25"></circle><circle cx="260" cy="262" r="25"></circle></g><g class="mode-io-nodes eval-io"><circle cx="55" cy="150" r="31"></circle><circle cx="465" cy="150" r="31"></circle></g><g class="mode-node-labels"><text x="55" y="156">h</text><text x="465" y="156">h̃</text></g>
+</svg>
+<div class="mode-equation">
+<span>DETERMINISTIC</span><strong>h̃ = h</strong><small>No mask · no additional scaling</small>
+</div>
+</div>
+</div>
+<div class="course-question-box dropout-mode-question fragment fade-in-then-out" data-fragment-index="1">
+<span>PREDICT THE EVALUATION RULE</span><strong>For one new image, should we sample another mask—or use the complete network?</strong>
+</div>
+<div class="mode-switch-strip fragment" data-fragment-index="3">
+<div>
+<span>model.train()</span><strong>random masks enabled</strong>
+</div>
+<b>⇄</b>
+<div>
+<span>model.eval()</span><strong>dropout becomes identity</strong>
+</div>
+<small>The parameters do not change when the mode changes; the forward rule does.</small>
+</div>
+<div class="course-takeaway-dark dropout-mode-takeaway fragment" data-fragment-index="4">
+<span>IMPLEMENTATION INVARIANT</span><strong>Inverted dropout puts the compensation in training, so evaluation simply uses the complete network.</strong><small>Forgot eval mode? Predictions remain random.</small>
+</div>
+<div class="notes">
+<p>Budget about three minutes. Reveal training mode first and connect it directly to the previous slide: masks are random and surviving activations have already been divided by q. Ask students to predict what should happen for one new image. Reveal evaluation mode: all activations are used, no mask is sampled, and no additional scaling is applied. This is why inverted dropout is convenient. Then reveal the explicit mode switch. As with BatchNorm, the same model object has two forward behaviors; unlike BatchNorm, dropout stores no running statistics and becomes the identity transformation at evaluation. Run evaluation in training mode and repeated predictions can differ even for the same input.</p>
+</div>
+</section>
+<section id="a-correct-numpy-implementation-has-one-mode-branch" class="level2">
+<h2 class="anchored" data-anchor-id="a-correct-numpy-implementation-has-one-mode-branch">A correct NumPy implementation has one mode branch</h2>
+<div class="dropout-implementation-layout">
+<div class="dropout-code-panel">
+<div class="code-file-label">
+<span>NUMPY · FORWARD PASS</span><strong>dropout.py</strong>
+</div>
+<pre><code><span class="py-kw">import</span> numpy <span class="py-kw">as</span> np
+
+<span class="py-kw">def</span> <span class="py-fn">dropout</span>(x, p, training, rng):
+    <span class="py-kw">if not</span> <span class="py-num">0.0</span> &lt;= p &lt; <span class="py-num">1.0</span>:
+        <span class="py-kw">raise</span> ValueError(<span class="py-str">"p must be in [0, 1)"</span>)
+
+    <span class="py-kw">if not</span> training <span class="py-kw">or</span> p == <span class="py-num">0.0</span>:
+        <span class="py-kw">return</span> x
+
+    q = <span class="py-num">1.0</span> - p
+    mask = rng.<span class="py-fn">random</span>(x.shape) &lt; q
+    <span class="py-kw">return</span> x * mask / q</code></pre>
+</div>
+<div class="implementation-trace">
+<div class="trace-card trace-train fragment" data-fragment-index="0">
+<span>training = True</span><strong>sample mask → multiply → divide by q</strong><small>The Boolean mask broadcasts elementwise over x.</small>
+</div>
+<div class="trace-card trace-eval fragment" data-fragment-index="1">
+<span>training = False</span><strong>return x unchanged</strong><small>No random draw and no evaluation-time scaling.</small>
+</div>
+<div class="rng-contract fragment" data-fragment-index="2">
+<span>RANDOMNESS IS AN INPUT</span><strong>rng = np.random.default_rng(seed)</strong><small>Pass one generator through training. Fix its seed when a run must be reproducible.</small>
+</div>
+<div class="implementation-check fragment" data-fragment-index="3">
+<span>MONTE CARLO CHECK</span>
+<pre><code>samples = np.stack([
+    dropout(x, p=<span class="py-num">0.5</span>, training=<span class="py-bool">True</span>, rng=rng)
+    <span class="py-kw">for</span> _ <span class="py-kw">in</span> range(<span class="py-num">100_000</span>)
+])
+np.<span class="py-fn">allclose</span>(samples.mean(<span class="py-num">0</span>), x, atol=<span class="py-num">0.1</span>)</code></pre>
+<b>→ True</b>
+</div>
+</div>
+</div>
+<div class="course-takeaway-dark dropout-implementation-takeaway fragment" data-fragment-index="4">
+<span>IMPLEMENTATION CONTRACT</span><strong>Train: random mask and ÷q. Eval: identity. Test the expectation and the mode switch.</strong><small>p is the drop probability · q = 1 − p</small>
+</div>
+<div class="notes">
+<p>Budget about four minutes. Read the implementation by behavior rather than line by line. First reveal the training trace and map its three verbs to the previous derivation. Then reveal the evaluation trace: the early return is the entire second behavior. Highlight that the random generator is passed into the function instead of recreated internally; this supports controlled, reproducible experiments while still producing a new mask on each call. Finish with a Monte Carlo property check rather than testing one arbitrary mask: across many draws, the sample mean should approach x. The tolerance is appropriate for this small demonstration but is not a universal testing constant. Also test separately that evaluation returns x exactly and does not advance the generator state. This implementation uses elementwise dropout; structured variants would change the mask shape, not the scaling argument.</p>
+</div>
+</section>
+<section id="early-stopping-keeps-an-earlier-checkpoint" class="level2">
+<h2 class="anchored" data-anchor-id="early-stopping-keeps-an-earlier-checkpoint">Early stopping keeps an earlier checkpoint</h2>
+<div class="early-stopping-visual">
+<svg class="nostretch" viewbox="0 0 1280 545" role="img" aria-label="Training loss decreases continuously while validation loss reaches a minimum, fails to improve during a patience window, and training restores the best earlier checkpoint.">
+  <defs><marker id="restore-arrowhead" markerwidth="10" markerheight="10" refx="8" refy="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#7258a8"></path></marker></defs>
+  <line x1="95" y1="455" x2="1190" y2="455" class="early-axis"></line>
+  <line x1="95" y1="455" x2="95" y2="55" class="early-axis"></line>
+  <text x="650" y="515" text-anchor="middle" class="early-axis-label">epoch →</text>
+  <text x="30" y="255" text-anchor="middle" transform="rotate(-90 30 255)" class="early-axis-label">loss</text>
+
+  <g class="fragment" data-fragment-index="0">
+    <path d="M110 92 C255 178,400 290,570 360 C760 425,960 442,1170 447" class="early-train-curve"></path>
+    <rect x="925" y="397" width="205" height="42" rx="11" class="early-train-label-bg"></rect>
+    <text x="1028" y="424" text-anchor="middle" class="early-train-label">TRAINING LOSS</text>
+  </g>
+
+  <g class="fragment" data-fragment-index="1">
+    <path d="M110 115 C245 205,390 315,550 357 C665 386,735 372,805 330 C920 260,1025 180,1170 120" class="early-val-curve"></path>
+    <line x1="665" y1="65" x2="665" y2="455" class="best-checkpoint-line"></line>
+    <circle cx="665" cy="377" r="13" class="best-checkpoint-dot"></circle>
+    <rect x="530" y="72" width="270" height="52" rx="13" class="best-checkpoint-label-bg"></rect>
+    <text x="665" y="94" text-anchor="middle" class="best-checkpoint-kicker">SAVE CHECKPOINT</text>
+    <text x="665" y="114" text-anchor="middle" class="best-checkpoint-label">best validation loss</text>
+  </g>
+
+  <g class="fragment" data-fragment-index="2">
+    <rect x="665" y="52" width="300" height="403" rx="12" class="patience-window"></rect>
+    <circle cx="735" cy="365" r="9" class="waiting-dot"></circle><circle cx="805" cy="330" r="9" class="waiting-dot"></circle><circle cx="875" cy="287" r="9" class="waiting-dot"></circle><circle cx="945" cy="243" r="9" class="waiting-dot"></circle>
+    <text x="815" y="153" text-anchor="middle" class="patience-kicker">PATIENCE = 4</text>
+    <text x="815" y="178" text-anchor="middle" class="patience-label">wait through noisy non-improvements</text>
+  </g>
+
+  <g class="fragment" data-fragment-index="3">
+    <line x1="965" y1="52" x2="965" y2="455" class="stop-line"></line>
+    <rect x="982" y="63" width="185" height="58" rx="13" class="stop-label-bg"></rect>
+    <text x="1075" y="87" text-anchor="middle" class="stop-kicker">STOP</text>
+    <text x="1075" y="109" text-anchor="middle" class="stop-label">patience exhausted</text>
+    <path d="M952 308 C865 352,760 352,681 374" class="restore-arrow" marker-end="url(#restore-arrowhead)"></path>
+    <rect x="735" y="275" width="230" height="52" rx="13" class="restore-label-bg"></rect>
+    <text x="850" y="298" text-anchor="middle" class="restore-kicker">RESTORE</text>
+    <text x="850" y="318" text-anchor="middle" class="restore-label">return to saved weights</text>
+  </g>
+</svg>
+</div>
+<div class="early-stopping-benefits fragment" data-fragment-index="4">
+<div>
+<span>GENERALIZATION</span><strong>Avoid keeping the epochs that only improve training fit.</strong>
+</div>
+<div>
+<span>COMPUTE</span><strong>Stop spending epochs after useful validation progress has ended.</strong>
+</div>
+</div>
+<div class="course-takeaway-dark early-stopping-takeaway fragment" data-fragment-index="5">
+<span>STOP ≠ KEEP LAST</span><strong>Early stopping monitors validation evidence, stops after patience, and restores the best saved checkpoint.</strong>
+</div>
+<div class="notes">
+<p>Budget about three minutes. Begin with training loss alone and ask whether anything in that curve tells us when to stop. Reveal validation loss and save the checkpoint at its minimum. Next reveal the patience window: validation measurements are noisy, so one worse epoch should not necessarily terminate training. After four non-improving checks, reveal the stop line and then follow the arrow backward—the weights at the stopping epoch are not the weights we deploy. Finish with the two benefits: limiting continued adaptation to training-specific detail and avoiding computation after validation progress has stalled. Patience is an operational safeguard against noise, not a guarantee that the globally best future epoch has already occurred.</p>
+</div>
+</section>
+<section id="early-stopping-is-a-four-rule-controller" class="level2">
+<h2 class="anchored" data-anchor-id="early-stopping-is-a-four-rule-controller">Early stopping is a four-rule controller</h2>
+<div class="early-rules-grid">
+<div class="early-rule-card rule-monitor fragment" data-fragment-index="0">
+<div class="rule-number">
+1
+</div>
+<div class="rule-heading">
+<span>MONITOR</span><strong>Measure held-out performance</strong>
+</div>
+<div class="rule-equation">
+<span class="math inline">\(s_t = \mathcal{L}_{\mathrm{val}}(\theta_t)\)</span>
+</div>
+<div class="rule-note">
+For validation loss, smaller is better.
+</div>
+</div>
+<div class="early-rule-card rule-improve fragment" data-fragment-index="1">
+<div class="rule-number">
+2
+</div>
+<div class="rule-heading">
+<span>TEST</span><strong>Require meaningful improvement</strong>
+</div>
+<div class="rule-equation">
+<span class="math inline">\(s_t \lt s^* - \delta\)</span>
+</div>
+<div class="rule-note">
+<span class="math inline">\(\delta\)</span> ignores changes too small to trust.
+</div>
+</div>
+<div class="early-rule-card rule-update fragment" data-fragment-index="2">
+<div class="rule-number">
+3
+</div>
+<div class="rule-heading">
+<span>UPDATE</span><strong>Save or increase the wait</strong>
+</div>
+<div class="rule-equation rule-cases">
+<span class="math inline">\(\begin{cases}s^* \leftarrow s_t,\; \theta^* \leftarrow \theta_t,\; w\leftarrow0 &amp; \text{if improved}\\[2pt]w\leftarrow w+1 &amp; \text{otherwise}\end{cases}\)</span>
+</div>
+</div>
+<div class="early-rule-card rule-stop fragment" data-fragment-index="3">
+<div class="rule-number">
+4
+</div>
+<div class="rule-heading">
+<span>ACT</span><strong>Stop, then restore</strong>
+</div>
+<div class="rule-equation">
+<span class="math inline">\(w \ge P \;\Longrightarrow\; \text{stop and return }\theta^*\)</span>
+</div>
+<div class="rule-note">
+<span class="math inline">\(P\)</span> is patience; <span class="math inline">\(\theta^*\)</span> is the best checkpoint.
+</div>
+</div>
+</div>
+<div class="course-takeaway-dark early-rules-takeaway fragment" data-fragment-index="4">
+<span>ONE MEMORY</span><strong>The controller keeps the best score <span class="math inline">\(s^*\)</span>, its weights <span class="math inline">\(\theta^*\)</span>, and a wait counter <span class="math inline">\(w\)</span>.</strong>
+</div>
+<div class="notes">
+<p>Budget about four minutes. Connect each rule directly to the preceding visual. First define the monitored score at epoch t; here it is validation loss, so lower is better. Then introduce the minimum meaningful change delta and ask what happens when an apparent improvement is smaller than delta. Reveal the state update: a meaningful improvement replaces both the best score and checkpoint and resets the counter; otherwise the counter advances. Finally, stop once the counter reaches patience P and return the saved weights rather than the latest weights. Mention that accuracy or another maximized metric reverses the inequality, while the controller itself is unchanged.</p>
+</div>
+</section>
+<section id="four-classical-learning-rate-schedules" class="level2">
+<h2 class="anchored" data-anchor-id="four-classical-learning-rate-schedules">Four classical learning-rate schedules</h2>
+<div class="warmup-rule fragment" data-fragment-index="0">
+<span>SHARED FIRST PHASE · WARMUP</span><strong>Raise the learning rate gradually before applying the main schedule.</strong>
+<div>
+<span class="math inline">\(\eta_t=\eta_0\frac{t}{W},\quad 0\le t\lt W\)</span>
+</div>
+</div>
+<div class="schedule-gallery">
+  <div class="schedule-card fragment" data-fragment-index="1">
+    <div class="schedule-card-head"><span>WARMUP + CONSTANT</span><strong>Reach the peak, then hold it</strong></div>
+    <svg viewbox="0 0 510 205" role="img" aria-label="Constant learning-rate schedule">
+      <line x1="55" y1="165" x2="480" y2="165" class="schedule-axis"></line><line x1="55" y1="165" x2="55" y2="25" class="schedule-axis"></line>
+      <line x1="130" y1="35" x2="130" y2="165" class="warmup-marker"></line><text x="130" y="184" class="warmup-label">W</text>
+      <path d="M65 158 L130 62 L470 62" class="schedule-curve curve-blue"></path>
+      <text x="270" y="197" class="schedule-axis-label">epoch t</text><text x="24" y="96" class="schedule-axis-label schedule-y">ηₜ</text>
+    </svg>
+    <div class="schedule-equation">\(\eta_t=\eta_0,\quad t\ge W\)</div>
+  </div>
+  <div class="schedule-card fragment" data-fragment-index="2">
+    <div class="schedule-card-head"><span>WARMUP + STEP</span><strong>Drop at milestones</strong></div>
+    <svg viewbox="0 0 510 205" role="img" aria-label="Step-decay learning-rate schedule">
+      <line x1="55" y1="165" x2="480" y2="165" class="schedule-axis"></line><line x1="55" y1="165" x2="55" y2="25" class="schedule-axis"></line>
+      <line x1="130" y1="35" x2="130" y2="165" class="warmup-marker"></line><text x="130" y="184" class="warmup-label">W</text>
+      <path d="M65 158 L130 48 L220 48 L220 87 L310 87 L310 119 L400 119 L400 143 L470 143" class="schedule-curve curve-orange"></path>
+      <text x="270" y="197" class="schedule-axis-label">epoch t</text><text x="24" y="96" class="schedule-axis-label schedule-y">ηₜ</text>
+    </svg>
+    <div class="schedule-equation">\(\eta_t=\eta_0\,\gamma^{\lfloor (t-W)/S\rfloor},\quad t\ge W\)</div>
+  </div>
+  <div class="schedule-card fragment" data-fragment-index="3">
+    <div class="schedule-card-head"><span>WARMUP + EXPONENTIAL</span><strong>Decay smoothly</strong></div>
+    <svg viewbox="0 0 510 205" role="img" aria-label="Exponential learning-rate schedule">
+      <line x1="55" y1="165" x2="480" y2="165" class="schedule-axis"></line><line x1="55" y1="165" x2="55" y2="25" class="schedule-axis"></line>
+      <line x1="130" y1="35" x2="130" y2="165" class="warmup-marker"></line><text x="130" y="184" class="warmup-label">W</text>
+      <path d="M65 158 L130 42 C200 77,250 108,310 130 C370 149,425 155,470 157" class="schedule-curve curve-green"></path>
+      <text x="270" y="197" class="schedule-axis-label">epoch t</text><text x="24" y="96" class="schedule-axis-label schedule-y">ηₜ</text>
+    </svg>
+    <div class="schedule-equation">\(\eta_t=\eta_0\,e^{-k(t-W)},\quad t\ge W\)</div>
+  </div>
+  <div class="schedule-card fragment" data-fragment-index="4">
+    <div class="schedule-card-head"><span>WARMUP + COSINE</span><strong>Land gently at the floor</strong></div>
+    <svg viewbox="0 0 510 205" role="img" aria-label="Cosine-decay learning-rate schedule">
+      <line x1="55" y1="165" x2="480" y2="165" class="schedule-axis"></line><line x1="55" y1="165" x2="55" y2="25" class="schedule-axis"></line>
+      <line x1="130" y1="35" x2="130" y2="165" class="warmup-marker"></line><text x="130" y="184" class="warmup-label">W</text>
+      <path d="M65 158 L130 42 C165 43,200 48,235 60 C300 84,325 124,385 146 C415 157,445 159,470 159" class="schedule-curve curve-purple"></path>
+      <text x="270" y="197" class="schedule-axis-label">epoch t</text><text x="24" y="96" class="schedule-axis-label schedule-y">ηₜ</text>
+    </svg>
+    <div class="schedule-equation schedule-equation-long">\(\eta_t=\eta_{\min}+\frac{\eta_0-\eta_{\min}}{2}\!\left(1+\cos\frac{\pi(t-W)}{T-W}\right),\ t\ge W\)</div>
+  </div>
+</div>
+<div class="course-takeaway-dark schedule-takeaway fragment" data-fragment-index="5">
+<span>TWO PHASES</span><strong>Warm up to stabilize the first updates; then control how aggressively learning slows down.</strong>
+</div>
+<div class="notes">
+<p>Budget about five minutes. Start with the shared warmup rule: over W epochs, the rate rises linearly from zero to eta-zero. Warmup limits unstable first updates, especially when gradients or optimizer statistics have not yet settled. Then keep the axes identical and reveal the four continuations one by one. Constant is the baseline rather than a decay rule. Step decay makes explicit scale changes at milestones separated by S epochs. Exponential decay reduces the rate by a constant multiplicative factor over equal time intervals. Cosine decay starts and ends gently over the remaining horizon T minus W and approaches eta-min. Ask students to compare when each schedule spends most of its training budget at a large rate. These are predetermined schedules; a metric-triggered reduction such as reduce-on-plateau is adaptive and deliberately left for the implementation discussion.</p>
+</div>
+</section>
+<section id="case-study-rescue-a-small-image-classifier" class="level2">
+<h2 class="anchored" data-anchor-id="case-study-rescue-a-small-image-classifier">Case study: rescue a small image classifier</h2>
+<div class="training-case-layout">
+<div class="case-evidence">
+<div class="case-context">
+<span>CONCRETE PROBLEM</span><strong>Train a 6-layer ReLU classifier on 10 image classes</strong><small>Same data · same architecture · same optimizer budget</small>
+</div>
+<svg viewbox="0 0 730 410" role="img" aria-label="Schematic validation-loss traces comparing an uncontrolled baseline with a reliable training recipe.">
+<line x1="70" y1="345" x2="690" y2="345" class="case-axis"></line><line x1="70" y1="345" x2="70" y2="45" class="case-axis"></line> <text x="375" y="393" class="case-axis-text">epoch →</text><text x="25" y="200" transform="rotate(-90 25 200)" class="case-axis-text">validation loss</text> <g class="fragment" data-fragment-index="0"><path d="M85 82 C106 142,124 82,151 158 C190 244,240 278,300 290 C395 310,490 274,590 202 C625 178,655 155,680 135" class="case-curve case-baseline"></path><text x="540" y="176" class="case-curve-label label-baseline">baseline</text></g> <g class="fragment" data-fragment-index="3"><path d="M85 122 C145 165,205 220,275 260 C365 307,470 320,570 324 C615 324,650 320,680 314" class="case-curve case-reliable"></path><line x1="570" y1="55" x2="570" y2="345" class="case-best-line"></line><circle cx="570" cy="324" r="11" class="case-best-dot"></circle><text x="442" y="302" class="case-curve-label label-reliable">controlled run</text><text x="583" y="73" class="case-best-label">best checkpoint</text></g>
+</svg>
+<div class="case-schematic-note">
+Illustrative trace: the mechanism matters, not these exact coordinates.
+</div>
+</div>
+<div class="case-actions">
+<div class="case-diagnosis fragment" data-fragment-index="1">
+<span>READ THE EVIDENCE</span>
+<div>
+<b>Early instability</b><small>updates begin too aggressively</small>
+</div>
+<div>
+<b>Later validation rise</b><small>training continues after generalization peaks</small>
+</div>
+</div>
+<div class="case-recipe fragment" data-fragment-index="2">
+<span>CHANGE THE TRAINING RECIPE</span>
+<div>
+<b>1</b><strong>He initialization + BatchNorm</strong><small>preserve useful signal through depth</small>
+</div>
+<div>
+<b>2</b><strong>Warmup → cosine decay</strong><small>stabilize first steps, then refine</small>
+</div>
+<div>
+<b>3</b><strong>Weight decay + dropout</strong><small>constrain reliance on the training sample</small>
+</div>
+<div>
+<b>4</b><strong>Early stopping</strong><small>restore the best validation checkpoint</small>
+</div>
+</div>
+</div>
+</div>
+<div class="course-takeaway-dark case-takeaway fragment" data-fragment-index="4">
+<span>ONE SYSTEM</span><strong>Reliable training comes from compatible choices—not from one “magic” technique.</strong>
+</div>
+<div class="notes">
+<p>Budget about five minutes. Treat the curves as a schematic case study, not reported benchmark data. Reveal the baseline and ask students to identify two different problems: unstable early progress and a later generalization gap. Reveal the diagnoses before the remedies. Then assemble the recipe in causal order: initialization and normalization protect signal flow; warmup and decay control update size over time; weight decay and dropout constrain the fitted solution; early stopping decides which checkpoint to deploy. Finally reveal the controlled trace and emphasize that the architecture, data, and optimizer budget did not change. The lesson is coordination: each mechanism addresses a different failure mode.</p>
+</div>
+</section>
+<section id="recent-techniques-extend-the-training-control-panel" class="level2">
+<h2 class="anchored" data-anchor-id="recent-techniques-extend-the-training-control-panel">Recent techniques extend the training control panel</h2>
+<div class="modern-tools-grid">
+<div class="modern-tool tool-control recent-tool fragment" data-fragment-index="0">
+<span>2021 · GENERALIZE</span><strong>Sharpness-aware minimization</strong>
+<p>
+Optimize the worst loss in a small neighborhood of the weights, encouraging solutions that remain good under perturbation.
+</p>
+<a href="https://openreview.net/forum?id=6Tm1mposlrM" target="_blank" rel="noopener">Sharpness-Aware Minimization for Efficiently Improving Generalization · Foret et al., 2021 ↗</a>
+</div>
+<div class="modern-tool tool-speed recent-tool fragment" data-fragment-index="0">
+<span>2023 · OPTIMIZER</span><strong>Lion</strong>
+<p>
+Use momentum to choose a sign-based update while storing one optimizer state per parameter instead of Adam’s two.
+</p>
+<a href="https://arxiv.org/abs/2302.06675" target="_blank" rel="noopener">Symbolic Discovery of Optimization Algorithms · Chen et al., 2023 ↗</a>
+</div>
+<div class="modern-tool tool-control recent-tool fragment" data-fragment-index="1">
+<span>2024 · CONTROL</span><strong>Schedule-free optimization</strong>
+<p>
+Combine optimization and iterate averaging so training need not specify a decay schedule or stopping horizon.
+</p>
+<a href="https://arxiv.org/abs/2405.15682" target="_blank" rel="noopener">The Road Less Scheduled · Defazio et al., 2024 ↗</a>
+</div>
+<div class="modern-tool tool-speed foundation-tool fragment" data-fragment-index="1">
+<span>FOUNDATION</span><strong>Mixed precision</strong>
+<p>
+Run suitable operations in FP16 while preserving sensitive state and small gradients at higher precision.
+</p>
+<a href="https://openreview.net/forum?id=r1gs9JgRZ" target="_blank" rel="noopener">Mixed Precision Training · Micikevicius et al., 2018 ↗</a>
+</div>
+<div class="modern-tool tool-memory foundation-tool fragment" data-fragment-index="2">
+<span>FOUNDATION</span><strong>Activation checkpointing</strong>
+<p>
+Store selected activations only and recompute the missing ones during backward to trade compute for memory.
+</p>
+<a href="https://arxiv.org/abs/1604.06174" target="_blank" rel="noopener">Training Deep Nets with Sublinear Memory Cost · Chen et al., 2016 ↗</a>
+</div>
+<div class="modern-tool tool-memory recent-tool fragment" data-fragment-index="2">
+<span>2023 · MEMORY</span><strong>Gradient accumulation</strong>
+<p>
+Run several micro-batches, add their gradients, then make one optimizer step with a larger effective batch.
+</p>
+<a href="https://ieeexplore.ieee.org/document/10171567/" target="_blank" rel="noopener">Measuring the Impact of Gradient Accumulation on Cloud-Based Distributed Training · Liu et al., 2023 ↗</a>
+</div>
+</div>
+<div class="course-takeaway-dark modern-tools-takeaway fragment" data-fragment-index="3">
+<span>CLASSIFY FIRST</span><strong>Is the bottleneck compute, memory, numerical stability, or scale?</strong><small>Choose the mechanism that matches the bottleneck.</small>
+</div>
+<div class="notes">
+<p>Budget about four minutes. This is a horizon map, not six new lessons, and every technique applies to ordinary feed-forward or convolutional neural networks. Reveal the recent methods first. Sharpness-aware minimization changes the objective by considering a small neighborhood around the current weights; it can improve generalization but usually requires extra gradient computation. Lion is a sign-based momentum optimizer with one state tensor rather than Adam’s two, but its learning rate and weight decay must be retuned. Schedule-free optimization combines optimization with iterate averaging so the final horizon need not define a decay schedule. Then identify the two foundations: mixed precision reduces arithmetic cost and memory traffic, while activation checkpointing trades extra computation for lower activation memory. Finish with modern gradient accumulation, which permits a larger effective batch without storing that whole batch at once. Emphasize that gradients are added across micro-batches and normalized consistently before the single optimizer step; zeroing gradients between micro-batches would destroy the mechanism. End by asking students to classify the need before naming a technique; none is a universal upgrade.</p>
+</div>
+</section>
+<section id="next-week-prepare-for-pytorch" class="level2">
+<h2 class="anchored" data-anchor-id="next-week-prepare-for-pytorch">Next week: prepare for PyTorch</h2>
+<div class="pytorch-teaser">
+<img src="pytorch-next-week.png" alt="Glowing tensor grids feeding a dynamic neural-network computation graph, joined by an orange forward-and-backward path.">
+<div class="pytorch-teaser-overlay">
+<span>FROM ARRAYS TO TRAINABLE MODELS</span><strong>Tensors → dynamic computation graphs → complete training loops</strong><small>Bring a working Python environment and be ready to build.</small>
+</div>
+</div>
+<div class="pytorch-teaser-credit">
+Course-made illustration · generated for this lecture
+</div>
+<div class="notes">
+<p>Close in under one minute. The NumPy implementations in this lecture exposed the mechanics; next week PyTorch will provide tensors, automatic differentiation, modules, and optimizers that assemble those mechanics into practical training loops. Ask students to arrive with the course environment working so the session can begin with code rather than installation.</p>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Deep Learning · ENSA Tétouan</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

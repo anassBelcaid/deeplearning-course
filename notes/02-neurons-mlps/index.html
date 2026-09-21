@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dr.&nbsp;A. Belcaid">
+<meta name="description" content="How nonlinear hidden layers turn a linear classifier into a multilayer perceptron">
+
+<title>From Linear Classifiers to Neural Networks – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e90830a6c3a870e8aa2cd7457ccbff49.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../schedule.html"> 
+<span class="menu-text">Schedule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../logistics.html"> 
+<span class="menu-text">Logistics</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#from-a-linear-score-to-a-neuron" id="toc-from-a-linear-score-to-a-neuron" class="nav-link active" data-scroll-target="#from-a-linear-score-to-a-neuron"><span class="header-section-number">1</span> From a linear score to a neuron</a>
+  <ul class="collapse">
+  <li><a href="#the-computation-performed-by-one-neuron" id="toc-the-computation-performed-by-one-neuron" class="nav-link" data-scroll-target="#the-computation-performed-by-one-neuron"><span class="header-section-number">1.1</span> The computation performed by one neuron</a></li>
+  <li><a href="#why-nonlinearities-are-necessary" id="toc-why-nonlinearities-are-necessary" class="nav-link" data-scroll-target="#why-nonlinearities-are-necessary"><span class="header-section-number">1.2</span> Why nonlinearities are necessary</a></li>
+  </ul></li>
+  <li><a href="#activation-functions" id="toc-activation-functions" class="nav-link" data-scroll-target="#activation-functions"><span class="header-section-number">2</span> Activation functions</a>
+  <ul class="collapse">
+  <li><a href="#sigmoid" id="toc-sigmoid" class="nav-link" data-scroll-target="#sigmoid"><span class="header-section-number">2.1</span> Sigmoid</a></li>
+  <li><a href="#hyperbolic-tangent" id="toc-hyperbolic-tangent" class="nav-link" data-scroll-target="#hyperbolic-tangent"><span class="header-section-number">2.2</span> Hyperbolic tangent</a></li>
+  <li><a href="#rectified-linear-unit" id="toc-rectified-linear-unit" class="nav-link" data-scroll-target="#rectified-linear-unit"><span class="header-section-number">2.3</span> Rectified linear unit</a></li>
+  <li><a href="#a-controlled-activation-experiment" id="toc-a-controlled-activation-experiment" class="nav-link" data-scroll-target="#a-controlled-activation-experiment"><span class="header-section-number">2.4</span> A controlled activation experiment</a></li>
+  </ul></li>
+  <li><a href="#building-a-two-layer-network" id="toc-building-a-two-layer-network" class="nav-link" data-scroll-target="#building-a-two-layer-network"><span class="header-section-number">3</span> Building a two-layer network</a>
+  <ul class="collapse">
+  <li><a href="#shape-bookkeeping" id="toc-shape-bookkeeping" class="nav-link" data-scroll-target="#shape-bookkeeping"><span class="header-section-number">3.1</span> Shape bookkeeping</a></li>
+  <li><a href="#counting-parameters" id="toc-counting-parameters" class="nav-link" data-scroll-target="#counting-parameters"><span class="header-section-number">3.2</span> Counting parameters</a></li>
+  </ul></li>
+  <li><a href="#hidden-representations" id="toc-hidden-representations" class="nav-link" data-scroll-target="#hidden-representations"><span class="header-section-number">4</span> Hidden representations</a>
+  <ul class="collapse">
+  <li><a href="#filters-and-feature-maps-are-different-objects" id="toc-filters-and-feature-maps-are-different-objects" class="nav-link" data-scroll-target="#filters-and-feature-maps-are-different-objects"><span class="header-section-number">4.1</span> Filters and feature maps are different objects</a></li>
+  <li><a href="#a-representation-is-a-pattern-of-activations" id="toc-a-representation-is-a-pattern-of-activations" class="nav-link" data-scroll-target="#a-representation-is-a-pattern-of-activations"><span class="header-section-number">4.2</span> A representation is a pattern of activations</a></li>
+  <li><a href="#width-and-depth-play-different-roles" id="toc-width-and-depth-play-different-roles" class="nav-link" data-scroll-target="#width-and-depth-play-different-roles"><span class="header-section-number">4.3</span> Width and depth play different roles</a></li>
+  </ul></li>
+  <li><a href="#implementing-the-forward-pass-in-numpy" id="toc-implementing-the-forward-pass-in-numpy" class="nav-link" data-scroll-target="#implementing-the-forward-pass-in-numpy"><span class="header-section-number">5</span> Implementing the forward pass in NumPy</a>
+  <ul class="collapse">
+  <li><a href="#defensive-shape-checks" id="toc-defensive-shape-checks" class="nav-link" data-scroll-target="#defensive-shape-checks"><span class="header-section-number">5.1</span> Defensive shape checks</a></li>
+  <li><a href="#sanity-checks-before-training" id="toc-sanity-checks-before-training" class="nav-link" data-scroll-target="#sanity-checks-before-training"><span class="header-section-number">5.2</span> Sanity checks before training</a></li>
+  </ul></li>
+  <li><a href="#what-the-forward-pass-does-not-yet-solve" id="toc-what-the-forward-pass-does-not-yet-solve" class="nav-link" data-scroll-target="#what-the-forward-pass-does-not-yet-solve"><span class="header-section-number">6</span> What the forward pass does not yet solve</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">7</span> Summary</a></li>
+  <li><a href="#reading-and-practice" id="toc-reading-and-practice" class="nav-link" data-scroll-target="#reading-and-practice"><span class="header-section-number">8</span> Reading and practice</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">From Linear Classifiers to Neural Networks</h1>
+<p class="subtitle lead">Chapter 2 · Neurons, activations, hidden representations, and the forward pass</p>
+</div>
+
+<div>
+  <div class="description">
+    How nonlinear hidden layers turn a linear classifier into a multilayer perceptron
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dr.&nbsp;A. Belcaid </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="chapter-opening">
+<div class="chapter-kicker">
+<p>PART II · NEURAL NETWORKS FROM SCRATCH</p>
+</div>
+<div class="chapter-cover">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="assets/chapter-cover.png" class="img-fluid figure-img" alt="A visual overview of a multilayer neural network transforming concentric data into a separable hidden representation."></p>
+<figcaption>Nonlinearly entangled data passes through neurons and successive feature transformations before becoming separable in a learned hidden space. Original course illustration generated for this chapter.</figcaption>
+</figure>
+</div>
+</div>
+<p>The answer is not “add many matrices.” Several affine maps in succession still collapse into one affine map. A neural network gains expressive power by placing a <strong>nonlinear activation</strong> between learned affine transformations.</p>
+</div>
+<section id="by-the-end-of-this-chapter-you-should-be-able-to" class="level3 unnumbered unlisted learning-objectives">
+<h3 class="unnumbered unlisted anchored" data-anchor-id="by-the-end-of-this-chapter-you-should-be-able-to">By the end of this chapter, you should be able to</h3>
+<ol type="1">
+<li>Describe a neuron as an affine score followed by an activation.</li>
+<li>Explain geometrically why a single linear classifier fails on nonlinear data.</li>
+<li>Compute sigmoid, tanh, and ReLU outputs and derivatives.</li>
+<li>Write the forward pass of a two-layer multilayer perceptron using matrices.</li>
+<li>Check every parameter and intermediate tensor shape.</li>
+<li>Explain how hidden activations form a learned representation.</li>
+<li>Implement a self-contained NumPy forward pass and prediction method.</li>
+</ol>
+</section>
+<section id="from-a-linear-score-to-a-neuron" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="from-a-linear-score-to-a-neuron"><span class="header-section-number">1</span> From a linear score to a neuron</h2>
+<p>Chapter 1 introduced the multiclass linear classifier</p>
+<p><span class="math display">\[
+S=XW+b.
+\]</span></p>
+<p>For a batch of <span class="math inline">\(N\)</span> examples with <span class="math inline">\(D\)</span> input features and <span class="math inline">\(K\)</span> classes,</p>
+<p><span class="math display">\[
+X\in\mathbb R^{N\times D},\qquad
+W\in\mathbb R^{D\times K},\qquad
+b\in\mathbb R^{K},\qquad
+S\in\mathbb R^{N\times K}.
+\]</span></p>
+<p>Each column of <span class="math inline">\(W\)</span> defines one class score. This model is efficient, but each pairwise decision boundary is a hyperplane. No amount of training can make one hyperplane wrap around a curved or disconnected class.</p>
+<div id="fig-spiral-boundaries" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-spiral-boundaries-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/02-neurons-mlps/assets/spiral-boundaries.svg" class="img-fluid figure-img" style="width:92.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-spiral-boundaries-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: A linear boundary cannot separate the intertwined spiral classes, while a small neural network can construct a nonlinear partition. The drawing is based on the Stanford CS231n spiral case study <span class="citation" data-cites="cs231nnotes">(<a href="#ref-cs231nnotes" role="doc-biblioref">Li et al., n.d.</a>)</span>.
+</figcaption>
+</figure>
+</div>
+<p>The <a href="https://playground.tensorflow.org/">TensorFlow Playground</a> makes this limitation visible. Select the concentric-circle dataset, first train a linear model, and then add a hidden layer. The hidden layer can transform the input before the final linear decision.</p>
+<div id="fig-playground" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-playground-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/02-neurons-mlps/assets/tensorflow-playground-circle.png" class="img-fluid figure-img" style="width:90.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-playground-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: TensorFlow Playground fitting concentric classes with a neural network. The visualization exposes the learned output of each hidden unit.
+</figcaption>
+</figure>
+</div>
+<section id="the-computation-performed-by-one-neuron" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="the-computation-performed-by-one-neuron"><span class="header-section-number">1.1</span> The computation performed by one neuron</h3>
+<p>A neuron receives an input vector <span class="math inline">\(x\in\mathbb R^D\)</span>, computes a weighted sum plus a bias,</p>
+<p><span class="math display">\[
+z=w^\top x+b,
+\]</span></p>
+<p>and applies an activation function <span class="math inline">\(\phi\)</span>:</p>
+<p><span class="math display">\[
+h=\phi(z).
+\]</span></p>
+<div id="fig-dense-neuron" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-dense-neuron-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/02-neurons-mlps/assets/dense-neuron.svg" class="img-fluid figure-img" style="width:88.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-dense-neuron-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Two complementary views of a neuron: incoming features are weighted and summed, then an activation transforms the pre-activation <span class="math inline">\(z\)</span> into an output <span class="math inline">\(h\)</span>. Course diagram.
+</figcaption>
+</figure>
+</div>
+<p>The weights control orientation, the bias controls translation, and the activation controls the form of the response. Before the activation, the equation</p>
+<p><span class="math display">\[
+w^\top x+b=0
+\]</span></p>
+<p>defines a hyperplane. The signed value <span class="math inline">\(z=w^\top x+b\)</span> indicates on which side of that hyperplane the input lies and how strongly it matches the neuron’s learned direction.</p>
+<div id="fig-neuron-boundary" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-neuron-boundary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/02-neurons-mlps/assets/neuron-boundary.svg" class="img-fluid figure-img" style="width:82.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-neuron-boundary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: A neuron first creates a linear boundary and then converts signed distance-like scores into responses. Course schematic; the biological-neuron analogy commonly used in neural-network introductions is also illustrated by Stanford CS231n <span class="citation" data-cites="cs231nnotes">(<a href="#ref-cs231nnotes" role="doc-biblioref">Li et al., n.d.</a>)</span>.
+</figcaption>
+</figure>
+</div>
+<p>The neuron picture is useful, but the biological analogy should not be taken literally. Artificial neurons are differentiable computational units inspired only loosely by biological cells. Their practical importance comes from composition, matrix computation, and optimization—not biological fidelity <span class="citation" data-cites="goodfellow2016deep">(<a href="#ref-goodfellow2016deep" role="doc-biblioref">Goodfellow et al. 2016</a>)</span>.</p>
+</section>
+<section id="why-nonlinearities-are-necessary" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="why-nonlinearities-are-necessary"><span class="header-section-number">1.2</span> Why nonlinearities are necessary</h3>
+<p>Suppose we stack two affine transformations without an activation:</p>
+<p><span class="math display">\[
+f(x)=(xW_1+b_1)W_2+b_2.
+\]</span></p>
+<p>Expanding gives</p>
+<p><span class="math display">\[
+f(x)=x(W_1W_2)+(b_1W_2+b_2).
+\]</span></p>
+<p>Define <span class="math inline">\(W'=W_1W_2\)</span> and <span class="math inline">\(b'=b_1W_2+b_2\)</span>. Then</p>
+<p><span class="math display">\[
+f(x)=xW'+b',
+\]</span></p>
+<p>which is still one affine transformation. Ten affine layers without nonlinearities have the same structural limitation.</p>
+<div class="key-idea">
+<p><strong>Depth alone does not create nonlinear behavior.</strong> The activation prevents successive layers from collapsing into a single affine map.</p>
+</div>
+<div id="fig-neuron-gates" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-neuron-gates-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/02-neurons-mlps/assets/neuron-gates.svg" class="img-fluid figure-img" style="width:94.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-neuron-gates-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Several neurons apply the same activation to different pre-activations. Some units respond strongly and others are suppressed, creating a new feature vector rather than another linear copy of the input.
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="activation-functions" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="activation-functions"><span class="header-section-number">2</span> Activation functions</h2>
+<p>An activation function should be understood through four views: its formula, its output curve, its derivative, and the optimization behavior produced by that derivative.</p>
+<section id="sigmoid" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="sigmoid"><span class="header-section-number">2.1</span> Sigmoid</h3>
+<p>The logistic sigmoid is</p>
+<p><span class="math display">\[
+\sigma(z)=\frac{1}{1+e^{-z}}.
+\]</span></p>
+<p>Its derivative can be expressed using its own output:</p>
+<p><span class="math display">\[
+\sigma'(z)=\sigma(z)(1-\sigma(z)).
+\]</span></p>
+<div id="fig-sigmoid" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-sigmoid-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/02-neurons-mlps/assets/sigmoid-detail.svg" class="img-fluid figure-img" style="width:88.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sigmoid-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: Sigmoid output and derivative. The derivative is at most <span class="math inline">\(1/4\)</span> and approaches zero for inputs far from the origin.
+</figcaption>
+</figure>
+</div>
+<p>Sigmoid maps every real number into <span class="math inline">\((0,1)\)</span>, so it is natural for the output of a binary probabilistic classifier. As a hidden activation, however, it has two important weaknesses:</p>
+<ul>
+<li>it is not zero-centered;</li>
+<li>it saturates for large positive or negative inputs, where its derivative is nearly zero.</li>
+</ul>
+<p>When many saturated units are composed, gradients passed backward through their derivatives can shrink severely. We will formalize this phenomenon when deriving backpropagation.</p>
+</section>
+<section id="hyperbolic-tangent" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="hyperbolic-tangent"><span class="header-section-number">2.2</span> Hyperbolic tangent</h3>
+<p>The hyperbolic tangent is</p>
+<p><span class="math display">\[
+\tanh(z)=\frac{e^z-e^{-z}}{e^z+e^{-z}},
+\]</span></p>
+<p>with derivative</p>
+<p><span class="math display">\[
+\frac{d}{dz}\tanh(z)=1-\tanh^2(z).
+\]</span></p>
+<div id="fig-tanh" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-tanh-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/02-neurons-mlps/assets/tanh-detail.svg" class="img-fluid figure-img" style="width:88.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-tanh-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: Tanh output and derivative. Tanh is zero-centered but still saturates at both extremes.
+</figcaption>
+</figure>
+</div>
+<p>Tanh maps to <span class="math inline">\((-1,1)\)</span> and is zero-centered, which often makes its hidden activations easier to work with than sigmoid outputs. It nevertheless saturates, and its derivative also approaches zero when <span class="math inline">\(|z|\)</span> is large.</p>
+</section>
+<section id="rectified-linear-unit" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="rectified-linear-unit"><span class="header-section-number">2.3</span> Rectified linear unit</h3>
+<p>The rectified linear unit, or ReLU, is</p>
+<p><span class="math display">\[
+\operatorname{ReLU}(z)=\max(0,z).
+\]</span></p>
+<p>Away from zero, its derivative is</p>
+<p><span class="math display">\[
+\operatorname{ReLU}'(z)=
+\begin{cases}
+0,&amp;z&lt;0,\\
+1,&amp;z&gt;0.
+\end{cases}
+\]</span></p>
+<p>At <span class="math inline">\(z=0\)</span> the mathematical derivative is undefined; implementations choose a conventional subgradient, commonly zero.</p>
+<div id="fig-relu" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-relu-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/02-neurons-mlps/assets/relu-detail.svg" class="img-fluid figure-img" style="width:88.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-relu-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: ReLU output and derivative. Positive values pass unchanged, while negative values and their local gradients are suppressed.
+</figcaption>
+</figure>
+</div>
+<p>ReLU is computationally simple, does not saturate on its positive side, and often produces sparse activations. A unit can nevertheless become inactive for every training example if updates leave all its pre-activations negative—the “dying ReLU” problem. Variants such as leaky ReLU keep a small negative slope.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 23%">
+<col style="width: 23%">
+<col style="width: 17%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Activation</th>
+<th style="text-align: right;">Range</th>
+<th style="text-align: right;">Largest derivative</th>
+<th>Main strength</th>
+<th>Main weakness</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Sigmoid</td>
+<td style="text-align: right;"><span class="math inline">\((0,1)\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0.25\)</span></td>
+<td>Probability-like output</td>
+<td>Saturation; not zero-centered</td>
+</tr>
+<tr class="even">
+<td>Tanh</td>
+<td style="text-align: right;"><span class="math inline">\((-1,1)\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td>Zero-centered</td>
+<td>Saturation</td>
+</tr>
+<tr class="odd">
+<td>ReLU</td>
+<td style="text-align: right;"><span class="math inline">\([0,\infty)\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td>Simple; positive side does not saturate</td>
+<td>Zero gradient on negative side</td>
+</tr>
+</tbody>
+</table>
+<div class="margin-question">
+<p><strong>Practice before reading the solution</strong></p>
+<p>Apply ReLU elementwise to</p>
+<p><span class="math display">\[
+z=[-2.0,\,-0.1,\,0,\,1.4,\,3.0].
+\]</span></p>
+<p>Which entries can pass a nonzero local gradient? Pause for one minute.</p>
+<details>
+<summary>
+Reveal the solution
+</summary>
+<p><span class="math display">\[
+\operatorname{ReLU}(z)=[0,0,0,1.4,3.0].
+\]</span></p>
+The entries at <span class="math inline">\(1.4\)</span> and <span class="math inline">\(3.0\)</span> have local derivative one. Negative entries have derivative zero. At exactly zero, our implementation will use derivative zero.
+</details>
+</div>
+</section>
+<section id="a-controlled-activation-experiment" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="a-controlled-activation-experiment"><span class="header-section-number">2.4</span> A controlled activation experiment</h3>
+<p>In TensorFlow Playground, keep the dataset, train/validation split, architecture, learning rate, and number of training steps fixed. Change only the activation among sigmoid, tanh, and ReLU. Then inspect:</p>
+<ol type="1">
+<li>how rapidly the training loss falls;</li>
+<li>the boundary each model learns;</li>
+<li>which hidden units become nearly constant;</li>
+<li>whether the outcome changes when training is restarted.</li>
+</ol>
+<p>This is not a benchmark. It is a controlled experiment for connecting the shapes in Figures <a href="#fig-sigmoid" class="quarto-xref">Figure&nbsp;6</a>–<a href="#fig-relu" class="quarto-xref">Figure&nbsp;8</a> to learning behavior. One run is not sufficient evidence because initialization and stochastic sampling can change the result.</p>
+</section>
+</section>
+<section id="building-a-two-layer-network" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="building-a-two-layer-network"><span class="header-section-number">3</span> Building a two-layer network</h2>
+<p>A <strong>layer</strong> collects many neurons and evaluates them in parallel. Let the input dimension be <span class="math inline">\(D\)</span>, the hidden width be <span class="math inline">\(H\)</span>, and the number of output classes be <span class="math inline">\(K\)</span>.</p>
+<div id="fig-cs231n-network" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-cs231n-network-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/02-neurons-mlps/assets/cs231n-neural-net2.jpeg" class="img-fluid figure-img" style="width:68.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cs231n-network-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9: A fully connected neural network with one hidden layer. Every input connects to every hidden unit, and every hidden unit connects to every output. Stanford CS231n <span class="citation" data-cites="cs231nnotes">(<a href="#ref-cs231nnotes" role="doc-biblioref">Li et al., n.d.</a>)</span>.
+</figcaption>
+</figure>
+</div>
+<p>For a batch <span class="math inline">\(X\in\mathbb R^{N\times D}\)</span>, define the forward pass as</p>
+<p><span class="math display">\[
+\begin{aligned}
+Z_1 &amp;= XW_1+b_1,\\
+H_1 &amp;= \operatorname{ReLU}(Z_1),\\
+S &amp;= H_1W_2+b_2.
+\end{aligned}
+\]</span></p>
+<p>Here <span class="math inline">\(Z_1\)</span> contains the <strong>pre-activations</strong>, <span class="math inline">\(H_1\)</span> contains the hidden activations, and <span class="math inline">\(S\)</span> contains the class scores. We do not apply ReLU to <span class="math inline">\(S\)</span>: the loss needs unrestricted class scores.</p>
+<div id="fig-forward-pass" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-forward-pass-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/02-neurons-mlps/assets/forward-pass-steps.svg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-forward-pass-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10: The two-layer forward pass shown as explicit computational stages, from a batch of inputs to class scores.
+</figcaption>
+</figure>
+</div>
+<section id="shape-bookkeeping" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="shape-bookkeeping"><span class="header-section-number">3.1</span> Shape bookkeeping</h3>
+<p>The shapes reveal whether each matrix product is valid:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Object</th>
+<th style="text-align: right;">Shape</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(X\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(N\times D\)</span></td>
+<td>batch of <span class="math inline">\(N\)</span> examples</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(W_1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(D\times H\)</span></td>
+<td>input-to-hidden weights</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(b_1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(H\)</span></td>
+<td>one bias per hidden unit</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(Z_1,H_1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(N\times H\)</span></td>
+<td>one hidden representation per example</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(W_2\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(H\times K\)</span></td>
+<td>hidden-to-output weights</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(b_2\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(K\)</span></td>
+<td>one bias per class</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(S\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(N\times K\)</span></td>
+<td>one class-score vector per example</td>
+</tr>
+</tbody>
+</table>
+<p>Bias vectors are broadcast across the <span class="math inline">\(N\)</span> rows. Broadcasting does not create a separate learned bias for each example; every example uses the same <span class="math inline">\(b_1\)</span> and <span class="math inline">\(b_2\)</span>.</p>
+<div class="margin-question">
+<p><strong>Shape exercise</strong></p>
+<p>Let <span class="math inline">\(N=64\)</span>, <span class="math inline">\(D=3072\)</span>, <span class="math inline">\(H=100\)</span>, and <span class="math inline">\(K=10\)</span>. Determine the shapes of all parameters and intermediates before revealing the answer.</p>
+<details>
+<summary>
+Reveal the solution
+</summary>
+<span class="math display">\[
+\begin{aligned}
+X &amp;: (64,3072), &amp; W_1 &amp;: (3072,100), &amp; b_1 &amp;: (100),\\
+Z_1,H_1 &amp;: (64,100), &amp; W_2 &amp;: (100,10), &amp; b_2 &amp;: (10),\\
+S &amp;: (64,10).&amp;&amp;
+\end{aligned}
+\]</span>
+</details>
+</div>
+</section>
+<section id="counting-parameters" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="counting-parameters"><span class="header-section-number">3.2</span> Counting parameters</h3>
+<p>The number of learned scalar parameters is</p>
+<p><span class="math display">\[
+P=(DH+H)+(HK+K).
+\]</span></p>
+<p>For <span class="math inline">\(D=3072\)</span>, <span class="math inline">\(H=100\)</span>, and <span class="math inline">\(K=10\)</span>,</p>
+<p><span class="math display">\[
+P=3072(100)+100+100(10)+10=308{,}310.
+\]</span></p>
+<p>If the hidden width doubles to <span class="math inline">\(H=200\)</span>, the hidden activations double in width and both weight matrices grow:</p>
+<p><span class="math display">\[
+P=3072(200)+200+200(10)+10=616{,}610.
+\]</span></p>
+<p>The count is almost doubled because the dominant terms <span class="math inline">\(DH\)</span> and <span class="math inline">\(HK\)</span> are linear in <span class="math inline">\(H\)</span>. Greater width creates more features and capacity, but also increases computation, memory use, and the opportunity to overfit.</p>
+</section>
+</section>
+<section id="hidden-representations" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="hidden-representations"><span class="header-section-number">4</span> Hidden representations</h2>
+<p>The vector</p>
+<p><span class="math display">\[
+h(x)=\operatorname{ReLU}(xW_1+b_1)\in\mathbb R^H
+\]</span></p>
+<p>is a new description of the input. Instead of asking the final layer to classify raw pixels, we ask it to classify learned features. Training adjusts <span class="math inline">\(W_1\)</span> and <span class="math inline">\(b_1\)</span> so that useful distinctions become easier in this hidden coordinate system <span class="citation" data-cites="bengio2013representation">(<a href="#ref-bengio2013representation" role="doc-biblioref">Bengio et al. 2013</a>)</span>.</p>
+<div id="fig-cnn-tsne" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-cnn-tsne-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/02-neurons-mlps/assets/cs231n-cnn-tsne.jpeg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cnn-tsne-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11: A t-SNE projection of AlexNet fc7 feature vectors. Each thumbnail represents one high-dimensional activation vector; images with similar learned representations appear nearby in the two-dimensional projection. Source: Stanford CS231n <span class="citation" data-cites="cs231nnotes">(<a href="#ref-cs231nnotes" role="doc-biblioref">Li et al., n.d.</a>)</span>.
+</figcaption>
+</figure>
+</div>
+<p>A two-dimensional projection is evidence, not a literal picture of the hidden space. The original vectors have thousands of components, and a projection necessarily distorts some distances. Still, the neighborhoods show that the learned coordinates capture substantial visual structure.</p>
+<section id="filters-and-feature-maps-are-different-objects" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="filters-and-feature-maps-are-different-objects"><span class="header-section-number">4.1</span> Filters and feature maps are different objects</h3>
+<p>A <strong>filter</strong> is a learned parameter. A <strong>feature map</strong> is the response produced when that filter is applied to a particular input. Confusing them is like confusing the weight vector <span class="math inline">\(w\)</span> with the activation <span class="math inline">\(\phi(w^\top x+b)\)</span>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Learned AlexNet conv1 filters</th>
+<th>Their activation maps for one cat image</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img src="../../lectures/02-neurons-mlps/assets/alexnet-conv1-filters.jpeg" class="img-fluid" alt="The 96 first-layer filters include oriented edges, color contrasts, and frequency patterns."></td>
+<td><img src="../../lectures/02-neurons-mlps/assets/alexnet-conv1-activations.jpeg" class="img-fluid" alt="Different learned filters respond to different structures and locations in the same image."></td>
+</tr>
+</tbody>
+</table>
+<p>AlexNet was a landmark large-scale convolutional classifier <span class="citation" data-cites="krizhevsky2012imagenet">(<a href="#ref-krizhevsky2012imagenet" role="doc-biblioref">Krizhevsky et al. 2012</a>)</span>. We will study convolution later; here the visualizations make a general principle concrete: hidden units are reusable detectors, and an image is represented by the pattern of their responses.</p>
+</section>
+<section id="a-representation-is-a-pattern-of-activations" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="a-representation-is-a-pattern-of-activations"><span class="header-section-number">4.2</span> A representation is a pattern of activations</h3>
+<p>Meaning is usually distributed across many hidden units. Two cats need not activate exactly the same units with exactly the same magnitudes, but their activation vectors may be more similar to one another than to a truck’s vector.</p>
+<div id="fig-pool5-values" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pool5-values-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/02-neurons-mlps/assets/alexnet-pool5-max-activations.jpeg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pool5-values-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12: Image patches that maximally activate selected AlexNet pool5 units. The white values report activation magnitudes, making clear that a representation contains graded numerical responses rather than only on/off symbols. Source: Stanford CS231n <span class="citation" data-cites="cs231nnotes">(<a href="#ref-cs231nnotes" role="doc-biblioref">Li et al., n.d.</a>)</span>.
+</figcaption>
+</figure>
+</div>
+<p>The examples in Figure <a href="#fig-pool5-values" class="quarto-xref">Figure&nbsp;12</a> should not be interpreted as proof that each unit has one clean human-readable meaning. A unit may respond to several correlated visual structures, and a concept can be distributed over many units. The important object for the next layer is the complete activation vector.</p>
+</section>
+<section id="width-and-depth-play-different-roles" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="width-and-depth-play-different-roles"><span class="header-section-number">4.3</span> Width and depth play different roles</h3>
+<p>Increasing width gives a layer more units with which to construct a piecewise-linear transformation. This can produce a more intricate boundary, but the extra capacity can fit noise as well as signal.</p>
+<div id="fig-width" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-width-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/02-neurons-mlps/assets/width-boundaries.svg" class="img-fluid figure-img" style="width:90.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-width-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13: As hidden width grows, more rectified pieces can participate in a nonlinear boundary. Course schematic; actual behavior depends on learned parameters and optimization.
+</figcaption>
+</figure>
+</div>
+<p>Depth repeatedly transforms one representation into another. Early learned responses often capture local contrasts and orientations; deeper responses can become more selective because they compose earlier features.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Early AlexNet layer: conv1</th>
+<th>Deeper AlexNet layer: conv5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img src="../../lectures/02-neurons-mlps/assets/alexnet-conv1-activations.jpeg" class="img-fluid" alt="Dense responses to local edges, colors, and textures."></td>
+<td><img src="../../lectures/02-neurons-mlps/assets/alexnet-conv5-activations.jpeg" class="img-fluid" alt="Sparser, more spatially selective responses after several learned transformations."></td>
+</tr>
+</tbody>
+</table>
+<p>These images do not imply that every network learns the same fixed hierarchy. They illustrate what this trained model learned. Architecture, task, data, and optimization all influence the resulting representation.</p>
+</section>
+</section>
+<section id="implementing-the-forward-pass-in-numpy" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="implementing-the-forward-pass-in-numpy"><span class="header-section-number">5</span> Implementing the forward pass in NumPy</h2>
+<p>Keeping the first implementation self-contained makes the relationship between equations, arrays, and object-oriented code explicit.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TwoLayerNet:</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, input_dim, hidden_dim, n_classes, seed<span class="op">=</span><span class="dv">0</span>):</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        rng <span class="op">=</span> np.random.default_rng(seed)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        scale <span class="op">=</span> <span class="fl">1e-2</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.W1 <span class="op">=</span> scale <span class="op">*</span> rng.standard_normal((input_dim, hidden_dim))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.b1 <span class="op">=</span> np.zeros(hidden_dim)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.W2 <span class="op">=</span> scale <span class="op">*</span> rng.standard_normal((hidden_dim, n_classes))</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.b2 <span class="op">=</span> np.zeros(n_classes)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, X):</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        z1 <span class="op">=</span> X <span class="op">@</span> <span class="va">self</span>.W1 <span class="op">+</span> <span class="va">self</span>.b1</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        h1 <span class="op">=</span> np.maximum(<span class="fl">0.0</span>, z1)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        scores <span class="op">=</span> h1 <span class="op">@</span> <span class="va">self</span>.W2 <span class="op">+</span> <span class="va">self</span>.b2</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        cache <span class="op">=</span> {<span class="st">"X"</span>: X, <span class="st">"z1"</span>: z1, <span class="st">"h1"</span>: h1}</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> scores, cache</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> predict(<span class="va">self</span>, X):</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        scores, _ <span class="op">=</span> <span class="va">self</span>.forward(X)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> np.argmax(scores, axis<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The class is only an organizational container. <code>self.W1</code> means that the array belongs to this network instance and remains available across method calls. <code>forward</code> uses those stored parameters; it does not import a second hidden implementation from elsewhere.</p>
+<p>The cache is unnecessary for prediction, but it records the intermediate values that backpropagation will need. Returning it now makes the data flow explicit.</p>
+<section id="defensive-shape-checks" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="defensive-shape-checks"><span class="header-section-number">5.1</span> Defensive shape checks</h3>
+<p>Silent broadcasting mistakes can produce an array with a plausible shape while implementing the wrong computation. During development, assert the contract:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> checked_forward(model, X):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> X.ndim <span class="op">==</span> <span class="dv">2</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> X.shape[<span class="dv">1</span>] <span class="op">==</span> model.W1.shape[<span class="dv">0</span>]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> model.b1.shape <span class="op">==</span> (model.W1.shape[<span class="dv">1</span>],)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> model.W2.shape[<span class="dv">0</span>] <span class="op">==</span> model.W1.shape[<span class="dv">1</span>]</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    scores, cache <span class="op">=</span> model.forward(X)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> cache[<span class="st">"z1"</span>].shape <span class="op">==</span> (X.shape[<span class="dv">0</span>], model.W1.shape[<span class="dv">1</span>])</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> cache[<span class="st">"h1"</span>].shape <span class="op">==</span> cache[<span class="st">"z1"</span>].shape</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> scores.shape <span class="op">==</span> (X.shape[<span class="dv">0</span>], model.W2.shape[<span class="dv">1</span>])</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> scores, cache</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="sanity-checks-before-training" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="sanity-checks-before-training"><span class="header-section-number">5.2</span> Sanity checks before training</h3>
+<p>Before trusting a loss curve, verify simple invariants:</p>
+<ol type="1">
+<li><code>scores.shape</code> must be <span class="math inline">\((N,K)\)</span>.</li>
+<li>Every ReLU activation must be nonnegative.</li>
+<li><code>predict(X)</code> must return <span class="math inline">\(N\)</span> integer class indices.</li>
+<li>Identical input rows must produce identical score rows in evaluation mode.</li>
+<li>With very small random weights, initial class scores should be near one another.</li>
+</ol>
+<p>If the initial model assigns roughly equal probability to each of <span class="math inline">\(K\)</span> classes, the expected softmax loss is approximately</p>
+<p><span class="math display">\[
+-\log\left(\frac1K\right)=\log K.
+\]</span></p>
+<p>For <span class="math inline">\(K=10\)</span>, this is about <span class="math inline">\(2.303\)</span>. A dramatically different initial loss is a useful signal to inspect shapes, labels, numerical stability, and initialization before writing any optimization code.</p>
+</section>
+</section>
+<section id="what-the-forward-pass-does-not-yet-solve" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="what-the-forward-pass-does-not-yet-solve"><span class="header-section-number">6</span> What the forward pass does not yet solve</h2>
+<p>The network can now produce scores, but its random hidden features are not useful yet. Learning still requires:</p>
+<p><span class="math display">\[
+\text{scores}
+\longrightarrow
+\text{loss}
+\longrightarrow
+\text{gradients}
+\longrightarrow
+\text{parameter update}.
+\]</span></p>
+<p>Backpropagation is the efficient procedure that computes how the loss changes with every parameter in this composed function <span class="citation" data-cites="rumelhart1986backprop">(<a href="#ref-rumelhart1986backprop" role="doc-biblioref">Rumelhart et al. 1986</a>)</span>. The next chapters will derive that procedure and then study optimization in depth.</p>
+<div class="key-idea">
+<p>The forward pass is a chain of explicit transformations. Backpropagation does not replace this chain; it traverses the same computation in reverse using the chain rule.</p>
+</div>
+</section>
+<section id="summary" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="summary"><span class="header-section-number">7</span> Summary</h2>
+<ul>
+<li>A neuron computes an affine pre-activation <span class="math inline">\(z=w^\top x+b\)</span> and a nonlinear activation <span class="math inline">\(h=\phi(z)\)</span>.</li>
+<li>Stacking affine transformations without an activation still produces one affine transformation.</li>
+<li>Sigmoid and tanh saturate; ReLU is simple and non-saturating on its positive side but can become inactive.</li>
+<li>A two-layer classifier computes <span class="math inline">\(Z_1=XW_1+b_1\)</span>, <span class="math inline">\(H_1=\operatorname{ReLU}(Z_1)\)</span>, and <span class="math inline">\(S=H_1W_2+b_2\)</span>.</li>
+<li>Hidden activations are learned feature vectors. Their geometry can make classes easier for the final linear layer to separate.</li>
+<li>Filters are learned parameters; feature maps are input-dependent activations.</li>
+<li>Width supplies more features within a layer, while depth composes successive representations.</li>
+<li>Shapes and simple numerical invariants should be checked before training.</li>
+</ul>
+</section>
+<section id="reading-and-practice" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="reading-and-practice"><span class="header-section-number">8</span> Reading and practice</h2>
+<div class="reading-list">
+<div class="reading-item required">
+<p><span class="reading-icon">📄</span></p>
+<section id="required-stanford-cs231n-neural-networks-part-1" class="level3 unnumbered unlisted">
+<h3 class="unnumbered unlisted anchored" data-anchor-id="required-stanford-cs231n-neural-networks-part-1">Required · Stanford CS231n: Neural Networks Part 1</h3>
+<p><a href="https://cs231n.github.io/neural-networks-1/">Read the notes</a> for the class-score viewpoint, neural-network architecture, activation functions, and biological analogy <span class="citation" data-cites="cs231nnotes">(<a href="#ref-cs231nnotes" role="doc-biblioref">Li et al., n.d.</a>)</span>.</p>
+</section>
+</div>
+<div class="reading-item required">
+<p><span class="reading-icon">📖</span></p>
+<section id="required-deep-learning-chapter-6" class="level3 unnumbered unlisted">
+<h3 class="unnumbered unlisted anchored" data-anchor-id="required-deep-learning-chapter-6">Required · Deep Learning, Chapter 6</h3>
+<p><a href="https://www.deeplearningbook.org/contents/mlp.html">Read Deep Feedforward Networks</a>, especially the motivation for hidden units, architecture design, and gradient-based learning <span class="citation" data-cites="goodfellow2016deep">(<a href="#ref-goodfellow2016deep" role="doc-biblioref">Goodfellow et al. 2016</a>)</span>.</p>
+</section>
+</div>
+<div class="reading-item">
+<p><span class="reading-icon">🔎</span></p>
+<section id="visual-exploration-what-convnets-learn" class="level3 unnumbered unlisted">
+<h3 class="unnumbered unlisted anchored" data-anchor-id="visual-exploration-what-convnets-learn">Visual exploration · What ConvNets learn</h3>
+<p><a href="https://cs231n.github.io/understanding-cnn/">Explore the CS231n visualizations</a> used in this chapter. Distinguish filters, activation maps, maximally activating inputs, and feature-space projections.</p>
+</section>
+</div>
+<div class="reading-item">
+<p><span class="reading-icon">🧪</span></p>
+<section id="practice-tensorflow-playground" class="level3 unnumbered unlisted">
+<h3 class="unnumbered unlisted anchored" data-anchor-id="practice-tensorflow-playground">Practice · TensorFlow Playground</h3>
+<p><a href="https://playground.tensorflow.org/">Open the playground</a>. Hold all settings constant while comparing linear, sigmoid, tanh, and ReLU networks on the circle and spiral datasets.</p>
+</section>
+</div>
+</div>
+</section>
+<section id="references" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-bengio2013representation" class="csl-entry" role="listitem">
+Bengio, Yoshua, Aaron Courville, and Pascal Vincent. 2013. <span>“Representation Learning: A Review and New Perspectives.”</span> <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em> 35 (8): 1798–828. <a href="https://doi.org/10.1109/TPAMI.2013.50">https://doi.org/10.1109/TPAMI.2013.50</a>.
+</div>
+<div id="ref-goodfellow2016deep" class="csl-entry" role="listitem">
+Goodfellow, Ian, Yoshua Bengio, and Aaron Courville. 2016. <em>Deep Learning</em>. MIT Press. <a href="https://www.deeplearningbook.org/">https://www.deeplearningbook.org/</a>.
+</div>
+<div id="ref-krizhevsky2012imagenet" class="csl-entry" role="listitem">
+Krizhevsky, Alex, Ilya Sutskever, and Geoffrey E. Hinton. 2012. <span>“ImageNet Classification with Deep Convolutional Neural Networks.”</span> <em>Advances in Neural Information Processing Systems</em> 25. <a href="https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks">https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks</a>.
+</div>
+<div id="ref-cs231nnotes" class="csl-entry" role="listitem">
+Li, Fei-Fei, Andrej Karpathy, and Justin Johnson. n.d. <em>CS231n: Deep Learning for Computer Vision—Course Notes</em>. <a href="https://cs231n.github.io/">https://cs231n.github.io/</a>.
+</div>
+<div id="ref-rumelhart1986backprop" class="csl-entry" role="listitem">
+Rumelhart, David E., Geoffrey E. Hinton, and Ronald J. Williams. 1986. <span>“Learning Representations by Back-Propagating Errors.”</span> <em>Nature</em> 323: 533–36. <a href="https://doi.org/10.1038/323533a0">https://doi.org/10.1038/323533a0</a>.
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Deep Learning · ENSA Tétouan</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

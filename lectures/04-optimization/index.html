@@ -1,0 +1,2500 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dr.&nbsp;A. Belcaid">
+
+<title>Optimization: Making Learning Move – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2e7c9b518fe54fcaa4a8b379123416fc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../schedule.html"> 
+<span class="menu-text">Schedule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../logistics.html"> 
+<span class="menu-text">Logistics</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#optimization-making-learning-move" id="toc-optimization-making-learning-move" class="nav-link active" data-scroll-target="#optimization-making-learning-move">Optimization: making learning move</a></li>
+  <li><a href="#todays-journey" id="toc-todays-journey" class="nav-link" data-scroll-target="#todays-journey">Today’s journey</a></li>
+  <li><a href="#loss-landscapes-1" id="toc-loss-landscapes-1" class="nav-link" data-scroll-target="#loss-landscapes-1">01 · Loss landscapes</a>
+  <ul class="collapse">
+  <li><a href="#one-model-many-parameter-settings" id="toc-one-model-many-parameter-settings" class="nav-link" data-scroll-target="#one-model-many-parameter-settings">One model, many parameter settings</a></li>
+  <li><a href="#parameters-become-a-point" id="toc-parameters-become-a-point" class="nav-link" data-scroll-target="#parameters-become-a-point">Parameters become a point</a></li>
+  <li><a href="#build-the-landscapedo-not-assume-it" id="toc-build-the-landscapedo-not-assume-it" class="nav-link" data-scroll-target="#build-the-landscapedo-not-assume-it">Build the landscape—do not assume it</a></li>
+  <li><a href="#which-move-would-you-choose" id="toc-which-move-would-you-choose" class="nav-link" data-scroll-target="#which-move-would-you-choose">Which move would you choose?</a></li>
+  <li><a href="#we-see-the-mapthe-optimizer-does-not" id="toc-we-see-the-mapthe-optimizer-does-not" class="nav-link" data-scroll-target="#we-see-the-mapthe-optimizer-does-not">We see the map—the optimizer does not</a></li>
+  <li><a href="#a-useful-picturewith-one-warning" id="toc-a-useful-picturewith-one-warning" class="nav-link" data-scroll-target="#a-useful-picturewith-one-warning">A useful picture—with one warning</a></li>
+  </ul></li>
+  <li><a href="#direction-step-size-1" id="toc-direction-step-size-1" class="nav-link" data-scroll-target="#direction-step-size-1">02 · Direction + step size</a>
+  <ul class="collapse">
+  <li><a href="#the-gradient-answers-a-local-question" id="toc-the-gradient-answers-a-local-question" class="nav-link" data-scroll-target="#the-gradient-answers-a-local-question">The gradient answers a local question</a></li>
+  <li><a href="#an-update-needs-two-decisions" id="toc-an-update-needs-two-decisions" class="nav-link" data-scroll-target="#an-update-needs-two-decisions">An update needs two decisions</a></li>
+  <li><a href="#your-turn-execute-one-update" id="toc-your-turn-execute-one-update" class="nav-link" data-scroll-target="#your-turn-execute-one-update">Your turn: execute one update</a></li>
+  <li><a href="#same-start-same-landscapechange-only-eta" id="toc-same-start-same-landscapechange-only-eta" class="nav-link" data-scroll-target="#same-start-same-landscapechange-only-eta">Same start, same landscape—change only <span class="math inline">\(\eta\)</span></a></li>
+  <li><a href="#one-update-becomes-a-training-loop" id="toc-one-update-becomes-a-training-loop" class="nav-link" data-scroll-target="#one-update-becomes-a-training-loop">One update becomes a training loop</a></li>
+  <li><a href="#gradient-descent-works-cleanly-on-the-easy-bowl" id="toc-gradient-descent-works-cleanly-on-the-easy-bowl" class="nav-link" data-scroll-target="#gradient-descent-works-cleanly-on-the-easy-bowl">Gradient descent works cleanly on the easy bowl</a></li>
+  </ul></li>
+  <li><a href="#difficult-terrain-1" id="toc-difficult-terrain-1" class="nav-link" data-scroll-target="#difficult-terrain-1">03 · Difficult terrain</a>
+  <ul class="collapse">
+  <li><a href="#one-rulethree-very-different-journeys" id="toc-one-rulethree-very-different-journeys" class="nav-link" data-scroll-target="#one-rulethree-very-different-journeys">One rule—three very different journeys</a></li>
+  <li><a href="#why-does-the-ravine-produce-a-zig-zag" id="toc-why-does-the-ravine-produce-a-zig-zag" class="nav-link" data-scroll-target="#why-does-the-ravine-produce-a-zig-zag">Why does the ravine produce a zig-zag?</a></li>
+  <li><a href="#a-small-gradient-does-not-mean-we-are-done" id="toc-a-small-gradient-does-not-mean-we-are-done" class="nav-link" data-scroll-target="#a-small-gradient-does-not-mean-we-are-done">A small gradient does not mean “we are done”</a></li>
+  <li><a href="#a-minibatch-gradient-is-a-noisy-estimate" id="toc-a-minibatch-gradient-is-a-noisy-estimate" class="nav-link" data-scroll-target="#a-minibatch-gradient-is-a-noisy-estimate">A minibatch gradient is a noisy estimate</a></li>
+  <li><a href="#sgd-can-refer-to-three-different-batch-regimes" id="toc-sgd-can-refer-to-three-different-batch-regimes" class="nav-link" data-scroll-target="#sgd-can-refer-to-three-different-batch-regimes">“SGD” can refer to three different batch regimes</a></li>
+  <li><a href="#curvature-changes-the-safe-step-size" id="toc-curvature-changes-the-safe-step-size" class="nav-link" data-scroll-target="#curvature-changes-the-safe-step-size">Curvature changes the safe step size</a></li>
+  <li><a href="#read-the-failure-before-choosing-a-remedy" id="toc-read-the-failure-before-choosing-a-remedy" class="nav-link" data-scroll-target="#read-the-failure-before-choosing-a-remedy">Read the failure before choosing a remedy</a></li>
+  </ul></li>
+  <li><a href="#remember-direction-1" id="toc-remember-direction-1" class="nav-link" data-scroll-target="#remember-direction-1">04 · Remember direction</a>
+  <ul class="collapse">
+  <li><a href="#gradient-descent-forgets-after-every-step" id="toc-gradient-descent-forgets-after-every-step" class="nav-link" data-scroll-target="#gradient-descent-forgets-after-every-step">Gradient descent forgets after every step</a></li>
+  <li><a href="#momentum-adds-one-state-variable" id="toc-momentum-adds-one-state-variable" class="nav-link" data-scroll-target="#momentum-adds-one-state-variable">Momentum adds one state variable</a></li>
+  <li><a href="#in-a-ravine-history-changes-the-path" id="toc-in-a-ravine-history-changes-the-path" class="nav-link" data-scroll-target="#in-a-ravine-history-changes-the-path">In a ravine, history changes the path</a></li>
+  <li><a href="#your-turn-update-the-optimizer-state" id="toc-your-turn-update-the-optimizer-state" class="nav-link" data-scroll-target="#your-turn-update-the-optimizer-state">Your turn: update the optimizer state</a></li>
+  <li><a href="#how-much-history-should-survive" id="toc-how-much-history-should-survive" class="nav-link" data-scroll-target="#how-much-history-should-survive">How much history should survive?</a></li>
+  <li><a href="#nesterov-asks-at-the-look-ahead-point" id="toc-nesterov-asks-at-the-look-ahead-point" class="nav-link" data-scroll-target="#nesterov-asks-at-the-look-ahead-point">Nesterov asks at the look-ahead point</a></li>
+  <li><a href="#remembering-direction-solves-only-part-of-the-problem" id="toc-remembering-direction-solves-only-part-of-the-problem" class="nav-link" data-scroll-target="#remembering-direction-solves-only-part-of-the-problem">Remembering direction solves only part of the problem</a></li>
+  </ul></li>
+  <li><a href="#adapt-each-step-1" id="toc-adapt-each-step-1" class="nav-link" data-scroll-target="#adapt-each-step-1">05 · Adapt each step</a>
+  <ul class="collapse">
+  <li><a href="#one-learning-rate-can-mean-two-very-different-steps" id="toc-one-learning-rate-can-mean-two-very-different-steps" class="nav-link" data-scroll-target="#one-learning-rate-can-mean-two-very-different-steps">One learning rate can mean two very different steps</a></li>
+  <li><a href="#adagrad-remembers-every-squared-gradient" id="toc-adagrad-remembers-every-squared-gradient" class="nav-link" data-scroll-target="#adagrad-remembers-every-squared-gradient">AdaGrad remembers every squared gradient</a></li>
+  <li><a href="#your-turn-compare-two-coordinate-updates" id="toc-your-turn-compare-two-coordinate-updates" class="nav-link" data-scroll-target="#your-turn-compare-two-coordinate-updates">Your turn: compare two coordinate updates</a></li>
+  <li><a href="#adagrads-strength-becomes-its-weakness" id="toc-adagrads-strength-becomes-its-weakness" class="nav-link" data-scroll-target="#adagrads-strength-becomes-its-weakness">AdaGrad’s strength becomes its weakness</a></li>
+  <li><a href="#rmsprop-replaces-the-total-with-a-moving-average" id="toc-rmsprop-replaces-the-total-with-a-moving-average" class="nav-link" data-scroll-target="#rmsprop-replaces-the-total-with-a-moving-average">RMSProp replaces the total with a moving average</a></li>
+  <li><a href="#adam-keeps-two-kinds-of-memory" id="toc-adam-keeps-two-kinds-of-memory" class="nav-link" data-scroll-target="#adam-keeps-two-kinds-of-memory">Adam keeps two kinds of memory</a></li>
+  <li><a href="#match-the-optimizer-to-the-information-it-stores" id="toc-match-the-optimizer-to-the-information-it-stores" class="nav-link" data-scroll-target="#match-the-optimizer-to-the-information-it-stores">Match the optimizer to the information it stores</a></li>
+  </ul></li>
+  <li><a href="#read-the-training-run-1" id="toc-read-the-training-run-1" class="nav-link" data-scroll-target="#read-the-training-run-1">06 · Read the training run</a>
+  <ul class="collapse">
+  <li><a href="#a-training-run-leaves-several-traces" id="toc-a-training-run-leaves-several-traces" class="nav-link" data-scroll-target="#a-training-run-leaves-several-traces">A training run leaves several traces</a></li>
+  <li><a href="#the-loss-curve-reveals-the-learning-rate-regime" id="toc-the-loss-curve-reveals-the-learning-rate-regime" class="nav-link" data-scroll-target="#the-loss-curve-reveals-the-learning-rate-regime">The loss curve reveals the learning-rate regime</a></li>
+  <li><a href="#why-schedule-the-learning-rate" id="toc-why-schedule-the-learning-rate" class="nav-link" data-scroll-target="#why-schedule-the-learning-rate">Why schedule the learning rate?</a></li>
+  <li><a href="#your-turn-diagnose-before-changing-anything" id="toc-your-turn-diagnose-before-changing-anything" class="nav-link" data-scroll-target="#your-turn-diagnose-before-changing-anything">Your turn: diagnose before changing anything</a></li>
+  <li><a href="#translate-symptoms-into-the-next-controlled-test" id="toc-translate-symptoms-into-the-next-controlled-test" class="nav-link" data-scroll-target="#translate-symptoms-into-the-next-controlled-test">Translate symptoms into the next controlled test</a></li>
+  <li><a href="#the-complete-optimization-story" id="toc-the-complete-optimization-story" class="nav-link" data-scroll-target="#the-complete-optimization-story">The complete optimization story</a></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.html"><i class="bi bi-file-slides"></i>RevealJS</a></li></ul></div></nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Optimization: Making Learning Move</h1>
+<p class="subtitle lead">From gradients to reliable parameter updates</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dr.&nbsp;A. Belcaid </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="optimization-making-learning-move" class="level2 deck-title">
+<h2 class="deck-title anchored" data-anchor-id="optimization-making-learning-move">Optimization: making learning move</h2>
+<div class="deck-title-grid">
+<div class="deck-title-copy">
+<p><span class="eyebrow">CHAPTER 04 · OPTIMIZATION</span></p>
+<section id="from-gradients-to-reliable-parameter-updates" class="level3">
+<h3 class="anchored" data-anchor-id="from-gradients-to-reliable-parameter-updates">From gradients to reliable parameter updates</h3>
+<p>Backpropagation tells us <strong>how the loss changes</strong>. Optimization decides <strong>how the parameters should move</strong>.</p>
+<p><span class="deck-author">Dr.&nbsp;A. Belcaid</span></p>
+</section>
+</div>
+<div class="deck-title-art optimization-hero">
+<p><img src="assets/optimization-hero.png" class="img-fluid" alt="A luminous optimization trajectory descends through a narrow three-dimensional loss landscape, beside alternative zig-zagging paths."></p>
+</div>
+</div>
+<div class="notes">
+<p>Connect directly to Chapter 3. Gradients are information, not updates. This chapter studies the rule that converts that information into a trajectory through parameter space. The hero previews three recurring ideas: landscape geometry, path history, and different step scales.</p>
+</div>
+</section>
+<section id="todays-journey" class="level2">
+<h2 class="anchored" data-anchor-id="todays-journey">Today’s journey</h2>
+<div class="optimization-roadmap">
+<div class="optimizer-stop landscape-stop">
+<p><span>01</span></p>
+<section id="loss-landscapes" class="level3">
+<h3 class="anchored" data-anchor-id="loss-landscapes">Loss landscapes</h3>
+<p>What does learning navigate?</p>
+</section>
+</div>
+<div class="optimizer-stop step-stop">
+<p><span>02</span></p>
+<section id="direction-step-size" class="level3">
+<h3 class="anchored" data-anchor-id="direction-step-size">Direction + step size</h3>
+<p>Gradient descent and learning rate</p>
+</section>
+</div>
+<div class="optimizer-stop difficulty-stop">
+<p><span>03</span></p>
+<section id="difficult-terrain" class="level3">
+<h3 class="anchored" data-anchor-id="difficult-terrain">Difficult terrain</h3>
+<p>Noise, ravines, plateaus, curvature</p>
+</section>
+</div>
+<div class="optimizer-stop momentum-stop">
+<p><span>04</span></p>
+<section id="remember-direction" class="level3">
+<h3 class="anchored" data-anchor-id="remember-direction">Remember direction</h3>
+<p>Momentum and Nesterov</p>
+</section>
+</div>
+<div class="optimizer-stop adaptive-stop">
+<p><span>05</span></p>
+<section id="adapt-each-step" class="level3">
+<h3 class="anchored" data-anchor-id="adapt-each-step">Adapt each step</h3>
+<p>AdaGrad, RMSProp, and Adam</p>
+</section>
+</div>
+<div class="optimizer-stop diagnostic-stop">
+<p><span>06</span></p>
+<section id="read-the-training-run" class="level3">
+<h3 class="anchored" data-anchor-id="read-the-training-run">Read the training run</h3>
+<p>Schedules, curves, and diagnosis</p>
+</section>
+</div>
+</div>
+<div class="roadmap-question fragment">
+<p><span>Our recurring experiment:</span> <strong>same landscape · same start · different update rule</strong></p>
+</div>
+<div class="notes">
+<p>This is a 1h30 path with active demonstrations throughout, not six equal blocks. Sections 1–3 establish the mechanism and its failures. Sections 4–5 introduce optimizer families as responses to visible failures. Section 6 translates the visual intuition into practical training decisions. Use Gradient Lab repeatedly with the same initial point and change one control at a time.</p>
+</div>
+</section>
+<section id="loss-landscapes-1" class="level1 section-slide landscape-section" data-section-progress="1 / 6" style="--section-progress:16.667%">
+<h1 class="section-slide landscape-section" data-section-progress="1 / 6" style="--section-progress:16.667%">01 · Loss landscapes</h1>
+<section id="one-model-many-parameter-settings" class="level2">
+<h2 class="anchored" data-anchor-id="one-model-many-parameter-settings">One model, many parameter settings</h2>
+<div class="landscape-model">
+<p><span>TWO-PARAMETER CLASSIFIER</span></p>
+<p><span class="math display">\[
+z=w_1x_1+w_2x_2,\qquad \hat y=\sigma(z)
+\]</span></p>
+</div>
+<div class="boundary-gallery">
+<div class="boundary-card fragment">
+<p><img src="assets/boundary-1-poor.svg" class="img-fluid" alt="A poor linear decision boundary for the small binary dataset, with high binary cross-entropy."></p>
+</div>
+<div class="boundary-card fragment">
+<p><img src="assets/boundary-2-better.svg" class="img-fluid" alt="A better linear decision boundary for the same dataset, with lower binary cross-entropy."></p>
+</div>
+<div class="boundary-card fragment">
+<p><img src="assets/boundary-3-strong.svg" class="img-fluid" alt="A strong linear decision boundary separating the same dataset, with the lowest binary cross-entropy of the three settings."></p>
+</div>
+</div>
+<div class="landscape-takeaway fragment">
+<p><span>same data · same model</span> <strong>change the parameters → change the predictions → change the loss</strong></p>
+</div>
+<div class="notes">
+<p>Begin with the concrete classifier. Reveal one parameter setting at a time and ask students to predict whether its loss should be higher or lower before showing the next panel. The values are computed from the ten displayed observations with binary cross-entropy; they are not decorative estimates. Do not introduce optimization yet—we are only establishing that each parameter setting produces one model and one loss.</p>
+</div>
+</section>
+<section id="parameters-become-a-point" class="level2">
+<h2 class="anchored" data-anchor-id="parameters-become-a-point">Parameters become a point</h2>
+<div class="parameter-map">
+<div class="parameter-vector">
+<p><span>THE MODEL STORES</span></p>
+<p><span class="math display">\[
+\theta=
+\begin{bmatrix}
+w_1\\[4pt]w_2
+\end{bmatrix}
+=
+\begin{bmatrix}
+0.25\\[4pt]0.35
+\end{bmatrix}
+\]</span></p>
+<div class="mini-boundary">
+<i></i><b></b><b></b><b></b><b></b><em></em>
+</div>
+</div>
+<div class="mapping-arrow fragment">
+<p><span>one coordinate</span> <strong>→</strong></p>
+</div>
+<div class="parameter-plane fragment">
+<span>PARAMETER SPACE</span>
+<div class="coordinate-plane">
+<p><i class="axis-x"></i><i class="axis-y"></i> <b class="parameter-dot"></b> <em><span class="math inline">\((0.25,\,0.35)\)</span></em> <small class="w1-label"><span class="math inline">\(w_1\)</span></small><small class="w2-label"><span class="math inline">\(w_2\)</span></small></p>
+</div>
+</div>
+</div>
+<div class="parameter-loss-map fragment">
+<p><span class="math display">\[
+(w_1,w_2)\quad\longmapsto\quad \mathcal L(w_1,w_2)
+\]</span></p>
+<p><strong>Every point represents one complete model—and receives one loss.</strong></p>
+</div>
+<div class="notes">
+<p>Make the representation change explicit: the two numbers that defined a boundary on the previous slide are now coordinates. A point in parameter space is not an observation and not a hidden activation; it is a complete parameter setting. For a model with P parameters, the same idea produces a point in P-dimensional space.</p>
+</div>
+</section>
+<section id="build-the-landscapedo-not-assume-it" class="level2">
+<h2 class="anchored" data-anchor-id="build-the-landscapedo-not-assume-it">Build the landscape—do not assume it</h2>
+<div class="landscape-build">
+<div class="build-stage">
+<span>1 · EVALUATE</span> <img src="assets/landscape-samples.svg" class="img-fluid" alt="Nine sampled parameter settings labeled by their computed loss.">
+<p>
+Try several parameter settings.
+</p>
+</div>
+<div class="build-arrow fragment">
+<p>→</p>
+</div>
+<div class="build-stage fragment">
+<span>2 · CONNECT</span> <img src="assets/loss-contours.svg" class="img-fluid" alt="A contour map joining parameter settings that have equal loss.">
+<p>
+Join regions of equal loss.
+</p>
+</div>
+<div class="build-arrow fragment">
+<p>→</p>
+</div>
+<div class="build-stage fragment">
+<span>3 · LIFT</span> <img src="assets/loss-surface.svg" class="img-fluid" alt="A three-dimensional rendering of the same two-parameter loss surface.">
+<p>
+Use height to encode loss.
+</p>
+</div>
+</div>
+<div class="landscape-definition fragment">
+<p><strong>A loss landscape is simply the loss evaluated across parameter settings.</strong></p>
+</div>
+<div class="notes">
+<p>This slide prevents the landscape metaphor from becoming mystical. First we could train several models and record their losses. A dense set of evaluations creates the contour view; height creates the 3D view. All three panels describe the same function for the same classifier. Contours are usually more useful for reading directions, while surfaces are often more intuitive for introducing the idea.</p>
+</div>
+</section>
+<section id="which-move-would-you-choose" class="level2">
+<h2 class="anchored" data-anchor-id="which-move-would-you-choose">Which move would you choose?</h2>
+<div class="contour-exercise">
+<div class="contour-visual">
+<p><img src="assets/candidate-moves.svg" class="img-fluid" alt="A loss contour map with a current parameter point and three candidate moves labeled A, B, and C."></p>
+</div>
+<div class="contour-prompt">
+<p><span>READ THE MAP</span></p>
+<section id="from-the-orange-point-which-move-should-reduce-the-loss-most" class="level3">
+<h3 class="anchored" data-anchor-id="from-the-orange-point-which-move-should-reduce-the-loss-most">From the orange point, which move should reduce the loss most?</h3>
+<div class="move-options">
+<b>A</b><b>B</b><b>C</b>
+</div>
+<div class="pause-panel">
+<p><strong>PAUSE · 45 seconds</strong> <span>Use only the contour shading—no derivatives yet.</span></p>
+</div>
+<div class="fragment move-answer">
+<p><span>WORKED READING</span> <strong>C crosses toward progressively lower-loss contours.</strong> <small>A and B enter darker, higher-loss regions.</small></p>
+</div>
+</section>
+</div>
+</div>
+<div class="notes">
+<p>Ask for a vote before advancing. The exercise uses visual global information, which an optimizer will not actually possess. That tension is intentional and motivates the next slide. Emphasize that the choice is about a small move from the current point, not jumping directly to a visible minimum.</p>
+</div>
+</section>
+<section id="we-see-the-mapthe-optimizer-does-not" class="level2">
+<h2 class="anchored" data-anchor-id="we-see-the-mapthe-optimizer-does-not">We see the map—the optimizer does not</h2>
+<div class="knowledge-contrast">
+<div class="teacher-view">
+<p><span>OUR TEACHING VIEW</span> <img src="assets/loss-contours.svg" class="img-fluid" alt="The full loss contour map visible to the instructor and students."> <strong>surface · contours · basin</strong></p>
+</div>
+<div class="optimizer-view fragment">
+<span>OPTIMIZER’S VIEW</span>
+<div class="local-window">
+<p><b></b><i class="local-gradient"></i></p>
+</div>
+<p><strong>one point · one loss · local gradient</strong></p>
+</div>
+</div>
+<div class="local-question fragment">
+<div class="local-label">
+At step <span class="math inline">\(t\)</span>, it knows
+</div>
+<div class="local-state">
+<p><span class="math display">\[
+\theta_t,\quad \mathcal L(\theta_t),\quad \nabla_\theta\mathcal L(\theta_t)
+\]</span></p>
+</div>
+<div class="local-prompt">
+<strong>How should that local information become the next point?</strong>
+</div>
+</div>
+<div class="notes">
+<p>Correct a common misconception: gradient-based training does not render or search the whole surface. We can visualize the complete two-dimensional example because it is tiny. The optimizer evaluates the current minibatch loss and obtains local derivatives through backpropagation. Section 2 will turn that gradient into a direction and choose a step size.</p>
+</div>
+</section>
+<section id="a-useful-picturewith-one-warning" class="level2">
+<h2 class="anchored" data-anchor-id="a-useful-picturewith-one-warning">A useful picture—with one warning</h2>
+<div class="dimension-story">
+<div class="dimension-card two-d">
+<span>OUR EXACT EXAMPLE</span> <strong>2 parameters</strong>
+<div class="dimension-vector">
+<span class="math inline">\((w_1,w_2)\)</span>
+</div>
+<p><small>The complete landscape fits on a page.</small></p>
+</div>
+<div class="dimension-expand fragment">
+<p>→</p>
+</div>
+<div class="dimension-card many-d fragment">
+<span>A REAL NETWORK</span> <strong><span class="math inline">\(P\)</span> parameters</strong>
+<div class="dimension-vector">
+<span class="math inline">\((\theta_1,\theta_2,\ldots,\theta_P)\)</span>
+</div>
+<p><small>The landscape lives in <span class="math inline">\(P\)</span> dimensions.</small></p>
+</div>
+</div>
+<div class="slice-explanation fragment">
+<div class="slice-visual">
+<div class="high-d-cloud">
+<i></i><i></i><i></i><i></i><i></i><b></b>
+</div>
+</div>
+<section id="most-neural-network-landscapes-are-visualized-through-a-1d-or-2d-slice." class="level3 slice-copy">
+<h3 class="anchored" data-anchor-id="most-neural-network-landscapes-are-visualized-through-a-1d-or-2d-slice.">Most neural-network landscapes are visualized through a 1D or 2D slice.</h3>
+<p>The picture is a <strong>thinking tool</strong>—not a complete map of millions of dimensions.</p>
+</section>
+</div>
+<div class="section-bridge fragment">
+<div class="bridge-label">
+KEEP THIS IDEA
+</div>
+<div class="bridge-claim">
+<strong>Training is a trajectory through parameter space.</strong>
+</div>
+<div class="bridge-detail">
+The update rule determines that trajectory.
+</div>
+</div>
+<div class="notes">
+<p>Be precise about dimensionality. Our logistic classifier truly has two parameters, so its surface is exact. For a network, a plotted surface usually varies parameters along two selected directions while holding the remaining coordinates implicit. The picture remains pedagogically useful for curvature, ravines, and trajectories, but it should not be presented as the full object.</p>
+</div>
+</section>
+</section>
+<section id="direction-step-size-1" class="level1 section-slide step-section" data-section-progress="2 / 6" style="--section-progress:33.333%">
+<h1 class="section-slide step-section" data-section-progress="2 / 6" style="--section-progress:33.333%">02 · Direction + step size</h1>
+<section id="the-gradient-answers-a-local-question" class="level2">
+<h2 class="anchored" data-anchor-id="the-gradient-answers-a-local-question">The gradient answers a local question</h2>
+<div class="slope-story">
+<div class="slope-plot">
+<p><img src="assets/local-slope.svg" class="img-fluid" alt="A one-dimensional quadratic loss curve at w equals 3, with a tangent whose positive slope points uphill to the right and a negative-gradient arrow pointing downhill to the left."></p>
+</div>
+<div class="slope-reading">
+<div class="evidence-tag">
+AT THE CURRENT POINT
+</div>
+<p><span class="math display">\[
+\mathcal L(w)=(w-1)^2,\qquad w_t=3
+\]</span></p>
+<div class="slope-question fragment">
+The derivative is positive. Which way lowers the loss?
+</div>
+<div class="slope-answer fragment">
+<p><span>REVEAL</span> <strong>Move opposite the slope: to the left.</strong> <small><span class="math inline">\(\nabla_w\mathcal L(3)=4\)</span>, so <span class="math inline">\(-\nabla_w\mathcal L(3)=-4\)</span>.</small></p>
+</div>
+</div>
+</div>
+<div class="gradient-principle fragment">
+<div class="principle-label">
+LOCAL RULE
+</div>
+<div class="principle-copy">
+The gradient points toward the steepest local increase; its negative points toward the steepest local decrease.
+</div>
+</div>
+<div class="notes">
+<p>Budget about three minutes. Start with the curve, not the definition. Ask students to read the sign of the tangent and choose left or right before revealing the arrow interpretation. The statement is local: it identifies the steepest infinitesimal decrease at the current point, not the location of the minimum and not a promise that any finite step will help.</p>
+</div>
+</section>
+<section id="an-update-needs-two-decisions" class="level2">
+<h2 class="anchored" data-anchor-id="an-update-needs-two-decisions">An update needs two decisions</h2>
+<div class="update-anatomy">
+<div class="update-equation">
+<div class="equation-kicker">
+GRADIENT DESCENT
+</div>
+<p><span class="math display">\[
+\theta_{t+1}=\theta_t-\eta\,\nabla_\theta\mathcal L(\theta_t)
+\]</span></p>
+</div>
+<div class="update-parts">
+<div class="update-part direction-part fragment">
+<p><span>1 · DIRECTION</span> <strong><span class="math inline">\(-\nabla_\theta\mathcal L(\theta_t)\)</span></strong> <small>Which way should we move?</small></p>
+</div>
+<div class="update-part distance-part fragment">
+<p><span>2 · STEP SIZE</span> <strong><span class="math inline">\(\eta\)</span></strong> <small>How far should we move?</small></p>
+</div>
+</div>
+</div>
+<div class="step-vector-demo fragment">
+<div class="step-start">
+<b></b><span><span class="math inline">\(\theta_t\)</span></span>
+</div>
+<div class="step-arrow short-step">
+<i></i><span>smaller <span class="math inline">\(\eta\)</span></span>
+</div>
+<div class="step-arrow long-step">
+<i></i><span>larger <span class="math inline">\(\eta\)</span></span>
+</div>
+<div class="step-end short-end">
+<b></b>
+</div>
+<div class="step-end long-end">
+<b></b>
+</div>
+</div>
+<div class="update-caution fragment">
+<div class="caution-label">
+SAME GRADIENT
+</div>
+<div class="caution-copy">
+Changing <span class="math inline">\(\eta\)</span> keeps the direction—but changes the destination.
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Read the equation from left to right as an action: start at the current parameters, obtain the local direction from backpropagation, scale it, and subtract. Use the lower vector diagram to distinguish direction from distance. Eta is dimensionless notation here; its practical scale depends on the loss, parameterization, batch, and optimizer.</p>
+</div>
+</section>
+<section id="your-turn-execute-one-update" class="level2">
+<h2 class="anchored" data-anchor-id="your-turn-execute-one-update">Your turn: execute one update</h2>
+<div class="update-exercise">
+<div class="exercise-givens">
+<div class="exercise-label">
+GIVENS
+</div>
+<p><span class="math display">\[
+\theta_t=
+\begin{bmatrix}0.25\\0.35\end{bmatrix},\qquad
+\nabla_\theta\mathcal L(\theta_t)=
+\begin{bmatrix}0.40\\-0.20\end{bmatrix},\qquad
+\eta=0.5
+\]</span></p>
+<div class="exercise-task">
+<strong>Task:</strong> compute <span class="math inline">\(\theta_{t+1}\)</span> and state how each parameter moves.
+</div>
+</div>
+<div class="exercise-work">
+<div class="pause-panel">
+<p><strong>PAUSE · 60 seconds</strong> <span>Scale the gradient first; then subtract component by component.</span></p>
+</div>
+<div class="worked-update fragment">
+<p><span>WORKED SOLUTION</span></p>
+<p><span class="math display">\[
+\theta_{t+1}
+=\begin{bmatrix}0.25\\0.35\end{bmatrix}
+-0.5\begin{bmatrix}0.40\\-0.20\end{bmatrix}
+=\begin{bmatrix}0.05\\0.45\end{bmatrix}
+\]</span></p>
+<p><small><span class="math inline">\(w_1\)</span> decreases by <span class="math inline">\(0.20\)</span>; <span class="math inline">\(w_2\)</span> increases by <span class="math inline">\(0.10\)</span>.</small></p>
+</div>
+</div>
+</div>
+<div class="transfer-check fragment">
+<div class="transfer-label">
+TRANSFER
+</div>
+<div class="transfer-copy">
+If <span class="math inline">\(\eta\)</span> doubled, would the direction change, the distance change, or both?
+</div>
+<div class="transfer-answer fragment">
+Only the distance: the update would be twice as long.
+</div>
+</div>
+<div class="notes">
+<p>Budget about three minutes including the pause. Insist on the minus sign: the second gradient component is negative, so subtracting it increases w2. Reveal the numerical displacement before the verbal interpretation. For the transfer question, keep the gradient fixed; later sections will show that changing the destination changes the next gradient.</p>
+</div>
+</section>
+<section id="same-start-same-landscapechange-only-eta" class="level2">
+<h2 class="anchored" data-anchor-id="same-start-same-landscapechange-only-eta">Same start, same landscape—change only <span class="math inline">\(\eta\)</span></h2>
+<div class="rate-experiment">
+<div class="rate-card slow-rate fragment">
+<div class="rate-label">
+<span class="math inline">\(\eta=0.05\)</span>
+</div>
+<p><img src="assets/rate-too-small.svg" class="img-fluid" alt="Loss contours with a very short gradient-descent trajectory that makes safe but slow progress from the same initial point."> <strong>Safe, but slow</strong> <small>Ten updates barely cross the basin.</small></p>
+</div>
+<div class="rate-card useful-rate fragment">
+<div class="rate-label">
+<span class="math inline">\(\eta=0.25\)</span>
+</div>
+<p><img src="assets/rate-useful.svg" class="img-fluid" alt="Loss contours with a gradient-descent trajectory that reaches the low-loss center efficiently from the same initial point."> <strong>Useful progress</strong> <small>Steps shrink naturally near the minimum.</small></p>
+</div>
+<div class="rate-card large-rate fragment">
+<div class="rate-label">
+<span class="math inline">\(\eta=0.85\)</span>
+</div>
+<p><img src="assets/rate-too-large.svg" class="img-fluid" alt="Loss contours with a gradient-descent trajectory that overshoots repeatedly across the basin from the same initial point."> <strong>Overshoots</strong> <small>Loss can oscillate—or even diverge.</small></p>
+</div>
+</div>
+<div class="rate-conclusion fragment">
+<div class="rate-conclusion-label">
+CONCLUSION
+</div>
+<div class="rate-conclusion-copy">
+The gradient chooses a direction. The learning rate decides whether that direction becomes progress.
+</div>
+</div>
+<div class="notes">
+<p>Budget about three minutes. Reveal the panels left to right and ask students to describe the path before naming it. All panels use the same quadratic landscape, initial point, and update rule; eta is the only controlled variable. A small eta is not incorrect—it trades time for conservative movement. A large eta can cross the valley because the gradient is local while the update is finite.</p>
+</div>
+</section>
+<section id="one-update-becomes-a-training-loop" class="level2">
+<h2 class="anchored" data-anchor-id="one-update-becomes-a-training-loop">One update becomes a training loop</h2>
+<div class="gd-loop">
+<div class="loop-stage data-stage">
+<div class="loop-icon">
+<span class="math inline">\(B_t\)</span>
+</div>
+<p><strong>Sample a minibatch</strong> <small>data</small></p>
+</div>
+<div class="loop-arrow fragment">
+<p>→</p>
+</div>
+<div class="loop-stage forward-stage fragment">
+<div class="loop-icon">
+<span class="math inline">\(\hat y\)</span>
+</div>
+<p><strong>Predict</strong> <small>hypothesis</small></p>
+</div>
+<div class="loop-arrow fragment">
+<p>→</p>
+</div>
+<div class="loop-stage loss-stage fragment">
+<div class="loop-icon">
+<span class="math inline">\(\mathcal L\)</span>
+</div>
+<p><strong>Measure error</strong> <small>loss</small></p>
+</div>
+<div class="loop-arrow fragment">
+<p>→</p>
+</div>
+<div class="loop-stage gradient-stage fragment">
+<div class="loop-icon">
+<span class="math inline">\(\nabla\)</span>
+</div>
+<p><strong>Backpropagate</strong> <small>gradient</small></p>
+</div>
+<div class="loop-arrow fragment">
+<p>→</p>
+</div>
+<div class="loop-stage update-stage fragment">
+<div class="loop-icon">
+<span class="math inline">\(\theta^+\)</span>
+</div>
+<p><strong>Update parameters</strong> <small>optimization</small></p>
+</div>
+</div>
+<div class="loop-return fragment">
+<div class="return-arrow">
+↖
+</div>
+<div class="return-copy">
+<strong>Repeat with the new parameters</strong><span>Evaluation remains separate: judge generalization on held-out data.</span>
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes. This reconnects optimization to the course’s five-part frame. The optimizer does not replace the model, loss, or backpropagation; it consumes the gradient and changes theta. Point out that minibatch sampling makes the observed gradient vary, which sets up the next section, but do not teach stochastic optimization failures yet. Evaluation uses held-out data and does not produce training updates.</p>
+</div>
+</section>
+<section id="gradient-descent-works-cleanly-on-the-easy-bowl" class="level2">
+<h2 class="anchored" data-anchor-id="gradient-descent-works-cleanly-on-the-easy-bowl">Gradient descent works cleanly on the easy bowl</h2>
+<div class="easy-bowl-bridge">
+<div class="easy-bowl-visual">
+<p><img src="assets/rate-useful.svg" class="img-fluid" alt="A smooth bowl-shaped contour landscape with gradient descent converging toward its center."></p>
+</div>
+<div class="easy-bowl-copy">
+<div class="bridge-eyebrow">
+SO FAR, WE ASSUMED
+</div>
+<div class="assumption fragment">
+<b>01</b><span>a smooth, well-scaled bowl</span>
+</div>
+<div class="assumption fragment">
+<b>02</b><span>a trustworthy local gradient</span>
+</div>
+<div class="assumption fragment">
+<b>03</b><span>one learning rate that works everywhere</span>
+</div>
+<div class="terrain-question fragment">
+<strong>What changes when the landscape is narrow, flat, curved, or noisy?</strong>
+</div>
+</div>
+</div>
+<div class="notes">
+<p>Budget about one minute. This is a deliberate handoff, not a summary of failure modes. Students now have the baseline mechanism needed to recognize why difficult terrain causes trouble. Section 3 should break these assumptions one at a time using the same starting point and controlled comparisons.</p>
+</div>
+</section>
+</section>
+<section id="difficult-terrain-1" class="level1 section-slide difficulty-section" data-section-progress="3 / 6" style="--section-progress:50%">
+<h1 class="section-slide difficulty-section" data-section-progress="3 / 6" style="--section-progress:50%">03 · Difficult terrain</h1>
+<section id="one-rulethree-very-different-journeys" class="level2">
+<h2 class="anchored" data-anchor-id="one-rulethree-very-different-journeys">One rule—three very different journeys</h2>
+<div class="terrain-gallery">
+<div class="terrain-card bowl-card">
+<div class="terrain-label">
+WELL-SCALED BOWL
+</div>
+<p><img src="assets/terrain-bowl.svg" class="img-fluid" alt="Circular loss contours with a short gradient-descent path moving directly toward the minimum."> <strong>Direct progress</strong></p>
+</div>
+<div class="terrain-card ravine-card fragment">
+<div class="terrain-label">
+NARROW RAVINE
+</div>
+<p><img src="assets/terrain-ravine.svg" class="img-fluid" alt="Long narrow loss contours with a gradient-descent path zig-zagging across the steep walls while progressing slowly along the valley."> <strong>Side-to-side oscillation</strong></p>
+</div>
+<div class="terrain-card plateau-card fragment">
+<div class="terrain-label">
+FLAT PLATEAU
+</div>
+<p><img src="assets/terrain-plateau.svg" class="img-fluid" alt="A mostly flat loss surface with a gradient-descent path making tiny steps far from the low-loss basin."> <strong>Barely moves</strong></p>
+</div>
+</div>
+<div class="terrain-control fragment">
+<div class="terrain-control-label">
+CONTROLLED COMPARISON
+</div>
+<div class="terrain-control-copy">
+Same update rule · comparable start · useful learning rate on the easy bowl
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Reveal one landscape at a time and ask students to describe only the path before naming the failure. The optimizer has not changed; the local geometry has. The three panels establish the section’s organizing question: what information is missing when one current gradient is converted directly into one step?</p>
+</div>
+</section>
+<section id="why-does-the-ravine-produce-a-zig-zag" class="level2">
+<h2 class="anchored" data-anchor-id="why-does-the-ravine-produce-a-zig-zag">Why does the ravine produce a zig-zag?</h2>
+<div class="ravine-exercise">
+<div class="ravine-visual">
+<p><img src="assets/ravine-components.svg" class="img-fluid" alt="A narrow diagonal ravine with the gradient at the current point decomposed into a large across-ravine component and a small along-ravine component."></p>
+</div>
+<div class="ravine-prompt">
+<div class="exercise-label">
+READ THE COMPONENTS
+</div>
+<section id="which-component-dominates-the-next-update" class="level3">
+<h3 class="anchored" data-anchor-id="which-component-dominates-the-next-update">Which component dominates the next update?</h3>
+<div class="component-options">
+<span><b>A</b> along the valley</span><span><b>B</b> across the valley</span>
+</div>
+<div class="pause-panel">
+<p><strong>PAUSE · 45 seconds</strong> <span>Compare arrow lengths before thinking about the minimum.</span></p>
+</div>
+<div class="ravine-solution fragment">
+<p><span>WORKED READING</span> <strong>B dominates: steep walls create a large across-valley gradient.</strong> <small>The sign flips on the opposite wall, so successive steps bounce while forward progress remains small.</small></p>
+</div>
+</section>
+</div>
+</div>
+<div class="ravine-transfer fragment">
+<div class="transfer-label">
+TRANSFER
+</div>
+<div class="transfer-copy">
+Lowering <span class="math inline">\(\eta\)</span> reduces the bouncing—but what happens to progress along the shallow valley?
+</div>
+<div class="transfer-answer fragment">
+It becomes even slower.
+</div>
+</div>
+<div class="notes">
+<p>Budget about three minutes including the pause. Use the component decomposition to connect the visual path to the gradient. Curvature is high across the ravine and low along it. A single scalar learning rate scales both components equally, creating a compromise: large enough to move along the valley can be too large across it; safe across it can be painfully slow along it.</p>
+</div>
+</section>
+<section id="a-small-gradient-does-not-mean-we-are-done" class="level2">
+<h2 class="anchored" data-anchor-id="a-small-gradient-does-not-mean-we-are-done">A small gradient does not mean “we are done”</h2>
+<div class="flat-contrast">
+<div class="flat-case minimum-case">
+<div class="flat-label">
+AT A MINIMUM
+</div>
+<img src="assets/small-gradient-minimum.svg" class="img-fluid" alt="A one-dimensional loss curve at its minimum, where the local slope and gradient are near zero and the loss is low.">
+<div class="flat-readout">
+<span>gradient</span><strong>small</strong><span>loss</span><strong>low</strong>
+</div>
+</div>
+<div class="flat-case plateau-case fragment">
+<div class="flat-label">
+ON A PLATEAU
+</div>
+<img src="assets/small-gradient-plateau.svg" class="img-fluid" alt="A one-dimensional loss curve on a high flat plateau, where the local slope and gradient are near zero although the loss remains high.">
+<div class="flat-readout">
+<span>gradient</span><strong>small</strong><span>loss</span><strong>high</strong>
+</div>
+</div>
+</div>
+<div class="flat-conclusion fragment">
+<div class="flat-conclusion-label">
+SAME LOCAL SIGNAL
+</div>
+<div class="flat-conclusion-copy">
+<span class="math inline">\(\lVert\nabla\mathcal L\rVert\approx0\)</span> can mean success, a plateau, or a saddle-like region.
+</div>
+<div class="flat-conclusion-test">
+Check the loss and the recent trajectory—not the gradient norm alone.
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Ask whether a near-zero gradient is sufficient evidence of convergence before revealing the plateau. It is not. In high dimensions, saddle points and broad flat regions are additional possibilities. Keep the claim operational: diagnose with the loss level and recent movement rather than introducing Hessian eigenvalue analysis here.</p>
+</div>
+</section>
+<section id="a-minibatch-gradient-is-a-noisy-estimate" class="level2">
+<h2 class="anchored" data-anchor-id="a-minibatch-gradient-is-a-noisy-estimate">A minibatch gradient is a noisy estimate</h2>
+<div class="noise-story">
+<div class="noise-visual">
+<p><img src="assets/noisy-gradients.svg" class="img-fluid" alt="At one parameter point, six minibatches produce negative-gradient update arrows with different directions; their average points toward the full-dataset descent direction."></p>
+</div>
+<div class="noise-copy">
+<div class="noise-evidence">
+SAME PARAMETERS · DIFFERENT MINIBATCHES
+</div>
+<div class="noise-question fragment">
+Which arrow should the optimizer trust?
+</div>
+<div class="noise-reveal fragment">
+<p><span>REVEAL</span> <strong>Each minibatch provides an estimate—not the exact full-data gradient.</strong> <small>Averaging more examples usually reduces variation, but costs more computation per update.</small></p>
+</div>
+</div>
+</div>
+<div class="gradient-estimate fragment">
+<div class="estimate-batch">
+<span class="math inline">\(-g_t=-\nabla_\theta\mathcal L_{B_t}(\theta_t)\)</span>
+</div>
+<div class="estimate-arrow">
+≈
+</div>
+<div class="estimate-full">
+<span class="math inline">\(-\nabla_\theta\mathcal L_{\mathrm{data}}(\theta_t)\)</span>
+</div>
+<div class="estimate-note">
+useful direction + sampling noise
+</div>
+</div>
+<div class="notes">
+<p>Budget about three minutes. First reveal the minibatch update arrows and ask whether any single one is wrong. They are negative gradients of different minibatch losses, so variation is expected. The mean arrow in the diagram represents the full-data descent tendency conceptually. Avoid claiming that larger batches are universally better: they reduce gradient variance but change computational and generalization tradeoffs.</p>
+</div>
+</section>
+<section id="sgd-can-refer-to-three-different-batch-regimes" class="level2">
+<h2 class="anchored" data-anchor-id="sgd-can-refer-to-three-different-batch-regimes">“SGD” can refer to three different batch regimes</h2>
+<div class="batch-example">
+<div class="batch-example-label">
+CONCRETE DATASET
+</div>
+<div class="batch-example-count">
+<strong><i>N</i> = 1,200</strong><span>training examples</span>
+</div>
+<div class="batch-example-question">
+How many examples contribute to one gradient update?
+</div>
+</div>
+<div class="batch-regimes">
+<div class="batch-regime single-regime fragment">
+<div class="regime-number">
+<span class="math inline">\(|B_t|=1\)</span>
+</div>
+<div class="regime-dots single-dots">
+<b></b>
+</div>
+<strong>Stochastic GD</strong> <small>one example per update</small>
+<div class="regime-tradeoff">
+<span>very noisy</span><span>very frequent updates</span>
+</div>
+</div>
+<div class="batch-regime mini-regime fragment">
+<div class="regime-number">
+<span class="math inline">\(1&lt;|B_t|&lt;N\)</span>
+</div>
+<div class="regime-dots mini-dots">
+<b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b>
+</div>
+<strong>Minibatch SGD</strong> <small>for example, 32 or 128 examples</small>
+<div class="regime-tradeoff">
+<span>moderate noise</span><span>efficient parallel work</span>
+</div>
+</div>
+<div class="batch-regime full-regime fragment">
+<div class="regime-number">
+<span class="math inline">\(|B_t|=N\)</span>
+</div>
+<div class="regime-dots full-dots">
+<b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b>
+</div>
+<strong>Full-batch GD</strong> <small>all 1,200 examples per update</small>
+<div class="regime-tradeoff">
+<span>exact dataset gradient</span><span>expensive update</span>
+</div>
+</div>
+</div>
+<div class="sgd-language fragment">
+<div class="sgd-language-label">
+LANGUAGE WARNING
+</div>
+<div class="sgd-language-copy">
+In deep learning, “SGD” usually means <strong>minibatch SGD</strong>. “Batch” alone is ambiguous—say <strong>minibatch</strong> or <strong>full batch</strong>.
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Anchor all three regimes to the same 1,200-example dataset and vary only the number of examples used for one update. Strictly, stochastic gradient descent uses one example; common deep-learning usage extends the name SGD to minibatches. Full-batch gradient descent computes the exact gradient of the finite training-set objective, not a noise-free gradient of the unknown population objective. Update frequency alone is not wall-clock speed: hardware parallelism makes minibatches especially practical.</p>
+</div>
+</section>
+<section id="curvature-changes-the-safe-step-size" class="level2">
+<h2 class="anchored" data-anchor-id="curvature-changes-the-safe-step-size">Curvature changes the safe step size</h2>
+<div class="curvature-comparison">
+<div class="curvature-panel gentle-panel">
+<div class="curvature-heading">
+GENTLE CURVATURE
+</div>
+<div class="curvature-formula">
+<span class="math inline">\(\mathcal L(w)=\tfrac12 w^2\)</span>
+</div>
+<p><img src="assets/curvature-gentle.svg" class="img-fluid" alt="A broad quadratic curve where a fixed learning-rate step moves safely toward the minimum."> <strong>The step stays inside the bowl.</strong></p>
+</div>
+<div class="curvature-panel sharp-panel fragment">
+<div class="curvature-heading">
+SHARP CURVATURE
+</div>
+<div class="curvature-formula">
+<span class="math inline">\(\mathcal L(w)=4w^2\)</span>
+</div>
+<p><img src="assets/curvature-sharp.svg" class="img-fluid" alt="A sharp quadratic curve where the same learning rate creates a much larger gradient step that overshoots the minimum."> <strong>The same <span class="math inline">\(\eta\)</span> overshoots.</strong></p>
+</div>
+</div>
+<div class="curvature-mechanism fragment">
+<div class="mechanism-step">
+<b>1</b><span>Sharper curve</span>
+</div>
+<div class="mechanism-arrow">
+→
+</div>
+<div class="mechanism-step">
+<b>2</b><span>Larger gradient change</span>
+</div>
+<div class="mechanism-arrow">
+→
+</div>
+<div class="mechanism-step">
+<b>3</b><span>Smaller safe <span class="math inline">\(\eta\)</span></span>
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes. This is a controlled one-dimensional comparison: same starting coordinate and same eta, different curvature. The sharper quadratic produces a larger gradient magnitude and a more aggressive update. State the practical conclusion rather than proving a smoothness bound: the learning rate that is safe depends on the local curvature, which can differ across directions and change during training.</p>
+</div>
+</section>
+<section id="read-the-failure-before-choosing-a-remedy" class="level2">
+<h2 class="anchored" data-anchor-id="read-the-failure-before-choosing-a-remedy">Read the failure before choosing a remedy</h2>
+<div class="failure-diagnostic">
+<div class="failure-row fragment">
+<div class="failure-icon ravine-icon">
+↔︎
+</div>
+<div class="failure-evidence">
+<strong>Zig-zag across a narrow valley</strong><span>large alternating gradient component</span>
+</div>
+<div class="failure-need">
+need directional persistence
+</div>
+</div>
+<div class="failure-row fragment">
+<div class="failure-icon plateau-icon">
+···
+</div>
+<div class="failure-evidence">
+<strong>Loss remains high; steps become tiny</strong><span>weak local signal</span>
+</div>
+<div class="failure-need">
+need patience or a changed scale
+</div>
+</div>
+<div class="failure-row fragment">
+<div class="failure-icon noise-icon">
+↝
+</div>
+<div class="failure-evidence">
+<strong>Direction changes between minibatches</strong><span>sampling variation</span>
+</div>
+<div class="failure-need">
+need a steadier trajectory
+</div>
+</div>
+<div class="failure-row fragment">
+<div class="failure-icon curvature-icon">
+⌁
+</div>
+<div class="failure-evidence">
+<strong>One scale is safe here but unstable there</strong><span>unequal or changing curvature</span>
+</div>
+<div class="failure-need">
+need scale awareness
+</div>
+</div>
+</div>
+<div class="momentum-bridge fragment">
+<div class="momentum-bridge-label">
+NEXT QUESTION
+</div>
+<div class="momentum-bridge-copy">
+What if the optimizer remembered which directions have been consistent?
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Treat this as diagnosis, not a list to memorize. Reveal the evidence column first and ask students to name the visible behavior. The final phrases describe information a remedy would need; they do not yet name algorithms. The last question motivates momentum as history-based directional persistence in section 4.</p>
+</div>
+</section>
+</section>
+<section id="remember-direction-1" class="level1 section-slide momentum-section" data-section-progress="4 / 6" style="--section-progress:66.667%">
+<h1 class="section-slide momentum-section" data-section-progress="4 / 6" style="--section-progress:66.667%">04 · Remember direction</h1>
+<section id="gradient-descent-forgets-after-every-step" class="level2">
+<h2 class="anchored" data-anchor-id="gradient-descent-forgets-after-every-step">Gradient descent forgets after every step</h2>
+<div class="memory-contrast">
+<div class="memory-panel forget-panel">
+<div class="memory-heading">
+PLAIN GRADIENT DESCENT
+</div>
+<p><img src="assets/memory-forget.svg" class="img-fluid" alt="A sequence of recent update arrows ending at the current point, followed by a new step that uses only the current gradient and ignores the earlier consistent direction."> <strong>Uses the current gradient only</strong> <small>Past directions disappear from the next decision.</small></p>
+</div>
+<div class="memory-panel remember-panel fragment">
+<div class="memory-heading">
+MOMENTUM
+</div>
+<p><img src="assets/memory-remember.svg" class="img-fluid" alt="A sequence of recent update arrows whose consistent horizontal components accumulate into a longer forward arrow while alternating vertical components cancel."> <strong>Carries a running direction</strong> <small>Consistent components reinforce; oscillating components cancel.</small></p>
+</div>
+</div>
+<div class="memory-principle fragment">
+<div class="memory-principle-label">
+NEW INFORMATION
+</div>
+<div class="memory-principle-copy">
+The next step depends on the current gradient <em>and</em> the recent path.
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Begin with the information limitation: plain gradient descent is memoryless. Reveal momentum only after students identify that recent arrows contain a stable horizontal tendency and an alternating vertical tendency. Momentum is not merely “faster gradient descent”; it changes the state of the optimizer by storing a running direction.</p>
+</div>
+</section>
+<section id="momentum-adds-one-state-variable" class="level2">
+<h2 class="anchored" data-anchor-id="momentum-adds-one-state-variable">Momentum adds one state variable</h2>
+<div class="momentum-mechanism">
+<div class="momentum-equations">
+<div class="equation-kicker">
+CLASSICAL MOMENTUM
+</div>
+<p><span class="math display">\[
+v_{t+1}=\beta v_t+g_t,
+\qquad g_t=\nabla_\theta\mathcal L(\theta_t)
+\]</span></p>
+<p><span class="math display">\[
+\theta_{t+1}=\theta_t-\eta v_{t+1}
+\]</span></p>
+</div>
+<div class="momentum-parts">
+<div class="momentum-part history-part fragment">
+<p><span>HISTORY</span> <strong><span class="math inline">\(\beta v_t\)</span></strong> <small>retain part of the running direction</small></p>
+</div>
+<div class="momentum-plus fragment">
++
+</div>
+<div class="momentum-part current-part fragment">
+<p><span>NEW EVIDENCE</span> <strong><span class="math inline">\(g_t\)</span></strong> <small>add the current gradient</small></p>
+</div>
+</div>
+</div>
+<div class="beta-reading fragment">
+<div class="beta-label">
+<span class="math inline">\(0\leq\beta&lt;1\)</span>
+</div>
+<div class="beta-low">
+<strong>smaller <span class="math inline">\(\beta\)</span></strong><span>shorter memory</span>
+</div>
+<div class="beta-track">
+<i></i><b></b>
+</div>
+<div class="beta-high">
+<strong>larger <span class="math inline">\(\beta\)</span></strong><span>longer memory</span>
+</div>
+</div>
+<div class="convention-note fragment">
+<div class="convention-label">
+NOTATION NOTE
+</div>
+<div class="convention-copy">
+Some libraries scale the new gradient by <span class="math inline">\((1-\beta)\)</span>. The stored quantity changes scale; the idea is the same.
+</div>
+</div>
+<div class="notes">
+<p>Budget about three minutes. Define g_t first, then reveal the history and current-gradient terms. This course uses the classical accumulated-gradient convention v equals beta v plus g. Flag the alternative exponentially weighted average convention now so students are not confused by library documentation later. Eta still controls the final parameter displacement.</p>
+</div>
+</section>
+<section id="in-a-ravine-history-changes-the-path" class="level2">
+<h2 class="anchored" data-anchor-id="in-a-ravine-history-changes-the-path">In a ravine, history changes the path</h2>
+<div class="momentum-ravine-compare">
+<div class="ravine-path-card gd-path">
+<div class="path-label">
+GRADIENT DESCENT
+</div>
+<p><img src="assets/ravine-gd-path.svg" class="img-fluid" alt="A narrow ravine with plain gradient descent zig-zagging strongly across its walls and progressing slowly along the valley."> <strong>Alternating wall-to-wall steps</strong></p>
+</div>
+<div class="path-versus fragment">
+<p>→</p>
+</div>
+<div class="ravine-path-card momentum-path fragment">
+<div class="path-label">
+WITH MOMENTUM
+</div>
+<p><img src="assets/ravine-momentum-path.svg" class="img-fluid" alt="The same narrow ravine and starting point with momentum damping side-to-side oscillation and moving farther along the valley."> <strong>Oscillation damped · progress accumulated</strong></p>
+</div>
+</div>
+<div class="component-memory fragment">
+<div class="component-memory-item">
+<span>ACROSS THE VALLEY</span><strong><span class="math inline">\(+,-,+,-\)</span></strong><small>cancels over time</small>
+</div>
+<div class="component-memory-arrow">
+⇢
+</div>
+<div class="component-memory-item">
+<span>ALONG THE VALLEY</span><strong><span class="math inline">\(+,+,+,+\)</span></strong><small>builds over time</small>
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes. This is the recurring controlled experiment: same ravine, same start, same learning rate. Read the component signs in the lower strip. Momentum does not know the ravine geometry explicitly; its memory makes alternating components cancel and persistent components accumulate. Avoid saying it eliminates oscillation in every case—beta and eta still matter.</p>
+</div>
+</section>
+<section id="your-turn-update-the-optimizer-state" class="level2">
+<h2 class="anchored" data-anchor-id="your-turn-update-the-optimizer-state">Your turn: update the optimizer state</h2>
+<div class="momentum-exercise">
+<div class="momentum-givens">
+<div class="exercise-label">
+GIVENS
+</div>
+<p><span class="math display">\[
+\theta_t=
+\begin{bmatrix}1.00 \\ -0.50\end{bmatrix},\quad
+v_t=\begin{bmatrix}0.60 \\ -0.20\end{bmatrix},\quad
+g_t=\begin{bmatrix}0.20 \\ 0.40\end{bmatrix}
+\]</span></p>
+<p><span class="math display">\[
+\beta=0.9,\qquad \eta=0.1
+\]</span></p>
+<div class="exercise-task">
+<strong>Task:</strong> compute <span class="math inline">\(v_{t+1}\)</span>, then <span class="math inline">\(\theta_{t+1}\)</span>.
+</div>
+</div>
+<div class="momentum-work">
+<div class="pause-panel">
+<p><strong>PAUSE · 75 seconds</strong> <span>Update the velocity before using it to move the parameters.</span></p>
+</div>
+<div class="momentum-solution fragment">
+<p><span>WORKED SOLUTION</span></p>
+<p><span class="math display">\[
+v_{t+1}=0.9
+\begin{bmatrix}0.60 \\ -0.20\end{bmatrix}
+{}+\begin{bmatrix}0.20 \\ 0.40\end{bmatrix}
+=\begin{bmatrix}0.74 \\ 0.22\end{bmatrix}
+\]</span></p>
+<p><span class="math display">\[
+\theta_{t+1}=\begin{bmatrix}1.00 \\ -0.50\end{bmatrix}
+{}-0.1\begin{bmatrix}0.74 \\ 0.22\end{bmatrix}
+=\begin{bmatrix}0.926 \\ -0.522\end{bmatrix}
+\]</span></p>
+</div>
+</div>
+</div>
+<div class="momentum-transfer fragment">
+<div class="transfer-label">
+INTERPRET
+</div>
+<div class="transfer-copy">
+The second component of <span class="math inline">\(g_t\)</span> is positive. Why is the new velocity still influenced by its earlier negative value?
+</div>
+<div class="transfer-answer fragment">
+Momentum blends new evidence with stored history.
+</div>
+</div>
+<div class="notes">
+<p>Budget about three minutes including the pause. Students must update optimizer state before parameters. Work component by component and keep the sign convention visible: v stores accumulated gradients, and theta moves by minus eta v. The transfer question is the conceptual point—one gradient does not immediately erase history.</p>
+</div>
+</section>
+<section id="how-much-history-should-survive" class="level2">
+<h2 class="anchored" data-anchor-id="how-much-history-should-survive">How much history should survive?</h2>
+<div class="beta-experiment">
+<div class="beta-card beta-zero">
+<div class="beta-value">
+<span class="math inline">\(\beta=0\)</span>
+</div>
+<div class="history-dots">
+<i></i><i></i><i></i><i></i><b></b>
+</div>
+<p><strong>No memory</strong> <small><span class="math inline">\(v_{t+1}=g_t\)</span></small></p>
+</div>
+<div class="beta-card beta-mid fragment">
+<div class="beta-value">
+<span class="math inline">\(\beta=0.9\)</span>
+</div>
+<div class="history-dots">
+<i></i><i></i><i></i><i></i><b></b>
+</div>
+<p><strong>Persistent history</strong> <small>recent directions remain influential</small></p>
+</div>
+<div class="beta-card beta-high-card fragment">
+<div class="beta-value">
+<span class="math inline">\(\beta=0.99\)</span>
+</div>
+<div class="history-dots">
+<i></i><i></i><i></i><i></i><b></b>
+</div>
+<p><strong>Very long memory</strong> <small>stable—but slow to change course</small></p>
+</div>
+</div>
+<div class="beta-tradeoff fragment">
+<div class="tradeoff-left">
+more smoothing · stronger persistence
+</div>
+<div class="tradeoff-line">
+<i></i>
+</div>
+<div class="tradeoff-right">
+slower response to a new direction
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Reveal beta values from left to right. Beta zero recovers plain gradient descent under this convention. Larger beta preserves history longer, which can smooth noise and sustain motion, but can also carry the optimizer past a turn. Treat 0.9 as a common reference value, not a universal optimum.</p>
+</div>
+</section>
+<section id="nesterov-asks-at-the-look-ahead-point" class="level2">
+<h2 class="anchored" data-anchor-id="nesterov-asks-at-the-look-ahead-point">Nesterov asks at the look-ahead point</h2>
+<div class="nesterov-story">
+<div class="nesterov-visual">
+<p><img src="assets/nesterov-lookahead.svg" class="img-fluid" alt="A contour landscape showing the current parameter point, the momentum-only look-ahead point, the gradient evaluated there, and the corrected Nesterov destination."></p>
+</div>
+<div class="nesterov-copy">
+<div class="nesterov-step fragment">
+<b>1</b><span>Follow stored momentum to a provisional point</span>
+</div>
+<p><span class="math display">\[
+\theta_t^{\mathrm{look}}=\theta_t-\eta\beta v_t
+\]</span></p>
+<div class="nesterov-step fragment">
+<b>2</b><span>Measure the gradient there—not back at <span class="math inline">\(\theta_t\)</span></span>
+</div>
+<p><span class="math display">\[
+v_{t+1}=\beta v_t+\nabla\mathcal L(\theta_t^{\mathrm{look}})
+\]</span></p>
+<div class="nesterov-step fragment">
+<b>3</b><span>Use the corrected direction</span>
+</div>
+<p><span class="math display">\[
+\theta_{t+1}=\theta_t-\eta v_{t+1}
+\]</span></p>
+</div>
+</div>
+<div class="nesterov-conclusion fragment">
+<div class="nesterov-label">
+NESTEROV MOMENTUM
+</div>
+<div class="nesterov-claim">
+Look where momentum is taking you, then correct using the local evidence there.
+</div>
+</div>
+<div class="notes">
+<p>Budget about three minutes. Build the picture in three advances: momentum predicts a provisional location, the gradient is evaluated at that look-ahead point, and the final step incorporates the correction. This is the conceptual distinction from classical momentum. Mention that equivalent-looking update formulas exist because implementations store and scale velocity differently.</p>
+</div>
+</section>
+<section id="remembering-direction-solves-only-part-of-the-problem" class="level2">
+<h2 class="anchored" data-anchor-id="remembering-direction-solves-only-part-of-the-problem">Remembering direction solves only part of the problem</h2>
+<div class="momentum-scorecard">
+<div class="score-row score-help fragment">
+<div class="score-symbol">
+✓
+</div>
+<div class="score-claim">
+<strong>Ravine oscillation</strong><span>alternating components can cancel</span>
+</div>
+</div>
+<div class="score-row score-help fragment">
+<div class="score-symbol">
+✓
+</div>
+<div class="score-claim">
+<strong>Noisy directions</strong><span>history can steady the trajectory</span>
+</div>
+</div>
+<div class="score-row score-limit fragment">
+<div class="score-symbol">
+?
+</div>
+<div class="score-claim">
+<strong>Different scales across parameters</strong><span>one global <span class="math inline">\(\eta\)</span> still scales every coordinate</span>
+</div>
+</div>
+<div class="score-row score-limit fragment">
+<div class="score-symbol">
+?
+</div>
+<div class="score-claim">
+<strong>Changing curvature</strong><span>the useful step size may still vary by coordinate and time</span>
+</div>
+</div>
+</div>
+<div class="adaptive-bridge fragment">
+<div class="adaptive-bridge-label">
+NEXT QUESTION
+</div>
+<div class="adaptive-bridge-copy">
+What if each parameter received its own step scale?
+</div>
+</div>
+<div class="notes">
+<p>Budget about one minute. Momentum adds directional memory, not coordinate-wise scale adaptation. Use the two unresolved rows to motivate AdaGrad, RMSProp, and Adam. Do not imply the optimizer families are mutually exclusive—Adam will combine momentum-like first-moment memory with adaptive second-moment scaling.</p>
+</div>
+</section>
+</section>
+<section id="adapt-each-step-1" class="level1 section-slide adaptive-section" data-section-progress="5 / 6" style="--section-progress:83.333%">
+<h1 class="section-slide adaptive-section" data-section-progress="5 / 6" style="--section-progress:83.333%">05 · Adapt each step</h1>
+<section id="one-learning-rate-can-mean-two-very-different-steps" class="level2">
+<h2 class="anchored" data-anchor-id="one-learning-rate-can-mean-two-very-different-steps">One learning rate can mean two very different steps</h2>
+<div class="coordinate-problem">
+<div class="coordinate-visual">
+<p><img src="assets/coordinate-scales.svg" class="img-fluid" alt="Two parameter coordinates at the same point: coordinate one has a consistently large gradient scale and receives an oversized step, while coordinate two has a small gradient scale and barely moves under one global learning rate."></p>
+</div>
+<div class="coordinate-copy">
+<div class="coordinate-kicker">
+SAME GLOBAL <span class="math inline">\(\eta\)</span>
+</div>
+<div class="coordinate-row large-coordinate fragment">
+<span>coordinate 1</span><strong><span class="math inline">\(g_{t,1}=8.0\)</span></strong><small>step is too aggressive</small>
+</div>
+<div class="coordinate-row small-coordinate fragment">
+<span>coordinate 2</span><strong><span class="math inline">\(g_{t,2}=0.08\)</span></strong><small>step is barely visible</small>
+</div>
+<div class="coordinate-question fragment">
+Should both coordinates use the same effective scale?
+</div>
+</div>
+</div>
+<div class="coordinate-conclusion fragment">
+<div class="coordinate-conclusion-label">
+ADAPTIVE IDEA
+</div>
+<div class="coordinate-conclusion-copy">
+Keep a separate denominator for each coordinate: large historical gradients shrink future steps; small ones preserve them.
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Begin with the numerical mismatch. A scalar eta multiplies both coordinates, but their gradient scales differ by a factor of one hundred. The goal is not to make every coordinate move equally; it is to normalize persistent scale differences so one coordinate does not dominate merely because its gradients are numerically larger.</p>
+</div>
+</section>
+<section id="adagrad-remembers-every-squared-gradient" class="level2">
+<h2 class="anchored" data-anchor-id="adagrad-remembers-every-squared-gradient">AdaGrad remembers every squared gradient</h2>
+<div class="adagrad-mechanism">
+<div class="adagrad-equations">
+<div class="equation-kicker">
+ADAGRAD
+</div>
+<p><span class="math display">\[
+s_t=s_{t-1}+g_t\odot g_t
+\]</span></p>
+<p><span class="math display">\[
+\theta_{t+1}=\theta_t-
+\frac{\eta}{\sqrt{s_t}+\varepsilon}\odot g_t
+\]</span></p>
+</div>
+<div class="adagrad-reading">
+<div class="adaptive-part fragment">
+<span>SQUARE</span><strong><span class="math inline">\(g_t\odot g_t\)</span></strong><small>measure magnitude without sign</small>
+</div>
+<div class="adaptive-part fragment">
+<span>ACCUMULATE</span><strong><span class="math inline">\(s_t\)</span></strong><small>store a total for each coordinate</small>
+</div>
+<div class="adaptive-part fragment">
+<span>NORMALIZE</span><strong><span class="math inline">\(1/(\sqrt{s_t}+\varepsilon)\)</span></strong><small>reduce repeatedly large coordinates</small>
+</div>
+</div>
+</div>
+<div class="elementwise-note fragment">
+<div class="elementwise-symbol">
+<span class="math inline">\(\odot\)</span>
+</div>
+<div class="elementwise-copy">
+<strong>All operations are element-wise.</strong><span>Each parameter receives its own accumulated scale and effective step size.</span>
+</div>
+</div>
+<div class="citation-strip">
+AdaGrad: <span class="citation" data-cites="duchi2011adagrad">(Duchi et al. 2011)</span>
+</div>
+<div class="notes">
+<p>Budget about three minutes. Read the mechanism in the order square, accumulate, normalize. Squaring removes the sign because s tracks scale, not direction. Epsilon prevents division by zero. Emphasize that s has the same shape as theta; adaptive optimization introduces per-parameter state rather than searching for one scalar learning rate that suits every coordinate.</p>
+</div>
+</section>
+<section id="your-turn-compare-two-coordinate-updates" class="level2">
+<h2 class="anchored" data-anchor-id="your-turn-compare-two-coordinate-updates">Your turn: compare two coordinate updates</h2>
+<div class="adaptive-exercise">
+<div class="adaptive-givens">
+<div class="exercise-label">
+GIVENS
+</div>
+<p><span class="math display">\[
+g_t=\begin{bmatrix}4\\1\end{bmatrix},\qquad
+s_{t-1}=\begin{bmatrix}0\\0\end{bmatrix},\qquad
+\eta=0.1,\quad\varepsilon=0
+\]</span></p>
+<div class="exercise-task">
+<strong>Task:</strong> compute <span class="math inline">\(s_t\)</span> and the AdaGrad displacement <span class="math inline">\(\Delta\theta_t\)</span>.
+</div>
+</div>
+<div class="adaptive-work">
+<div class="pause-panel">
+<p><strong>PAUSE · 75 seconds</strong> <span>Square first, then divide each gradient component by its own square root.</span></p>
+</div>
+<div class="adaptive-solution fragment">
+<p><span>WORKED SOLUTION</span></p>
+<p><span class="math display">\[
+s_t=\begin{bmatrix}16\\1\end{bmatrix}
+\]</span></p>
+<p><span class="math display">\[
+\Delta\theta_t
+=-0.1\begin{bmatrix}4/\sqrt{16}\\1/\sqrt{1}\end{bmatrix}
+=\begin{bmatrix}-0.1\\-0.1\end{bmatrix}
+\]</span></p>
+<p><small>The raw gradients differ by <span class="math inline">\(4\times\)</span>; the first-step normalized displacements are equal.</small></p>
+</div>
+</div>
+</div>
+<div class="adaptive-transfer fragment">
+<div class="transfer-label">
+INTERPRET
+</div>
+<div class="transfer-copy">
+If coordinate 1 keeps producing large gradients, what happens to its denominator?
+</div>
+<div class="transfer-answer fragment">
+It keeps growing, so its effective step keeps shrinking.
+</div>
+</div>
+<div class="notes">
+<p>Budget about three minutes including the pause. This intentionally uses epsilon zero to keep the arithmetic transparent; real implementations require a small positive epsilon. Equal first-step magnitudes are a property of this constructed example, not AdaGrad’s objective in general. The transfer question exposes the consequence of an accumulator that can only increase.</p>
+</div>
+</section>
+<section id="adagrads-strength-becomes-its-weakness" class="level2">
+<h2 class="anchored" data-anchor-id="adagrads-strength-becomes-its-weakness">AdaGrad’s strength becomes its weakness</h2>
+<div class="adagrad-history">
+<div class="history-plot">
+<p><img src="assets/adagrad-shrinking.svg" class="img-fluid" alt="Across training steps, AdaGrad's accumulated squared-gradient total rises monotonically while the effective learning rate falls and never recovers after an early burst of large gradients."></p>
+</div>
+<div class="history-copy">
+<div class="history-evidence">
+AFTER AN EARLY BURST
+</div>
+<div class="history-stat fragment">
+<span>accumulator <span class="math inline">\(s_t\)</span></span><strong>can only increase</strong>
+</div>
+<div class="history-stat fragment">
+<span>effective step <span class="math inline">\(\eta/\sqrt{s_t}\)</span></span><strong>can only decrease</strong>
+</div>
+<div class="history-question fragment">
+<strong>What if the useful scale changes later?</strong><span>AdaGrad never forgets the old large gradients.</span>
+</div>
+</div>
+</div>
+<div class="forgetting-bridge fragment">
+<div class="forgetting-label">
+NEEDED
+</div>
+<div class="forgetting-copy">
+Keep recent squared gradients—but gradually forget distant ones.
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes. The graph shows an early high-gradient phase permanently enlarging the denominator. This can be useful for sparse problems, where rare coordinates retain relatively larger steps, but it can make continued neural-network training stall. The desired repair is selective memory, not abandoning coordinate-wise scaling.</p>
+</div>
+</section>
+<section id="rmsprop-replaces-the-total-with-a-moving-average" class="level2">
+<h2 class="anchored" data-anchor-id="rmsprop-replaces-the-total-with-a-moving-average">RMSProp replaces the total with a moving average</h2>
+<div class="rmsprop-mechanism">
+<div class="rmsprop-visual">
+<p><img src="assets/rmsprop-memory.svg" class="img-fluid" alt="A timeline of squared gradients with old observations fading and recent observations retaining weight in an exponentially weighted moving average."></p>
+</div>
+<div class="rmsprop-copy">
+<div class="equation-kicker">
+RMSPROP
+</div>
+<p><span class="math display">\[
+s_t=\rho s_{t-1}+(1-\rho)g_t\odot g_t
+\]</span></p>
+<p><span class="math display">\[
+\theta_{t+1}=\theta_t-
+\frac{\eta}{\sqrt{s_t}+\varepsilon}\odot g_t
+\]</span></p>
+<div class="rmsprop-reading fragment">
+<strong>Same normalization</strong><span>but <span class="math inline">\(s_t\)</span> can now adapt when the recent scale changes.</span>
+</div>
+</div>
+</div>
+<div class="adagrad-rmsprop-contrast fragment">
+<div class="contrast-item">
+<span>ADAGRAD</span><strong>sum of all past squares</strong><small>memory only grows</small>
+</div>
+<div class="contrast-arrow">
+→
+</div>
+<div class="contrast-item">
+<span>RMSPROP</span><strong>weighted recent squares</strong><small>old evidence fades</small>
+</div>
+</div>
+<div class="citation-strip">
+RMSProp: <span class="citation" data-cites="tieleman2012rmsprop">(Tieleman and Hinton 2012)</span>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Compare only the state update; the normalization step remains the same. Rho controls how quickly the squared-gradient scale can change. RMSProp was popularized in Hinton’s neural-networks course notes. Keep rho conceptually distinct from momentum beta even though both are exponential-memory coefficients.</p>
+</div>
+</section>
+<section id="adam-keeps-two-kinds-of-memory" class="level2">
+<h2 class="anchored" data-anchor-id="adam-keeps-two-kinds-of-memory">Adam keeps two kinds of memory</h2>
+<div class="adam-assembly">
+<div class="adam-memory first-memory fragment">
+<div class="adam-memory-label">
+FIRST MOMENT
+</div>
+<div class="adam-symbol">
+<span class="math inline">\(m_t\)</span>
+</div>
+<p><strong>Which direction persists?</strong> <small>momentum-like average of gradients</small></p>
+</div>
+<div class="adam-plus fragment">
+<ul>
+<li></li>
+</ul>
+</div>
+<div class="adam-memory second-memory fragment">
+<div class="adam-memory-label">
+SECOND MOMENT
+</div>
+<div class="adam-symbol">
+<span class="math inline">\(v_t\)</span>
+</div>
+<p><strong>What scale is typical?</strong> <small>RMSProp-like average of squared gradients</small></p>
+</div>
+</div>
+<div class="adam-equations fragment">
+<div class="adam-state">
+<p><span class="math display">\[
+m_t=\beta_1m_{t-1}+(1-\beta_1)g_t
+\]</span></p>
+<p><span class="math display">\[
+v_t=\beta_2v_{t-1}+(1-\beta_2)g_t^2
+\]</span></p>
+</div>
+<div class="adam-update">
+<p><span class="math display">\[
+\hat m_t=\frac{m_t}{1-\beta_1^t},\qquad
+\hat v_t=\frac{v_t}{1-\beta_2^t}
+\]</span></p>
+<p><span class="math display">\[
+\theta_{t+1}=\theta_t-
+\eta\frac{\hat m_t}{\sqrt{\hat v_t}+\varepsilon}
+\]</span></p>
+</div>
+</div>
+<div class="bias-correction fragment">
+<div class="bias-label">
+WHY THE HATS?
+</div>
+<div class="bias-copy">
+Both averages start at zero. Bias correction compensates for that cold start during early updates.
+</div>
+</div>
+<div class="citation-strip">
+Adam: <span class="citation" data-cites="kingma2015adam">(Kingma and Ba 2015)</span>
+</div>
+<div class="notes">
+<p>Budget about three minutes. Build Adam from the two memories before showing its equations. Here v denotes the second-moment state, not the classical-momentum velocity used in section 4; call out this overloaded convention explicitly. The square in g_t squared is element-wise. Bias correction matters most early because both moving averages are initialized at zero.</p>
+</div>
+</section>
+<section id="match-the-optimizer-to-the-information-it-stores" class="level2">
+<h2 class="anchored" data-anchor-id="match-the-optimizer-to-the-information-it-stores">Match the optimizer to the information it stores</h2>
+<div class="optimizer-memory-table">
+<div class="memory-header">
+<div>
+OPTIMIZER
+</div>
+<div>
+DIRECTION MEMORY
+</div>
+<div>
+SCALE MEMORY
+</div>
+<div>
+MAIN TRADEOFF
+</div>
+</div>
+<div class="memory-table-row fragment">
+<div>
+<strong>Gradient descent</strong>
+</div>
+<div>
+—
+</div>
+<div>
+—
+</div>
+<div>
+simple; one global scale
+</div>
+</div>
+<div class="memory-table-row fragment">
+<div>
+<strong>Momentum</strong>
+</div>
+<div class="has-memory">
+✓
+</div>
+<div>
+—
+</div>
+<div>
+smoother path; can overshoot turns
+</div>
+</div>
+<div class="memory-table-row fragment">
+<div>
+<strong>AdaGrad</strong>
+</div>
+<div>
+—
+</div>
+<div class="has-memory">
+all past squares
+</div>
+<div>
+steps may decay too far
+</div>
+</div>
+<div class="memory-table-row fragment">
+<div>
+<strong>RMSProp</strong>
+</div>
+<div>
+—
+</div>
+<div class="has-memory">
+recent squares
+</div>
+<div>
+adapts scale; still no direction memory
+</div>
+</div>
+<div class="memory-table-row adam-row fragment">
+<div>
+<strong>Adam</strong>
+</div>
+<div class="has-memory">
+✓
+</div>
+<div class="has-memory">
+recent squares
+</div>
+<div>
+more state; convenient strong baseline
+</div>
+</div>
+</div>
+<div class="diagnostic-bridge fragment">
+<div class="diagnostic-bridge-label">
+FINAL SECTION
+</div>
+<div class="diagnostic-bridge-copy">
+The optimizer produces a trajectory. How do we read whether that trajectory is healthy?
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes. This table organizes algorithms by stored information, not by a universal ranking. Adam is often a convenient baseline, but optimizer choice does not remove the need to tune the learning rate, monitor validation performance, or reason about the task. Transition from mechanisms to observable training evidence.</p>
+</div>
+</section>
+</section>
+<section id="read-the-training-run-1" class="level1 section-slide diagnostic-section" data-section-progress="6 / 6" style="--section-progress:100%">
+<h1 class="section-slide diagnostic-section" data-section-progress="6 / 6" style="--section-progress:100%">06 · Read the training run</h1>
+<section id="a-training-run-leaves-several-traces" class="level2">
+<h2 class="anchored" data-anchor-id="a-training-run-leaves-several-traces">A training run leaves several traces</h2>
+<div class="run-dashboard">
+<div class="dashboard-visual">
+<p><img src="assets/training-dashboard.svg" class="img-fluid" alt="A synchronized training dashboard showing training and validation loss, learning rate, and gradient norm over the same sequence of epochs."></p>
+</div>
+<div class="dashboard-copy">
+<div class="dashboard-question">
+If the loss behaves badly, which trace explains why?
+</div>
+<div class="trace-item fragment">
+<b>1</b><span><strong>training loss</strong><small>is optimization making progress?</small></span>
+</div>
+<div class="trace-item fragment">
+<b>2</b><span><strong>validation loss</strong><small>does progress generalize?</small></span>
+</div>
+<div class="trace-item fragment">
+<b>3</b><span><strong>learning rate</strong><small>what step scale was applied?</small></span>
+</div>
+<div class="trace-item fragment">
+<b>4</b><span><strong>gradient norm</strong><small>was the local signal tiny or explosive?</small></span>
+</div>
+</div>
+</div>
+<div class="dashboard-principle fragment">
+<div class="dashboard-principle-label">
+DIAGNOSE JOINTLY
+</div>
+<div class="dashboard-principle-copy">
+A single curve shows a symptom. Aligned traces help identify the cause.
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Read all panels at the same epoch positions. Training loss answers an optimization question; validation loss answers a generalization question. Learning rate and gradient norm provide mechanism evidence. Do not diagnose from gradient norm alone—the scale depends on architecture, loss reduction, and parameterization.</p>
+</div>
+</section>
+<section id="the-loss-curve-reveals-the-learning-rate-regime" class="level2">
+<h2 class="anchored" data-anchor-id="the-loss-curve-reveals-the-learning-rate-regime">The loss curve reveals the learning-rate regime</h2>
+<div class="loss-regimes">
+<div class="loss-regime slow-loss fragment">
+<div class="loss-regime-label">
+TOO SMALL
+</div>
+<p><img src="assets/loss-too-small.svg" class="img-fluid" alt="A smooth training-loss curve that decreases very slowly across epochs."> <strong>Stable but nearly flat</strong> <small>useful direction · insufficient distance</small></p>
+</div>
+<div class="loss-regime healthy-loss fragment">
+<div class="loss-regime-label">
+USEFUL RANGE
+</div>
+<p><img src="assets/loss-healthy.svg" class="img-fluid" alt="A training-loss curve that falls quickly and then settles smoothly."> <strong>Fast decrease, then settling</strong> <small>large early progress · smaller late gains</small></p>
+</div>
+<div class="loss-regime unstable-loss fragment">
+<div class="loss-regime-label">
+TOO LARGE
+</div>
+<p><img src="assets/loss-too-large.svg" class="img-fluid" alt="A training-loss curve with large oscillations and an eventual sharp increase."> <strong>Oscillation or divergence</strong> <small>finite steps repeatedly overshoot</small></p>
+</div>
+</div>
+<div class="loss-caveat fragment">
+<div class="loss-caveat-label">
+CAUTION
+</div>
+<div class="loss-caveat-copy">
+Noise is not automatically failure. Minibatch training can look jagged while its smoothed trend improves.
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Reveal the curve before its label and ask students to name the visible evidence. These are signatures, not proofs: a flat curve can also reflect saturated activations, bad data, or a bug; divergence can come from exploding gradients or invalid numerics. Use additional traces before changing the optimizer.</p>
+</div>
+</section>
+<section id="why-schedule-the-learning-rate" class="level2">
+<h2 class="anchored" data-anchor-id="why-schedule-the-learning-rate">Why schedule the learning rate?</h2>
+<div class="schedule-story">
+<div class="schedule-visual">
+<p><img src="assets/lr-schedules.svg" class="img-fluid" alt="Four learning-rate schedules over training: constant, step decay, cosine decay, and warmup followed by cosine decay."></p>
+</div>
+<div class="schedule-copy">
+<div class="schedule-phase early-phase fragment">
+<span>EARLY TRAINING</span><strong>Move far enough to make progress</strong><small>parameters are far from a useful solution</small>
+</div>
+<div class="schedule-phase late-phase fragment">
+<span>LATE TRAINING</span><strong>Reduce the step to refine</strong><small>large updates can bounce around a good basin</small>
+</div>
+<div class="schedule-phase warmup-phase fragment">
+<span>OPTIONAL WARMUP</span><strong>Reach the target rate gradually</strong><small>useful when early updates are fragile</small>
+</div>
+</div>
+</div>
+<div class="schedule-conclusion fragment">
+<div class="schedule-label">
+SCHEDULE ≠ OPTIMIZER
+</div>
+<div class="schedule-claim">
+The optimizer defines how gradients become updates; the schedule changes the global learning rate over time.
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes. Use the graph to separate optimizer state from the external learning-rate schedule. Decay supports coarse early movement and finer late refinement. Warmup is not required in every run; it is useful when immediately applying the target rate destabilizes early training. Step and cosine schedules are examples, not a universal ranking.</p>
+</div>
+</section>
+<section id="your-turn-diagnose-before-changing-anything" class="level2">
+<h2 class="anchored" data-anchor-id="your-turn-diagnose-before-changing-anything">Your turn: diagnose before changing anything</h2>
+<div class="diagnosis-exercise">
+<div class="diagnosis-evidence">
+<div class="exercise-label">
+OBSERVED RUN
+</div>
+<img src="assets/diagnosis-overfit.svg" class="img-fluid" alt="Training loss decreases throughout training while validation loss decreases initially, reaches a minimum, and then rises.">
+<div class="diagnosis-facts">
+<span>training loss keeps falling</span><span>validation loss turns upward</span><span>gradient norm remains finite</span>
+</div>
+</div>
+<div class="diagnosis-work">
+<div class="diagnosis-task">
+<strong>Task:</strong> choose the best diagnosis.
+<div class="diagnosis-options">
+<span><b>A</b> learning rate too small</span><span><b>B</b> learning rate too large</span><span><b>C</b> overfitting</span>
+</div>
+</div>
+<div class="pause-panel">
+<p><strong>PAUSE · 60 seconds</strong> <span>Use the relationship between training and validation loss.</span></p>
+</div>
+<div class="diagnosis-solution fragment">
+<p><span>WORKED DIAGNOSIS</span> <strong>C · Overfitting</strong> <small>Optimization still improves the training objective, but generalization worsens after the validation minimum.</small></p>
+</div>
+</div>
+</div>
+<div class="diagnosis-transfer fragment">
+<div class="transfer-label">
+ACTION
+</div>
+<div class="transfer-copy">
+Keep the checkpoint with the best validation metric; then consider regularization, augmentation, more data, or earlier stopping.
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes including the pause. This exercise prevents optimizer changes from becoming the default response to every bad curve. The training objective continues to improve, so the primary symptom is generalization, not failed optimization. A learning-rate schedule may affect the result, but it is not the most direct diagnosis from this evidence.</p>
+</div>
+</section>
+<section id="translate-symptoms-into-the-next-controlled-test" class="level2">
+<h2 class="anchored" data-anchor-id="translate-symptoms-into-the-next-controlled-test">Translate symptoms into the next controlled test</h2>
+<div class="run-diagnostic-table">
+<div class="run-diagnostic-header">
+<div>
+VISIBLE EVIDENCE
+</div>
+<div>
+FIRST HYPOTHESIS
+</div>
+<div>
+NEXT CONTROLLED TEST
+</div>
+</div>
+<div class="run-diagnostic-row fragment">
+<div>
+<strong>loss decreases, but painfully slowly</strong>
+</div>
+<div>
+step scale may be too small
+</div>
+<div>
+increase <span class="math inline">\(\eta\)</span> modestly; keep everything else fixed
+</div>
+</div>
+<div class="run-diagnostic-row fragment">
+<div>
+<strong>loss oscillates or becomes non-finite</strong>
+</div>
+<div>
+steps or gradients may be too large
+</div>
+<div>
+lower <span class="math inline">\(\eta\)</span>; inspect gradient norm and numerics
+</div>
+</div>
+<div class="run-diagnostic-row fragment">
+<div>
+<strong>loss is high and gradients are near zero</strong>
+</div>
+<div>
+plateau, saturation, or dead path
+</div>
+<div>
+inspect activations and initialization; test scale
+</div>
+</div>
+<div class="run-diagnostic-row fragment">
+<div>
+<strong>training improves; validation worsens</strong>
+</div>
+<div>
+overfitting
+</div>
+<div>
+keep best checkpoint; test regularization
+</div>
+</div>
+</div>
+<div class="controlled-test-rule fragment">
+<div class="controlled-test-label">
+RULE
+</div>
+<div class="controlled-test-copy">
+Change one factor, rerun from a comparable seed, and compare aligned traces.
+</div>
+</div>
+<div class="notes">
+<p>Budget about two minutes. This is a troubleshooting routine, not a guarantee. Each symptom generates a first hypothesis and a minimally confounded test. Encourage students to record configurations and seeds. A single run is noisy evidence; repeated runs matter when conclusions are consequential.</p>
+</div>
+</section>
+<section id="the-complete-optimization-story" class="level2">
+<h2 class="anchored" data-anchor-id="the-complete-optimization-story">The complete optimization story</h2>
+<div class="optimization-summary">
+<div class="summary-step fragment">
+<div class="summary-number">
+01
+</div>
+<div class="summary-copy">
+<strong>Read the local signal</strong><span>the gradient points uphill</span>
+</div>
+</div>
+<div class="summary-arrow fragment">
+<p>→</p>
+</div>
+<div class="summary-step fragment">
+<div class="summary-number">
+02
+</div>
+<div class="summary-copy">
+<strong>Choose direction + distance</strong><span>negative gradient and learning rate</span>
+</div>
+</div>
+<div class="summary-arrow fragment">
+<p>→</p>
+</div>
+<div class="summary-step fragment">
+<div class="summary-number">
+03
+</div>
+<div class="summary-copy">
+<strong>Add useful memory</strong><span>momentum and adaptive scales</span>
+</div>
+</div>
+<div class="summary-arrow fragment">
+<p>→</p>
+</div>
+<div class="summary-step fragment">
+<div class="summary-number">
+04
+</div>
+<div class="summary-copy">
+<strong>Read the trajectory</strong><span>curves, schedules, and evaluation</span>
+</div>
+</div>
+</div>
+<div class="five-frame-return fragment">
+<div class="frame-pill">
+data
+</div>
+<div class="frame-pill">
+hypothesis
+</div>
+<div class="frame-pill">
+loss
+</div>
+<div class="frame-pill active-frame">
+optimization
+</div>
+<div class="frame-pill">
+evaluation
+</div>
+</div>
+<div class="final-takeaway fragment">
+<div class="final-takeaway-label">
+TAKEAWAY
+</div>
+<div class="final-takeaway-copy">
+An optimizer is not a magic model chooser—it is a rule for turning local evidence into a training trajectory.
+</div>
+</div>
+<div class="notes">
+<p>Budget about one minute. Close by returning to the five-part frame. Optimization consumes the loss gradient and changes the hypothesis parameters; evaluation judges the resulting model on held-out data. The durable skill is not memorizing a ranking of optimizers, but connecting stored information and hyperparameters to observable trajectories.</p>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Deep Learning · ENSA Tétouan</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

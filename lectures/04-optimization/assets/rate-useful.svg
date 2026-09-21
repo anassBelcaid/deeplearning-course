@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 410 330" role="img" aria-labelledby="title desc">
+  <title id="title">Useful learning rate</title><desc id="desc">Concentric loss contours and a gradient-descent path that converges efficiently to the minimum.</desc>
+  <rect width="410" height="330" rx="18" fill="#f8fbfd"/>
+  <g fill="none" stroke="#b8d8ef" stroke-width="2"><ellipse cx="205" cy="165" rx="178" ry="128"/><ellipse cx="205" cy="165" rx="137" ry="98"/><ellipse cx="205" cy="165" rx="96" ry="68"/><ellipse cx="205" cy="165" rx="53" ry="37"/></g>
+  <ellipse cx="205" cy="165" rx="23" ry="15" fill="#d9f0e2"/><circle cx="205" cy="165" r="7" fill="#29845a"/>
+  <polyline points="55,63 102,91 140,116 169,136 188,151 198,159 203,163 205,165" fill="none" stroke="#29845a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="#29845a"><circle cx="55" cy="63" r="8"/><circle cx="102" cy="91" r="5"/><circle cx="140" cy="116" r="5"/><circle cx="169" cy="136" r="5"/><circle cx="188" cy="151" r="5"/><circle cx="198" cy="159" r="5"/></g>
+  <text x="38" y="42" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#657687">START</text>
+</svg>

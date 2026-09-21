@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dr.&nbsp;A. Belcaid">
+<meta name="description" content="A detailed guide to semantic, instance, and panoptic segmentation; object detection; edge detection; and their evaluation">
+
+<title>Segmentation and Object Detection – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e90830a6c3a870e8aa2cd7457ccbff49.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../schedule.html"> 
+<span class="menu-text">Schedule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../logistics.html"> 
+<span class="menu-text">Logistics</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#start-with-the-required-prediction" id="toc-start-with-the-required-prediction" class="nav-link active" data-scroll-target="#start-with-the-required-prediction"><span class="header-section-number">1</span> Start with the required prediction</a>
+  <ul class="collapse">
+  <li><a href="#three-meanings-of-segment-the-image" id="toc-three-meanings-of-segment-the-image" class="nav-link" data-scroll-target="#three-meanings-of-segment-the-image"><span class="header-section-number">1.1</span> Three meanings of “segment the image”</a></li>
+  </ul></li>
+  <li><a href="#semantic-segmentation-classification-at-every-pixel" id="toc-semantic-segmentation-classification-at-every-pixel" class="nav-link" data-scroll-target="#semantic-segmentation-classification-at-every-pixel"><span class="header-section-number">2</span> Semantic segmentation: classification at every pixel</a>
+  <ul class="collapse">
+  <li><a href="#the-contextprecision-tension" id="toc-the-contextprecision-tension" class="nav-link" data-scroll-target="#the-contextprecision-tension"><span class="header-section-number">2.1</span> The context–precision tension</a></li>
+  <li><a href="#fcn-keep-a-spatial-output" id="toc-fcn-keep-a-spatial-output" class="nav-link" data-scroll-target="#fcn-keep-a-spatial-output"><span class="header-section-number">2.2</span> FCN: keep a spatial output</a></li>
+  <li><a href="#u-net-a-symmetric-path-back-to-resolution" id="toc-u-net-a-symmetric-path-back-to-resolution" class="nav-link" data-scroll-target="#u-net-a-symmetric-path-back-to-resolution"><span class="header-section-number">2.3</span> U-Net: a symmetric path back to resolution</a></li>
+  <li><a href="#deeplab-enlarge-context-without-another-stride" id="toc-deeplab-enlarge-context-without-another-stride" class="nav-link" data-scroll-target="#deeplab-enlarge-context-without-another-stride"><span class="header-section-number">2.4</span> DeepLab: enlarge context without another stride</a></li>
+  <li><a href="#intersection-over-union-and-mean-iou" id="toc-intersection-over-union-and-mean-iou" class="nav-link" data-scroll-target="#intersection-over-union-and-mean-iou"><span class="header-section-number">2.5</span> Intersection over union and mean IoU</a></li>
+  </ul></li>
+  <li><a href="#object-detection-predict-a-set-of-localized-objects" id="toc-object-detection-predict-a-set-of-localized-objects" class="nav-link" data-scroll-target="#object-detection-predict-a-set-of-localized-objects"><span class="header-section-number">3</span> Object detection: predict a set of localized objects</a>
+  <ul class="collapse">
+  <li><a href="#boxes-are-geometric-claims" id="toc-boxes-are-geometric-claims" class="nav-link" data-scroll-target="#boxes-are-geometric-claims"><span class="header-section-number">3.1</span> Boxes are geometric claims</a></li>
+  <li><a href="#why-one-object-creates-many-candidates" id="toc-why-one-object-creates-many-candidates" class="nav-link" data-scroll-target="#why-one-object-creates-many-candidates"><span class="header-section-number">3.2</span> Why one object creates many candidates</a></li>
+  <li><a href="#two-stage-detection-propose-then-inspect" id="toc-two-stage-detection-propose-then-inspect" class="nav-link" data-scroll-target="#two-stage-detection-propose-then-inspect"><span class="header-section-number">3.3</span> Two-stage detection: propose, then inspect</a></li>
+  <li><a href="#one-stage-detection-predict-densely-in-one-pass" id="toc-one-stage-detection-predict-densely-in-one-pass" class="nav-link" data-scroll-target="#one-stage-detection-predict-densely-in-one-pass"><span class="header-section-number">3.4</span> One-stage detection: predict densely in one pass</a></li>
+  <li><a href="#set-prediction-supervise-unique-assignments" id="toc-set-prediction-supervise-unique-assignments" class="nav-link" data-scroll-target="#set-prediction-supervise-unique-assignments"><span class="header-section-number">3.5</span> Set prediction: supervise unique assignments</a></li>
+  <li><a href="#precision-recall-and-average-precision" id="toc-precision-recall-and-average-precision" class="nav-link" data-scroll-target="#precision-recall-and-average-precision"><span class="header-section-number">3.6</span> Precision, recall, and average precision</a></li>
+  </ul></li>
+  <li><a href="#instance-and-panoptic-segmentation" id="toc-instance-and-panoptic-segmentation" class="nav-link" data-scroll-target="#instance-and-panoptic-segmentation"><span class="header-section-number">4</span> Instance and panoptic segmentation</a>
+  <ul class="collapse">
+  <li><a href="#mask-r-cnn-add-a-mask-question-to-each-region" id="toc-mask-r-cnn-add-a-mask-question-to-each-region" class="nav-link" data-scroll-target="#mask-r-cnn-add-a-mask-question-to-each-region"><span class="header-section-number">4.1</span> Mask R-CNN: add a mask question to each region</a></li>
+  <li><a href="#why-roialign-matters" id="toc-why-roialign-matters" class="nav-link" data-scroll-target="#why-roialign-matters"><span class="header-section-number">4.2</span> Why ROIAlign matters</a></li>
+  <li><a href="#panoptic-segmentation-one-coherent-scene" id="toc-panoptic-segmentation-one-coherent-scene" class="nav-link" data-scroll-target="#panoptic-segmentation-one-coherent-scene"><span class="header-section-number">4.3</span> Panoptic segmentation: one coherent scene</a></li>
+  </ul></li>
+  <li><a href="#edge-detection-local-change-versus-perceptual-boundary" id="toc-edge-detection-local-change-versus-perceptual-boundary" class="nav-link" data-scroll-target="#edge-detection-local-change-versus-perceptual-boundary"><span class="header-section-number">5</span> Edge detection: local change versus perceptual boundary</a>
+  <ul class="collapse">
+  <li><a href="#derivatives-turn-transitions-into-peaks" id="toc-derivatives-turn-transitions-into-peaks" class="nav-link" data-scroll-target="#derivatives-turn-transitions-into-peaks"><span class="header-section-number">5.1</span> Derivatives turn transitions into peaks</a></li>
+  <li><a href="#canny-is-a-pipeline-not-one-filter" id="toc-canny-is-a-pipeline-not-one-filter" class="nav-link" data-scroll-target="#canny-is-a-pipeline-not-one-filter"><span class="header-section-number">5.2</span> Canny is a pipeline, not one filter</a></li>
+  <li><a href="#learned-boundaries-ask-a-different-question" id="toc-learned-boundaries-ask-a-different-question" class="nav-link" data-scroll-target="#learned-boundaries-ask-a-different-question"><span class="header-section-number">5.3</span> Learned boundaries ask a different question</a></li>
+  <li><a href="#boundary-evaluation" id="toc-boundary-evaluation" class="nav-link" data-scroll-target="#boundary-evaluation"><span class="header-section-number">5.4</span> Boundary evaluation</a></li>
+  </ul></li>
+  <li><a href="#choosing-the-task-model-and-metric-together" id="toc-choosing-the-task-model-and-metric-together" class="nav-link" data-scroll-target="#choosing-the-task-model-and-metric-together"><span class="header-section-number">6</span> Choosing the task, model, and metric together</a>
+  <ul class="collapse">
+  <li><a href="#failure-analysis-should-follow-the-contract" id="toc-failure-analysis-should-follow-the-contract" class="nav-link" data-scroll-target="#failure-analysis-should-follow-the-contract"><span class="header-section-number">6.1</span> Failure analysis should follow the contract</a></li>
+  </ul></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">7</span> Exercises</a>
+  <ul class="collapse">
+  <li><a href="#exercise-1-select-the-output-contract" id="toc-exercise-1-select-the-output-contract" class="nav-link" data-scroll-target="#exercise-1-select-the-output-contract"><span class="header-section-number">7.1</span> Exercise 1: select the output contract</a></li>
+  <li><a href="#exercise-2-compute-mask-iou" id="toc-exercise-2-compute-mask-iou" class="nav-link" data-scroll-target="#exercise-2-compute-mask-iou"><span class="header-section-number">7.2</span> Exercise 2: compute mask IoU</a></li>
+  <li><a href="#exercise-3-reason-about-non-maximum-suppression" id="toc-exercise-3-reason-about-non-maximum-suppression" class="nav-link" data-scroll-target="#exercise-3-reason-about-non-maximum-suppression"><span class="header-section-number">7.3</span> Exercise 3: reason about non-maximum suppression</a></li>
+  <li><a href="#exercise-4-separate-edge-orientation-from-gradient-direction" id="toc-exercise-4-separate-edge-orientation-from-gradient-direction" class="nav-link" data-scroll-target="#exercise-4-separate-edge-orientation-from-gradient-direction"><span class="header-section-number">7.4</span> Exercise 4: separate edge orientation from gradient direction</a></li>
+  </ul></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">8</span> Chapter summary</a></li>
+  <li><a href="#primary-resources" id="toc-primary-resources" class="nav-link" data-scroll-target="#primary-resources"><span class="header-section-number">9</span> Primary resources</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Segmentation and Object Detection</h1>
+<p class="subtitle lead">Chapter 9 · Predicting structured scenes</p>
+</div>
+
+<div>
+  <div class="description">
+    A detailed guide to semantic, instance, and panoptic segmentation; object detection; edge detection; and their evaluation
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dr.&nbsp;A. Belcaid </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="chapter-opening">
+<div class="chapter-kicker">
+<p>PART V · LEARNING FROM IMAGES</p>
+</div>
+<div class="chapter-cover">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="assets/chapter-cover.png" class="img-fluid figure-img" alt="A continuous urban street scene transitions from a natural image with object boxes through colored semantic and instance regions to a dark edge map."></p>
+<figcaption>One street scene is interpreted through bounding boxes, semantic regions, instance masks, and edge contours. Original course illustration generated for this chapter.</figcaption>
+</figure>
+</div>
+</div>
+<p>An image-level classifier can correctly say “street scene” while remaining silent about the questions that make the prediction useful: <strong>Where is each cyclist? Which pixels are road? Do two touching pedestrians belong to one instance or two? Where does the sidewalk boundary run?</strong></p>
+<p>This chapter studies tasks whose outputs preserve spatial structure. The unifying principle is simple: first specify the smallest output that supports the intended decision; only then choose a model family, training target, and evaluation measure.</p>
+</div>
+<section id="by-the-end-of-this-chapter-you-should-be-able-to" class="level3 unnumbered unlisted learning-objectives">
+<h3 class="unnumbered unlisted anchored" data-anchor-id="by-the-end-of-this-chapter-you-should-be-able-to">By the end of this chapter, you should be able to</h3>
+<ol type="1">
+<li>Distinguish classification, detection, semantic segmentation, instance segmentation, panoptic segmentation, and edge detection by their output contracts.</li>
+<li>Explain why dense prediction must combine semantic context with spatial precision.</li>
+<li>Trace the information paths in FCN, U-Net, and DeepLabv3+.</li>
+<li>Explain proposals, one-stage dense prediction, set prediction, matching, and non-maximum suppression.</li>
+<li>Derive intersection over union and mean IoU from concrete predictions.</li>
+<li>Explain how Mask R-CNN extends detection and why ROIAlign matters.</li>
+<li>Distinguish local intensity edges from learned perceptual boundaries.</li>
+<li>Choose a suitable output, model family, and evaluation measure from an application specification.</li>
+</ol>
+</section>
+<section id="start-with-the-required-prediction" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Start with the required prediction</h1>
+<p>Consider one urban photograph containing a car, two cyclists, a pedestrian, buildings, road, sidewalk, and sky. The pixels are identical in every row below; only the required answer changes.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Question</th>
+<th>Smallest sufficient output</th>
+<th>What is intentionally absent?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Is a cyclist present?</td>
+<td>One image-level label or probability</td>
+<td>location, count, shape</td>
+</tr>
+<tr class="even">
+<td>Where is every cyclist?</td>
+<td>A set of labeled boxes</td>
+<td>exact silhouettes</td>
+</tr>
+<tr class="odd">
+<td>Which pixels are road?</td>
+<td>One class label per pixel</td>
+<td>object identity</td>
+</tr>
+<tr class="even">
+<td>How many cyclists are present, and which pixels belong to each?</td>
+<td>One mask per cyclist</td>
+<td>labels for uncountable background regions</td>
+</tr>
+<tr class="odd">
+<td>Explain every pixel and preserve the identity of countable objects</td>
+<td>One panoptic scene partition</td>
+<td>overlapping assignments</td>
+</tr>
+<tr class="even">
+<td>Where does appearance change rapidly?</td>
+<td>An edge-strength map</td>
+<td>object class and identity</td>
+</tr>
+</tbody>
+</table>
+<p>The distinction is not cosmetic. It changes every part of the learning problem:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Five-part frame</th>
+<th>Spatial-prediction consequence</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Data</strong></td>
+<td>Labels may be boxes, class maps, instance masks, or boundary traces.</td>
+</tr>
+<tr class="even">
+<td><strong>Hypothesis</strong></td>
+<td>The model must emit a compatible grid or variable-size set.</td>
+</tr>
+<tr class="odd">
+<td><strong>Loss</strong></td>
+<td>Training must compare the same structures, often after an assignment step.</td>
+</tr>
+<tr class="even">
+<td><strong>Optimization</strong></td>
+<td>Dense outputs increase memory and create severe class imbalance.</td>
+</tr>
+<tr class="odd">
+<td><strong>Evaluation</strong></td>
+<td>Classification accuracy cannot judge localization or boundary quality.</td>
+</tr>
+</tbody>
+</table>
+<p>Cityscapes illustrates the annotation burden. Its authors collected urban video from 50 cities and released 5,000 images with fine pixel-level annotations plus 20,000 with coarse annotations <span class="citation" data-cites="cordts2016cityscapes">(<a href="#ref-cordts2016cityscapes" role="doc-biblioref">Cordts et al. 2016</a>)</span>. A box is cheaper to annotate than a precise mask; a panoptic partition is richer still. Asking for more structure has a real data cost.</p>
+<section id="three-meanings-of-segment-the-image" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="three-meanings-of-segment-the-image"><span class="header-section-number">1.1</span> Three meanings of “segment the image”</h2>
+<p><strong>Semantic segmentation</strong> assigns a class to every pixel. All pixels labeled <code>person</code> share one category even when they belong to different people.</p>
+<p><strong>Instance segmentation</strong> returns a separate mask for each countable object. Two touching people remain distinguishable because identity is part of the output.</p>
+<p><strong>Panoptic segmentation</strong> partitions the complete image. Countable <strong>things</strong> such as people and cars receive both category and instance identity; amorphous <strong>stuff</strong> such as road and sky receives a category but not an arbitrary instance number <span class="citation" data-cites="kirillov2019panoptic">(<a href="#ref-kirillov2019panoptic" role="doc-biblioref">Kirillov et al. 2019</a>)</span>.</p>
+<div id="fig-panoptic-contract" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A street photograph and three annotations show semantic categories, separate object instances, and a complete panoptic partition.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-panoptic-contract-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/09-segmentation-detection/assets/panoptic-paper-figure1.png" class="img-fluid figure-img" style="width:100.0%" alt="A street photograph and three annotations show semantic categories, separate object instances, and a complete panoptic partition.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-panoptic-contract-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: A real street photograph is compared with semantic, instance, and panoptic annotations. Source: Kirillov et al., Figure 1.
+</figcaption>
+</figure>
+</div>
+<p><a href="#fig-panoptic-contract" class="quarto-xref">Figure&nbsp;1</a> makes two independent questions visible:</p>
+<ol type="1">
+<li><strong>Coverage:</strong> must every pixel receive an explanation?</li>
+<li><strong>Identity:</strong> must different objects of the same category remain separate?</li>
+</ol>
+<p>Semantic segmentation provides coverage without identity. Instance segmentation provides identity for things without necessarily covering stuff. Panoptic segmentation requires both.</p>
+</section>
+</section>
+<section id="semantic-segmentation-classification-at-every-pixel" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Semantic segmentation: classification at every pixel</h1>
+<p>Let an input batch have shape <code>(N, 3, H, W)</code> and suppose there are <span class="math inline">\(K\)</span> semantic classes. A segmentation model emits logits</p>
+<p><span class="math display">\[
+Z\in\mathbb{R}^{N\times K\times H\times W}.
+\]</span></p>
+<p>At pixel <span class="math inline">\((i,j)\)</span>, the vector <span class="math inline">\(Z_{:,i,j}\)</span> is a <span class="math inline">\(K\)</span>-class classification problem. The predicted map is</p>
+<p><span class="math display">\[
+\hat y_{i,j}=\arg\max_k Z_{k,i,j}.
+\]</span></p>
+<p>For a target class map <span class="math inline">\(y\in\{0,\ldots,K-1\}^{H\times W}\)</span>, pixel-wise cross-entropy is commonly averaged over valid pixels:</p>
+<p><span class="math display">\[
+\mathcal L_{seg}=-\frac{1}{|\Omega|}\sum_{(i,j)\in\Omega}
+\log p(y_{i,j}\mid x,i,j).
+\]</span></p>
+<p><span class="math inline">\(\Omega\)</span> excludes ignored or unlabeled pixels. The loss is familiar classification loss, but its spatial repetition creates new difficulties: adjacent pixels are correlated, large classes contribute many more terms, and small objects may occupy only a few cells.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.nn <span class="im">import</span> functional <span class="im">as</span> F</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>logits <span class="op">=</span> torch.randn(<span class="dv">4</span>, <span class="dv">19</span>, <span class="dv">256</span>, <span class="dv">512</span>)   <span class="co"># N, K, H, W</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> torch.randint(<span class="dv">0</span>, <span class="dv">19</span>, (<span class="dv">4</span>, <span class="dv">256</span>, <span class="dv">512</span>))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> F.cross_entropy(logits, target, ignore_index<span class="op">=</span><span class="dv">255</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>prediction <span class="op">=</span> logits.argmax(dim<span class="op">=</span><span class="dv">1</span>)       <span class="co"># N, H, W</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The tensor contract matters: <code>cross_entropy</code> expects the class axis before the spatial axes, while the integer target omits that class axis.</p>
+<section id="the-contextprecision-tension" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="the-contextprecision-tension"><span class="header-section-number">2.1</span> The context–precision tension</h2>
+<p>A classifier usually reduces spatial resolution. After five stride-two operations, a <span class="math inline">\(224\times224\)</span> input becomes a <span class="math inline">\(7\times7\)</span> feature map. Each deep location sees broad context, which helps distinguish a pedestrian from a narrow signpost, but a seven-cell grid cannot precisely trace fingers, bicycle spokes, or a thin curb.</p>
+<p>Upsampling a coarse prediction changes its size, not its information. If several boundary positions collapsed into the same deep cell, interpolation cannot infer which original position was correct. Dense architectures therefore need two complementary resources:</p>
+<ul>
+<li><strong>deep, coarse features</strong> for semantic context;</li>
+<li><strong>shallow, fine features</strong> for localization.</li>
+</ul>
+</section>
+<section id="fcn-keep-a-spatial-output" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="fcn-keep-a-spatial-output"><span class="header-section-number">2.2</span> FCN: keep a spatial output</h2>
+<p>Fully Convolutional Networks replaced a classifier’s dense head with spatial operations and trained the network end to end from pixels to pixels <span class="citation" data-cites="long2015fcn">(<a href="#ref-long2015fcn" role="doc-biblioref">Long et al. 2015</a>)</span>. The central move is architectural: do not collapse the feature grid into one vector. Produce a coarse class-score grid, upsample it, and combine deep semantic features with shallower spatial features through skip connections.</p>
+<p>The paper describes the tension directly: global information answers <em>what</em>, while local information answers <em>where</em>. Its FCN-32s, FCN-16s, and FCN-8s variants progressively fuse finer features. The names refer to the effective output stride before final upsampling, not to the number of layers.</p>
+</section>
+<section id="u-net-a-symmetric-path-back-to-resolution" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="u-net-a-symmetric-path-back-to-resolution"><span class="header-section-number">2.3</span> U-Net: a symmetric path back to resolution</h2>
+<p>U-Net makes the recovery path explicit <span class="citation" data-cites="ronneberger2015unet">(<a href="#ref-ronneberger2015unet" role="doc-biblioref">Ronneberger et al. 2015</a>)</span>. Its encoder repeatedly builds context while reducing resolution. Its decoder upsamples and combines the result with features copied from the corresponding encoder level.</p>
+<div id="fig-unet-paper" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Original U-Net diagram with a contracting encoder, expanding decoder, and horizontal skip connections.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-unet-paper-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/09-segmentation-detection/assets/unet-paper-figure1.png" class="img-fluid figure-img" style="width:96.0%" alt="Original U-Net diagram with a contracting encoder, expanding decoder, and horizontal skip connections.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-unet-paper-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: The original U-Net architecture has a contracting path, an expanding path, and copy-and-crop connections between matching resolutions. Source: Ronneberger et al., Figure 1.
+</figcaption>
+</figure>
+</div>
+<p>The skip connection does not merely make optimization easier. It transfers localization evidence that would otherwise have to pass through the bottleneck. The decoder learns to combine two different descriptions of the same region:</p>
+<ul>
+<li>encoder features: precise location, weaker semantics;</li>
+<li>decoder features: stronger semantics, coarser location.</li>
+</ul>
+<p>The 2015 architecture used valid convolutions, so feature maps shrank and encoder features were cropped before concatenation. Many modern implementations use padding and concatenate equal-sized grids directly. The transferable principle is the multi-resolution information path, not the historical crop.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Addition and concatenation make different promises
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A residual addition assumes two tensors describe compatible features with equal shape. A U-Net concatenation preserves both feature sets as separate channels and lets later convolutions learn how to mix them. Concatenation increases channel count and memory; it does not automatically guarantee that fine detail will be used.</p>
+</div>
+</div>
+</section>
+<section id="deeplab-enlarge-context-without-another-stride" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="deeplab-enlarge-context-without-another-stride"><span class="header-section-number">2.4</span> DeepLab: enlarge context without another stride</h2>
+<p>An atrous, or dilated, convolution spaces its kernel samples apart. In one dimension, a kernel of size <span class="math inline">\(k\)</span> with dilation <span class="math inline">\(d\)</span> has effective size</p>
+<p><span class="math display">\[
+k_{eff}=k+(k-1)(d-1).
+\]</span></p>
+<p>For <span class="math inline">\(k=3\)</span> and <span class="math inline">\(d=2\)</span>, three learned positions cover an effective width of five. The parameter count is unchanged; the sampled field becomes wider. Atrous Spatial Pyramid Pooling applies several dilation rates in parallel so the prediction can use context at multiple scales.</p>
+<p>DeepLabv3+ combines this multi-scale encoder with a decoder that recovers sharper boundaries <span class="citation" data-cites="chen2018deeplabv3plus">(<a href="#ref-chen2018deeplabv3plus" role="doc-biblioref">Chen et al. 2018</a>)</span>. In the paper’s Cityscapes experiment, the reported test score was 82.1% mIoU under its stated setting. That is a historical paper result, not a universal score for the architecture.</p>
+<div id="fig-deeplab-results" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Street-scene photographs are paired with DeepLabv3+ semantic predictions; the last row contains failure cases.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-deeplab-results-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/09-segmentation-detection/assets/deeplabv3plus-results.png" class="img-fluid figure-img" style="width:100.0%" alt="Street-scene photographs are paired with DeepLabv3+ semantic predictions; the last row contains failure cases.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-deeplab-results-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: DeepLabv3+ qualitative results include successful predictions and a final row of failure cases. Source: Chen et al., Figure 6.
+</figcaption>
+</figure>
+</div>
+<p>Read <a href="#fig-deeplab-results" class="quarto-xref">Figure&nbsp;3</a> diagnostically. Large surfaces and many object silhouettes are accurate, but thin structures, occlusion, rare appearances, and ambiguous boundaries remain difficult. A visually plausible color map is not sufficient evidence; we need a metric.</p>
+</section>
+<section id="intersection-over-union-and-mean-iou" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="intersection-over-union-and-mean-iou"><span class="header-section-number">2.5</span> Intersection over union and mean IoU</h2>
+<p>For a class <span class="math inline">\(c\)</span>, define the predicted pixel set <span class="math inline">\(P_c\)</span> and target set <span class="math inline">\(G_c\)</span>. Their intersection over union is</p>
+<p><span id="eq-iou"><span class="math display">\[
+\operatorname{IoU}_c=\frac{|P_c\cap G_c|}{|P_c\cup G_c|}
+=\frac{TP_c}{TP_c+FP_c+FN_c}.
+\tag{1}\]</span></span></p>
+<p>True negatives do not appear. In a road scene, most pixels may be “not pedestrian”; counting those easy negatives would make a poor pedestrian mask look deceptively strong.</p>
+<p><strong>Worked example.</strong> A target car occupies 120 pixels. The model marks 140 pixels as car, and 100 pixels overlap the target. Then</p>
+<p><span class="math display">\[
+|P\cup G|=140+120-100=160,
+\qquad \operatorname{IoU}=\frac{100}{160}=0.625.
+\]</span></p>
+<p>The 40 extra pixels and 20 missed pixels both enlarge the union without enlarging the intersection.</p>
+<p>Mean IoU gives every evaluated class equal weight:</p>
+<p><span class="math display">\[
+\operatorname{mIoU}=\frac{1}{K}\sum_{c=1}^{K}\operatorname{IoU}_c.
+\]</span></p>
+<p>If road, car, and pedestrian IoUs are <span class="math inline">\(0.90\)</span>, <span class="math inline">\(0.60\)</span>, and <span class="math inline">\(0.30\)</span>, then mIoU is <span class="math inline">\(0.60\)</span>. The large road region cannot numerically hide weak pedestrian performance. Dataset protocols still matter: they define ignored labels, absent classes, and whether scores are averaged over images or accumulated over the dataset.</p>
+</section>
+</section>
+<section id="object-detection-predict-a-set-of-localized-objects" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Object detection: predict a set of localized objects</h1>
+<p>A detector returns a variable-size set</p>
+<p><span class="math display">\[
+\hat{\mathcal Y}=\{(\hat b_i,\hat c_i,\hat s_i)\}_{i=1}^{M},
+\]</span></p>
+<p>where <span class="math inline">\(\hat b_i\)</span> is a box, <span class="math inline">\(\hat c_i\)</span> a class, and <span class="math inline">\(\hat s_i\)</span> a confidence score. Unlike segmentation, there is no natural “object number 1” at a fixed tensor position. Output order should not change the meaning of the set.</p>
+<section id="boxes-are-geometric-claims" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="boxes-are-geometric-claims"><span class="header-section-number">3.1</span> Boxes are geometric claims</h2>
+<p>A box may be stored as corner coordinates <span class="math inline">\((x_{min},y_{min},x_{max},y_{max})\)</span> or center-size coordinates <span class="math inline">\((c_x,c_y,w,h)\)</span>. Conventions must also specify whether coordinates are pixels or normalized values and how boundary pixels are counted.</p>
+<p>Box IoU uses the same set principle as mask IoU, but the sets are rectangular areas. Suppose a <span class="math inline">\(100\times80\)</span> target box overlaps a <span class="math inline">\(120\times70\)</span> prediction over an <span class="math inline">\(80\times60\)</span> rectangle. Then</p>
+<p><span class="math display">\[
+A_G=8000,\quad A_P=8400,\quad A_I=4800,
+\]</span></p>
+<p><span class="math display">\[
+\operatorname{IoU}=\frac{4800}{8000+8400-4800}
+=\frac{4800}{11600}\approx0.414.
+\]</span></p>
+<p>The class can be correct while localization is poor. Detection evaluation must judge both.</p>
+</section>
+<section id="why-one-object-creates-many-candidates" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="why-one-object-creates-many-candidates"><span class="header-section-number">3.2</span> Why one object creates many candidates</h2>
+<p>Dense detectors evaluate many spatial positions, scales, or candidate boxes. Several candidates can surround the same car. During training, the system needs a rule assigning candidates to targets. During inference, it needs a rule for turning overlapping candidates into final detections.</p>
+<p><strong>Non-maximum suppression (NMS)</strong> is a common inference rule:</p>
+<ol type="1">
+<li>sort candidates by confidence;</li>
+<li>keep the highest-scoring box;</li>
+<li>suppress lower-scoring boxes whose IoU with it exceeds a threshold;</li>
+<li>repeat with the remaining candidates.</li>
+</ol>
+<p>NMS is not a classifier and is usually not learned. A low suppression threshold removes duplicates aggressively but may erase two nearby objects. A high threshold preserves nearby objects but may leave duplicates.</p>
+</section>
+<section id="two-stage-detection-propose-then-inspect" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="two-stage-detection-propose-then-inspect"><span class="header-section-number">3.3</span> Two-stage detection: propose, then inspect</h2>
+<p>Faster R-CNN gives different modules different responsibilities <span class="citation" data-cites="ren2015fasterrcnn">(<a href="#ref-ren2015fasterrcnn" role="doc-biblioref">Ren et al. 2015</a>)</span>. A shared CNN first computes one feature map for the image. A Region Proposal Network predicts likely object regions and objectness scores. Region features are then pooled into a fixed spatial size and passed to a head that classifies and refines each proposal.</p>
+<div id="fig-faster-rcnn" class="quarto-float quarto-figure quarto-figure-center anchored" alt="An image passes through shared convolutional layers; one branch proposes regions and another classifies pooled proposal features.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-faster-rcnn-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/09-segmentation-detection/assets/faster-rcnn-paper-figure2.png" class="img-fluid figure-img" style="width:90.0%" alt="An image passes through shared convolutional layers; one branch proposes regions and another classifies pooled proposal features.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-faster-rcnn-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: The original Faster R-CNN figure shows shared convolutional features feeding a Region Proposal Network and an ROI-based detection head. Source: Ren et al., Figure 2.
+</figcaption>
+</figure>
+</div>
+<p>The proposal stage should favor recall: missing an object leaves the second stage nothing to inspect. The second stage can spend more computation on fewer regions. “Two-stage” describes this allocation of work; it does not guarantee greater accuracy in every deployment.</p>
+</section>
+<section id="one-stage-detection-predict-densely-in-one-pass" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="one-stage-detection-predict-densely-in-one-pass"><span class="header-section-number">3.4</span> One-stage detection: predict densely in one pass</h2>
+<p>The original YOLO formulation predicted boxes and class probabilities directly from the full image in one network evaluation <span class="citation" data-cites="redmon2016yolo">(<a href="#ref-redmon2016yolo" role="doc-biblioref">Redmon et al. 2016</a>)</span>. This unified design made the speed–accuracy trade-off concrete and helped establish one-stage detection as a major family.</p>
+<div id="fig-yolo" class="quarto-float quarto-figure quarto-figure-center anchored" alt="YOLO pipeline from resized image through one convolutional network to thresholded detections and non-maximum suppression.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-yolo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/09-segmentation-detection/assets/yolo-paper-figure1.png" class="img-fluid figure-img" style="width:78.0%" alt="YOLO pipeline from resized image through one convolutional network to thresholded detections and non-maximum suppression.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-yolo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: The original YOLO system resizes an image, runs one convolutional network, and applies non-maximum suppression. Source: Redmon et al., Figure 1.
+</figcaption>
+</figure>
+</div>
+<p>Modern one-stage detectors differ substantially from the 2016 model, but the durable structural choice remains: distribute classification and localization predictions densely rather than running a substantial per-proposal head.</p>
+</section>
+<section id="set-prediction-supervise-unique-assignments" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="set-prediction-supervise-unique-assignments"><span class="header-section-number">3.5</span> Set prediction: supervise unique assignments</h2>
+<p>DETR treats detection explicitly as set prediction <span class="citation" data-cites="carion2020detr">(<a href="#ref-carion2020detr" role="doc-biblioref">Carion et al. 2020</a>)</span>. It maintains a fixed number <span class="math inline">\(Q\)</span> of output slots. A transformer produces one class distribution and box per slot. Because the target objects have no canonical order, training solves a one-to-one bipartite matching between predictions and ground truth.</p>
+<div id="fig-detr" class="quarto-float quarto-figure quarto-figure-center anchored" alt="DETR architecture and bipartite matching connect a set of predicted boxes to ground-truth objects, with unmatched slots assigned no object.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-detr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/09-segmentation-detection/assets/detr-paper-figure1.png" class="img-fluid figure-img" style="width:100.0%" alt="DETR architecture and bipartite matching connect a set of predicted boxes to ground-truth objects, with unmatched slots assigned no object.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-detr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: DETR maps an image through a CNN and transformer to a fixed set of predictions, then matches predictions uniquely to ground-truth objects. Source: Carion et al., Figure 1.
+</figcaption>
+</figure>
+</div>
+<p>If the matching is <span class="math inline">\(\sigma\)</span>, a simplified objective has the form</p>
+<p><span class="math display">\[
+\mathcal L=\sum_{j=1}^{N}
+\left[\mathcal L_{class}(y_j,\hat y_{\sigma(j)})
++\lambda\mathcal L_{box}(b_j,\hat b_{\sigma(j)})\right]
++\sum_{q\ \text{unmatched}}\mathcal L_{class}(\varnothing,\hat y_q).
+\]</span></p>
+<p>Every target owns one matched prediction; unmatched slots learn the valid class “no object.” The assignment resolves duplicate responsibility during training and lets the original system avoid NMS. The conceptual change is the supervision of an unordered set, not merely the use of a transformer.</p>
+</section>
+<section id="precision-recall-and-average-precision" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="precision-recall-and-average-precision"><span class="header-section-number">3.6</span> Precision, recall, and average precision</h2>
+<p>For one class and one IoU threshold, a prediction is a true positive when it matches an unused ground-truth object with sufficient IoU. A duplicate prediction of an already matched object is a false positive. An unmatched ground-truth object is a false negative.</p>
+<p><span class="math display">\[
+\operatorname{precision}=\frac{TP}{TP+FP},
+\qquad
+\operatorname{recall}=\frac{TP}{TP+FN}.
+\]</span></p>
+<p>Sort detections by confidence and lower the acceptance threshold. Recall usually rises because more objects are recovered, while false positives may reduce precision. <strong>Average precision (AP)</strong> summarizes the resulting precision–recall curve. Benchmarks such as COCO report averages across categories and multiple IoU thresholds; stricter thresholds reward more precise boxes.</p>
+<div class="callout callout-style-simple callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>“mAP” is incomplete without the protocol
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>PASCAL VOC and COCO use different category sets, IoU conventions, and averaging rules. A number called mAP is not interpretable without naming the dataset and protocol. Never compare two reported values merely because both are percentages.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="instance-and-panoptic-segmentation" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Instance and panoptic segmentation</h1>
+<p>Semantic segmentation cannot reliably count touching people: the output contains the category <code>person</code>, not an identity variable. Connected components are not a general repair because occlusion can split one object while contact can join two.</p>
+<section id="mask-r-cnn-add-a-mask-question-to-each-region" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="mask-r-cnn-add-a-mask-question-to-each-region"><span class="header-section-number">4.1</span> Mask R-CNN: add a mask question to each region</h2>
+<p>Mask R-CNN extends Faster R-CNN with a parallel mask branch for every selected region <span class="citation" data-cites="he2017maskrcnn">(<a href="#ref-he2017maskrcnn" role="doc-biblioref">He et al. 2017</a>)</span>. The class and box heads ask <em>what object is this and where is its extent?</em> The mask head asks <em>which pixels inside this region belong to it?</em></p>
+<div id="fig-mask-rcnn" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A region of interest feeds parallel classification, bounding-box regression, and per-instance mask branches.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mask-rcnn-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/09-segmentation-detection/assets/mask-rcnn-paper-figure1.png" class="img-fluid figure-img" style="width:88.0%" alt="A region of interest feeds parallel classification, bounding-box regression, and per-instance mask branches.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mask-rcnn-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: Mask R-CNN extends the Faster R-CNN region pipeline with a parallel fully convolutional mask branch. Source: He et al., Figure 1.
+</figcaption>
+</figure>
+</div>
+<p>The mask branch predicts one small binary mask per class for each region. During training, only the channel corresponding to the target class contributes to the mask loss. This decouples category competition from mask shape: the classification head chooses the category, while the selected mask channel learns the silhouette.</p>
+</section>
+<section id="why-roialign-matters" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="why-roialign-matters"><span class="header-section-number">4.2</span> Why ROIAlign matters</h2>
+<p>ROI pooling converts differently sized regions into a fixed-size feature grid, but rounding region boundaries to integer feature coordinates introduces spatial misalignment. Classification may tolerate a one-cell shift; a pixel mask exposes it.</p>
+<p>ROIAlign samples at fractional coordinates and uses bilinear interpolation. For a point <span class="math inline">\((x,y)\)</span> between four feature values, it computes a distance-weighted combination rather than rounding to one cell. Mask R-CNN’s ablations showed that this small geometric correction was especially important for stricter mask localization <span class="citation" data-cites="he2017maskrcnn">(<a href="#ref-he2017maskrcnn" role="doc-biblioref">He et al. 2017</a>)</span>.</p>
+<p>The broader lesson is reusable: when the target is spatially precise, every resizing, stride, crop, and coordinate convention becomes part of the model’s contract.</p>
+</section>
+<section id="panoptic-segmentation-one-coherent-scene" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="panoptic-segmentation-one-coherent-scene"><span class="header-section-number">4.3</span> Panoptic segmentation: one coherent scene</h2>
+<p>Panoptic segmentation requires exactly one semantic label at every pixel and one instance identifier for every thing pixel <span class="citation" data-cites="kirillov2019panoptic">(<a href="#ref-kirillov2019panoptic" role="doc-biblioref">Kirillov et al. 2019</a>)</span>. A model or post-processing stage must reconcile overlapping instance masks with a semantic background map. The final output cannot assign one pixel simultaneously to two cars or leave a road hole unexplained.</p>
+<p>Panoptic Quality decomposes into segmentation quality and recognition quality:</p>
+<p><span class="math display">\[
+PQ=\underbrace{\frac{\sum_{(p,g)\in TP}\operatorname{IoU}(p,g)}{|TP|}}_{SQ}
+\times
+\underbrace{\frac{|TP|}{|TP|+\tfrac12|FP|+\tfrac12|FN|}}_{RQ}.
+\]</span></p>
+<p><span class="math inline">\(SQ\)</span> asks how well matched regions overlap. <span class="math inline">\(RQ\)</span> penalizes missing and spurious regions. The factorization prevents excellent boundaries on a few easy objects from hiding failures to recognize the rest of the scene.</p>
+</section>
+</section>
+<section id="edge-detection-local-change-versus-perceptual-boundary" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Edge detection: local change versus perceptual boundary</h1>
+<p>An edge map assigns a strength to every pixel, indicating rapid local image change. A strong edge may coincide with an object boundary, but it may also arise from a shadow, painted stripe, texture, specular highlight, or illumination change.</p>
+<section id="derivatives-turn-transitions-into-peaks" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="derivatives-turn-transitions-into-peaks"><span class="header-section-number">5.1</span> Derivatives turn transitions into peaks</h2>
+<p>For a one-dimensional intensity signal <span class="math inline">\(I(x)\)</span>, constant regions have derivative near zero, while a dark-to-bright transition creates a positive peak. A centered discrete difference is</p>
+<p><span class="math display">\[
+\frac{dI}{dx}\approx\frac{I(x+1)-I(x-1)}{2}.
+\]</span></p>
+<p>In two dimensions, the gradient is</p>
+<p><span class="math display">\[
+\nabla I=(G_x,G_y),\qquad
+G=\sqrt{G_x^2+G_y^2},\qquad
+\theta=\operatorname{atan2}(G_y,G_x).
+\]</span></p>
+<p>The gradient direction points toward fastest intensity increase and is perpendicular to the visible edge. A vertical boundary therefore produces a strong horizontal derivative.</p>
+<p>Sobel kernels estimate both components while smoothing slightly in the perpendicular direction:</p>
+<p><span class="math display">\[
+S_x=\begin{bmatrix}-1&amp;0&amp;1\\-2&amp;0&amp;2\\-1&amp;0&amp;1\end{bmatrix},
+\qquad
+S_y=\begin{bmatrix}-1&amp;-2&amp;-1\\0&amp;0&amp;0\\1&amp;2&amp;1\end{bmatrix}.
+\]</span></p>
+</section>
+<section id="canny-is-a-pipeline-not-one-filter" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="canny-is-a-pipeline-not-one-filter"><span class="header-section-number">5.2</span> Canny is a pipeline, not one filter</h2>
+<p>Canny derived an edge detector around three goals: good detection, good localization, and a single response to one edge <span class="citation" data-cites="canny1986computational">(<a href="#ref-canny1986computational" role="doc-biblioref">Canny 1986</a>)</span>. The practical pipeline assigns a responsibility to each stage:</p>
+<ol type="1">
+<li><strong>Gaussian smoothing</strong> reduces high-frequency noise before differentiation amplifies it.</li>
+<li><strong>Gradient estimation</strong> measures strength and direction.</li>
+<li><strong>Non-maximum suppression</strong> keeps a local maximum across the gradient direction, thinning a broad ridge.</li>
+<li><strong>Double thresholding and hysteresis</strong> seed contours with strong responses and retain weak responses only when connected to a strong edge.</li>
+</ol>
+<div id="fig-canny-real" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Six panels show a real photograph transformed through all major stages of the Canny edge detector.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-canny-real-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/09-segmentation-detection/assets/canny-real-image-stages.png" class="img-fluid figure-img" style="width:100.0%" alt="Six panels show a real photograph transformed through all major stages of the Canny edge detector.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-canny-real-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: A real photograph progresses through grayscale, Gaussian blur, gradient magnitude, non-maximum suppression, double thresholding, and hysteresis. Course-generated figure following Canny’s procedure.
+</figcaption>
+</figure>
+</div>
+<p>A low threshold preserves faint boundaries but admits texture and noise. A high threshold gives a cleaner map but breaks low-contrast contours. Hysteresis uses connectivity to make a better decision than either threshold alone, but its scale and thresholds remain application choices.</p>
+</section>
+<section id="learned-boundaries-ask-a-different-question" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="learned-boundaries-ask-a-different-question"><span class="header-section-number">5.3</span> Learned boundaries ask a different question</h2>
+<p>The Berkeley segmentation benchmark collected multiple human segmentations of natural images, making perceptual boundary agreement measurable <span class="citation" data-cites="arbelaez2011contour">(<a href="#ref-arbelaez2011contour" role="doc-biblioref">Arbeláez et al. 2011</a>)</span>. HED reframed boundary prediction as deeply supervised image-to-image learning with side outputs at several CNN depths <span class="citation" data-cites="xie2015hed">(<a href="#ref-xie2015hed" role="doc-biblioref">Xie and Tu 2015</a>)</span>.</p>
+<div id="fig-hed-evidence" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A cat photograph is compared with human boundaries, HED outputs at several depths, and Canny results at three scales.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-hed-evidence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/09-segmentation-detection/assets/hed-paper-figure1.png" class="img-fluid figure-img" style="width:92.0%" alt="A cat photograph is compared with human boundaries, HED outputs at several depths, and Canny results at three scales.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-hed-evidence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9: The HED paper compares a real image, human boundary annotation, fused HED output, side outputs, and Canny at three smoothing scales. Source: Xie and Tu, Figure 1.
+</figcaption>
+</figure>
+</div>
+<p><a href="#fig-hed-evidence" class="quarto-xref">Figure&nbsp;9</a> exposes the mechanism. A shallow side output responds to fine texture. Deeper outputs use larger receptive fields and become coarser and more global. Fusion combines these scales. Canny’s smoothing parameter instead creates a direct trade-off: small scale preserves clutter; large scale removes clutter and legitimate detail together.</p>
+<p>The comparison should not be overstated. HED learns the annotation policy of its dataset; it does not discover a universal definition of “meaningful boundary.” Domain shift, annotation disagreement, and rare structures remain relevant.</p>
+</section>
+<section id="boundary-evaluation" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="boundary-evaluation"><span class="header-section-number">5.4</span> Boundary evaluation</h2>
+<p>Exact pixel equality is too strict when two traces differ by one pixel. Boundary benchmarks therefore match predicted and ground-truth edge pixels within a localization tolerance, then compute precision and recall. A threshold on the edge-strength map produces one operating point; sweeping it produces a precision–recall curve.</p>
+<p>The HED paper reports ODS (one threshold optimized for the dataset), OIS (a best threshold per image), and AP (area-style summary of precision and recall) <span class="citation" data-cites="xie2015hed">(<a href="#ref-xie2015hed" role="doc-biblioref">Xie and Tu 2015</a>)</span>. These measure different capabilities. A large gap between OIS and ODS suggests that the best threshold varies substantially across images.</p>
+</section>
+</section>
+<section id="choosing-the-task-model-and-metric-together" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Choosing the task, model, and metric together</h1>
+<p>The architecture name should be the last decision, not the first.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Required decision</th>
+<th>Smallest sufficient output</th>
+<th>Representative family</th>
+<th>Evaluation evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Flag whether a helmet appears</td>
+<td>image label</td>
+<td>CNN classifier</td>
+<td>accuracy, precision/recall</td>
+</tr>
+<tr class="even">
+<td>Count and locate every helmet</td>
+<td>labeled box set</td>
+<td>Faster R-CNN, one-stage detector, DETR</td>
+<td>AP across IoU thresholds</td>
+</tr>
+<tr class="odd">
+<td>Measure total road area</td>
+<td>semantic class map</td>
+<td>FCN, U-Net, DeepLab</td>
+<td>road IoU, class-wise mIoU</td>
+</tr>
+<tr class="even">
+<td>Count cyclists and measure each silhouette</td>
+<td>instance masks</td>
+<td>Mask R-CNN-style instance segmentation</td>
+<td>matched mask AP/IoU</td>
+</tr>
+<tr class="odd">
+<td>Explain the complete traffic scene</td>
+<td>panoptic partition</td>
+<td>joint semantic–instance system</td>
+<td>PQ, SQ, RQ</td>
+</tr>
+<tr class="even">
+<td>Trace material transitions for metrology</td>
+<td>edge map</td>
+<td>Canny or learned boundary detector</td>
+<td>boundary precision–recall</td>
+</tr>
+</tbody>
+</table>
+<p>A richer output is not automatically better. If a decision only requires an image-level alarm, collecting pixel masks may waste annotation effort. Conversely, if occupied area matters, boxes systematically include background and are insufficient even when their AP is high.</p>
+<section id="failure-analysis-should-follow-the-contract" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="failure-analysis-should-follow-the-contract"><span class="header-section-number">6.1</span> Failure analysis should follow the contract</h2>
+<p>When a result is wrong, ask which contract failed:</p>
+<ul>
+<li><strong>Recognition:</strong> correct location, wrong class.</li>
+<li><strong>Localization:</strong> correct class, box or mask poorly aligned.</li>
+<li><strong>Coverage:</strong> unlabeled holes or missing stuff regions.</li>
+<li><strong>Identity:</strong> two objects merged or one object split.</li>
+<li><strong>Assignment:</strong> duplicate predictions claim one target.</li>
+<li><strong>Boundary selection:</strong> texture kept while meaningful contour is missed.</li>
+</ul>
+<p>These categories lead to different repairs. A stronger classifier does not fix quantized mask alignment. Lowering a detector threshold may recover missed objects but increase duplicates. Increasing image resolution may help small objects while increasing memory and latency.</p>
+</section>
+</section>
+<section id="exercises" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Exercises</h1>
+<section id="exercise-1-select-the-output-contract" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="exercise-1-select-the-output-contract"><span class="header-section-number">7.1</span> Exercise 1: select the output contract</h2>
+<p><strong>Given:</strong> A traffic camera must count each cyclist and measure the exact road area occupied by each cyclist.</p>
+<p><strong>Task:</strong> Choose the smallest sufficient output type, one suitable evaluation strategy, and one representative model family.</p>
+<details>
+<summary>
+Worked solution
+</summary>
+<p>Use <strong>instance segmentation</strong>. One mask per cyclist preserves identity for counting and pixels for occupied area. Semantic segmentation can merge touching cyclists; detection boxes preserve identity but include background.</p>
+Evaluate by matching predicted instances to ground-truth cyclists, penalizing missed and duplicate instances, then measuring mask overlap. A Mask R-CNN-style system is one representative family.
+</details>
+</section>
+<section id="exercise-2-compute-mask-iou" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="exercise-2-compute-mask-iou"><span class="header-section-number">7.2</span> Exercise 2: compute mask IoU</h2>
+<p><strong>Given:</strong> A target pedestrian mask contains 80 pixels. A predicted mask contains 100 pixels. Their intersection contains 60 pixels.</p>
+<p><strong>Task:</strong> Compute IoU and identify the false-positive and false-negative pixel counts.</p>
+<details>
+<summary>
+Worked solution
+</summary>
+<p>The prediction contains <span class="math inline">\(100-60=40\)</span> false-positive pixels. The target contains <span class="math inline">\(80-60=20\)</span> false-negative pixels. The union is</p>
+<p><span class="math display">\[
+60+40+20=120,
+\]</span></p>
+<p>so</p>
+<span class="math display">\[
+\operatorname{IoU}=60/120=0.5.
+\]</span>
+</details>
+</section>
+<section id="exercise-3-reason-about-non-maximum-suppression" class="level2" data-number="7.3">
+<h2 data-number="7.3" class="anchored" data-anchor-id="exercise-3-reason-about-non-maximum-suppression"><span class="header-section-number">7.3</span> Exercise 3: reason about non-maximum suppression</h2>
+<p><strong>Given:</strong> Three car detections have scores <span class="math inline">\(0.95\)</span>, <span class="math inline">\(0.82\)</span>, and <span class="math inline">\(0.60\)</span>. Their pairwise IoUs are <span class="math inline">\(0.76\)</span> between the first and second, <span class="math inline">\(0.18\)</span> between the first and third, and <span class="math inline">\(0.20\)</span> between the second and third. NMS uses threshold <span class="math inline">\(0.50\)</span>.</p>
+<p><strong>Task:</strong> Which detections remain?</p>
+<details>
+<summary>
+Worked solution
+</summary>
+<p>Keep the <span class="math inline">\(0.95\)</span> box first. Suppress the <span class="math inline">\(0.82\)</span> box because its IoU with the kept box is <span class="math inline">\(0.76&gt;0.50\)</span>. Keep the <span class="math inline">\(0.60\)</span> box because its IoU with the first box is only <span class="math inline">\(0.18\)</span>. The result contains the <span class="math inline">\(0.95\)</span> and <span class="math inline">\(0.60\)</span> detections.</p>
+This arithmetic alone cannot tell whether the third box is a second car or a false positive; NMS only reasons from scores and overlap.
+</details>
+</section>
+<section id="exercise-4-separate-edge-orientation-from-gradient-direction" class="level2" data-number="7.4">
+<h2 data-number="7.4" class="anchored" data-anchor-id="exercise-4-separate-edge-orientation-from-gradient-direction"><span class="header-section-number">7.4</span> Exercise 4: separate edge orientation from gradient direction</h2>
+<p><strong>Given:</strong> An image is dark on the left and bright on the right, with a vertical transition between them.</p>
+<p><strong>Task:</strong> Which Sobel component dominates, and which way does the gradient point?</p>
+<details>
+<summary>
+Worked solution
+</summary>
+<span class="math inline">\(|G_x|\)</span> dominates because intensity changes along the horizontal <span class="math inline">\(x\)</span> direction. The gradient points from dark to bright—toward the right under this sign convention. The visible edge is vertical and perpendicular to that gradient.
+</details>
+</section>
+</section>
+<section id="chapter-summary" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Chapter summary</h1>
+<ol type="1">
+<li>Spatial tasks differ first by output structure: label, box set, class map, instance masks, panoptic partition, or edge map.</li>
+<li>Semantic segmentation must combine broad context with fine spatial evidence; FCN, U-Net, and DeepLab embody different mechanisms for doing so.</li>
+<li>Detection must resolve a variable-size unordered set. Proposal systems, dense one-stage systems, and set-prediction systems allocate that responsibility differently.</li>
+<li>Instance segmentation adds identity-preserving masks; panoptic segmentation additionally demands complete, non-overlapping scene coverage.</li>
+<li>IoU measures spatial agreement. mIoU balances semantic classes, AP couples recognition with localization, and PQ couples recognition with region quality.</li>
+<li>Classical edges are local appearance transitions. Learned boundaries use annotated examples and context to select which transitions matter.</li>
+<li>The correct workflow is <strong>decision → output contract → annotation → model/loss → evaluation</strong>, not architecture name first.</li>
+</ol>
+</section>
+<section id="primary-resources" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Primary resources</h1>
+<ul>
+<li><a href="https://openaccess.thecvf.com/content_cvpr_2015/html/Long_Fully_Convolutional_Networks_2015_CVPR_paper.html">Fully Convolutional Networks for Semantic Segmentation</a></li>
+<li><a href="https://arxiv.org/abs/1505.04597">U-Net: Convolutional Networks for Biomedical Image Segmentation</a></li>
+<li><a href="https://openaccess.thecvf.com/content_ECCV_2018/html/Liang-Chieh_Chen_Encoder-Decoder_with_Atrous_ECCV_2018_paper.html">DeepLabv3+: Encoder-Decoder with Atrous Separable Convolution</a></li>
+<li><a href="https://papers.nips.cc/paper/2015/hash/14bfa6bb14875e45bba028a21ed38046-Abstract.html">Faster R-CNN</a></li>
+<li><a href="https://openaccess.thecvf.com/content_cvpr_2016/html/Redmon_You_Only_Look_CVPR_2016_paper.html">You Only Look Once</a></li>
+<li><a href="https://arxiv.org/abs/2005.12872">End-to-End Object Detection with Transformers</a></li>
+<li><a href="https://openaccess.thecvf.com/content_iccv_2017/html/He_Mask_R-CNN_ICCV_2017_paper.html">Mask R-CNN</a></li>
+<li><a href="https://openaccess.thecvf.com/content_CVPR_2019/html/Kirillov_Panoptic_Segmentation_CVPR_2019_paper.html">Panoptic Segmentation</a></li>
+<li><a href="https://doi.org/10.1109/TPAMI.1986.4767851">A Computational Approach to Edge Detection</a></li>
+<li><a href="https://openaccess.thecvf.com/content_iccv_2015/html/Xie_Holistically-Nested_Edge_Detection_ICCV_2015_paper.html">Holistically-Nested Edge Detection</a></li>
+</ul>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-arbelaez2011contour" class="csl-entry" role="listitem">
+Arbeláez, Pablo, Michael Maire, Charless Fowlkes, and Jitendra Malik. 2011. <span>“Contour Detection and Hierarchical Image Segmentation.”</span> <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em> 33 (5): 898–916. <a href="https://doi.org/10.1109/TPAMI.2010.161">https://doi.org/10.1109/TPAMI.2010.161</a>.
+</div>
+<div id="ref-canny1986computational" class="csl-entry" role="listitem">
+Canny, John. 1986. <span>“A Computational Approach to Edge Detection.”</span> <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em> PAMI-8 (6): 679–98. <a href="https://doi.org/10.1109/TPAMI.1986.4767851">https://doi.org/10.1109/TPAMI.1986.4767851</a>.
+</div>
+<div id="ref-carion2020detr" class="csl-entry" role="listitem">
+Carion, Nicolas, Francisco Massa, Gabriel Synnaeve, Nicolas Usunier, Alexander Kirillov, and Sergey Zagoruyko. 2020. <span>“End-to-End Object Detection with Transformers.”</span> <em>European Conference on Computer Vision</em>, 213–29. <a href="https://doi.org/10.1007/978-3-030-58452-8_13">https://doi.org/10.1007/978-3-030-58452-8_13</a>.
+</div>
+<div id="ref-chen2018deeplabv3plus" class="csl-entry" role="listitem">
+Chen, Liang-Chieh, Yukun Zhu, George Papandreou, Florian Schroff, and Hartwig Adam. 2018. <span>“Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation.”</span> <em>European Conference on Computer Vision</em>, 801–18. <a href="https://doi.org/10.1007/978-3-030-01234-2_49">https://doi.org/10.1007/978-3-030-01234-2_49</a>.
+</div>
+<div id="ref-cordts2016cityscapes" class="csl-entry" role="listitem">
+Cordts, Marius, Mohamed Omran, Sebastian Ramos, et al. 2016. <span>“The Cityscapes Dataset for Semantic Urban Scene Understanding.”</span> <em>IEEE Conference on Computer Vision and Pattern Recognition</em>, 3213–23. <a href="https://doi.org/10.1109/CVPR.2016.350">https://doi.org/10.1109/CVPR.2016.350</a>.
+</div>
+<div id="ref-he2017maskrcnn" class="csl-entry" role="listitem">
+He, Kaiming, Georgia Gkioxari, Piotr Dollár, and Ross Girshick. 2017. <span>“Mask <span>R-CNN</span>.”</span> <em>IEEE International Conference on Computer Vision</em>, 2961–69. <a href="https://doi.org/10.1109/ICCV.2017.322">https://doi.org/10.1109/ICCV.2017.322</a>.
+</div>
+<div id="ref-kirillov2019panoptic" class="csl-entry" role="listitem">
+Kirillov, Alexander, Kaiming He, Ross Girshick, Carsten Rother, and Piotr Dollár. 2019. <span>“Panoptic Segmentation.”</span> <em>IEEE/CVF Conference on Computer Vision and Pattern Recognition</em>, 9404–13. <a href="https://doi.org/10.1109/CVPR.2019.00963">https://doi.org/10.1109/CVPR.2019.00963</a>.
+</div>
+<div id="ref-long2015fcn" class="csl-entry" role="listitem">
+Long, Jonathan, Evan Shelhamer, and Trevor Darrell. 2015. <span>“Fully Convolutional Networks for Semantic Segmentation.”</span> <em>IEEE Conference on Computer Vision and Pattern Recognition</em>, 3431–40. <a href="https://doi.org/10.1109/CVPR.2015.7298965">https://doi.org/10.1109/CVPR.2015.7298965</a>.
+</div>
+<div id="ref-redmon2016yolo" class="csl-entry" role="listitem">
+Redmon, Joseph, Santosh Divvala, Ross Girshick, and Ali Farhadi. 2016. <span>“You Only Look Once: Unified, Real-Time Object Detection.”</span> <em>IEEE Conference on Computer Vision and Pattern Recognition</em>, 779–88. <a href="https://doi.org/10.1109/CVPR.2016.91">https://doi.org/10.1109/CVPR.2016.91</a>.
+</div>
+<div id="ref-ren2015fasterrcnn" class="csl-entry" role="listitem">
+Ren, Shaoqing, Kaiming He, Ross Girshick, and Jian Sun. 2015. <span>“Faster <span>R-CNN</span>: Towards Real-Time Object Detection with Region Proposal Networks.”</span> <em>Advances in Neural Information Processing Systems</em> 28. <a href="https://papers.nips.cc/paper/2015/hash/14bfa6bb14875e45bba028a21ed38046-Abstract.html">https://papers.nips.cc/paper/2015/hash/14bfa6bb14875e45bba028a21ed38046-Abstract.html</a>.
+</div>
+<div id="ref-ronneberger2015unet" class="csl-entry" role="listitem">
+Ronneberger, Olaf, Philipp Fischer, and Thomas Brox. 2015. <span>“<span>U-Net</span>: Convolutional Networks for Biomedical Image Segmentation.”</span> <em>Medical Image Computing and Computer-Assisted Intervention</em>, 234–41. <a href="https://doi.org/10.1007/978-3-319-24574-4_28">https://doi.org/10.1007/978-3-319-24574-4_28</a>.
+</div>
+<div id="ref-xie2015hed" class="csl-entry" role="listitem">
+Xie, Saining, and Zhuowen Tu. 2015. <span>“Holistically-Nested Edge Detection.”</span> <em>IEEE International Conference on Computer Vision</em>, 1395–403. <a href="https://doi.org/10.1109/ICCV.2015.164">https://doi.org/10.1109/ICCV.2015.164</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Deep Learning · ENSA Tétouan</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

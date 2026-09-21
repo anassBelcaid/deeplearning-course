@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 590">
+  <defs>
+    <marker id="n1" markerWidth="6" markerHeight="6" refX="5.4" refY="3" orient="auto">
+      <path d="M0 0L6 3L0 6Z" fill="#7258a8"/>
+    </marker>
+    <marker id="n2" markerWidth="6" markerHeight="6" refX="5.4" refY="3" orient="auto">
+      <path d="M0 0L6 3L0 6Z" fill="#ef5b3f"/>
+    </marker>
+    <marker id="n3" markerWidth="6" markerHeight="6" refX="5.4" refY="3" orient="auto">
+      <path d="M0 0L6 3L0 6Z" fill="#29845a"/>
+    </marker>
+  </defs>
+  <rect x="1" y="1" width="678" height="588" rx="22" fill="#fff" stroke="#d7e2eb" stroke-width="2"/>
+  <g fill="none" stroke="#b8d8ef" stroke-width="3">
+    <ellipse cx="430" cy="315" rx="205" ry="160"/>
+    <ellipse cx="430" cy="315" rx="155" ry="120"/>
+    <ellipse cx="430" cy="315" rx="105" ry="80"/>
+    <ellipse cx="430" cy="315" rx="53" ry="38"/>
+  </g>
+  <ellipse cx="430" cy="315" rx="27" ry="18" fill="#d9f0e2"/>
+  <circle cx="190" cy="160" r="13" fill="#17212b"/>
+  <path d="M190 160L365 219" stroke="#7258a8" stroke-width="6" marker-end="url(#n1)"/>
+  <circle cx="380" cy="224" r="12" fill="#7258a8"/>
+  <path d="M380 224L447 291" stroke="#ef5b3f" stroke-width="6" marker-end="url(#n2)"/>
+  <path d="M190 160L399 292" stroke="#29845a" stroke-width="6" marker-end="url(#n3)"/>
+  <circle cx="414" cy="301" r="12" fill="#29845a"/>
+  <g font-family="Arial,sans-serif" font-weight="700">
+    <text x="83" y="136" font-size="19" fill="#17212b">current &#x3B8;</text>
+    <text x="268" y="174" font-size="19" fill="#7258a8">1 &#xB7; momentum look-ahead</text>
+    <text x="429" y="225" font-size="19" fill="#ef5b3f">2 &#xB7; gradient there</text>
+    <text x="212" y="342" font-size="19" fill="#29845a">3 &#xB7; corrected destination</text>
+  </g>
+</svg>

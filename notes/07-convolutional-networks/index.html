@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dr.&nbsp;A. Belcaid">
+<meta name="description" content="A visual and mathematical guide to convolution, feature maps, geometry, pooling, receptive fields, and complete PyTorch CNNs">
+
+<title>Convolutional Neural Networks – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e90830a6c3a870e8aa2cd7457ccbff49.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../schedule.html"> 
+<span class="menu-text">Schedule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../logistics.html"> 
+<span class="menu-text">Logistics</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-concrete-problem-classify-an-object-wherever-it-appears" id="toc-the-concrete-problem-classify-an-object-wherever-it-appears" class="nav-link active" data-scroll-target="#the-concrete-problem-classify-an-object-wherever-it-appears"><span class="header-section-number">1</span> The concrete problem: classify an object wherever it appears</a>
+  <ul class="collapse">
+  <li><a href="#parameter-efficiency-is-a-consequence-not-the-primary-definition" id="toc-parameter-efficiency-is-a-consequence-not-the-primary-definition" class="nav-link" data-scroll-target="#parameter-efficiency-is-a-consequence-not-the-primary-definition"><span class="header-section-number">1.1</span> Parameter efficiency is a consequence, not the primary definition</a></li>
+  </ul></li>
+  <li><a href="#the-convolution-operation" id="toc-the-convolution-operation" class="nav-link" data-scroll-target="#the-convolution-operation"><span class="header-section-number">2</span> The convolution operation</a>
+  <ul class="collapse">
+  <li><a href="#one-patch-produces-one-number" id="toc-one-patch-produces-one-number" class="nav-link" data-scroll-target="#one-patch-produces-one-number"><span class="header-section-number">2.1</span> One patch produces one number</a></li>
+  <li><a href="#sliding-creates-a-feature-map" id="toc-sliding-creates-a-feature-map" class="nav-link" data-scroll-target="#sliding-creates-a-feature-map"><span class="header-section-number">2.2</span> Sliding creates a feature map</a></li>
+  <li><a href="#convolution-is-a-linear-operation-activation-supplies-nonlinearity" id="toc-convolution-is-a-linear-operation-activation-supplies-nonlinearity" class="nav-link" data-scroll-target="#convolution-is-a-linear-operation-activation-supplies-nonlinearity"><span class="header-section-number">2.3</span> Convolution is a linear operation; activation supplies nonlinearity</a></li>
+  </ul></li>
+  <li><a href="#output-geometry-shape-padding-and-stride" id="toc-output-geometry-shape-padding-and-stride" class="nav-link" data-scroll-target="#output-geometry-shape-padding-and-stride"><span class="header-section-number">3</span> Output geometry: shape, padding, and stride</a>
+  <ul class="collapse">
+  <li><a href="#count-filter-starts-not-input-pixels" id="toc-count-filter-starts-not-input-pixels" class="nav-link" data-scroll-target="#count-filter-starts-not-input-pixels"><span class="header-section-number">3.1</span> Count filter starts, not input pixels</a>
+  <ul class="collapse">
+  <li><a href="#worked-shape-decision" id="toc-worked-shape-decision" class="nav-link" data-scroll-target="#worked-shape-decision"><span class="header-section-number">3.1.1</span> Worked shape decision</a></li>
+  <li><a href="#what-each-control-means" id="toc-what-each-control-means" class="nav-link" data-scroll-target="#what-each-control-means"><span class="header-section-number">3.1.2</span> What each control means</a></li>
+  </ul></li>
+  <li><a href="#exercise-predict-before-executing" id="toc-exercise-predict-before-executing" class="nav-link" data-scroll-target="#exercise-predict-before-executing"><span class="header-section-number">3.2</span> Exercise: predict before executing</a></li>
+  </ul></li>
+  <li><a href="#channels-and-feature-maps" id="toc-channels-and-feature-maps" class="nav-link" data-scroll-target="#channels-and-feature-maps"><span class="header-section-number">4</span> Channels and feature maps</a>
+  <ul class="collapse">
+  <li><a href="#a-filter-spans-every-input-channel" id="toc-a-filter-spans-every-input-channel" class="nav-link" data-scroll-target="#a-filter-spans-every-input-channel"><span class="header-section-number">4.1</span> A filter spans every input channel</a></li>
+  <li><a href="#worked-parameter-count" id="toc-worked-parameter-count" class="nav-link" data-scroll-target="#worked-parameter-count"><span class="header-section-number">4.2</span> Worked parameter count</a></li>
+  </ul></li>
+  <li><a href="#pooling-deciding-what-spatial-detail-to-keep" id="toc-pooling-deciding-what-spatial-detail-to-keep" class="nav-link" data-scroll-target="#pooling-deciding-what-spatial-detail-to-keep"><span class="header-section-number">5</span> Pooling: deciding what spatial detail to keep</a>
+  <ul class="collapse">
+  <li><a href="#max-and-average-pooling-ask-different-questions" id="toc-max-and-average-pooling-ask-different-questions" class="nav-link" data-scroll-target="#max-and-average-pooling-ask-different-questions"><span class="header-section-number">5.1</span> Max and average pooling ask different questions</a></li>
+  <li><a href="#global-average-pooling" id="toc-global-average-pooling" class="nav-link" data-scroll-target="#global-average-pooling"><span class="header-section-number">5.2</span> Global average pooling</a></li>
+  </ul></li>
+  <li><a href="#receptive-fields-and-feature-composition" id="toc-receptive-fields-and-feature-composition" class="nav-link" data-scroll-target="#receptive-fields-and-feature-composition"><span class="header-section-number">6</span> Receptive fields and feature composition</a>
+  <ul class="collapse">
+  <li><a href="#depth-expands-what-one-unit-can-use" id="toc-depth-expands-what-one-unit-can-use" class="nav-link" data-scroll-target="#depth-expands-what-one-unit-can-use"><span class="header-section-number">6.1</span> Depth expands what one unit can use</a></li>
+  <li><a href="#general-receptive-field-recurrence" id="toc-general-receptive-field-recurrence" class="nav-link" data-scroll-target="#general-receptive-field-recurrence"><span class="header-section-number">6.2</span> General receptive-field recurrence</a>
+  <ul class="collapse">
+  <li><a href="#convolution-pooling-convolution" id="toc-convolution-pooling-convolution" class="nav-link" data-scroll-target="#convolution-pooling-convolution"><span class="header-section-number">6.2.1</span> Convolution, pooling, convolution</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#from-shape-reasoning-to-a-pytorch-classifier" id="toc-from-shape-reasoning-to-a-pytorch-classifier" class="nav-link" data-scroll-target="#from-shape-reasoning-to-a-pytorch-classifier"><span class="header-section-number">7</span> From shape reasoning to a PyTorch classifier</a>
+  <ul class="collapse">
+  <li><a href="#declare-the-modules" id="toc-declare-the-modules" class="nav-link" data-scroll-target="#declare-the-modules"><span class="header-section-number">7.1</span> Declare the modules</a></li>
+  <li><a href="#verify-without-replacing-the-argument" id="toc-verify-without-replacing-the-argument" class="nav-link" data-scroll-target="#verify-without-replacing-the-argument"><span class="header-section-number">7.2</span> Verify without replacing the argument</a></li>
+  <li><a href="#read-the-printed-model" id="toc-read-the-printed-model" class="nav-link" data-scroll-target="#read-the-printed-model"><span class="header-section-number">7.3</span> Read the printed model</a></li>
+  <li><a href="#parameter-audit" id="toc-parameter-audit" class="nav-link" data-scroll-target="#parameter-audit"><span class="header-section-number">7.4</span> Parameter audit</a></li>
+  <li><a href="#exercise-design-a-resolution-independent-head" id="toc-exercise-design-a-resolution-independent-head" class="nav-link" data-scroll-target="#exercise-design-a-resolution-independent-head"><span class="header-section-number">7.5</span> Exercise: design a resolution-independent head</a></li>
+  </ul></li>
+  <li><a href="#alexnet-as-a-reading-exercise" id="toc-alexnet-as-a-reading-exercise" class="nav-link" data-scroll-target="#alexnet-as-a-reading-exercise"><span class="header-section-number">8</span> AlexNet as a reading exercise</a></li>
+  <li><a href="#summary-checklist" id="toc-summary-checklist" class="nav-link" data-scroll-target="#summary-checklist"><span class="header-section-number">9</span> Summary checklist</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading">Further reading</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Convolutional Neural Networks</h1>
+<p class="subtitle lead">Chapter 7 · Learning spatial features from images</p>
+</div>
+
+<div>
+  <div class="description">
+    A visual and mathematical guide to convolution, feature maps, geometry, pooling, receptive fields, and complete PyTorch CNNs
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dr.&nbsp;A. Belcaid </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="chapter-opening">
+<div class="chapter-kicker">
+<p>PART V · LEARNING FROM IMAGES</p>
+</div>
+<div class="chapter-cover">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="assets/chapter-cover.svg" class="img-fluid figure-img" alt="A dark visual pipeline from a local image grid through shared responses to an eye-like composed feature."></p>
+<figcaption>A local image patch is scanned by a shared filter, becomes a feature map, and is composed into a higher-level visual part. Original course SVG illustration created for this chapter.</figcaption>
+</figure>
+</div>
+</div>
+<p>An image classifier should recognize a boat whether it appears on the left or right of the image. A fully connected network <em>can</em> learn both cases, but its architecture gives it no reason to reuse the same detector at both locations. <strong>A convolutional neural network builds that reuse into the hypothesis:</strong> it applies one learned local operation across the spatial grid, then composes the resulting evidence across depth.</p>
+</div>
+<section id="by-the-end-of-this-chapter-you-should-be-able-to" class="level3 unnumbered unlisted learning-objectives">
+<h3 class="unnumbered unlisted anchored" data-anchor-id="by-the-end-of-this-chapter-you-should-be-able-to">By the end of this chapter, you should be able to</h3>
+<ol type="1">
+<li>Explain why image structure motivates local connectivity and shared weights.</li>
+<li>Compute one convolution response and an entire output shape.</li>
+<li>Distinguish spatial dimensions from channel dimensions.</li>
+<li>Count the parameters in a convolutional layer.</li>
+<li>Explain what max, average, and global average pooling preserve and discard.</li>
+<li>Calculate a theoretical receptive field through convolution and pooling.</li>
+<li>Translate a tensor-shape argument into a complete PyTorch CNN.</li>
+<li>Read a printed PyTorch model as a sequence of representation changes.</li>
+</ol>
+</section>
+<section id="the-concrete-problem-classify-an-object-wherever-it-appears" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> The concrete problem: classify an object wherever it appears</h1>
+<p>Suppose an RGB image has shape <code>(3, 32, 32)</code>. Flattening turns it into a vector of length <span class="math inline">\(3\cdot32\cdot32=3072\)</span>. A dense hidden unit then learns an independent weight for every channel and position:</p>
+<p><span class="math display">\[
+h_j=\phi\!\left(\sum_{c=1}^{3}\sum_{u=1}^{32}\sum_{v=1}^{32}
+W_{j,c,u,v}x_{c,u,v}+b_j\right).
+\]</span></p>
+<p>If the unit learns that a particular arrangement of pixels at the upper left is useful, nothing in this parameterization says that the same arrangement at the lower right should use the same weights. The network may learn that relation from data, but it pays separately for every position.</p>
+<p>Convolution introduces three linked design choices:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Observation about images</th>
+<th>Architectural choice</th>
+<th>Consequence</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Nearby pixels often form useful small patterns</td>
+<td>Local connectivity</td>
+<td>One unit reads a small patch rather than the full image.</td>
+</tr>
+<tr class="even">
+<td>The same pattern may appear in many locations</td>
+<td>Shared weights</td>
+<td>One filter is reused across the image.</td>
+</tr>
+<tr class="odd">
+<td>Useful patterns differ</td>
+<td>Multiple learned filters</td>
+<td>A layer produces multiple feature maps.</td>
+</tr>
+</tbody>
+</table>
+<div id="fig-spatial-reuse" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two grid images contain the same boat at different positions and point to one shared local detector.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-spatial-reuse-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="assets/spatial-reuse.svg" class="img-fluid figure-img" style="width:100.0%" alt="Two grid images contain the same boat at different positions and point to one shared local detector.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-spatial-reuse-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: The same boat-like pattern appears at two positions. Convolution asks the same local question at both locations instead of assigning unrelated flattened coordinates. Original course SVG.
+</figcaption>
+</figure>
+</div>
+<p>These are inductive biases, not guarantees. Convolution is exactly equivariant to translations only under compatible boundary and sampling conditions; pooling, stride, padding, and later aggregation modify that behavior. Biological studies of local receptive fields helped establish a language for hierarchical visual processing <span class="citation" data-cites="hubel1962receptive">(<a href="#ref-hubel1962receptive" role="doc-biblioref">Hubel and Wiesel 1962</a>)</span>. The engineering path to trainable systems includes the neocognitron <span class="citation" data-cites="fukushima1980neocognitron">(<a href="#ref-fukushima1980neocognitron" role="doc-biblioref">Fukushima 1980</a>)</span> and gradient-trained convolutional networks for document recognition <span class="citation" data-cites="lecun1998gradient">(<a href="#ref-lecun1998gradient" role="doc-biblioref">LeCun et al. 1998</a>)</span>. Modern large-scale recognition made the same principles visible at a different scale <span class="citation" data-cites="krizhevsky2012imagenet">(<a href="#ref-krizhevsky2012imagenet" role="doc-biblioref">Krizhevsky et al. 2012</a>)</span>.</p>
+<section id="parameter-efficiency-is-a-consequence-not-the-primary-definition" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="parameter-efficiency-is-a-consequence-not-the-primary-definition"><span class="header-section-number">1.1</span> Parameter efficiency is a consequence, not the primary definition</h2>
+<p>A dense map from 3,072 inputs to 64 hidden units owns</p>
+<p><span class="math display">\[
+64(3072+1)=196{,}672
+\]</span></p>
+<p>parameters. A convolution with 64 filters of size <span class="math inline">\(3\times3\)</span> over three input channels owns</p>
+<p><span class="math display">\[
+64(3\cdot3\cdot3+1)=1{,}792.
+\]</span></p>
+<p>The convolution is cheaper because it is a different hypothesis: each output reads locally, and the same local weights are shared at every position. Fewer parameters are useful, but the spatial reuse is the central idea.</p>
+</section>
+</section>
+<section id="the-convolution-operation" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> The convolution operation</h1>
+<section id="one-patch-produces-one-number" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="one-patch-produces-one-number"><span class="header-section-number">2.1</span> One patch produces one number</h2>
+<p>For a single-channel image <span class="math inline">\(X\)</span> and a <span class="math inline">\(K_h\times K_w\)</span> filter <span class="math inline">\(W\)</span>, a valid cross-correlation response at output position <span class="math inline">\((i,j)\)</span> is</p>
+<p><span class="math display">\[
+Y_{i,j}=b+\sum_{a=0}^{K_h-1}\sum_{b'=0}^{K_w-1}
+W_{a,b'}X_{i+a,j+b'}.
+\]</span></p>
+<p>Deep-learning libraries commonly call this operation <em>convolution</em> even though the filter is not reversed as it is in the mathematical definition of discrete convolution. Because the weights are learned, the distinction does not reduce model expressivity, but it matters when comparing formulas.</p>
+<div id="fig-convolution-worked" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A worked convolution: input patch times a three by three filter produces the scalar value two.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-convolution-worked-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="assets/convolution-worked.svg" class="img-fluid figure-img" style="width:100.0%" alt="A worked convolution: input patch times a three by three filter produces the scalar value two.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-convolution-worked-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: A 3 by 3 image patch and a vertical-change filter are multiplied elementwise and summed to produce the response 2. Original course SVG.
+</figcaption>
+</figure>
+</div>
+<p>In <a href="#fig-convolution-worked" class="quarto-xref">Figure&nbsp;2</a>, the filter gives positive weight to the left column, zero to the center, and negative weight to the right. Its response is large when intensities change across that direction. The same nine weights are then moved to the next input location.</p>
+<div class="callout callout-style-simple callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>What is learned?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The model does not normally receive a hand-designed edge filter. Training adjusts every filter coefficient and bias by gradient descent. Edge-like or color-contrast filters often emerge in early layers because they are useful for the classification loss, not because the architecture labels them as edges <span class="citation" data-cites="krizhevsky2012imagenet zeiler2014visualizing">(<a href="#ref-krizhevsky2012imagenet" role="doc-biblioref">Krizhevsky et al. 2012</a>; <a href="#ref-zeiler2014visualizing" role="doc-biblioref">Zeiler and Fergus 2014</a>)</span>.</p>
+</div>
+</div>
+</section>
+<section id="sliding-creates-a-feature-map" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="sliding-creates-a-feature-map"><span class="header-section-number">2.2</span> Sliding creates a feature map</h2>
+<p>At every legal spatial position:</p>
+<ol type="1">
+<li>select the local input patch;</li>
+<li>multiply it elementwise by the same filter;</li>
+<li>sum the products and add the bias;</li>
+<li>store the scalar at the corresponding output position.</li>
+</ol>
+<p>The grid of responses is a <strong>feature map</strong>. It preserves <em>where</em> the learned pattern matched. Bright or large activations do not mean that a complete object has been found; they mean that the filter’s current numerical pattern matched strongly at those positions.</p>
+<div id="fig-feature-map-bank" class="quarto-float quarto-figure quarto-figure-center anchored" alt="An input containing diagonal, vertical, and curved structures produces three distinct feature maps from three filters.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-feature-map-bank-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="assets/feature-map-bank.svg" class="img-fluid figure-img" style="width:100.0%" alt="An input containing diagonal, vertical, and curved structures produces three distinct feature maps from three filters.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-feature-map-bank-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: One image is processed by three different learned filters. Each filter asks a different local visual question and produces its own spatial response map. Original course SVG.
+</figcaption>
+</figure>
+</div>
+<p>In <a href="#fig-feature-map-bank" class="quarto-xref">Figure&nbsp;3</a>, the colored dots mark strong responses, not categorical decisions. A real learned filter is numerical and generally responds by degree. The output channel count is three because the layer contains three filters.</p>
+</section>
+<section id="convolution-is-a-linear-operation-activation-supplies-nonlinearity" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="convolution-is-a-linear-operation-activation-supplies-nonlinearity"><span class="header-section-number">2.3</span> Convolution is a linear operation; activation supplies nonlinearity</h2>
+<p>Before an activation function, convolution is linear in its input. A typical block therefore separates two roles:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>block <span class="op">=</span> nn.Sequential(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    nn.Conv2d(<span class="dv">3</span>, <span class="dv">16</span>, kernel_size<span class="op">=</span><span class="dv">3</span>, padding<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    nn.ReLU(),</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>Conv2d</code> learns local affine detectors. <code>ReLU</code> applies <span class="math inline">\(\max(0,z)\)</span> independently to every response. ReLU does not change <code>(N, C, H, W)</code> and owns no parameters, but without nonlinearities a stack of convolutions would collapse into one linear transformation away from boundary effects.</p>
+</section>
+</section>
+<section id="output-geometry-shape-padding-and-stride" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Output geometry: shape, padding, and stride</h1>
+<section id="count-filter-starts-not-input-pixels" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="count-filter-starts-not-input-pixels"><span class="header-section-number">3.1</span> Count filter starts, not input pixels</h2>
+<p>For one spatial dimension with input size <span class="math inline">\(W\)</span>, kernel size <span class="math inline">\(K\)</span>, zero-padding <span class="math inline">\(P\)</span>, dilation <span class="math inline">\(D\)</span>, and stride <span class="math inline">\(S\)</span>, the output width is</p>
+<p><span class="math display">\[
+W_{\mathrm{out}}
+=
+\left\lfloor
+\frac{W+2P-D(K-1)-1}{S}+1
+\right\rfloor.
+\]</span></p>
+<p>With dilation one this becomes</p>
+<p><span class="math display">\[
+W_{\mathrm{out}}
+=
+\left\lfloor\frac{W+2P-K}{S}\right\rfloor+1.
+\]</span></p>
+<p>The formula answers a concrete counting question: after padding, how many kernel starting positions fit if starts are separated by <span class="math inline">\(S\)</span> pixels?</p>
+<section id="worked-shape-decision" class="level3" data-number="3.1.1">
+<h3 data-number="3.1.1" class="anchored" data-anchor-id="worked-shape-decision"><span class="header-section-number">3.1.1</span> Worked shape decision</h3>
+<p>Let an input be <code>(N, 3, 32, 32)</code> and choose 16 filters with <span class="math inline">\(K=3\)</span>, <span class="math inline">\(P=1\)</span>, and <span class="math inline">\(S=1\)</span>.</p>
+<p><span class="math display">\[
+H_{\mathrm{out}}=W_{\mathrm{out}}
+=\left\lfloor\frac{32+2-3}{1}\right\rfloor+1=32.
+\]</span></p>
+<p>The output is <code>(N, 16, 32, 32)</code>. Padding preserved spatial size; the number of filters set the output-channel count.</p>
+</section>
+<section id="what-each-control-means" class="level3" data-number="3.1.2">
+<h3 data-number="3.1.2" class="anchored" data-anchor-id="what-each-control-means"><span class="header-section-number">3.1.2</span> What each control means</h3>
+<ul>
+<li><strong>Kernel size</strong> controls the local window used by one output.</li>
+<li><strong>Padding</strong> controls access to the image boundary and often preserves resolution.</li>
+<li><strong>Stride</strong> controls the spacing between filter starts and therefore subsampling.</li>
+<li><strong>Dilation</strong> spaces the kernel taps apart, increasing their span without adding coefficients.</li>
+</ul>
+<div id="fig-geometry-controls" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Three one-dimensional convolution diagrams compare no padding, padding one, and stride two.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-geometry-controls-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="assets/geometry-controls.svg" class="img-fluid figure-img" style="width:100.0%" alt="Three one-dimensional convolution diagrams compare no padding, padding one, and stride two.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-geometry-controls-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Valid convolution offers fewer legal starts, padding restores boundary starts, and stride two samples every second start. Original course SVG.
+</figcaption>
+</figure>
+</div>
+<p>The three cases in <a href="#fig-geometry-controls" class="quarto-xref">Figure&nbsp;4</a> isolate one control at a time. This is more reliable than memorizing that convolution “shrinks” or that padding “keeps size”: use the legal starting positions for the exact configuration.</p>
+<div class="callout callout-style-simple callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>“Same padding” is a design intention, not one universal integer
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For an odd kernel, stride one, and dilation one, <span class="math inline">\(P=(K-1)/2\)</span> preserves size. With even kernels, larger strides, or dilation, the required padding may be asymmetric or depend on the framework’s convention. Predict the desired output, then verify the exact API behavior.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-predict-before-executing" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="exercise-predict-before-executing"><span class="header-section-number">3.2</span> Exercise: predict before executing</h2>
+<p>An input has shape <code>(N, 8, 15, 21)</code>. A convolution uses 20 filters, a <span class="math inline">\(5\times3\)</span> kernel, padding <code>(2, 1)</code>, and stride <code>(2, 1)</code>.</p>
+<ol type="1">
+<li>Compute the output height.</li>
+<li>Compute the output width.</li>
+<li>State the full output shape.</li>
+</ol>
+<details>
+<summary>
+Worked solution
+</summary>
+<p>For height, <span class="math inline">\(H=15\)</span>, <span class="math inline">\(K_h=5\)</span>, <span class="math inline">\(P_h=2\)</span>, and <span class="math inline">\(S_h=2\)</span>:</p>
+<p><span class="math display">\[
+H_{\mathrm{out}}=\left\lfloor\frac{15+4-5}{2}\right\rfloor+1=8.
+\]</span></p>
+<p>For width, <span class="math inline">\(W=21\)</span>, <span class="math inline">\(K_w=3\)</span>, <span class="math inline">\(P_w=1\)</span>, and <span class="math inline">\(S_w=1\)</span>:</p>
+<p><span class="math display">\[
+W_{\mathrm{out}}=\left\lfloor\frac{21+2-3}{1}\right\rfloor+1=21.
+\]</span></p>
+Twenty filters create twenty output channels, so the output is <code>(N, 20, 8, 21)</code>.
+</details>
+</section>
+</section>
+<section id="channels-and-feature-maps" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Channels and feature maps</h1>
+<section id="a-filter-spans-every-input-channel" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="a-filter-spans-every-input-channel"><span class="header-section-number">4.1</span> A filter spans every input channel</h2>
+<p>For input shape <code>(N, C_in, H, W)</code>, one two-dimensional convolution filter has shape</p>
+<p><span class="math display">\[
+(C_{\mathrm{in}}, K_h, K_w).
+\]</span></p>
+<p>It receives a local patch from <strong>all</strong> input channels, multiplies each channel slice by its own weights, sums across channels and space, and produces one scalar. A bank of <span class="math inline">\(C_{\mathrm{out}}\)</span> filters produces <span class="math inline">\(C_{\mathrm{out}}\)</span> feature maps.</p>
+<div id="fig-channel-mixing" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Red, green, and blue image patches meet three filter slices and combine into one output response.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-channel-mixing-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="assets/channel-mixing.svg" class="img-fluid figure-img" style="width:100.0%" alt="Red, green, and blue image patches meet three filter slices and combine into one output response.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-channel-mixing-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: One RGB patch and the three matching slices of one filter are multiplied and summed across channels to produce one scalar in one output map. Original course SVG.
+</figcaption>
+</figure>
+</div>
+<p>The complete weight tensor therefore has shape</p>
+<p><span class="math display">\[
+(C_{\mathrm{out}}, C_{\mathrm{in}}, K_h, K_w).
+\]</span></p>
+<p>For a standard convolution with one bias per output channel, the learnable parameter count is</p>
+<p><span class="math display">\[
+C_{\mathrm{out}}\left(C_{\mathrm{in}}K_hK_w+1\right).
+\]</span></p>
+<p>Notice what does <strong>not</strong> appear: input height and width. Increasing image resolution creates more filter applications, but it does not create more shared filter coefficients.</p>
+</section>
+<section id="worked-parameter-count" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="worked-parameter-count"><span class="header-section-number">4.2</span> Worked parameter count</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>conv <span class="op">=</span> nn.Conv2d(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    in_channels<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    out_channels<span class="op">=</span><span class="dv">16</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    kernel_size<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    padding<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Each of the 16 filters contains <span class="math inline">\(3\cdot3\cdot3=27\)</span> weights and one bias:</p>
+<p><span class="math display">\[
+16(27+1)=448.
+\]</span></p>
+<p>The layer maps <code>(N, 3, H, W)</code> to <code>(N, 16, H, W)</code> because padding one preserves spatial size.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Keep two channel rules separate
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><code>in_channels</code> determines the depth of every filter.</li>
+<li><code>out_channels</code> determines how many distinct filters—and therefore feature maps—the layer learns.</li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="pooling-deciding-what-spatial-detail-to-keep" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Pooling: deciding what spatial detail to keep</h1>
+<p>Pooling summarizes local responses independently in each channel. It normally owns no learned weights and does not mix channels.</p>
+<section id="max-and-average-pooling-ask-different-questions" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="max-and-average-pooling-ask-different-questions"><span class="header-section-number">5.1</span> Max and average pooling ask different questions</h2>
+<p>For the patch</p>
+<p><span class="math display">\[
+\begin{bmatrix}1&amp;2\\3&amp;8\end{bmatrix},
+\]</span></p>
+<p>max pooling returns <span class="math inline">\(8\)</span>: “Was there a strong detection in this window?” Average pooling returns <span class="math inline">\(3.5\)</span>: “How active was this window on average?” Neither summary is universally best.</p>
+<div id="fig-pooling-comparison" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A two by two patch containing one, two, three, and eight branches to max and average pooling outputs.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pooling-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="assets/pooling-comparison.svg" class="img-fluid figure-img" style="width:100.0%" alt="A two by two patch containing one, two, three, and eight branches to max and average pooling outputs.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pooling-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: The same two-by-two patch produces 8 under max pooling and 3.5 under average pooling. Original course SVG.
+</figcaption>
+</figure>
+</div>
+<p>With a <span class="math inline">\(2\times2\)</span> kernel and stride two, an even spatial dimension is halved:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pool <span class="op">=</span> nn.MaxPool2d(kernel_size<span class="op">=</span><span class="dv">2</span>, stride<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch.randn(<span class="dv">64</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">32</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> pool(x)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(y.shape)  <span class="co"># torch.Size([64, 16, 16, 16])</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The batch size and channel count are unchanged. Spatial precision is reduced, which lowers the cost of later layers but discards exact location information.</p>
+</section>
+<section id="global-average-pooling" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="global-average-pooling"><span class="header-section-number">5.2</span> Global average pooling</h2>
+<p>Global average pooling replaces every <span class="math inline">\(H\times W\)</span> feature map by one mean:</p>
+<p><span class="math display">\[
+z_c=\frac{1}{HW}\sum_{i=1}^{H}\sum_{j=1}^{W}X_{c,i,j}.
+\]</span></p>
+<p>Thus <code>(N, C, H, W)</code> becomes <code>(N, C, 1, 1)</code>, or <code>(N, C)</code> after flattening. This produces a compact classifier input and avoids a large dense layer tied to one fixed spatial resolution.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>gap <span class="op">=</span> nn.AdaptiveAvgPool2d(output_size<span class="op">=</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>“Adaptive” means the module chooses the pooling regions needed to reach the requested output size. It does not mean that the pooling operation learns parameters.</p>
+</section>
+</section>
+<section id="receptive-fields-and-feature-composition" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Receptive fields and feature composition</h1>
+<section id="depth-expands-what-one-unit-can-use" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="depth-expands-what-one-unit-can-use"><span class="header-section-number">6.1</span> Depth expands what one unit can use</h2>
+<p>The <strong>theoretical receptive field</strong> of a unit is the region of the original input that can influence it. A first-layer <span class="math inline">\(3\times3\)</span> unit can use only a small patch. A later unit combines nearby earlier responses, so its input footprint is larger.</p>
+<div id="fig-receptive-fields" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Three cards show a short edge with a three by three receptive field, a curve with five by five, and an eye-like part with seven by seven.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-receptive-fields-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="assets/receptive-fields.svg" class="img-fluid figure-img" style="width:100.0%" alt="Three cards show a short edge with a three by three receptive field, a curve with five by five, and an eye-like part with seven by seven.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-receptive-fields-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: Three stride-one 3 by 3 convolutions expand the receptive field from 3 by 3 to 5 by 5 and then 7 by 7, enabling edge responses to be composed into motifs and an eye-like part. Original course SVG.
+</figcaption>
+</figure>
+</div>
+<p><a href="#fig-receptive-fields" class="quarto-xref">Figure&nbsp;7</a> shows a possible learned hierarchy, not a fixed dictionary. Depth gives later units the <em>capacity</em> to combine evidence over a larger region; the data and optimization determine which features are actually learned. Visualizations of trained networks provide empirical examples of such hierarchies <span class="citation" data-cites="zeiler2014visualizing">(<a href="#ref-zeiler2014visualizing" role="doc-biblioref">Zeiler and Fergus 2014</a>)</span>, while representation-learning reviews discuss why distributed features need not correspond to one clean human concept per unit <span class="citation" data-cites="bengio2013representation">(<a href="#ref-bengio2013representation" role="doc-biblioref">Bengio et al. 2013</a>)</span>.</p>
+</section>
+<section id="general-receptive-field-recurrence" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="general-receptive-field-recurrence"><span class="header-section-number">6.2</span> General receptive-field recurrence</h2>
+<p>Track two quantities at layer <span class="math inline">\(\ell\)</span>:</p>
+<ul>
+<li><span class="math inline">\(r_\ell\)</span>: receptive-field size measured in input pixels;</li>
+<li><span class="math inline">\(j_\ell\)</span>: the input-space jump between adjacent outputs.</li>
+</ul>
+<p>Starting with <span class="math inline">\(r_0=j_0=1\)</span>, a layer with kernel <span class="math inline">\(k_\ell\)</span>, stride <span class="math inline">\(s_\ell\)</span>, and dilation <span class="math inline">\(d_\ell\)</span> obeys</p>
+<p><span class="math display">\[
+j_\ell=j_{\ell-1}s_\ell,
+\]</span></p>
+<p><span class="math display">\[
+r_\ell=r_{\ell-1}+(k_\ell-1)d_\ell j_{\ell-1}.
+\]</span></p>
+<p>Padding changes the alignment and boundary coverage, but not this theoretical field size.</p>
+<section id="convolution-pooling-convolution" class="level3" data-number="6.2.1">
+<h3 data-number="6.2.1" class="anchored" data-anchor-id="convolution-pooling-convolution"><span class="header-section-number">6.2.1</span> Convolution, pooling, convolution</h3>
+<p>Consider <code>Conv3(stride=1) → Pool2(stride=2) → Conv3(stride=1)</code>:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 21%">
+<col style="width: 28%">
+<col style="width: 28%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Operation</th>
+<th style="text-align: right;"><span class="math inline">\(j\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(r\)</span></th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>input</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td>one pixel</td>
+</tr>
+<tr class="even">
+<td>Conv <span class="math inline">\(3\times3\)</span>, stride 1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">3</td>
+<td>neighboring outputs are one input pixel apart</td>
+</tr>
+<tr class="odd">
+<td>Pool <span class="math inline">\(2\times2\)</span>, stride 2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">4</td>
+<td>adjacent pooled outputs jump two input pixels</td>
+</tr>
+<tr class="even">
+<td>Conv <span class="math inline">\(3\times3\)</span>, stride 1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">8</td>
+<td>three positions spaced by two span eight input pixels</td>
+</tr>
+</tbody>
+</table>
+<p>Pooling grows the receptive field and increases the jump. The next convolution therefore expands its field faster in input coordinates.</p>
+<div class="callout callout-style-simple callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Theoretical is not effective
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The theoretical field identifies which pixels <em>can</em> influence a unit. Their actual influence is generally uneven. Luo et al.&nbsp;showed that the effective receptive field often occupies only part of the theoretical field and tends to concentrate near its center <span class="citation" data-cites="luo2016effective">(<a href="#ref-luo2016effective" role="doc-biblioref">Luo et al. 2016</a>)</span>. Do not interpret every pixel inside the theoretical boundary as equally important.</p>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="from-shape-reasoning-to-a-pytorch-classifier" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> From shape reasoning to a PyTorch classifier</h1>
+<p>We now build a classifier for RGB images of shape <code>(N, 3, 32, 32)</code>. Each convolution uses a <span class="math inline">\(3\times3\)</span> kernel with padding one; each max pool halves the spatial size.</p>
+<div id="fig-cnn-pipeline" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A shape pipeline from N by 3 by 32 by 32 through two convolutional blocks to ten class scores.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-cnn-pipeline-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="assets/cnn-shape-pipeline.svg" class="img-fluid figure-img" style="width:100.0%" alt="A shape pipeline from N by 3 by 32 by 32 through two convolutional blocks to ten class scores.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cnn-pipeline-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: Tensor shapes through a two-block CNN: RGB input, two convolution-ReLU-pooling blocks, flattening, and ten output scores. Original course SVG.
+</figcaption>
+</figure>
+</div>
+<section id="declare-the-modules" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="declare-the-modules"><span class="header-section-number">7.1</span> Declare the modules</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch <span class="im">import</span> nn</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> SmallCNN(nn.Module):</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, num_classes<span class="op">=</span><span class="dv">10</span>):</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.features <span class="op">=</span> nn.Sequential(</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>            nn.Conv2d(<span class="dv">3</span>, <span class="dv">16</span>, kernel_size<span class="op">=</span><span class="dv">3</span>, padding<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>            nn.ReLU(),</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>            nn.MaxPool2d(kernel_size<span class="op">=</span><span class="dv">2</span>),</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>            nn.Conv2d(<span class="dv">16</span>, <span class="dv">32</span>, kernel_size<span class="op">=</span><span class="dv">3</span>, padding<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>            nn.ReLU(),</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>            nn.MaxPool2d(kernel_size<span class="op">=</span><span class="dv">2</span>),</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.classifier <span class="op">=</span> nn.Linear(<span class="dv">32</span> <span class="op">*</span> <span class="dv">8</span> <span class="op">*</span> <span class="dv">8</span>, num_classes)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.features(x)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> torch.flatten(x, start_dim<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.classifier(x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The number <code>32 * 8 * 8</code> is not discovered by trial and error. It follows from the shape contract in <a href="#fig-cnn-pipeline" class="quarto-xref">Figure&nbsp;8</a>:</p>
+<p><span class="math display">\[
+32\times32\xrightarrow{\text{pool}}16\times16
+\xrightarrow{\text{pool}}8\times8.
+\]</span></p>
+<p>The second block produces 32 channels, hence <span class="math inline">\(32\cdot8\cdot8=2048\)</span> features per image.</p>
+<p><code>torch.flatten(x, start_dim=1)</code> preserves dimension zero, the batch. Flattening from dimension zero would merge examples and break the classifier interface.</p>
+</section>
+<section id="verify-without-replacing-the-argument" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="verify-without-replacing-the-argument"><span class="header-section-number">7.2</span> Verify without replacing the argument</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SmallCNN()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch.randn(<span class="dv">64</span>, <span class="dv">3</span>, <span class="dv">32</span>, <span class="dv">32</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>logits <span class="op">=</span> model(x)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(logits.shape)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># torch.Size([64, 10])</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A synthetic batch is an inexpensive interface test. It confirms the calculation, but should not replace it: when a shape is wrong, the calculation tells you which operation changed it unexpectedly.</p>
+</section>
+<section id="read-the-printed-model" class="level2" data-number="7.3">
+<h2 data-number="7.3" class="anchored" data-anchor-id="read-the-printed-model"><span class="header-section-number">7.3</span> Read the printed model</h2>
+<pre class="text"><code>SmallCNN(
+  (features): Sequential(
+    (0): Conv2d(3, 16, kernel_size=(3, 3), padding=(1, 1))
+    (1): ReLU()
+    (2): MaxPool2d(kernel_size=2, stride=2)
+    (3): Conv2d(16, 32, kernel_size=(3, 3), padding=(1, 1))
+    (4): ReLU()
+    (5): MaxPool2d(kernel_size=2, stride=2)
+  )
+  (classifier): Linear(in_features=2048, out_features=10)
+)</code></pre>
+<p>The representation exposes ownership and composition:</p>
+<ul>
+<li><code>features</code> owns an ordered chain of spatial operations;</li>
+<li>indices <code>(0)</code> through <code>(5)</code> are child modules inside that <code>Sequential</code>;</li>
+<li>convolution and linear layers own parameters;</li>
+<li>ReLU and max pooling own no learned parameters;</li>
+<li>the printed structure does not show intermediate tensor shapes, so those must still be reasoned about or inspected during execution.</li>
+</ul>
+</section>
+<section id="parameter-audit" class="level2" data-number="7.4">
+<h2 data-number="7.4" class="anchored" data-anchor-id="parameter-audit"><span class="header-section-number">7.4</span> Parameter audit</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Layer</th>
+<th style="text-align: right;">Calculation</th>
+<th style="text-align: right;">Parameters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Conv 1, <span class="math inline">\(3\to16\)</span>, <span class="math inline">\(3\times3\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(16(3\cdot3\cdot3+1)\)</span></td>
+<td style="text-align: right;">448</td>
+</tr>
+<tr class="even">
+<td>Conv 2, <span class="math inline">\(16\to32\)</span>, <span class="math inline">\(3\times3\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(32(16\cdot3\cdot3+1)\)</span></td>
+<td style="text-align: right;">4,640</td>
+</tr>
+<tr class="odd">
+<td>Linear, <span class="math inline">\(2048\to10\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(10(2048+1)\)</span></td>
+<td style="text-align: right;">20,490</td>
+</tr>
+<tr class="even">
+<td><strong>Total</strong></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"><strong>25,578</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The small classifier head owns most of the parameters. Replacing flattening with global average pooling would reduce the classifier input from 2,048 to 32, but it would also discard spatial layout. That is an architectural trade, not an automatic improvement.</p>
+</section>
+<section id="exercise-design-a-resolution-independent-head" class="level2" data-number="7.5">
+<h2 data-number="7.5" class="anchored" data-anchor-id="exercise-design-a-resolution-independent-head"><span class="header-section-number">7.5</span> Exercise: design a resolution-independent head</h2>
+<p>Modify <code>SmallCNN</code> so it can accept different input heights and widths. Preserve 32 channels after the feature extractor and produce ten logits.</p>
+<details>
+<summary>
+Worked solution
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> FlexibleCNN(nn.Module):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, num_classes<span class="op">=</span><span class="dv">10</span>):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.features <span class="op">=</span> nn.Sequential(</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>            nn.Conv2d(<span class="dv">3</span>, <span class="dv">16</span>, <span class="dv">3</span>, padding<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>            nn.ReLU(),</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>            nn.MaxPool2d(<span class="dv">2</span>),</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>            nn.Conv2d(<span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">3</span>, padding<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>            nn.ReLU(),</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>            nn.MaxPool2d(<span class="dv">2</span>),</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pool <span class="op">=</span> nn.AdaptiveAvgPool2d((<span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.classifier <span class="op">=</span> nn.Linear(<span class="dv">32</span>, num_classes)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.features(x)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.pool(x)</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> torch.flatten(x, start_dim<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.classifier(x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+Adaptive global pooling turns any remaining spatial grid into one value per channel. The classifier therefore always receives 32 features. The tradeoff is that exact spatial arrangement is removed before classification.
+</details>
+</section>
+</section>
+<section id="alexnet-as-a-reading-exercise" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> AlexNet as a reading exercise</h1>
+<p>AlexNet contains five convolutional layers followed by three learned classifier layers and uses ReLU activations and max pooling <span class="citation" data-cites="krizhevsky2012imagenet">(<a href="#ref-krizhevsky2012imagenet" role="doc-biblioref">Krizhevsky et al. 2012</a>)</span>. Its historical scale and GPU-specific split make the original diagram visually dense, but it is written in the same language developed here:</p>
+<ol type="1">
+<li>track <code>(N, C, H, W)</code>;</li>
+<li>identify kernel, padding, and stride;</li>
+<li>separate learned operations from parameter-free transformations;</li>
+<li>locate the transition from spatial maps to a feature vector;</li>
+<li>compute the classifier input from the final feature shape.</li>
+</ol>
+<p>The durable skill is not memorizing one architecture. It is being able to reconstruct the representation change performed by any listed sequence of convolution, activation, pooling, flattening, and linear layers.</p>
+</section>
+<section id="summary-checklist" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Summary checklist</h1>
+<p>When reading or designing a CNN, ask:</p>
+<ol type="1">
+<li><strong>Data:</strong> What do the channel and spatial axes mean?</li>
+<li><strong>Hypothesis:</strong> Which filters are shared, and where are nonlinearities placed?</li>
+<li><strong>Geometry:</strong> What are <code>(C, H, W)</code> after every operation?</li>
+<li><strong>Parameters:</strong> Which modules own weights, and how many?</li>
+<li><strong>Information:</strong> What does pooling preserve, and what does it discard?</li>
+<li><strong>Context:</strong> How large is each unit’s receptive field in input pixels?</li>
+<li><strong>Classifier:</strong> Where does the spatial representation become a vector or global summary?</li>
+<li><strong>Evaluation:</strong> Does the output provide one raw score per class for every example?</li>
+</ol>
+</section>
+<section id="further-reading" class="level1 unnumbered">
+<h1 class="unnumbered">Further reading</h1>
+<ul>
+<li>LeCun et al.&nbsp;give the classic end-to-end account of gradient-trained convolutional systems for document recognition <span class="citation" data-cites="lecun1998gradient">(<a href="#ref-lecun1998gradient" role="doc-biblioref">LeCun et al. 1998</a>)</span>.</li>
+<li>Krizhevsky, Sutskever, and Hinton show the large-scale ImageNet case that motivated the lecture’s final reading exercise <span class="citation" data-cites="krizhevsky2012imagenet">(<a href="#ref-krizhevsky2012imagenet" role="doc-biblioref">Krizhevsky et al. 2012</a>)</span>.</li>
+<li>Zeiler and Fergus develop visual tools for inspecting what intermediate convolutional features respond to <span class="citation" data-cites="zeiler2014visualizing">(<a href="#ref-zeiler2014visualizing" role="doc-biblioref">Zeiler and Fergus 2014</a>)</span>.</li>
+<li>Luo et al.&nbsp;distinguish theoretical from effective receptive fields <span class="citation" data-cites="luo2016effective">(<a href="#ref-luo2016effective" role="doc-biblioref">Luo et al. 2016</a>)</span>.</li>
+<li>The official <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Conv2d.html">PyTorch <code>Conv2d</code> documentation</a>, <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.MaxPool2d.html"><code>MaxPool2d</code> documentation</a>, and <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.AdaptiveAvgPool2d.html"><code>AdaptiveAvgPool2d</code> documentation</a> define the exact executable contracts used here.</li>
+</ul>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-bengio2013representation" class="csl-entry" role="listitem">
+Bengio, Yoshua, Aaron Courville, and Pascal Vincent. 2013. <span>“Representation Learning: A Review and New Perspectives.”</span> <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em> 35 (8): 1798–828. <a href="https://doi.org/10.1109/TPAMI.2013.50">https://doi.org/10.1109/TPAMI.2013.50</a>.
+</div>
+<div id="ref-fukushima1980neocognitron" class="csl-entry" role="listitem">
+Fukushima, Kunihiko. 1980. <span>“Neocognitron: A Self-Organizing Neural Network Model for a Mechanism of Pattern Recognition Unaffected by Shift in Position.”</span> <em>Biological Cybernetics</em> 36: 193–202. <a href="https://doi.org/10.1007/BF00344251">https://doi.org/10.1007/BF00344251</a>.
+</div>
+<div id="ref-hubel1962receptive" class="csl-entry" role="listitem">
+Hubel, David H., and Torsten N. Wiesel. 1962. <span>“Receptive Fields, Binocular Interaction and Functional Architecture in the Cat’s Visual Cortex.”</span> <em>The Journal of Physiology</em> 160 (1): 106–54. <a href="https://doi.org/10.1113/jphysiol.1962.sp006837">https://doi.org/10.1113/jphysiol.1962.sp006837</a>.
+</div>
+<div id="ref-krizhevsky2012imagenet" class="csl-entry" role="listitem">
+Krizhevsky, Alex, Ilya Sutskever, and Geoffrey E. Hinton. 2012. <span>“ImageNet Classification with Deep Convolutional Neural Networks.”</span> <em>Advances in Neural Information Processing Systems</em> 25. <a href="https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks">https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks</a>.
+</div>
+<div id="ref-lecun1998gradient" class="csl-entry" role="listitem">
+LeCun, Yann, Léon Bottou, Yoshua Bengio, and Patrick Haffner. 1998. <span>“Gradient-Based Learning Applied to Document Recognition.”</span> <em>Proceedings of the IEEE</em> 86 (11): 2278–324. <a href="https://doi.org/10.1109/5.726791">https://doi.org/10.1109/5.726791</a>.
+</div>
+<div id="ref-luo2016effective" class="csl-entry" role="listitem">
+Luo, Wenjie, Yujia Li, Raquel Urtasun, and Richard Zemel. 2016. <span>“Understanding the Effective Receptive Field in Deep Convolutional Neural Networks.”</span> <em>Advances in Neural Information Processing Systems</em> 29. <a href="https://arxiv.org/abs/1701.04128">https://arxiv.org/abs/1701.04128</a>.
+</div>
+<div id="ref-zeiler2014visualizing" class="csl-entry" role="listitem">
+Zeiler, Matthew D., and Rob Fergus. 2014. <span>“Visualizing and Understanding Convolutional Networks.”</span> <em>European Conference on Computer Vision</em>, 818–33. <a href="https://doi.org/10.1007/978-3-319-10590-1_53">https://doi.org/10.1007/978-3-319-10590-1_53</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Deep Learning · ENSA Tétouan</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

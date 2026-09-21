@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 560" role="img" aria-labelledby="title desc">
+  <title id="title">Backpropagation as message passing</title>
+  <desc id="desc">Two children send gradient messages to a node v. The node adds them and sends locally transformed messages to three parents.</desc>
+  <defs>
+    <marker id="c" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#ef5b45"/></marker>
+    <filter id="s" x="-25%" y="-25%" width="150%" height="150%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#0f2a37" flood-opacity=".12"/></filter>
+    <style>.msg{fill:none;stroke:#ef5b45;stroke-width:7;marker-end:url(#c)}.parent{fill:#eaf3fb;stroke:#2878c8;stroke-width:4}.child{fill:#f1ecf8;stroke:#7b61a8;stroke-width:4}.node{fill:#ef5b45;stroke:#bd3e2d;stroke-width:6;filter:url(#s)}.dark{fill:#17212b;font:italic 700 29px Georgia,serif;text-anchor:middle;dominant-baseline:middle}.light{fill:#fff;font:italic 700 34px Georgia,serif;text-anchor:middle;dominant-baseline:middle}.label{fill:#657079;font:700 18px 'Courier New',monospace;letter-spacing:1px;text-anchor:middle}.formula{fill:#17212b;font:700 24px Arial,sans-serif;text-anchor:middle}.panel{fill:#fffdf7;stroke:#d9d5cc;stroke-width:3;filter:url(#s)}</style>
+  </defs>
+  <rect width="1280" height="560" fill="#f4f0e7"/>
+  <path class="msg" d="M1075 155C965 155 895 225 770 265 M1075 405C965 405 895 335 770 295 M630 280C520 280 485 110 360 110 M630 280H360 M630 280C520 280 485 450 360 450"/>
+  <circle class="parent" cx="295" cy="110" r="55"/><text class="dark" x="295" y="110">p₁</text>
+  <circle class="parent" cx="295" cy="280" r="55"/><text class="dark" x="295" y="280">p₂</text>
+  <circle class="parent" cx="295" cy="450" r="55"/><text class="dark" x="295" y="450">p₃</text>
+  <circle class="node" cx="700" cy="280" r="62"/><text class="light" x="700" y="280">v</text>
+  <circle class="child" cx="1140" cy="155" r="55"/><text class="dark" x="1140" y="155">c₁</text>
+  <circle class="child" cx="1140" cy="405" r="55"/><text class="dark" x="1140" y="405">c₂</text>
+  <rect class="panel" x="470" y="30" width="460" height="82" rx="16"/><text class="label" x="700" y="62">RECEIVE · ACCUMULATE</text><text class="formula" x="700" y="94">gᵥ = message(c₁) + message(c₂)</text>
+  <rect class="panel" x="430" y="448" width="540" height="82" rx="16"/><text class="label" x="700" y="480">TRANSFORM LOCALLY · SEND</text><text class="formula" x="700" y="512">message(pᵢ) = gᵥ × ∂v/∂pᵢ</text>
+</svg>

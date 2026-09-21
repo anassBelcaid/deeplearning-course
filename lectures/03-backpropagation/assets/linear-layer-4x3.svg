@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 560" role="img" aria-labelledby="title desc">
+  <title id="title">Four inputs feeding a three-unit linear layer</title>
+  <desc id="desc">A fully connected four-to-three linear layer feeds a scalar loss. The four connections producing h1 are highlighted.</desc>
+  <defs>
+    <marker id="gray" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#a5abb0"/></marker>
+    <marker id="blue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#2878c8"/></marker>
+    <marker id="coral" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#ef5b45"/></marker>
+    <filter id="s" x="-25%" y="-25%" width="150%" height="150%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#0f2a37" flood-opacity=".12"/></filter>
+    <style>.edge{fill:none;stroke:#a5abb0;stroke-width:3;marker-end:url(#gray)}.focus{fill:none;stroke:#2878c8;stroke-width:6;marker-end:url(#blue)}.back{fill:none;stroke:#ef5b45;stroke-width:7;marker-end:url(#coral)}.x{fill:#2878c8;stroke:#145a96;stroke-width:4}.h{fill:#f1ecf8;stroke:#7b61a8;stroke-width:4;filter:url(#s)}.hfocus{fill:#fff0ed;stroke:#ef5b45;stroke-width:6;filter:url(#s)}.loss{fill:#ef5b45;stroke:#bd3e2d;stroke-width:5;filter:url(#s)}.light{fill:#fff;font:italic 700 30px Georgia,serif;text-anchor:middle;dominant-baseline:middle}.dark{fill:#17212b;font:italic 700 30px Georgia,serif;text-anchor:middle;dominant-baseline:middle}.label{fill:#657079;font:700 18px 'Courier New',monospace;letter-spacing:1px;text-anchor:middle}.callout{fill:#fffdf7;stroke:#ef5b45;stroke-width:4;filter:url(#s)}.callout-main{fill:#17212b;font:700 25px Arial,sans-serif;text-anchor:middle}</style>
+  </defs>
+  <rect width="1280" height="560" fill="#f4f0e7"/>
+  <path class="edge" d="M175 95L720 280 M175 215L720 280 M175 335L720 280 M175 455L720 280 M175 95L720 455 M175 215L720 455 M175 335L720 455 M175 455L720 455 M175 95L720 105 M175 215L720 105 M175 335L720 105 M175 455L720 105 M820 105L1080 280 M820 280H1080 M820 455L1080 280"/>
+  <path class="focus" d="M175 95L720 105 M175 215L720 105 M175 335L720 105 M175 455L720 105"/>
+  <path class="back" d="M1080 248L820 105"/>
+  <circle class="x" cx="120" cy="95" r="55"/><text class="light" x="120" y="95">x₁</text>
+  <circle class="x" cx="120" cy="215" r="55"/><text class="light" x="120" y="215">x₂</text>
+  <circle class="x" cx="120" cy="335" r="55"/><text class="light" x="120" y="335">x₃</text>
+  <circle class="x" cx="120" cy="455" r="55"/><text class="light" x="120" y="455">x₄</text>
+  <circle class="hfocus" cx="770" cy="105" r="55"/><text class="dark" x="770" y="105">h₁</text>
+  <circle class="h" cx="770" cy="280" r="55"/><text class="dark" x="770" y="280">h₂</text>
+  <circle class="h" cx="770" cy="455" r="55"/><text class="dark" x="770" y="455">h₃</text>
+  <circle class="loss" cx="1135" cy="280" r="58"/><text class="light" x="1135" y="280">𝓛</text>
+  <text class="label" x="410" y="52">FOCUS: THE FOUR CONTRIBUTIONS THAT CREATE h₁</text>
+  <rect class="callout" x="925" y="40" width="290" height="78" rx="16"/><text class="callout-main" x="1070" y="88">g₁ arrives from downstream</text>
+</svg>

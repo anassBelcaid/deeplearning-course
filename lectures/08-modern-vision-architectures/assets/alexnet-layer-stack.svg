@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">AlexNet layer stack</title>
+  <desc id="desc">AlexNet shown from input at the bottom to classifier at the top. Convolution layers are blue, pooling layers are orange, and fully connected layers are purple. The narrowing bars indicate decreasing spatial resolution.</desc>
+  <defs>
+    <filter id="shadow" x="-10%" y="-20%" width="120%" height="150%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#17212b" flood-opacity="0.16"/>
+    </filter>
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="#526573"/>
+    </marker>
+    <style>
+      .layer { stroke:#17212b; stroke-width:1.5; rx:7; filter:url(#shadow); }
+      .conv { fill:#b9dcf7; }
+      .pool { fill:#f4b267; }
+      .fc { fill:#d8c8ec; }
+      .input { fill:#f7f4ec; }
+      .label { fill:#17212b; font:600 17px Arial, sans-serif; text-anchor:middle; dominant-baseline:middle; }
+      .flow { stroke:#526573; stroke-width:2; marker-end:url(#arrow); }
+      .legend { fill:#526573; font:600 15px Arial, sans-serif; }
+      .legend-title { fill:#17212b; font:700 15px Arial, sans-serif; }
+    </style>
+  </defs>
+
+  <!-- The bars narrow after pooling to make spatial downsampling visible. -->
+  <g aria-label="AlexNet network" transform="translate(0,4)">
+    <rect class="layer fc" x="470" y="10" width="260" height="35"/>
+    <text class="label" x="600" y="27.5">FC 1000 · softmax</text>
+    <line class="flow" x1="600" y1="59" x2="600" y2="47"/>
+
+    <rect class="layer fc" x="430" y="63" width="340" height="35"/>
+    <text class="label" x="600" y="80.5">FC 4096 · ReLU · dropout</text>
+    <line class="flow" x1="600" y1="112" x2="600" y2="100"/>
+
+    <rect class="layer fc" x="430" y="116" width="340" height="35"/>
+    <text class="label" x="600" y="133.5">FC 4096 · ReLU · dropout</text>
+    <line class="flow" x1="600" y1="165" x2="600" y2="153"/>
+
+    <rect class="layer pool" x="390" y="169" width="420" height="35"/>
+    <text class="label" x="600" y="186.5">3 × 3 MaxPool · stride 2</text>
+    <line class="flow" x1="600" y1="218" x2="600" y2="206"/>
+
+    <rect class="layer conv" x="350" y="222" width="500" height="35"/>
+    <text class="label" x="600" y="239.5">3 × 3 Conv · 256 channels · pad 1</text>
+    <line class="flow" x1="600" y1="271" x2="600" y2="259"/>
+
+    <rect class="layer conv" x="350" y="275" width="500" height="35"/>
+    <text class="label" x="600" y="292.5">3 × 3 Conv · 384 channels · pad 1</text>
+    <line class="flow" x1="600" y1="324" x2="600" y2="312"/>
+
+    <rect class="layer conv" x="350" y="328" width="500" height="35"/>
+    <text class="label" x="600" y="345.5">3 × 3 Conv · 384 channels · pad 1</text>
+    <line class="flow" x1="600" y1="377" x2="600" y2="365"/>
+
+    <rect class="layer pool" x="310" y="381" width="580" height="35"/>
+    <text class="label" x="600" y="398.5">3 × 3 MaxPool · stride 2</text>
+    <line class="flow" x1="600" y1="430" x2="600" y2="418"/>
+
+    <rect class="layer conv" x="245" y="434" width="710" height="35"/>
+    <text class="label" x="600" y="451.5">5 × 5 Conv · 256 channels · pad 2</text>
+    <line class="flow" x1="600" y1="483" x2="600" y2="471"/>
+
+    <rect class="layer pool" x="180" y="487" width="840" height="35"/>
+    <text class="label" x="600" y="504.5">3 × 3 MaxPool · stride 2</text>
+    <line class="flow" x1="600" y1="536" x2="600" y2="524"/>
+
+    <rect class="layer conv" x="110" y="540" width="980" height="35"/>
+    <text class="label" x="600" y="557.5">11 × 11 Conv · 96 channels · stride 4</text>
+    <line class="flow" x1="600" y1="589" x2="600" y2="577"/>
+
+    <rect class="layer input" x="60" y="593" width="1080" height="35"/>
+    <text class="label" x="600" y="610.5">Image · 224 × 224 × 3</text>
+  </g>
+
+  <g transform="translate(935,18)" aria-label="Legend">
+    <text class="legend-title" x="0" y="0">LAYER TYPE</text>
+    <rect class="layer conv" x="0" y="17" width="24" height="16"/>
+    <text class="legend" x="34" y="30">convolution</text>
+    <rect class="layer pool" x="0" y="47" width="24" height="16"/>
+    <text class="legend" x="34" y="60">pooling</text>
+    <rect class="layer fc" x="0" y="77" width="24" height="16"/>
+    <text class="legend" x="34" y="90">fully connected</text>
+  </g>
+</svg>

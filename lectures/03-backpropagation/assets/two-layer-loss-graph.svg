@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 1160 520" role="img" aria-labelledby="title desc">
+  <title id="title">Symbolic computation graph for a two-layer binary classifier</title>
+  <desc id="desc">A compact forward graph uses symbols for affine maps, sigmoid activations, and binary cross-entropy. A legend defines values, parameters, affine maps, sigmoid, ReLU, and cross-entropy.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#2878c8"/></marker>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="150%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#0f2a37" flood-opacity="0.12"/></filter>
+    <style>
+      .edge{fill:none;stroke:#2878c8;stroke-width:4;marker-end:url(#arrow)}.value{fill:#2878c8;stroke:#145a96;stroke-width:3}.parameter{fill:#fffdf7;stroke:#7b61a8;stroke-width:3}.linear{fill:#fffdf7;stroke:#17212b;stroke-width:3;filter:url(#shadow)}.activation{fill:#f1ecf8;stroke:#7b61a8;stroke-width:4;filter:url(#shadow)}.loss{fill:#ef5b45;stroke:#bd3e2d;stroke-width:4;filter:url(#shadow)}
+      .math-light{fill:#fff;font:italic 700 27px Georgia,serif;text-anchor:middle;dominant-baseline:middle}.math-purple{fill:#60468d;font:italic 700 24px Georgia,serif;text-anchor:middle;dominant-baseline:middle}.edge-label{fill:#657079;font:italic 700 21px Georgia,serif;text-anchor:middle}.legend-text{fill:#657079;font:18px Arial,sans-serif}.legend-title{fill:#17212b;font:700 17px "Courier New",monospace;letter-spacing:1px}.icon-line{fill:none;stroke:#17212b;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}.curve{fill:none;stroke:#7b61a8;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}.white-icon{fill:none;stroke:#fff;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+    </style>
+  </defs>
+
+  <path class="edge" d="M105 212H273"/><path class="edge" d="M192 82C235 82 238 145 273 170"/><path class="edge" d="M192 342C235 342 238 279 273 254"/><path class="edge" d="M383 212H446"/><path class="edge" d="M554 212H638"/><path class="edge" d="M612 82C625 82 629 145 638 170"/><path class="edge" d="M612 342C625 342 629 279 638 254"/><path class="edge" d="M748 212H820"/><path class="edge" d="M928 212H1026"/><path class="edge" d="M1087 93V151"/>
+
+  <circle class="value" cx="65" cy="212" r="40"/><text class="math-light" x="65" y="212">x</text>
+  <rect class="parameter" x="112" y="52" width="80" height="60" rx="20"/><text class="math-purple" x="152" y="82">W₁</text>
+  <rect class="parameter" x="112" y="312" width="80" height="60" rx="20"/><text class="math-purple" x="152" y="342">b₁</text>
+
+  <rect class="linear" x="273" y="157" width="110" height="110" rx="20"/>
+  <path class="icon-line" d="M304 184H342M304 200H342M304 216H342M317 178V222M330 178V222M304 239H337"/><circle cx="353" cy="231" r="6" fill="#ef5b45"/>
+  <text class="edge-label" x="414" y="193">z₁</text>
+
+  <circle class="activation" cx="500" cy="212" r="54"/><path class="curve" d="M468 242C478 242 480 224 487 220C496 214 504 213 513 204C521 196 522 182 532 182"/>
+  <text class="edge-label" x="596" y="193">h</text>
+
+  <rect class="parameter" x="532" y="52" width="80" height="60" rx="20"/><text class="math-purple" x="572" y="82">W₂</text>
+  <rect class="parameter" x="532" y="312" width="80" height="60" rx="20"/><text class="math-purple" x="572" y="342">b₂</text>
+
+  <rect class="linear" x="638" y="157" width="110" height="110" rx="20"/>
+  <path class="icon-line" d="M669 184H707M669 200H707M669 216H707M682 178V222M695 178V222M669 239H702"/><circle cx="718" cy="231" r="6" fill="#ef5b45"/>
+  <text class="edge-label" x="784" y="193">z₂</text>
+
+  <circle class="activation" cx="874" cy="212" r="54"/><path class="curve" d="M842 242C852 242 854 224 861 220C870 214 878 213 887 204C895 196 896 182 906 182"/>
+  <text class="edge-label" x="973" y="193">ŷ</text>
+
+  <circle class="value" cx="1087" cy="53" r="40"/><text class="math-light" x="1087" y="53">y</text>
+  <path class="loss" d="M1087 151L1148 212L1087 273L1026 212Z"/><path class="white-icon" d="M1058 228V205M1073 228V190M1088 228V214M1103 228V198M1118 228V181"/>
+  <path class="edge" d="M1087 273V327"/><circle class="loss" cx="1087" cy="372" r="45"/><text class="math-light" x="1087" y="372">L</text>
+
+  <line x1="35" y1="438" x2="1170" y2="438" stroke="#d9d5cc" stroke-width="2"/><text class="legend-title" x="35" y="485">SYMBOLS</text>
+  <circle class="value" cx="165" cy="480" r="18"/><text class="legend-text" x="193" y="486">value</text>
+  <rect class="parameter" x="285" y="462" width="48" height="36" rx="12"/><text class="legend-text" x="345" y="486">parameter</text>
+  <rect class="linear" x="460" y="458" width="44" height="44" rx="8"/><path class="icon-line" d="M470 469H490M470 478H490M477 465V483" style="stroke-width:2.5"/><circle cx="494" cy="489" r="3.5" fill="#ef5b45"/><text class="legend-text" x="518" y="486">linear</text>
+  <circle class="activation" cx="650" cy="480" r="23"/><path class="curve" d="M637 492C643 492 642 482 648 480C654 478 656 468 663 468" style="stroke-width:3"/><text class="legend-text" x="684" y="486">sigmoid</text>
+  <circle class="activation" cx="810" cy="480" r="23"/><path class="curve" d="M797 492H808L823 468" style="stroke-width:3"/><text class="legend-text" x="844" y="486">ReLU</text>
+  <path class="loss" d="M1000 457L1023 480L1000 503L977 480Z"/><path class="white-icon" d="M989 490V479M998 490V470M1007 490V482M1016 490V465" style="stroke-width:2.5"/><text class="legend-text" x="1035" y="486">cross-entropy</text>
+</svg>

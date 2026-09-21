@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500" role="img" aria-labelledby="title desc">
+  <title id="title">One convolution output calculation</title><desc id="desc">A highlighted three by three image patch is multiplied elementwise by an edge detector and summed to produce one feature map value.</desc>
+  <defs><marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#e85d45"/></marker></defs>
+  <rect width="1200" height="500" rx="18" fill="#f4f0e8"/>
+  <g font-family="system-ui,sans-serif" text-anchor="middle"><text x="210" y="48" font-size="22" font-weight="700" fill="#213744">input patch</text><text x="570" y="48" font-size="22" font-weight="700" fill="#213744">filter</text><text x="980" y="48" font-size="22" font-weight="700" fill="#213744">one response</text></g>
+  <g font-family="ui-monospace,monospace" font-size="28" text-anchor="middle" dominant-baseline="central">
+    <g transform="translate(70 90)"><rect width="280" height="280" fill="#fff" stroke="#2878c8" stroke-width="7"/>
+      <g fill="#e8f2fb" stroke="#fff" stroke-width="3"><rect width="93" height="93"/><rect x="93" width="94" height="93"/><rect x="187" width="93" height="93"/><rect y="93" width="93" height="94"/><rect x="93" y="93" width="94" height="94"/><rect x="187" y="93" width="93" height="94"/><rect y="187" width="93" height="93"/><rect x="93" y="187" width="94" height="93"/><rect x="187" y="187" width="93" height="93"/></g>
+      <g fill="#213744"><text x="46" y="46">1</text><text x="140" y="46">2</text><text x="233" y="46">0</text><text x="46" y="140">0</text><text x="140" y="140">3</text><text x="233" y="140">1</text><text x="46" y="233">2</text><text x="140" y="233">1</text><text x="233" y="233">0</text></g>
+    </g>
+    <text x="405" y="230" font-size="44" fill="#e85d45">⊙</text>
+    <g transform="translate(445 90)"><rect width="250" height="280" fill="#fff" stroke="#008e9b" stroke-width="7"/>
+      <g fill="#e5f4f3" stroke="#fff" stroke-width="3"><rect width="83" height="93"/><rect x="83" width="84" height="93"/><rect x="167" width="83" height="93"/><rect y="93" width="83" height="94"/><rect x="83" y="93" width="84" height="94"/><rect x="167" y="93" width="83" height="94"/><rect y="187" width="83" height="93"/><rect x="83" y="187" width="84" height="93"/><rect x="167" y="187" width="83" height="93"/></g>
+      <g fill="#213744"><text x="41" y="46">1</text><text x="125" y="46">0</text><text x="208" y="46">−1</text><text x="41" y="140">1</text><text x="125" y="140">0</text><text x="208" y="140">−1</text><text x="41" y="233">1</text><text x="125" y="233">0</text><text x="208" y="233">−1</text></g>
+    </g>
+    <path d="M730 230H850" stroke="#e85d45" stroke-width="7" marker-end="url(#a)"/>
+    <g transform="translate(885 120)"><rect width="190" height="190" rx="20" fill="#213744"/><text x="95" y="95" fill="#fff" font-size="58">2</text></g>
+  </g>
+  <text x="600" y="445" fill="#526573" font-family="ui-monospace,monospace" font-size="24" text-anchor="middle">(1−0) + (0−1) + (2−0) = 2</text>
+</svg>

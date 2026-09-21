@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 470" role="img" aria-labelledby="title desc">
+  <title id="title">A loss curve and its tangent at one parameter value</title>
+  <desc id="desc">A smooth loss curve decreases at w equals 0.40. A coral tangent line shows the local slope, and a small horizontal change delta w produces a vertical change delta L.</desc>
+  <defs>
+    <marker id="blue-arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#2878c8"/></marker>
+    <style>
+      .axis{stroke:#657079;stroke-width:3;marker-end:url(#blue-arrow)}.curve{fill:none;stroke:#2878c8;stroke-width:7;stroke-linecap:round}.tangent{stroke:#ef5b45;stroke-width:6;stroke-linecap:round}.guide{fill:none;stroke:#7b61a8;stroke-width:3;stroke-dasharray:8 8}.point{fill:#ef5b45;stroke:#bd3e2d;stroke-width:3}.label{fill:#657079;font:22px Arial,sans-serif}.math{fill:#17212b;font:italic 700 24px Georgia,serif}.accent{fill:#ef5b45;font:700 22px Arial,sans-serif}
+    </style>
+  </defs>
+  <line class="axis" x1="80" y1="405" x2="700" y2="405"/><line class="axis" x1="80" y1="405" x2="80" y2="45"/>
+  <text class="math" x="696" y="444">w</text><text class="math" x="30" y="60">𝓛</text>
+  <path class="curve" d="M115 88C235 92 297 145 365 245C430 338 535 365 660 372"/>
+  <line class="tangent" x1="255" y1="82" x2="515" y2="394"/>
+  <circle class="point" cx="374" cy="255" r="11"/>
+  <line class="guide" x1="374" y1="255" x2="374" y2="405"/>
+  <text class="math" x="338" y="438">0.40</text>
+  <line class="guide" x1="374" y1="320" x2="455" y2="320"/>
+  <line class="guide" x1="455" y1="320" x2="455" y2="405"/>
+  <text class="accent" x="398" y="352">Δw</text><text class="accent" x="468" y="292">Δ𝓛</text>
+  <text class="label" x="485" y="88">tangent = local behavior</text>
+</svg>

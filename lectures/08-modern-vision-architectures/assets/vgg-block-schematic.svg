@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="610" viewBox="0 0 620 610" role="img" aria-labelledby="title desc">
+  <title id="title">Reusable VGG block</title>
+  <desc id="desc">A labeled plate groups a repeated sequence of three by three convolution and ReLU layers. A two by two max pooling operation follows the plate.</desc>
+  <defs>
+    <filter id="shadow"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#17212b" flood-opacity=".14"/></filter>
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0 0L7 3.5 0 7Z" fill="#526573"/></marker>
+    <style>
+      .plate{fill:#edf6ff;stroke:#2878c8;stroke-width:2.5;stroke-dasharray:9 7;rx:18}
+      .conv{fill:#b9dcf7;stroke:#17212b;stroke-width:1.5;rx:7;filter:url(#shadow)}
+      .relu{fill:#dff2e8;stroke:#25734d;stroke-width:1.5;rx:7}
+      .pool{fill:#f4b267;stroke:#17212b;stroke-width:1.5;rx:7;filter:url(#shadow)}
+      .io{fill:#f7f4ec;stroke:#526573;stroke-width:1.5;rx:7}
+      .label{fill:#17212b;font:600 17px Arial,sans-serif;text-anchor:middle;dominant-baseline:middle}
+      .minor{fill:#526573;font:600 14px Arial,sans-serif;text-anchor:middle}
+      .plate-title{fill:#1f5f96;font:700 15px Arial,sans-serif}
+      .flow{stroke:#526573;stroke-width:2;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect class="io" x="85" y="548" width="450" height="40"/><text class="label" x="310" y="568">input · H × W × Cᵢₙ</text>
+  <line class="flow" x1="310" y1="544" x2="310" y2="524"/>
+  <rect class="plate" x="55" y="92" width="510" height="425"/>
+  <text class="plate-title" x="80" y="122">REPEAT × num_convs</text>
+  <text class="minor" x="310" y="150">resolution preserved inside the plate</text>
+  <rect class="conv" x="105" y="420" width="410" height="47"/><text class="label" x="310" y="443.5">Conv 3 × 3 · Cₒᵤₜ · pad 1</text>
+  <line class="flow" x1="310" y1="416" x2="310" y2="395"/>
+  <rect class="relu" x="170" y="350" width="280" height="42"/><text class="label" x="310" y="371">ReLU</text>
+  <line class="flow" x1="310" y1="346" x2="310" y2="325"/>
+  <circle cx="310" cy="300" r="4" fill="#526573"/><circle cx="310" cy="282" r="4" fill="#526573"/><circle cx="310" cy="264" r="4" fill="#526573"/>
+  <line class="flow" x1="310" y1="252" x2="310" y2="231"/>
+  <rect class="conv" x="105" y="184" width="410" height="47"/><text class="label" x="310" y="207.5">Conv 3 × 3 · Cₒᵤₜ · pad 1</text>
+  <line class="flow" x1="310" y1="180" x2="310" y2="159"/>
+  <rect class="relu" x="170" y="117" width="280" height="42"/><text class="label" x="310" y="138">ReLU</text>
+  <line class="flow" x1="310" y1="88" x2="310" y2="68"/>
+  <text class="minor" x="310" y="13">output · H/2 × W/2 × Cₒᵤₜ</text>
+  <rect class="pool" x="85" y="20" width="450" height="47"/><text class="label" x="310" y="43.5">MaxPool 2 × 2 · stride 2</text>
+</svg>

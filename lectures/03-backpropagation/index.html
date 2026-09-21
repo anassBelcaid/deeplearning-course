@@ -1,0 +1,1718 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dr.&nbsp;A. Belcaid">
+
+<title>Backpropagation: From Error to Credit – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2e7c9b518fe54fcaa4a8b379123416fc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../schedule.html"> 
+<span class="menu-text">Schedule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../logistics.html"> 
+<span class="menu-text">Logistics</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#backpropagation-from-error-to-credit" id="toc-backpropagation-from-error-to-credit" class="nav-link active" data-scroll-target="#backpropagation-from-error-to-credit">Backpropagation: from error to credit</a></li>
+  <li><a href="#todays-journey" id="toc-todays-journey" class="nav-link" data-scroll-target="#todays-journey">Today’s journey</a></li>
+  <li><a href="#the-credit-assignment-problem" id="toc-the-credit-assignment-problem" class="nav-link" data-scroll-target="#the-credit-assignment-problem">01 · The credit assignment problem</a>
+  <ul class="collapse">
+  <li><a href="#a-confident-mistake" id="toc-a-confident-mistake" class="nav-link" data-scroll-target="#a-confident-mistake">A confident mistake</a></li>
+  <li><a href="#one-number-many-suspects" id="toc-one-number-many-suspects" class="nav-link" data-scroll-target="#one-number-many-suspects">One number, many suspects</a></li>
+  <li><a href="#start-with-one-suspect" id="toc-start-with-one-suspect" class="nav-link" data-scroll-target="#start-with-one-suspect">Start with one suspect</a></li>
+  </ul></li>
+  <li><a href="#one-variable-1" id="toc-one-variable-1" class="nav-link" data-scroll-target="#one-variable-1">02 · One variable</a>
+  <ul class="collapse">
+  <li><a href="#what-happens-as-the-nudge-shrinks" id="toc-what-happens-as-the-nudge-shrinks" class="nav-link" data-scroll-target="#what-happens-as-the-nudge-shrinks">What happens as the nudge shrinks?</a></li>
+  <li><a href="#the-derivative-is-a-local-promise" id="toc-the-derivative-is-a-local-promise" class="nav-link" data-scroll-target="#the-derivative-is-a-local-promise">The derivative is a local promise</a></li>
+  <li><a href="#exercise-read-the-local-signal" id="toc-exercise-read-the-local-signal" class="nav-link" data-scroll-target="#exercise-read-the-local-signal">Exercise · Read the local signal</a></li>
+  <li><a href="#challenge-can-algebra-reach-the-first-node" id="toc-challenge-can-algebra-reach-the-first-node" class="nav-link" data-scroll-target="#challenge-can-algebra-reach-the-first-node">Challenge · Can algebra reach the first node?</a></li>
+  <li><a href="#correctbut-the-bookkeeping-does-not-scale" id="toc-correctbut-the-bookkeeping-does-not-scale" class="nav-link" data-scroll-target="#correctbut-the-bookkeeping-does-not-scale">Correct—but the bookkeeping does not scale</a></li>
+  <li><a href="#each-operation-knows-one-derivative" id="toc-each-operation-knows-one-derivative" class="nav-link" data-scroll-target="#each-operation-knows-one-derivative">Each operation knows one derivative</a></li>
+  <li><a href="#backpropagation-assembles-the-same-answer" id="toc-backpropagation-assembles-the-same-answer" class="nav-link" data-scroll-target="#backpropagation-assembles-the-same-answer">Backpropagation assembles the same answer</a></li>
+  <li><a href="#exercise-build-a-neurons-graph" id="toc-exercise-build-a-neurons-graph" class="nav-link" data-scroll-target="#exercise-build-a-neurons-graph">Exercise · Build a neuron’s graph</a></li>
+  <li><a href="#worked-solution-the-forward-graph" id="toc-worked-solution-the-forward-graph" class="nav-link" data-scroll-target="#worked-solution-the-forward-graph">Worked solution · The forward graph</a></li>
+  <li><a href="#exercise-send-the-credit-backward" id="toc-exercise-send-the-credit-backward" class="nav-link" data-scroll-target="#exercise-send-the-credit-backward">Exercise · Send the credit backward</a></li>
+  <li><a href="#worked-solution-backpropagate" id="toc-worked-solution-backpropagate" class="nav-link" data-scroll-target="#worked-solution-backpropagate">Worked solution · Backpropagate</a></li>
+  </ul></li>
+  <li><a href="#multiple-paths" id="toc-multiple-paths" class="nav-link" data-scroll-target="#multiple-paths">03 · Multiple paths</a>
+  <ul class="collapse">
+  <li><a href="#one-input-reaches-the-result-twice" id="toc-one-input-reaches-the-result-twice" class="nav-link" data-scroll-target="#one-input-reaches-the-result-twice">One input reaches the result twice</a></li>
+  <li><a href="#exercise-one-weight-two-paths" id="toc-exercise-one-weight-two-paths" class="nav-link" data-scroll-target="#exercise-one-weight-two-paths">Exercise · One weight, two paths</a></li>
+  <li><a href="#exercise-open-one-linear-neuron" id="toc-exercise-open-one-linear-neuron" class="nav-link" data-scroll-target="#exercise-open-one-linear-neuron">Exercise · Open one linear neuron</a></li>
+  <li><a href="#one-neuron-sends-three-kinds-of-message" id="toc-one-neuron-sends-three-kinds-of-message" class="nav-link" data-scroll-target="#one-neuron-sends-three-kinds-of-message">One neuron sends three kinds of message</a></li>
+  <li><a href="#backpropagation-is-message-passing" id="toc-backpropagation-is-message-passing" class="nav-link" data-scroll-target="#backpropagation-is-message-passing">Backpropagation is message passing</a></li>
+  <li><a href="#from-three-neurons-to-one-linear-layer-rule" id="toc-from-three-neurons-to-one-linear-layer-rule" class="nav-link" data-scroll-target="#from-three-neurons-to-one-linear-layer-rule">From three neurons to one linear-layer rule</a></li>
+  <li><a href="#restore-the-full-two-layer-network" id="toc-restore-the-full-two-layer-network" class="nav-link" data-scroll-target="#restore-the-full-two-layer-network">Restore the full two-layer network</a></li>
+  </ul></li>
+  <li><a href="#backward-rule-toolbox" id="toc-backward-rule-toolbox" class="nav-link" data-scroll-target="#backward-rule-toolbox">04 · Backward-rule toolbox</a>
+  <ul class="collapse">
+  <li><a href="#core-transformation-blocks" id="toc-core-transformation-blocks" class="nav-link" data-scroll-target="#core-transformation-blocks">Core transformation blocks</a></li>
+  <li><a href="#gates-probabilities-and-losses" id="toc-gates-probabilities-and-losses" class="nav-link" data-scroll-target="#gates-probabilities-and-losses">Gates, probabilities, and losses</a></li>
+  </ul></li>
+  <li><a href="#automatic-differentiation" id="toc-automatic-differentiation" class="nav-link" data-scroll-target="#automatic-differentiation">05 · Automatic differentiation</a>
+  <ul class="collapse">
+  <li><a href="#the-same-graphnow-automatic" id="toc-the-same-graphnow-automatic" class="nav-link" data-scroll-target="#the-same-graphnow-automatic">The same graph—now automatic</a></li>
+  <li><a href="#inspect-the-value-objects-created-by-code" id="toc-inspect-the-value-objects-created-by-code" class="nav-link" data-scroll-target="#inspect-the-value-objects-created-by-code">Inspect the <code>Value</code> objects created by code</a></li>
+  <li><a href="#what-does-backward-actually-do" id="toc-what-does-backward-actually-do" class="nav-link" data-scroll-target="#what-does-backward-actually-do">What does <code>backward()</code> actually do?</a></li>
+  <li><a href="#coding-session-build-the-black-box" id="toc-coding-session-build-the-black-box" class="nav-link" data-scroll-target="#coding-session-build-the-black-box">Coding session · Build the black box</a></li>
+  </ul></li>
+  <li><a href="#what-gradients-reveal" id="toc-what-gradients-reveal" class="nav-link" data-scroll-target="#what-gradients-reveal">06 · What gradients reveal</a>
+  <ul class="collapse">
+  <li><a href="#read-a-gradient-before-using-it" id="toc-read-a-gradient-before-using-it" class="nav-link" data-scroll-target="#read-a-gradient-before-using-it">Read a gradient before using it</a></li>
+  <li><a href="#read-gradient-flow-across-layers" id="toc-read-gradient-flow-across-layers" class="nav-link" data-scroll-target="#read-gradient-flow-across-layers">Read gradient flow across layers</a></li>
+  <li><a href="#backpropagation-in-five-moves" id="toc-backpropagation-in-five-moves" class="nav-link" data-scroll-target="#backpropagation-in-five-moves">Backpropagation in five moves</a></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.html"><i class="bi bi-file-slides"></i>RevealJS</a></li></ul></div></nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Backpropagation: From Error to Credit</h1>
+<p class="subtitle lead">Local derivatives, computation graphs, and gradient flow</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dr.&nbsp;A. Belcaid </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="backpropagation-from-error-to-credit" class="level2 deck-title">
+<h2 class="deck-title anchored" data-anchor-id="backpropagation-from-error-to-credit">Backpropagation: from error to credit</h2>
+<div class="deck-title-grid">
+<div class="deck-title-copy">
+<p><span class="eyebrow">CHAPTER 03 · FROM SCRATCH</span></p>
+<section id="local-derivatives-computation-graphs-and-gradient-flow" class="level3">
+<h3 class="anchored" data-anchor-id="local-derivatives-computation-graphs-and-gradient-flow">Local derivatives, computation graphs, and gradient flow</h3>
+<p>The loss says <strong>how wrong</strong> we are. Backpropagation asks: <strong>who contributed—and by how much?</strong></p>
+<p><span class="deck-author">Dr.&nbsp;A. Belcaid</span></p>
+</section>
+</div>
+<div class="deck-title-art backprop-hero">
+<p><img src="assets/backpropagation-hero.png" class="img-fluid" alt="A two-layer neural computation graph with blue signals flowing forward and coral gradient paths branching backward from a scalar loss."></p>
+</div>
+</div>
+</section>
+<section id="todays-journey" class="level2">
+<h2 class="anchored" data-anchor-id="todays-journey">Today’s journey</h2>
+<div class="backprop-roadmap">
+<div class="roadmap-stop scalar-stop">
+<p><span>01</span></p>
+<section id="one-variable" class="level3">
+<h3 class="anchored" data-anchor-id="one-variable">One variable</h3>
+<p>Derivative as sensitivity</p>
+</section>
+</div>
+<div class="roadmap-arrow">
+<p>→</p>
+</div>
+<div class="roadmap-stop">
+<p><span>02</span></p>
+<section id="a-chain" class="level3">
+<h3 class="anchored" data-anchor-id="a-chain">A chain</h3>
+<p>Multiply local derivatives</p>
+</section>
+</div>
+<div class="roadmap-arrow">
+<p>→</p>
+</div>
+<div class="roadmap-stop">
+<p><span>03</span></p>
+<section id="many-variables" class="level3">
+<h3 class="anchored" data-anchor-id="many-variables">Many variables</h3>
+<p>Route partial derivatives</p>
+</section>
+</div>
+<div class="roadmap-arrow">
+<p>→</p>
+</div>
+<div class="roadmap-stop branch-stop">
+<p><span>04</span></p>
+<section id="branches" class="level3">
+<h3 class="anchored" data-anchor-id="branches">Branches</h3>
+<p>Accumulate gradient paths</p>
+</section>
+</div>
+<div class="roadmap-arrow">
+<p>→</p>
+</div>
+<div class="roadmap-stop network-stop">
+<p><span>05</span></p>
+<section id="two-layer-mlp" class="level3">
+<h3 class="anchored" data-anchor-id="two-layer-mlp">Two-layer MLP</h3>
+<p>One complete backward pass</p>
+</section>
+</div>
+<div class="roadmap-arrow">
+<p>→</p>
+</div>
+<div class="roadmap-stop diagnostic-stop">
+<p><span>06</span></p>
+<section id="gradient-signals" class="level3">
+<h3 class="anchored" data-anchor-id="gradient-signals">Gradient signals</h3>
+<p>What they reveal—and hide</p>
+</section>
+</div>
+</div>
+<div class="roadmap-question fragment">
+<p><span>One rule travels through the whole graph:</span> <strong>incoming gradient × local derivative</strong></p>
+</div>
+<div class="notes">
+<p>Preview the conceptual progression only. Emphasize that we begin with familiar single-variable calculus, then add one complication at a time until the same rule works for a neural network. Parameter updates belong to the optimization lecture.</p>
+</div>
+</section>
+<section id="the-credit-assignment-problem" class="level1 section-slide credit-section" data-section-progress="1 / 6" style="--section-progress:16.667%">
+<h1 class="section-slide credit-section" data-section-progress="1 / 6" style="--section-progress:16.667%">01 · The credit assignment problem</h1>
+<section id="a-confident-mistake" class="level2">
+<h2 class="anchored" data-anchor-id="a-confident-mistake">A confident mistake</h2>
+<div class="mistake-scene">
+<div class="mistake-example">
+<p><span class="example-label">ONE TRAINING EXAMPLE</span></p>
+<div class="cat-photo">
+<p><img src="../01-what-is-learning/assets/cs231n-classify.png" alt="A gray cat sitting in a tree, used as one image-classification example."></p>
+</div>
+<p><small class="cat-source">Image: <a href="https://cs231n.github.io/classification/">Stanford CS231n</a></small></p>
+<div class="target-label">
+<small>true label</small><strong>cat · <span class="math inline">\(y=1\)</span></strong>
+</div>
+</div>
+<div class="mistake-prediction">
+<p><span class="example-label">MODEL PREDICTION</span></p>
+<div class="class-score wrong">
+<span>dog</span><i style="--score:88%"></i><b>0.88</b>
+</div>
+<div class="class-score">
+<span>cat</span><i style="--score:12%"></i><b>0.12</b>
+</div>
+<div class="fragment loss-result">
+<p><span>binary cross-entropy</span> <strong>𝓛 = −log(0.12) = 2.12</strong></p>
+</div>
+</div>
+</div>
+<div class="fragment intro-conclusion">
+<p><span>The loss confirms the mistake.</span> <strong>It does not identify what caused it.</strong></p>
+</div>
+<div class="notes">
+<p>Begin with the prediction, not the definition. Ask whether 0.12 is good for the true class. Reveal the loss only after students judge the output. The exact architecture is deliberately hidden for now; all we know is that the model is confidently wrong.</p>
+</div>
+</section>
+<section id="one-number-many-suspects" class="level2">
+<h2 class="anchored" data-anchor-id="one-number-many-suspects">One number, many suspects</h2>
+<div class="credit-scene">
+<div class="parameter-field">
+<p><span class="example-label">TRAINABLE PARAMETERS</span></p>
+<div class="parameter-cloud">
+<p><span>W<sub>1</sub></span><span>b<sub>1</sub></span><span>W<sub>2</sub></span><span>b<sub>2</sub></span> <span>w<sub>11</sub></span><span>w<sub>12</sub></span><span>w<sub>21</sub></span><span>⋯</span></p>
+</div>
+</div>
+<div class="credit-arrow">
+<p><span>forward pass</span> <b>→</b></p>
+</div>
+<div class="scalar-loss">
+<p><small>ONE SCALAR</small> <strong>𝓛 = 2.12</strong></p>
+</div>
+</div>
+<div class="fragment credit-question">
+<p>How much responsibility does each parameter have for this error?</p>
+</div>
+<div class="fragment credit-definition">
+<p>That is the <strong>credit assignment problem</strong>.</p>
+</div>
+<div class="notes">
+<p>Contrast the dimensionalities: many parameters enter the computation, but the loss compresses the outcome to one scalar. “Credit” can be positive or negative: a parameter may push the loss up or down. Avoid implying moral blame; responsibility means sensitivity of the loss to a small change.</p>
+</div>
+</section>
+<section id="start-with-one-suspect" class="level2">
+<h2 class="anchored" data-anchor-id="start-with-one-suspect">Start with one suspect</h2>
+<div class="nudge-comparison">
+<div class="nudge-state">
+<p><span>BEFORE</span> <strong>w = 0.40</strong> <b>𝓛(w) = 2.12</b></p>
+</div>
+<div class="nudge-action">
+<p><span>NUDGE</span> <strong><span class="math inline">\(+0.01\)</span></strong> <b>→</b></p>
+</div>
+<div class="nudge-state after">
+<p><span>AFTER</span> <strong>w = 0.41</strong> <b>𝓛(w) = 2.08</b></p>
+</div>
+</div>
+<div class="fragment sensitivity-result">
+<span>observed sensitivity</span>
+<div class="difference-quotient">
+<p><span class="fraction"><b>Δ𝓛</b><b>Δw</b></span> <i>=</i> <span class="fraction wide"><b>2.08 − 2.12</b><b>0.41 − 0.40</b></span> <i>=</i><strong>−4</strong></p>
+</div>
+</div>
+<div class="fragment sensitivity-meaning">
+<div>
+<span>sign</span><strong>direction</strong>
+</div>
+<div>
+<span>magnitude</span><strong>strength</strong>
+</div>
+</div>
+<div class="notes">
+<p>Treat these as illustrative values, not a completed optimization step. Ask students to interpret the sign before revealing the takeaway. This finite change motivates the derivative as the limiting local sensitivity. We will next formalize it with single-variable calculus.</p>
+</div>
+</section>
+</section>
+<section id="one-variable-1" class="level1 section-slide scalar-section" data-section-progress="2 / 6" style="--section-progress:33.333%">
+<h1 class="section-slide scalar-section" data-section-progress="2 / 6" style="--section-progress:33.333%">02 · One variable</h1>
+<section id="what-happens-as-the-nudge-shrinks" class="level2">
+<h2 class="anchored" data-anchor-id="what-happens-as-the-nudge-shrinks">What happens as the nudge shrinks?</h2>
+<div class="limit-question">
+<p>At <span class="math inline">\(w=0.40\)</span>, estimate how the loss responds to a smaller and smaller change in <strong>one</strong> weight.</p>
+</div>
+<div class="difference-table">
+<div class="table-head">
+<span>nudge <span class="math inline">\(\Delta w\)</span></span><span>new loss</span><span><span class="math inline">\(\Delta\mathcal L/\Delta w\)</span></span>
+</div>
+<div class="fragment">
+<strong><span class="math inline">\(0.1\)</span></strong><span><span class="math inline">\(1.76\)</span></span><b><span class="math inline">\(-3.60\)</span></b>
+</div>
+<div class="fragment">
+<strong><span class="math inline">\(0.01\)</span></strong><span><span class="math inline">\(2.0804\)</span></span><b><span class="math inline">\(-3.96\)</span></b>
+</div>
+<div class="fragment">
+<strong><span class="math inline">\(0.001\)</span></strong><span><span class="math inline">\(2.116004\)</span></span><b><span class="math inline">\(-3.996\)</span></b>
+</div>
+</div>
+<div class="fragment limit-result">
+<p><span>as Δw → 0</span> <strong>d𝓛/dw → −4</strong></p>
+</div>
+<div class="notes">
+<p>Ask students to predict the third row after seeing the first two. These illustrative measurements are consistent with the previous slide and approach −4. Emphasize that the derivative is not a new kind of quantity; it is the stabilized local sensitivity as the nudge vanishes.</p>
+</div>
+</section>
+<section id="the-derivative-is-a-local-promise" class="level2">
+<h2 class="anchored" data-anchor-id="the-derivative-is-a-local-promise">The derivative is a local promise</h2>
+<div class="sensitivity-layout">
+<div class="sensitivity-plot">
+<p><img src="assets/local-sensitivity.svg" class="img-fluid" alt="A smooth loss curve with a descending tangent at w equals 0.40 and small changes delta w and delta L marked."></p>
+</div>
+<div class="local-promise">
+<p><span>NEAR <span class="math inline">\(w=0.40\)</span></span></p>
+<p><span class="math display">\[
+\Delta\mathcal L
+\approx
+\frac{d\mathcal L}{dw}\,\Delta w
+\]</span></p>
+<div class="fragment numeric-promise">
+<p>If <span class="math inline">\(\Delta w=+0.001\)</span>,</p>
+<p><span class="math display">\[\Delta\mathcal L\approx(-4)(0.001)=-0.004\]</span></p>
+</div>
+</div>
+</div>
+<div class="fragment local-warning">
+<p>Local means <strong>near this value of <span class="math inline">\(w\)</span></strong>—not everywhere on the curve.</p>
+</div>
+<div class="notes">
+<p>Connect the derivative to a tangent only after the numerical limiting process. Ask students to predict whether the loss moves up or down for a positive nudge. The tangent is a local linear model of the loss, not a global description.</p>
+</div>
+</section>
+<section id="exercise-read-the-local-signal" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-read-the-local-signal">Exercise · Read the local signal</h2>
+<div class="gradient-sign-figure">
+<p><img src="assets/gradient-signs.svg" class="img-fluid" alt="Four local loss plots: A rises, B falls, C is flat, and D rises steeply at the marked parameter value."></p>
+</div>
+<div class="exercise-prompt">
+<p>For each marked point, decide: is <span class="math inline">\(d\mathcal L/dw\)</span> positive, negative, or zero—and where is its magnitude largest?</p>
+</div>
+<div class="exercise-pause">
+<p><span>PAUSE</span><b>90 seconds</b><small>Use the tangent direction at the coral point.</small></p>
+</div>
+<div class="fragment exercise-solution gradient-solution">
+<span class="solution-label">SOLUTION</span>
+<div>
+<b>A</b><span>positive</span>
+</div>
+<div>
+<b>B</b><span>negative</span>
+</div>
+<div>
+<b>C</b><span>zero</span>
+</div>
+<div>
+<b>D</b><span>largest magnitude</span>
+</div>
+</div>
+<div class="notes">
+<p>Have students answer with hand signals: thumbs up, down, or flat for A–C, then identify D as the strongest sensitivity. Do not discuss parameter updates; the task is only to read what the derivative reveals locally.</p>
+</div>
+</section>
+<section id="challenge-can-algebra-reach-the-first-node" class="level2">
+<h2 class="anchored" data-anchor-id="challenge-can-algebra-reach-the-first-node">Challenge · Can algebra reach the first node?</h2>
+<div class="long-expression">
+<p><span class="math display">\[
+\mathcal L(x)=\left[(x^2+1)^3-2\right]^2,
+\qquad x=1
+\]</span></p>
+</div>
+<div class="exercise-prompt">
+<p>Compute the derivative of the final quantity with respect to the first one: <span class="math inline">\(d\mathcal L/dx\)</span> at <span class="math inline">\(x=1\)</span>.</p>
+</div>
+<div class="exercise-pause">
+<p><span>PAUSE</span><b>2 minutes</b><small>Differentiate the nested expression using the chain rule you already know.</small></p>
+</div>
+<div class="fragment exercise-solution algebra-solution">
+<p><span class="solution-label">ALGEBRAIC SOLUTION</span></p>
+<p><span class="math display">\[
+\frac{d\mathcal L}{dx}
+=2\big[(x^2+1)^3-2\big]\;3(x^2+1)^2\;2x
+\]</span></p>
+<p><span class="math display">\[
+\left.\frac{d\mathcal L}{dx}\right|_{x=1}
+=2(6)\cdot3(2)^2\cdot2=288
+\]</span></p>
+</div>
+<div class="notes">
+<p>Give students a genuine attempt. They already know enough calculus to solve this expression algebraically. The purpose is not to make the derivative mysterious; it is to make the bookkeeping cost visible. Reveal 288, then ask what happens when the expression contains thousands of operations.</p>
+</div>
+</section>
+<section id="correctbut-the-bookkeeping-does-not-scale" class="level2">
+<h2 class="anchored" data-anchor-id="correctbut-the-bookkeeping-does-not-scale">Correct—but the bookkeeping does not scale</h2>
+<div class="scalar-graph-figure">
+<p><img src="assets/scalar-chain-forward.svg" class="img-fluid" alt="A two-row computation graph evaluates the nested expression from x equals 1 through five operations to loss 36, storing the intermediate values a, b, c, and d."></p>
+</div>
+<div class="fragment forward-summary">
+<p><span>same expression</span><strong>five small operations · four remembered values</strong></p>
+</div>
+<div class="notes">
+<p>Read the graph left to right and have students supply each value before revealing it verbally. The variable names are bookkeeping: each operation now has one small input-output relationship that can be differentiated independently.</p>
+</div>
+</section>
+<section id="each-operation-knows-one-derivative" class="level2">
+<h2 class="anchored" data-anchor-id="each-operation-knows-one-derivative">Each operation knows one derivative</h2>
+<div class="scalar-graph-figure">
+<p><img src="assets/scalar-chain-local.svg" class="img-fluid" alt="The same two-row computation graph with a coral local-derivative badge attached to each of the five operation nodes."></p>
+</div>
+<div class="fragment local-rule-card">
+<p><span>local view</span><strong>Each operation differentiates only itself.</strong></p>
+</div>
+<div class="notes">
+<p>Reveal one local derivative at a time from left to right. Ask for the generic derivative first, then substitute the stored forward value. No node needs to know the entire expression or the final answer.</p>
+</div>
+</section>
+<section id="backpropagation-assembles-the-same-answer" class="level2">
+<h2 class="anchored" data-anchor-id="backpropagation-assembles-the-same-answer">Backpropagation assembles the same answer</h2>
+<div class="r-stack backprop-step-stack">
+<img src="assets/scalar-backprop-step-0.svg" alt="The scalar computation graph with identifiers and operation symbols only; all forward values have already been stored.">
+<img class="fragment fade-in-then-out" src="assets/scalar-backprop-step-1.svg" alt="Backward step 1 highlights the final square and computes d loss over d d equals 12.">
+<img class="fragment fade-in-then-out" src="assets/scalar-backprop-step-2.svg" alt="Backward step 2 highlights subtract two and computes d loss over d c equals 12.">
+<img class="fragment fade-in-then-out" src="assets/scalar-backprop-step-3.svg" alt="Backward step 3 highlights the cube and computes d loss over d b equals 144.">
+<img class="fragment fade-in-then-out" src="assets/scalar-backprop-step-4.svg" alt="Backward step 4 highlights add one and computes d loss over d a equals 144.">
+<img class="fragment fade-in" src="assets/scalar-backprop-step-5.svg" alt="Backward step 5 highlights the first square and computes d loss over d x equals 288.">
+</div>
+<div class="notes">
+<p>Advance through the five graph states. At each step, point first to the incoming sensitivity, then to the highlighted operation’s local derivative, and only then read the result in the external panel. The nodes remain uncluttered throughout. The final value 288 exactly matches the algebraic solution.</p>
+</div>
+</section>
+<section id="exercise-build-a-neurons-graph" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-build-a-neurons-graph">Exercise · Build a neuron’s graph</h2>
+<div class="long-expression neuron-exercise-formula">
+<p><span class="math display">\[
+z=wx+b,\qquad \hat y=\sigma(z),\qquad
+\mathcal L=\frac12(\hat y-y)^2
+\]</span></p>
+<p><span class="math display">\[
+x=2,\qquad w=1,\qquad b=-1,\qquad y=1
+\]</span></p>
+</div>
+<div class="exercise-prompt">
+<p>Draw the computation graph from the four inputs to the loss. Introduce an intermediate node whenever a new value is produced.</p>
+</div>
+<div class="exercise-pause">
+<p><span>PAUSE</span><b>2 minutes</b><small>Start with the affine map, then follow the formula from left to right.</small></p>
+</div>
+<div class="fragment exercise-solution">
+<p><span class="solution-label">READY?</span> Compare your graph on the next slide.</p>
+</div>
+<div class="notes">
+<p>Do not let students differentiate yet. First check whether their graph has four leaves, an affine operation, a sigmoid operation, and a loss operation. This separates graph construction from gradient bookkeeping.</p>
+</div>
+</section>
+<section id="worked-solution-the-forward-graph" class="level2">
+<h2 class="anchored" data-anchor-id="worked-solution-the-forward-graph">Worked solution · The forward graph</h2>
+<div class="neuron-exercise-figure">
+<p><img src="assets/neuron-exercise-forward.svg" class="img-fluid" alt="Computation graph for one sigmoid neuron with inputs x, w, b, and target y. The graph evaluates an affine map, sigmoid, and squared-error loss."></p>
+</div>
+<div class="fragment graph-question">
+<p>The values are stored. From which node must the backward pass begin?</p>
+</div>
+<div class="notes">
+<p>Trace the forward values aloud: z equals 1, prediction equals 0.731, and loss equals 0.036. Then ask for the seed sensitivity at the loss. The answer is one.</p>
+</div>
+</section>
+<section id="exercise-send-the-credit-backward" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-send-the-credit-backward">Exercise · Send the credit backward</h2>
+<div class="exercise-backprop-grid">
+<div class="exercise-reference-graph">
+<p><img src="assets/neuron-exercise-forward.svg" class="img-fluid" alt="The completed forward graph remains visible as a reference while students backpropagate."></p>
+</div>
+<div class="exercise-prompt backprop-task">
+<p>Compute <span class="math display">\[
+\frac{\partial\mathcal L}{\partial w},\qquad
+\frac{\partial\mathcal L}{\partial b},\qquad
+\frac{\partial\mathcal L}{\partial x}.
+\]</span> Use <strong>incoming sensitivity × local derivative</strong> at every operation.</p>
+</div>
+</div>
+<div class="exercise-pause">
+<p><span>PAUSE</span><b>3 minutes</b><small>Work right to left. Keep the forward values available.</small></p>
+</div>
+<div class="fragment exercise-solution">
+<p><span class="solution-label">WORKED SOLUTION</span> Advance once more and check one operation at a time.</p>
+</div>
+</section>
+<section id="worked-solution-backpropagate" class="level2">
+<h2 class="anchored" data-anchor-id="worked-solution-backpropagate">Worked solution · Backpropagate</h2>
+<div class="r-stack backprop-step-stack neuron-backprop-stack">
+<img src="assets/neuron-exercise-forward.svg" alt="The completed forward graph for the sigmoid-neuron exercise.">
+<img class="fragment fade-in-then-out" src="assets/neuron-exercise-backprop-1.svg" alt="The loss step computes the sensitivity with respect to the prediction.">
+<img class="fragment fade-in-then-out" src="assets/neuron-exercise-backprop-2.svg" alt="The sigmoid step computes the sensitivity with respect to the logit.">
+<img class="fragment fade-in" src="assets/neuron-exercise-backprop-3.svg" alt="The affine step sends gradients to w, b, and x.">
+</div>
+<div class="notes">
+<p>Reveal only one operation at a time. At the affine map, emphasize the new structural idea: one node receives an incoming sensitivity and sends a different gradient to each of its three parents. This prepares the multivariate section without introducing optimization.</p>
+</div>
+</section>
+</section>
+<section id="multiple-paths" class="level1 section-slide multivariable-section" data-section-progress="3 / 6" style="--section-progress:50%">
+<h1 class="section-slide multivariable-section" data-section-progress="3 / 6" style="--section-progress:50%">03 · Multiple paths</h1>
+<section id="one-input-reaches-the-result-twice" class="level2">
+<h2 class="anchored" data-anchor-id="one-input-reaches-the-result-twice">One input reaches the result twice</h2>
+<div class="multivariable-intro-layout">
+<div class="multivariable-cards">
+<div class="multi-rule-card">
+<p><span class="multi-card-label">GENERAL RULE</span></p>
+<p>When <span class="math inline">\(f\)</span> depends on <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>, and both depend on <span class="math inline">\(t\)</span>: <span class="math display">\[
+\frac{df}{dt}
+=\frac{\partial f}{\partial x}\frac{dx}{dt}
++\frac{\partial f}{\partial y}\frac{dy}{dt}.
+\]</span></p>
+</div>
+<div class="fragment multi-example-card">
+<p><span class="multi-card-label">CONCRETE EXAMPLE</span> <span class="math display">\[
+f(x,y)=y+e^{xy},\qquad
+x(t)=\cos t,\qquad y(t)=t^2.
+\]</span></p>
+</div>
+<div class="fragment multi-result-card">
+<p><span class="multi-card-label">FOLLOW BOTH PATHS</span> <span class="math display">\[
+\frac{df}{dt}
+=\underbrace{y e^{xy}}_{\partial f/\partial x}(-\sin t)
++\underbrace{(1+x e^{xy})}_{\partial f/\partial y}(2t)
+\]</span> <span class="math display">\[
+=-t^2e^{t^2\cos t}\sin t
++2t\!\left(1+\cos t\,e^{t^2\cos t}\right).
+\]</span></p>
+</div>
+</div>
+<div class="multivariable-path-graph">
+<p><img src="assets/two-path-chain-rule.svg" class="img-fluid" alt="A computation graph in which t branches to x and y, and both paths meet at f. Each edge is labeled by its local derivative."></p>
+</div>
+</div>
+<div class="notes">
+<p>Keep the graph visible throughout. First trace the left path from t through x to f, then the right path through y. Ask whether the two effects should replace or reinforce one another before revealing the plus sign. In the example, compute the four local derivatives first and only then substitute x equals cosine t and y equals t squared.</p>
+</div>
+</section>
+<section id="exercise-one-weight-two-paths" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-one-weight-two-paths">Exercise · One weight, two paths</h2>
+<div class="regularization-formula">
+<p><span class="math display">\[
+\mathcal L_{\text{total}}
+=\underbrace{\frac12(\hat y-y)^2}_{\mathcal L_{\text{data}}}
++\underbrace{\frac{\lambda}{2}w^2}_{\mathcal L_{\text{reg}}},
+\qquad \lambda=0.1.
+\]</span></p>
+</div>
+<div class="regularization-layout">
+<div class="regularization-graph">
+<p><img src="assets/neuron-with-regularization.svg" class="img-fluid" alt="The weight w reaches the total loss through both the neuron data-loss path and an L2 regularization path."></p>
+</div>
+<div class="regularization-question">
+<p>From the previous exercise: <span class="math display">\[
+\frac{\partial\mathcal L_{\text{data}}}{\partial w}=-0.1058,
+\qquad w=1.
+\]</span></p>
+<p>How does regularization change <span class="math inline">\(\partial\mathcal L_{\text{total}}/\partial w\)</span>?</p>
+</div>
+</div>
+<div class="exercise-pause compact-pause">
+<p><span>PAUSE</span><b>90 seconds</b><small>Find the second path’s contribution, then add the two paths.</small></p>
+</div>
+<div class="fragment regularization-solution">
+<p><span class="solution-label">TWO PATHS · ONE GRADIENT</span> <span class="math display">\[
+\frac{\partial\mathcal L_{\text{total}}}{\partial w}
+=-0.1058+\lambda w
+=-0.1058+0.1
+=\boxed{-0.0058}.
+\]</span></p>
+</div>
+<div class="notes">
+<p>Ask for the sign of the regularization contribution before computing it. The data term pushes w upward under gradient descent because its gradient is negative; the regularizer pushes w toward zero because its contribution is positive. The point here is path addition, not the optimization update itself.</p>
+</div>
+</section>
+<section id="exercise-open-one-linear-neuron" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-open-one-linear-neuron">Exercise · Open one linear neuron</h2>
+<div class="linear-layer-figure">
+<p><img src="assets/linear-layer-4x3.svg" class="img-fluid" alt="A four-input, three-output linear layer feeding a scalar loss. The four edges producing h1 and the incoming gradient from the loss are highlighted."></p>
+</div>
+<div class="linear-layer-question">
+<p>Given <span class="math inline">\(g_1=\partial\mathcal{L}/\partial h_1\)</span>, what messages should <span class="math inline">\(h_1\)</span> send to its four weights, four inputs, and bias?</p>
+</div>
+<div class="exercise-pause compact-pause">
+<p><span>PAUSE</span><b>90 seconds</b><small>Use incoming gradient × local derivative. Start from the scalar equation for h₁.</small></p>
+</div>
+<div class="notes">
+<p>The gray connections establish the full layer, but keep attention on the four blue edges into h1. The coral arrow is the gradient arriving from everything downstream. Students only need the scalar rule learned in the previous section.</p>
+</div>
+</section>
+<section id="one-neuron-sends-three-kinds-of-message" class="level2">
+<h2 class="anchored" data-anchor-id="one-neuron-sends-three-kinds-of-message">One neuron sends three kinds of message</h2>
+<div class="linear-neuron-equation">
+<p><span class="math display">\[
+h_1=w_{11}x_1+w_{12}x_2+w_{13}x_3+w_{14}x_4+b_1,
+\qquad g_1=\frac{\partial\mathcal{L}}{\partial h_1}.
+\]</span></p>
+</div>
+<div class="linear-message-grid">
+<div class="fragment linear-message-card">
+<p><span>TO EACH WEIGHT</span> <span class="math display">\[
+\frac{\partial\mathcal{L}}{\partial w_{1j}}
+=g_1x_j
+\]</span> <small>The local derivative of <span class="math inline">\(h_1\)</span> with respect to <span class="math inline">\(w_{1j}\)</span> is <span class="math inline">\(x_j\)</span>.</small></p>
+</div>
+<div class="fragment linear-message-card">
+<p><span>TO EACH INPUT</span> <span class="math display">\[
+\left.\frac{\partial\mathcal{L}}{\partial x_j}\right|_{h_1}
+=g_1w_{1j}
+\]</span> <small>This is only the contribution arriving through <span class="math inline">\(h_1\)</span>.</small></p>
+</div>
+<div class="fragment linear-message-card">
+<p><span>TO THE BIAS</span> <span class="math display">\[
+\frac{\partial\mathcal{L}}{\partial b_1}=g_1
+\]</span> <small>The local derivative of <span class="math inline">\(h_1\)</span> with respect to <span class="math inline">\(b_1\)</span> is <span class="math inline">\(1\)</span>.</small></p>
+</div>
+</div>
+<div class="fragment linear-message-summary">
+<p>The formulas differ only because each edge has a different <strong>local derivative</strong>.</p>
+</div>
+<div class="notes">
+<p>Reveal weights, inputs, and bias separately. For each card, ask students to name the incoming message and the local derivative before reading the product. The vertical bar on the input gradient is important: h1 supplies only one of three path contributions.</p>
+</div>
+</section>
+<section id="backpropagation-is-message-passing" class="level2">
+<h2 class="anchored" data-anchor-id="backpropagation-is-message-passing">Backpropagation is message passing</h2>
+<div class="message-passing-figure">
+<p><img src="assets/gradient-message-passing.svg" class="img-fluid" alt="A generic node receives gradient messages from two children, adds them, and sends locally transformed messages to three parents."></p>
+</div>
+<div class="fragment message-passing-rule">
+<p><strong>Receive and add</strong> messages from children. <strong>Multiply locally and send</strong> messages to parents.</p>
+</div>
+<div class="notes">
+<p>Use family language carefully: parents produced v in the forward pass; children consumed v. Backpropagation reverses the direction. If several children used v, their messages add at v. The accumulated gradient is then multiplied by a different local derivative for each parent edge.</p>
+</div>
+</section>
+<section id="from-three-neurons-to-one-linear-layer-rule" class="level2">
+<h2 class="anchored" data-anchor-id="from-three-neurons-to-one-linear-layer-rule">From three neurons to one linear-layer rule</h2>
+<div class="linear-matrix-forward">
+<p><span class="math display">\[
+\mathbf h=W\mathbf x+\mathbf b,
+\qquad
+W\in\mathbb R^{3\times4},
+\quad \mathbf x\in\mathbb R^4,
+\quad \mathbf g_h=\frac{\partial\mathcal{L}}{\partial\mathbf h}\in\mathbb R^3.
+\]</span></p>
+</div>
+<div class="r-stack linear-matrix-stage">
+<div class="linear-matrix-rules fragment fade-out" data-fragment-index="3">
+<div class="fragment matrix-rule-card" data-fragment-index="0">
+<p><span>INPUT MESSAGES ADD</span> <span class="math display">\[
+\boxed{\displaystyle
+\frac{\partial\mathcal{L}}{\partial\mathbf x}=W^\top\mathbf g_h}
+\]</span> <small><span class="math inline">\(4\times3\)</span> times <span class="math inline">\(3\times1\)</span> gives one gradient for each input.</small></p>
+</div>
+<div class="fragment matrix-rule-card" data-fragment-index="1">
+<p><span>EVERY EDGE GETS A GRADIENT</span> <span class="math display">\[
+\boxed{\displaystyle
+\frac{\partial\mathcal{L}}{\partial W}=\mathbf g_h\mathbf x^\top}
+\]</span> <small><span class="math inline">\(3\times1\)</span> times <span class="math inline">\(1\times4\)</span> gives the full <span class="math inline">\(3\times4\)</span> weight matrix.</small></p>
+</div>
+<div class="fragment matrix-rule-card" data-fragment-index="2">
+<p><span>EACH NEURON HAS ONE BIAS</span> <span class="math display">\[
+\boxed{\displaystyle
+\frac{\partial\mathcal{L}}{\partial\mathbf b}=\mathbf g_h}
+\]</span> <small>The bias local derivative is one for every output neuron.</small></p>
+</div>
+</div>
+<div class="fragment linear-layer-conclusion" data-fragment-index="3">
+<p><span class="conclusion-label">LINEAR LAYER · BACKWARD RULES TO REMEMBER</span></p>
+<div class="conclusion-rule-grid">
+<div>
+<small>INPUT</small><span class="math display">\[\displaystyle \frac{\partial\mathcal{L}}{\partial\mathbf x}=W^\top\mathbf g_h\]</span>
+</div>
+<div>
+<small>WEIGHTS</small><span class="math display">\[\displaystyle \frac{\partial\mathcal{L}}{\partial W}=\mathbf g_h\mathbf x^\top\]</span>
+</div>
+<div>
+<small>BIAS</small><span class="math display">\[\displaystyle \frac{\partial\mathcal{L}}{\partial\mathbf b}=\mathbf g_h\]</span>
+</div>
+</div>
+<p class="conclusion-memory">
+<strong>Transpose to inputs</strong> · <strong>outer product to weights</strong> · <strong>copy to bias</strong>
+</p>
+</div>
+</div>
+<div class="fragment matrix-rule-takeaway" data-fragment-index="4">
+<p>These are three forms of the same rule: <strong>incoming gradient × local derivative</strong>.</p>
+</div>
+<div class="notes">
+<p>Check dimensions before interpreting the equations. W transpose appears because each input must collect one contribution from every output neuron. The weight gradient is an outer product because every output message pairs with every input value.</p>
+</div>
+</section>
+<section id="restore-the-full-two-layer-network" class="level2">
+<h2 class="anchored" data-anchor-id="restore-the-full-two-layer-network">Restore the full two-layer network</h2>
+<div class="computation-graph-figure">
+<p><img src="assets/two-layer-loss-graph.svg" class="img-fluid" alt="Forward computation graph for a two-layer binary classifier. Input x and parameters W1 and b1 enter an affine operation and sigmoid; parameters W2 and b2 enter a second affine operation and sigmoid; the prediction and target y enter binary cross-entropy to produce loss L."></p>
+</div>
+<div class="fragment graph-question">
+<p>Every block receives a gradient message, applies its local rule, and sends new messages to its parents.</p>
+</div>
+<div class="fragment derivation-reference">
+<p><span>FULL WORKED DERIVATION</span> <a href="../../notes/03-backpropagation/two-layer-derivation.html">Read online</a> · <a href="../../notes/03-backpropagation/two-layer-derivation.pdf">Download PDF</a></p>
+</div>
+<div class="notes">
+<p>First read the established graph from left to right, then trace the backward order from the loss to the first affine map. The linear blocks use the matrix rules just derived; sigmoid and BCE contribute their own local derivative rules. No block needs to know the entire network.</p>
+</div>
+</section>
+</section>
+<section id="backward-rule-toolbox" class="level1 section-slide toolbox-section" data-section-progress="4 / 6" style="--section-progress:66.667%">
+<h1 class="section-slide toolbox-section" data-section-progress="4 / 6" style="--section-progress:66.667%">04 · Backward-rule toolbox</h1>
+<section id="core-transformation-blocks" class="level2">
+<h2 class="anchored" data-anchor-id="core-transformation-blocks">Core transformation blocks</h2>
+<div class="toolbox-grid">
+<div class="fragment toolbox-card linear-tool-card">
+<p><span class="toolbox-name">LINEAR</span></p>
+<div class="toolbox-visual" aria-label="A matrix transforms an input vector into an output vector.">
+<svg viewbox="0 0 260 125" role="img">
+<g class="tb-grid"><rect x="20" y="22" width="82" height="82" rx="10"></rect><path d="M47 22V104M75 22V104M20 49H102M20 77H102"></path></g><path class="tb-arrow" d="M112 63H151"></path><g class="tb-vector"><rect x="160" y="18" width="38" height="90" rx="10"></rect><path d="M160 48H198M160 78H198"></path></g><text x="225" y="70">+ b</text>
+</svg>
+</div>
+<p><span class="toolbox-forward">FORWARD</span> <span class="math display">\[
+\mathbf y=W\mathbf x+\mathbf b
+\]</span></p>
+<p><span class="toolbox-backward">BACKWARD MESSAGE</span> <span class="math display">\[
+\mathbf g_x=W^\top\mathbf g_y
+\]</span> <span class="math display">\[
+\nabla_W\mathcal L=\mathbf g_y\mathbf x^\top,
+\qquad \nabla_{\mathbf b}\mathcal L=\mathbf g_y
+\]</span></p>
+<p><strong class="toolbox-memory">transpose · outer product · copy</strong></p>
+</div>
+<div class="fragment toolbox-card sigmoid-tool-card">
+<p><span class="toolbox-name">SIGMOID</span></p>
+<div class="toolbox-visual" aria-label="The S-shaped sigmoid curve.">
+<svg viewbox="0 0 260 125" role="img">
+<path class="tb-axis" d="M22 105H240M35 114V12"></path><path class="tb-curve" d="M35 102C87 102 91 74 126 63C161 52 164 23 225 23"></path><circle class="tb-point" cx="126" cy="63" r="6"></circle>
+</svg>
+</div>
+<p><span class="toolbox-forward">FORWARD</span> <span class="math display">\[
+y=\sigma(x)
+\]</span></p>
+<p><span class="toolbox-backward">BACKWARD MESSAGE</span> <span class="math display">\[
+g_x=g_y\,y(1-y)
+\]</span></p>
+<p><strong class="toolbox-memory">gate by the stored output</strong></p>
+</div>
+<div class="fragment toolbox-card tanh-tool-card">
+<p><span class="toolbox-name">TANH</span></p>
+<div class="toolbox-visual" aria-label="The zero-centered S-shaped tanh curve.">
+<svg viewbox="0 0 260 125" role="img">
+<path class="tb-axis" d="M22 63H240M130 114V12"></path><path class="tb-curve" d="M35 101C89 101 94 78 113 68C124 62 136 64 147 57C167 45 170 24 225 24"></path><circle class="tb-point" cx="130" cy="63" r="6"></circle>
+</svg>
+</div>
+<p><span class="toolbox-forward">FORWARD</span> <span class="math display">\[
+y=\tanh(x)
+\]</span></p>
+<p><span class="toolbox-backward">BACKWARD MESSAGE</span> <span class="math display">\[
+g_x=g_y(1-y^2)
+\]</span></p>
+<p><strong class="toolbox-memory">one minus output squared</strong></p>
+</div>
+</div>
+<div class="notes">
+<p>Reveal one card at a time. For every card, ask students to identify the stored forward value, the incoming message, and the local derivative. Linear is the only block here that sends three kinds of message; sigmoid and tanh are elementwise gates.</p>
+</div>
+</section>
+<section id="gates-probabilities-and-losses" class="level2">
+<h2 class="anchored" data-anchor-id="gates-probabilities-and-losses">Gates, probabilities, and losses</h2>
+<div class="toolbox-grid">
+<div class="fragment toolbox-card relu-tool-card">
+<p><span class="toolbox-name">RELU</span></p>
+<div class="toolbox-visual" aria-label="A ReLU curve blocks negative inputs and passes positive inputs.">
+<svg viewbox="0 0 260 125" role="img">
+<path class="tb-axis" d="M22 98H240M105 114V12"></path><path class="tb-curve" d="M35 98H105L220 20"></path><circle class="tb-point" cx="105" cy="98" r="6"></circle>
+</svg>
+</div>
+<p><span class="toolbox-forward">FORWARD</span> <span class="math display">\[
+y=\max(0,x)
+\]</span></p>
+<p><span class="toolbox-backward">BACKWARD MESSAGE</span> <span class="math display">\[
+g_x=g_y\,\mathbf 1[x&gt;0]
+\]</span></p>
+<p><strong class="toolbox-memory">pass or block</strong></p>
+</div>
+<div class="fragment toolbox-card softmax-tool-card">
+<p><span class="toolbox-name">SOFTMAX</span></p>
+<div class="toolbox-visual" aria-label="Three logits are normalized into probability bars that sum to one.">
+<svg viewbox="0 0 260 125" role="img">
+<g class="tb-bars muted"><rect x="25" y="62" width="25" height="43"></rect><rect x="58" y="25" width="25" height="80"></rect><rect x="91" y="78" width="25" height="27"></rect></g><path class="tb-arrow" d="M126 63H158"></path><g class="tb-bars"><rect x="170" y="77" width="25" height="28"></rect><rect x="203" y="35" width="25" height="70"></rect></g><text x="198" y="22">Σp=1</text>
+</svg>
+</div>
+<p><span class="toolbox-forward">FORWARD</span> <span class="math display">\[
+p_i=\frac{e^{z_i}}{\sum_j e^{z_j}}
+\]</span></p>
+<p><span class="toolbox-backward">VECTOR–JACOBIAN PRODUCT</span> <span class="math display">\[
+\mathbf g_z=\mathbf p\odot
+\left(\mathbf g_p-\mathbf p^\top\mathbf g_p\right)
+\]</span></p>
+<p><strong class="toolbox-memory">the outputs interact</strong></p>
+</div>
+<div class="fragment toolbox-card ce-tool-card">
+<p><span class="toolbox-name">CROSS-ENTROPY</span></p>
+<div class="toolbox-visual" aria-label="Predicted probability bars are compared with a one-hot target.">
+<svg viewbox="0 0 260 125" role="img">
+<g class="tb-bars"><rect x="30" y="82" width="32" height="23"></rect><rect x="70" y="34" width="32" height="71"></rect><rect x="110" y="72" width="32" height="33"></rect></g><path class="tb-target" d="M178 100V24"></path><text x="178" y="118">target</text><path class="tb-arrow coral" d="M151 63H194"></path><circle class="tb-loss-dot" cx="222" cy="63" r="23"></circle><text class="light-svg" x="222" y="69">L</text>
+</svg>
+</div>
+<p><span class="toolbox-forward">FORWARD</span> <span class="math display">\[
+\mathcal L=-\sum_i y_i\log p_i
+\]</span></p>
+<p><span class="toolbox-backward">FUSED SHORTCUTS</span> <span class="math display">\[
+\text{softmax + CE:}\quad \mathbf g_z=\mathbf p-\mathbf y
+\]</span> <span class="math display">\[
+\text{sigmoid + BCE:}\quad g_z=\hat y-y
+\]</span></p>
+<p><strong class="toolbox-memory">prediction minus target</strong></p>
+</div>
+</div>
+<div class="fragment toolbox-footer">
+<p>Do not memorize six unrelated formulas. Identify the <strong>incoming message</strong> and multiply by the block’s <strong>local derivative</strong>.</p>
+</div>
+<div class="notes">
+<p>ReLU is a hard gate. Softmax is different from the elementwise activations because changing one logit changes every output probability. End with the fused loss shortcuts: these are the expressions students will use most often in classifiers.</p>
+</div>
+</section>
+</section>
+<section id="automatic-differentiation" class="level1 section-slide autodiff-section" data-section-progress="5 / 6" style="--section-progress:83.333%">
+<h1 class="section-slide autodiff-section" data-section-progress="5 / 6" style="--section-progress:83.333%">05 · Automatic differentiation</h1>
+<section id="the-same-graphnow-automatic" class="level2">
+<h2 class="anchored" data-anchor-id="the-same-graphnow-automatic">The same graph—now automatic</h2>
+<div class="micrograd-demo-layout">
+<div class="micrograd-code-panel">
+<p><span class="demo-kicker">MICROGRAD · FORWARD</span></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> micrograd.engine <span class="im">import</span> Value</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> Value(<span class="fl">1.0</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> ((x<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> <span class="dv">1</span>)<span class="op">**</span><span class="dv">3</span> <span class="op">-</span> <span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="fragment">
+<p><span class="demo-kicker backward-kicker">ONE BACKWARD CALL</span></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>L.backward()</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(x.grad)  <span class="co"># 288.0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+<div class="micrograd-demo-graph">
+<p><img src="assets/scalar-backprop-step-5.svg" class="img-fluid" alt="The familiar scalar graph after its complete backward pass, ending with derivative 288 at x."></p>
+</div>
+</div>
+<div class="fragment micrograd-question">
+<p>The answer is familiar. What did each <code>Value</code> have to remember for <code>backward()</code> to recover it?</p>
+</div>
+<div class="micrograd-source">
+<p>Demonstration API: <a href="https://github.com/karpathy/micrograd">Karpathy’s micrograd</a></p>
+</div>
+<div class="notes">
+<p>Run the forward lines first and ask what x and L contain. Reveal the backward call only after students predict its result. Micrograd is intentionally a black box in this lecture; students will build the box during the coding session.</p>
+</div>
+</section>
+<section id="inspect-the-value-objects-created-by-code" class="level2">
+<h2 class="anchored" data-anchor-id="inspect-the-value-objects-created-by-code">Inspect the <code>Value</code> objects created by code</h2>
+<div class="value-inspector-code">
+<div class="value-composed-code">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>x, y, z <span class="op">=</span> Value(<span class="fl">2.0</span>), Value(<span class="fl">3.0</span>), Value(<span class="fl">1.0</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> x <span class="op">*</span> y       <span class="co"># 6</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> a <span class="op">+</span> z       <span class="co"># 7</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> b <span class="op">**</span> <span class="dv">2</span>      <span class="co"># 49</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="value-composed-formula">
+<p><strong class="composed-expression">𝓛 = (xy + z)²</strong> <span>Every operator returns a new <code>Value</code>.</span></p>
+</div>
+</div>
+<div class="value-inspector">
+<div class="inspector-head">
+<span>PYTHON NAME</span><span>data</span><span>grad</span><span>_op</span><span>_prev</span><span>_backward</span>
+</div>
+<div class="fragment inspector-row leaf-row">
+<strong>x · y · z</strong><code>2 · 3 · 1</code><code>0</code><code>leaf</code><code>∅</code><code>no-op</code>
+</div>
+<div class="fragment inspector-row multiply-row">
+<strong>a</strong><code>6</code><code>0</code><code>’*’</code><code>{x, y}</code><code>multiply backward</code>
+</div>
+<div class="fragment inspector-row add-row">
+<strong>b</strong><code>7</code><code>0</code><code>‘+’</code><code>{a, z}</code><code>add backward</code>
+</div>
+<div class="fragment inspector-row power-row">
+<strong>L</strong><code>49</code><code>0</code><code>’**2’</code><code>{b}</code><code>power backward</code>
+</div>
+</div>
+<div class="fragment value-after-backward">
+<p><span>AFTER <code>L.backward()</code></span> <code>L.grad = 1</code><code>b.grad = 14</code><code>a.grad = 14</code><code>x.grad = 42</code><code>y.grad = 28</code><code>z.grad = 14</code></p>
+</div>
+<div class="notes">
+<p>Execute the expression one line at a time. Each overloaded Python operator constructs and returns a new Value. Read each inspector row across: the forward result, initial gradient, operation label, parent references, and the operation-specific backward closure. Only after all rows are understood should L.backward be revealed.</p>
+</div>
+</section>
+<section id="what-does-backward-actually-do" class="level2">
+<h2 class="anchored" data-anchor-id="what-does-backward-actually-do">What does <code>backward()</code> actually do?</h2>
+<div class="backward-algorithm-layout">
+<div class="backward-order-panel">
+<span class="algorithm-label">REVERSE TOPOLOGICAL ORDER</span>
+<div class="order-row">
+<i>forward</i><b><span class="math inline">\(x\)</span></b><span>→</span><b><span class="math inline">\(a\)</span></b><span>→</span><b><span class="math inline">\(b\)</span></b><span>→</span><b><span class="math inline">\(\mathcal L\)</span></b>
+</div>
+<div class="order-row backward-order">
+<i>backward</i><b><span class="math inline">\(x\)</span></b><span>←</span><b><span class="math inline">\(a\)</span></b><span>←</span><b><span class="math inline">\(b\)</span></b><span>←</span><b><span class="math inline">\(\mathcal L\)</span></b>
+</div>
+</div>
+<div class="backward-pseudocode">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>L.grad <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> node <span class="kw">in</span> <span class="bu">reversed</span>(topological_order):</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    node._backward()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+<div class="fragment accumulation-rule">
+<p><span>THE LINE THAT MAKES BRANCHING WORK</span></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>parent.grad <span class="op">+=</span> node.grad <span class="op">*</span> local_derivative</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong><code>+=</code> adds contributions from every path.</strong></p>
+</div>
+<div class="notes">
+<p>Topological order guarantees that every child has sent its message before a node runs its local backward rule. Pause on plus-equals: assignment would erase a contribution whenever a value is reused in more than one place.</p>
+</div>
+</section>
+<section id="coding-session-build-the-black-box" class="level2">
+<h2 class="anchored" data-anchor-id="coding-session-build-the-black-box">Coding session · Build the black box</h2>
+<div class="coding-handoff-goal">
+<span>THE TARGET</span>
+<pre class="handoff-code"><code>x = Value(1.0)
+a = x**2
+b = a + 1
+c = b**3
+d = c - 2
+L = d**2
+
+L.backward()
+assert x.grad == 288.0</code></pre>
+</div>
+<div class="coding-handoff-steps">
+<div class="fragment">
+<span>01</span><strong>Store the graph</strong><small><code>data</code>, <code>grad</code>, parents, operation</small>
+</div>
+<div class="fragment">
+<span>02</span><strong>Define local rules</strong><small>addition, multiplication, power</small>
+</div>
+<div class="fragment">
+<span>03</span><strong>Order the nodes</strong><small>topological traversal</small>
+</div>
+<div class="fragment">
+<span>04</span><strong>Pass messages</strong><small>seed, reverse, accumulate</small>
+</div>
+<div class="fragment">
+<span>05</span><strong>Extend the engine</strong><small>activation, neuron, tiny MLP</small>
+</div>
+</div>
+<div class="fragment coding-handoff-close">
+<p>In the lecture, <code>Value</code> was the tool. In the coding session, <strong><code>Value</code> is the assignment.</strong></p>
+</div>
+<div class="notes">
+<p>This slide is the contract for the coding session. The students are not asked to use unexplained future machinery: they will implement the exact mechanism motivated by the lecture and verify it against a derivative they already trust.</p>
+</div>
+</section>
+</section>
+<section id="what-gradients-reveal" class="level1 section-slide diagnostics-section" data-section-progress="6 / 6" style="--section-progress:100%">
+<h1 class="section-slide diagnostics-section" data-section-progress="6 / 6" style="--section-progress:100%">06 · What gradients reveal</h1>
+<section id="read-a-gradient-before-using-it" class="level2">
+<h2 class="anchored" data-anchor-id="read-a-gradient-before-using-it">Read a gradient before using it</h2>
+<div class="gradient-reading-grid">
+<div class="fragment gradient-reading-card sign-card">
+<span class="reading-icon">− / +</span>
+<h3 class="anchored">
+Sign
+</h3>
+<strong>Which local direction raises the loss?</strong>
+<p>
+<span class="math inline">\(g_w&lt;0\)</span>: increasing <span class="math inline">\(w\)</span> locally lowers the loss.<br><span class="math inline">\(g_w&gt;0\)</span>: increasing <span class="math inline">\(w\)</span> locally raises the loss.
+</p>
+</div>
+<div class="fragment gradient-reading-card magnitude-card">
+<span class="reading-icon">|g|</span>
+<h3 class="anchored">
+Magnitude
+</h3>
+<strong>How sensitive is the loss?</strong>
+<p>
+Large <span class="math inline">\(|g_w|\)</span>: a small change in <span class="math inline">\(w\)</span> has a strong local effect.<br>Small <span class="math inline">\(|g_w|\)</span>: weak local sensitivity.
+</p>
+</div>
+<div class="fragment gradient-reading-card zero-card">
+<span class="reading-icon">0</span>
+<h3 class="anchored">
+Near zero
+</h3>
+<strong>A clue—not a diagnosis.</strong>
+<p>
+The parameter may be locally irrelevant, a unit may be saturated, or several path contributions may cancel.
+</p>
+</div>
+</div>
+<div class="fragment gradient-interpretation-example">
+<span>QUICK READ</span> <span class="math display">\[
+\nabla_{\mathbf w}\mathcal L=\begin{bmatrix}-0.80 &amp; 0.02 &amp; 0.00\end{bmatrix}
+\]</span>
+<p>
+<span class="math inline">\(w_1\)</span> has the strongest local influence; <span class="math inline">\(w_2\)</span> is weakly sensitive; <span class="math inline">\(w_3\)</span> requires investigation before we call it “unimportant.”
+</p>
+</div>
+<div class="notes">
+<p>Ask students to interpret signs before magnitudes. Avoid converting the gradient into an update; that belongs to optimization. Emphasize that a zero gradient has several possible causes and must be interpreted using the graph and forward activations.</p>
+</div>
+</section>
+<section id="read-gradient-flow-across-layers" class="level2">
+<h2 class="anchored" data-anchor-id="read-gradient-flow-across-layers">Read gradient flow across layers</h2>
+<div class="gradient-flow-gallery">
+<div class="fragment gradient-flow-card healthy-flow">
+<span>HEALTHY FLOW</span>
+<div class="flow-bars">
+<i style="--bar:82%"></i><i style="--bar:68%"></i><i style="--bar:59%"></i><i style="--bar:48%"></i>
+</div>
+<strong>Messages remain measurable</strong>
+<p>
+Earlier layers still receive useful sensitivity.
+</p>
+</div>
+<div class="fragment gradient-flow-card vanishing-flow">
+<span>VANISHING</span>
+<div class="flow-bars">
+<i style="--bar:82%"></i><i style="--bar:38%"></i><i style="--bar:13%"></i><i style="--bar:3%"></i>
+</div>
+<strong>Messages shrink backward</strong>
+<p>
+Repeated small local derivatives can starve early layers.
+</p>
+</div>
+<div class="fragment gradient-flow-card exploding-flow">
+<span>EXPLODING</span>
+<div class="flow-bars">
+<i style="--bar:18%"></i><i style="--bar:35%"></i><i style="--bar:66%"></i><i style="--bar:100%"></i>
+</div>
+<strong>Messages grow backward</strong>
+<p>
+Repeated large transformations can create unstable sensitivity.
+</p>
+</div>
+</div>
+<div class="fragment flow-reading-key">
+<span>loss side</span>
+<div>
+backward direction&nbsp; ←
+</div>
+<p><span>input side</span></p>
+</div>
+<div class="fragment diagnostic-boundary">
+<p>Gradients expose the symptom. Initialization, architecture, normalization, and optimization determine what we do about it later.</p>
+</div>
+<div class="notes">
+<p>Read each set of bars from the loss side toward the input side. The diagrams are qualitative signatures rather than fixed numerical thresholds. This slide establishes diagnostic vocabulary; defer remedies to the relevant architecture and optimization lectures.</p>
+</div>
+</section>
+<section id="backpropagation-in-five-moves" class="level2">
+<h2 class="anchored" data-anchor-id="backpropagation-in-five-moves">Backpropagation in five moves</h2>
+<div class="final-rule-strip">
+<div class="fragment">
+<span>01</span><strong>Compute forward</strong><small>Store the values local rules will need.</small>
+</div>
+<div class="fragment">
+<span>02</span><strong>Seed the loss</strong><small>Set <code>loss.grad</code> to 1.</small>
+</div>
+<div class="fragment">
+<span>03</span><strong>Move backward</strong><small>Use reverse topological order.</small>
+</div>
+<div class="fragment">
+<span>04</span><strong>Transform locally</strong><small>Incoming gradient × local derivative.</small>
+</div>
+<div class="fragment">
+<span>05</span><strong>Add paths</strong><small>Add every contribution; never overwrite.</small>
+</div>
+</div>
+<div class="fragment final-memory-panel">
+<p><span>THE WHOLE IDEA</span> <strong>Receive messages · add them · apply the local rule · send messages to parents.</strong></p>
+</div>
+<div class="final-resource-grid">
+<a href="../../notes/03-backpropagation/two-layer-derivation.html"><span>REFERENCE</span><strong>Full two-layer derivation</strong><small>Read online →</small></a> <a href="../../notes/03-backpropagation/two-layer-derivation.pdf"><span>PDF</span><strong>Step-by-step backward pass</strong><small>Download →</small></a>
+<div>
+<span>NEXT</span><strong>Build <code>Value</code> from scratch</strong><small>Coding session →</small>
+</div>
+</div>
+<div class="fragment exit-ticket">
+<p><span>EXIT TICKET</span> Why must a backward engine use <code>parent.grad += ...</code> rather than <code>parent.grad = ...</code>?</p>
+</div>
+<div class="notes">
+<p>Reveal the five moves briskly and have the class speak the final memory sentence together. End with the exit ticket. The expected answer is that a parent can influence the loss through several children, so overwriting would discard all but one path contribution.</p>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Deep Learning · ENSA Tétouan</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

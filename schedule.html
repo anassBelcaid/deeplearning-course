@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Fourteen weeks, seven connected parts">
+
+<title>Schedule – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-2e7c9b518fe54fcaa4a8b379123416fc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    <img src="./assets/mark.svg" alt="" class="navbar-logo light-content">
+    <img src="./assets/mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./schedule.html" aria-current="page"> 
+<span class="menu-text">Schedule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./logistics.html"> 
+<span class="menu-text">Logistics</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+  
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content column-page" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Schedule</h1>
+</div>
+
+<div>
+  <div class="description">
+    Fourteen weeks, seven connected parts
+  </div>
+</div>
+
+
+<div class="quarto-title-meta column-page">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="schedule-intro">
+<p>The course moves from first principles to complete learning systems. Color marks a change of theme; project tracks show how practical work develops across several weeks.</p>
+<p><span class="status-chip">Provisional roadmap</span></p>
+</div>
+<div class="schedule-legend">
+<p><span class="legend-item"><i class="dot foundations"></i> Foundations</span> <span class="legend-item"><i class="dot scratch"></i> From scratch</span> <span class="legend-item"><i class="dot optimization"></i> Optimization</span> <span class="legend-item"><i class="dot pytorch"></i> PyTorch</span> <span class="legend-item"><i class="dot vision"></i> Vision</span> <span class="legend-item"><i class="dot sequences"></i> Sequences</span> <span class="legend-item"><i class="dot generative"></i> Generative models</span></p>
+</div>
+<div class="schedule-table">
+<div class="schedule-head">
+<p><span>Week &amp; topic</span><span>Course material</span><span>Useful links</span><span>Project track</span></p>
+</div>
+<div class="part-banner foundations">
+<p><span>Part I</span></p>
+<section id="foundations" class="level2">
+<h2 class="anchored" data-anchor-id="foundations">Foundations</h2>
+<p>What does it mean for a model to learn?</p>
+</section>
+</div>
+<div class="week-row foundations">
+<div class="week-topic">
+<p><span class="week-number">Week 01</span></p>
+<section id="what-does-it-mean-to-learn" class="level3">
+<h3 class="anchored" data-anchor-id="what-does-it-mean-to-learn">What Does It Mean to Learn?</h3>
+<p>Learning problems, data splits, losses, generalization, and linear models.</p>
+</section>
+</div>
+<div class="material-cell">
+<p><a href="./notes/01-what-is-learning/index.html" class="material-pill available">Notes</a><a href="notes/01-what-is-learning/index.pdf" class="material-pill available">PDF</a><a href="./lectures/01-what-is-learning/index.html" class="material-pill available">Slides</a><a href="./projects/01-classical-vision/index.html" class="material-pill available">Assignment</a></p>
+</div>
+<div class="links-cell">
+<p><a class="resource-mini read required" href="https://cs231n.github.io/classification/"><i>◫</i><span>CS231n · Classification</span></a> <a class="resource-mini read" href="https://www.deeplearningbook.org/contents/ml.html"><i>◫</i><span>DL Book · Ch. 5</span></a> <a class="resource-mini paper" href="https://homes.cs.washington.edu/~pedrod/papers/cacm12.pdf"><i>▤</i><span>Domingos · 2012</span></a> <a class="resource-mini practice" href="https://developers.google.com/machine-learning/crash-course/classification/accuracy-precision-recall"><i>✎</i><span>Metrics exercise</span></a></p>
+</div>
+<div class="project-cell">
+<p><span class="project-label">Homework 01 · Classical vision</span></p>
+<p><a href="./projects/01-classical-vision/starter/knn_cifar10.html">kNN notebook</a> · <a href="./projects/01-classical-vision/starter/softmax_cifar10.html">Softmax notebook</a> · <a href="./projects/01-classical-vision/starter/svm_cifar10.html">SVM notebook</a></p>
+</div>
+</div>
+<div class="part-banner scratch">
+<p><span>Part II</span></p>
+<section id="neural-networks-from-scratch" class="level2">
+<h2 class="anchored" data-anchor-id="neural-networks-from-scratch">Neural Networks from Scratch</h2>
+<p>Open the black box before using a framework.</p>
+</section>
+</div>
+<div class="week-row scratch">
+<div class="week-topic">
+<p><span class="week-number">Week 02</span></p>
+<section id="neurons-and-multilayer-networks" class="level3">
+<h3 class="anchored" data-anchor-id="neurons-and-multilayer-networks">Neurons and Multilayer Networks</h3>
+<p>Activations, MLPs, forward propagation, and representation capacity.</p>
+</section>
+</div>
+<div class="material-cell">
+<p><a href="./notes/02-neurons-mlps/index.html" class="material-pill available">Notes</a><a href="notes/02-neurons-mlps/index.pdf" class="material-pill available">PDF</a><a href="./lectures/02-neurons-mlps/index.html" class="material-pill available">Slides</a><a href="./projects/02-neural-boundaries/index.html" class="material-pill available">Project</a></p>
+</div>
+<div class="links-cell">
+<p><a class="resource-mini read required" href="https://cs231n.github.io/neural-networks-1/"><i>◫</i><span>CS231n · Neural Networks I</span></a> <a class="resource-mini read" href="https://www.deeplearningbook.org/contents/mlp.html"><i>◫</i><span>DL Book · Ch. 6</span></a> <a class="resource-mini practice" href="https://cs231n.github.io/neural-networks-case-study/"><i>✎</i><span>Spiral case study</span></a></p>
+</div>
+<div class="project-cell track-start">
+<p><a class="project-track-link" href="./projects/02-neural-boundaries/index.html"><span class="project-label">Project 1 · From scratch</span><br>Build the forward pass.</a></p>
+</div>
+</div>
+<div class="week-row scratch">
+<div class="week-topic">
+<p><span class="week-number">Week 03</span></p>
+<section id="backpropagation-and-autodiff" class="level3">
+<h3 class="anchored" data-anchor-id="backpropagation-and-autodiff">Backpropagation and Autodiff</h3>
+<p>Computational graphs, chain rule, autograd, and gradient checking.</p>
+</section>
+</div>
+<div class="material-cell">
+<p><a href="./notes/03-backpropagation/index.html" class="material-pill available">Notes</a><a href="notes/03-backpropagation/index.pdf" class="material-pill available">PDF</a><a href="./lectures/03-backpropagation/index.html" class="material-pill available">Slides</a><a href="projects/03-autograd/index.html" class="material-pill available">Project</a></p>
+</div>
+<div class="links-cell">
+<p><a class="resource-mini read required" href="https://www.cs.toronto.edu/~rgrosse/courses/csc321_2017/slides/lec6.pdf"><i>◫</i><span>CSC321 · Backpropagation</span></a> <a class="resource-mini read" href="https://www.nature.com/articles/323533a0"><i>◫</i><span>Rumelhart et al.&nbsp;· 1986</span></a> <a class="resource-mini read" href="https://cs231n.github.io/optimization-2/"><i>◫</i><span>CS231n · Backprop intuitions</span></a> <a class="resource-mini practice" href="https://github.com/karpathy/micrograd"><i>⌘</i><span>Karpathy · micrograd</span></a></p>
+</div>
+<div class="project-cell track-middle">
+<p><a class="project-track-link" href="projects/03-autograd/index.html"><span class="project-label">Project 1 · Autodiff</span><br>Add backward propagation.</a></p>
+</div>
+</div>
+<div class="part-banner optimization">
+<p><span>Part III</span></p>
+<section id="optimization-and-generalization" class="level2">
+<h2 class="anchored" data-anchor-id="optimization-and-generalization">Optimization and Generalization</h2>
+<p>Make neural networks learn reliably.</p>
+</section>
+</div>
+<div class="week-row optimization">
+<div class="week-topic">
+<p><span class="week-number">Week 04</span></p>
+<section id="optimizing-neural-networks" class="level3">
+<h3 class="anchored" data-anchor-id="optimizing-neural-networks">Optimizing Neural Networks</h3>
+<p>SGD, momentum, Adam, learning rates, schedules, and failure diagnosis.</p>
+</section>
+</div>
+<div class="material-cell">
+<p><a href="notes/04-optimization/index.html" class="material-pill available">Notes</a><a href="notes/04-optimization/index.pdf" class="material-pill available">PDF</a><a href="lectures/04-optimization/index.html" class="material-pill available">Slides</a><a href="labs/04-optimization/index.html" class="material-pill available">Lab</a></p>
+</div>
+<div class="links-cell">
+<p><a class="resource-mini explore required" href="https://gradientlab.ai/"><i>◎</i><span>Gradient Lab · Optimizer playground</span></a> <a class="resource-mini read required" href="https://distill.pub/2017/momentum/"><i>◫</i><span>Distill · Why Momentum Works</span></a> <a class="resource-mini read" href="https://www.deeplearningbook.org/contents/optimization.html"><i>◫</i><span>DL Book · Ch. 8</span></a> <a class="resource-mini read" href="https://arxiv.org/abs/1412.6980"><i>◫</i><span>Kingma &amp; Ba · Adam</span></a></p>
+</div>
+<div class="project-cell track-middle">
+<p><a class="project-track-link" href="labs/04-optimization/index.html"><span class="project-label">Lab 04</span><br>Implement and race optimizers.</a></p>
+</div>
+</div>
+<div class="week-row optimization">
+<div class="week-topic">
+<p><span class="week-number">Week 05</span></p>
+<section id="making-networks-train-reliably" class="level3">
+<h3 class="anchored" data-anchor-id="making-networks-train-reliably">Making Networks Train Reliably</h3>
+<p>Initialization, normalization, regularization, dropout, and tracking.</p>
+</section>
+</div>
+<div class="material-cell">
+<p><a href="notes/05-training-reliably/index.html" class="material-pill available">Notes</a><a href="notes/05-training-reliably/index.pdf" class="material-pill available">PDF</a><a href="lectures/05-training-reliably/index.html" class="material-pill available">Slides</a><a href="labs/05-reliable-training/index.html" class="material-pill available">Lab</a></p>
+</div>
+<div class="links-cell">
+<p><a class="resource-mini paper required" href="https://proceedings.mlr.press/v9/glorot10a.html"><i>□</i><span>Glorot &amp; Bengio · Xavier initialization</span></a> <a class="resource-mini paper required" href="https://openaccess.thecvf.com/content_iccv_2015/html/He_Delving_Deep_into_ICCV_2015_paper.html"><i>□</i><span>He et al.&nbsp;· Rectifier initialization</span></a> <a class="resource-mini paper required" href="https://proceedings.mlr.press/v37/ioffe15.html"><i>□</i><span>Ioffe &amp; Szegedy · Batch normalization</span></a> <a class="resource-mini paper" href="https://papers.nips.cc/paper_files/paper/2018/hash/905056c1ac1dad141560467e0a99e1cf-Abstract.html"><i>□</i><span>Santurkar et al.&nbsp;· Why BatchNorm helps</span></a> <a class="resource-mini paper" href="https://openreview.net/forum?id=Sy8gdB9xx"><i>□</i><span>Zhang et al.&nbsp;· Rethinking generalization</span></a> <a class="resource-mini paper required" href="https://www.jmlr.org/papers/v15/srivastava14a.html"><i>□</i><span>Srivastava et al.&nbsp;· Dropout</span></a> <a class="resource-mini paper" href="https://publikationen.bibliothek.kit.edu/7498"><i>□</i><span>Prechelt · Early stopping</span></a> <a class="resource-mini read" href="https://www.deeplearningbook.org/contents/regularization"><i>◫</i><span>DL Book · Regularization</span></a></p>
+</div>
+<div class="project-cell track-end">
+<p><a class="project-track-link" href="labs/05-reliable-training/index.html"><span class="project-label">Lab 05 · Training clinic</span><br>Diagnose and repair one image classifier.</a></p>
+<p>Project 1 report and reflection due.</p>
+</div>
+</div>
+<div class="part-banner pytorch">
+<p><span>Part IV</span></p>
+<section id="pytorch-fundamentals" class="level2">
+<h2 class="anchored" data-anchor-id="pytorch-fundamentals">PyTorch Fundamentals</h2>
+<p>Turn the mechanics into a reusable training system.</p>
+</section>
+</div>
+<div class="week-row pytorch">
+<div class="week-topic">
+<p><span class="week-number">Week 06</span></p>
+<section id="building-training-systems-with-pytorch" class="level3">
+<h3 class="anchored" data-anchor-id="building-training-systems-with-pytorch">Building Training Systems with PyTorch</h3>
+<p>Tensors, autograd, modules, data loaders, devices, and training loops.</p>
+</section>
+</div>
+<div class="material-cell">
+<p><a href="notes/06-pytorch/index.html" class="material-pill available">Notes</a><a href="notes/06-pytorch/index.pdf" class="material-pill available">PDF</a><a href="lectures/06-pytorch/index.html" class="material-pill available">Slides</a><a href="./projects/04-vision-system/starter/vision_training_system.html" class="material-pill available">Notebook</a></p>
+</div>
+<div class="links-cell">
+<p><a class="resource-mini read required" href="https://docs.pytorch.org/tutorials/beginner/basics/intro.html"><i>◫</i><span>PyTorch · Learn the Basics</span></a> <a class="resource-mini read required" href="https://docs.pytorch.org/tutorials/beginner/basics/quickstart_tutorial.html"><i>◫</i><span>PyTorch · Quickstart</span></a> <a class="resource-mini read" href="https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html"><i>◫</i><span>PyTorch · Automatic differentiation</span></a></p>
+</div>
+<div class="project-cell track-start">
+<p><a class="project-track-link" href="projects/04-vision-system/index.html"><span class="project-label">Project 2 · Vision system</span><br>Build the MLP training pipeline.</a></p>
+</div>
+</div>
+<div class="part-banner vision">
+<p><span>Part V</span></p>
+<section id="learning-from-images" class="level2">
+<h2 class="anchored" data-anchor-id="learning-from-images">Learning from Images</h2>
+<p>From spatial structure to modern visual systems.</p>
+</section>
+</div>
+<div class="week-row vision">
+<div class="week-topic">
+<p><span class="week-number">Week 07</span></p>
+<section id="convolutional-neural-networks" class="level3">
+<h3 class="anchored" data-anchor-id="convolutional-neural-networks">Convolutional Neural Networks</h3>
+<p>Convolution, padding, stride, receptive fields, pooling, and features.</p>
+</section>
+</div>
+<div class="material-cell">
+<p><a href="notes/07-convolutional-networks/index.html" class="material-pill available">Notes</a><a href="notes/07-convolutional-networks/index.pdf" class="material-pill available">PDF</a><a href="lectures/07-convolutional-networks/index.html" class="material-pill available">Slides</a><a href="./projects/04-vision-system/starter/vision_training_system.html" class="material-pill available">Notebook</a></p>
+</div>
+<div class="links-cell">
+<p><a class="resource-mini read required" href="https://cs231n.github.io/convolutional-networks/"><i>◫</i><span>CS231n · Convolutional networks</span></a> <a class="resource-mini read" href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Conv2d.html"><i>◫</i><span>PyTorch · Conv2d contract</span></a> <a class="resource-mini read" href="https://arxiv.org/abs/1701.04128"><i>◫</i><span>Luo et al.&nbsp;· Effective receptive fields</span></a></p>
+</div>
+<div class="project-cell track-middle">
+<p><a class="project-track-link" href="projects/04-vision-system/index.html"><span class="project-label">Project 2 · Vision system</span><br>Replace the MLP with a CNN and resume training.</a></p>
+</div>
+</div>
+<div class="week-row vision">
+<div class="week-topic">
+<p><span class="week-number">Week 08</span></p>
+<section id="modern-vision-architectures" class="level3">
+<h3 class="anchored" data-anchor-id="modern-vision-architectures">Modern Vision Architectures</h3>
+<p>VGG, NiN, Inception, residual learning, dense connectivity, and task-driven composition.</p>
+</section>
+</div>
+<div class="material-cell">
+<p><a href="notes/08-modern-vision-architectures/index.html" class="material-pill available">Notes</a><a href="notes/08-modern-vision-architectures/index.pdf" class="material-pill available">PDF</a><a href="lectures/08-modern-vision-architectures/index.html" class="material-pill available">Slides</a><a class="material-pill available" href="projects/05-flower-architectures/starter/flower_architectures.ipynb?download=1">Notebook</a></p>
+</div>
+<div class="links-cell">
+<p><a class="resource-mini read required" href="https://arxiv.org/abs/1409.1556"><i>◫</i><span>Simonyan &amp; Zisserman · Very deep CNNs</span></a> <a class="resource-mini read required" href="https://arxiv.org/abs/1512.03385"><i>◫</i><span>He et al.&nbsp;· Residual learning</span></a> <a class="resource-mini read" href="https://arxiv.org/abs/1608.06993"><i>◫</i><span>Huang et al.&nbsp;· Dense connectivity</span></a></p>
+</div>
+<div class="project-cell track-middle">
+<p><a class="project-track-link" href="projects/05-flower-architectures/index.html"><span class="project-label">Homework 3 · Flower architectures</span><br>VGG transfer and DenseNet from verified components.</a></p>
+</div>
+</div>
+<div class="week-row vision">
+<div class="week-topic">
+<p><span class="week-number">Week 09</span></p>
+<section id="segmentation-and-object-detection" class="level3">
+<h3 class="anchored" data-anchor-id="segmentation-and-object-detection">Segmentation and Object Detection</h3>
+<p>Dense prediction, U-Net, bounding boxes, IoU, NMS, and detectors.</p>
+</section>
+</div>
+<div class="material-cell">
+<p><a href="notes/09-segmentation-detection/index.html" class="material-pill available">Notes</a><a href="notes/09-segmentation-detection/index.pdf" class="material-pill available">PDF</a><a href="lectures/09-segmentation-detection/index.html" class="material-pill available">Slides</a><a href="labs/09-semantic-segmentation/index.html" class="material-pill available">Lab</a></p>
+</div>
+<div class="links-cell">
+<p><a class="resource-mini paper required" href="https://arxiv.org/abs/1505.04597"><i>□</i><span>Ronneberger et al.&nbsp;· U-Net</span></a> <a class="resource-mini paper required" href="https://openaccess.thecvf.com/content_cvpr_2015/html/Long_Fully_Convolutional_Networks_2015_CVPR_paper.html"><i>□</i><span>Long et al.&nbsp;· Fully Convolutional Networks</span></a> <a class="resource-mini paper required" href="https://papers.nips.cc/paper/2015/hash/14bfa6bb14875e45bba028a21ed38046-Abstract.html"><i>□</i><span>Ren et al.&nbsp;· Faster R-CNN</span></a> <a class="resource-mini paper" href="https://openaccess.thecvf.com/content_iccv_2017/html/He_Mask_R-CNN_ICCV_2017_paper.html"><i>□</i><span>He et al.&nbsp;· Mask R-CNN</span></a> <a class="resource-mini paper" href="https://openaccess.thecvf.com/content_iccv_2015/html/Xie_Holistically-Nested_Edge_Detection_ICCV_2015_paper.html"><i>□</i><span>Xie &amp; Tu · HED</span></a></p>
+</div>
+<div class="project-cell track-end">
+<p><a class="project-track-link" href="labs/09-semantic-segmentation/index.html"><span class="project-label">Lab 09 · Seeing every pixel</span><br>Open a pretrained segmenter and interpret its spatial predictions.</a></p>
+<p><span class="project-label">Project 2 · Due</span><br>Evaluation and model card.</p>
+</div>
+</div>
+<div class="part-banner sequences">
+<p><span>Part VI</span></p>
+<section id="learning-from-sequences" class="level2">
+<h2 class="anchored" data-anchor-id="learning-from-sequences">Learning from Sequences</h2>
+<p>Memory, recurrence, and temporally structured data.</p>
+</section>
+</div>
+<div class="week-row sequences">
+<div class="week-topic">
+<p><span class="week-number">Week 10</span></p>
+<section id="recurrent-neural-networks" class="level3">
+<h3 class="anchored" data-anchor-id="recurrent-neural-networks">Recurrent Neural Networks</h3>
+<p>Hidden states, recurrence, unrolling, BPTT, and unstable gradients.</p>
+</section>
+</div>
+<div class="material-cell">
+<p><span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span></p>
+</div>
+<div class="links-cell">
+<p><span class="coming-soon">Sequence visualizations · Readings</span></p>
+</div>
+<div class="project-cell track-start">
+<p><span class="project-label">Project 3 · Sequences</span><br>Baseline recurrent model.</p>
+</div>
+</div>
+<div class="week-row sequences">
+<div class="week-topic">
+<p><span class="week-number">Week 11</span></p>
+<section id="gated-recurrent-networks" class="level3">
+<h3 class="anchored" data-anchor-id="gated-recurrent-networks">Gated Recurrent Networks</h3>
+<p>GRU and LSTM gates, memory, and comparative behavior.</p>
+</section>
+</div>
+<div class="material-cell">
+<p><span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span></p>
+</div>
+<div class="links-cell">
+<p><span class="coming-soon">Gate diagrams · GRU/LSTM readings</span></p>
+</div>
+<div class="project-cell track-middle">
+<p><span class="project-label">Project 3</span><br>Compare RNN, GRU, and LSTM.</p>
+</div>
+</div>
+<div class="week-row sequences">
+<div class="week-topic">
+<p><span class="week-number">Week 12</span></p>
+<section id="sequence-learning-in-practice" class="level3">
+<h3 class="anchored" data-anchor-id="sequence-learning-in-practice">Sequence Learning in Practice</h3>
+<p>Padding, masking, bidirectionality, and variable-length batches.</p>
+</section>
+</div>
+<div class="material-cell">
+<p><span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span></p>
+</div>
+<div class="links-cell">
+<p><span class="coming-soon">PyTorch sequence utilities</span></p>
+</div>
+<div class="project-cell track-end">
+<p><span class="project-label">Project 3 · Due</span><br>Analysis and error study.</p>
+</div>
+</div>
+<div class="part-banner generative">
+<p><span>Part VII</span></p>
+<section id="generative-representation-learning" class="level2">
+<h2 class="anchored" data-anchor-id="generative-representation-learning">Generative Representation Learning</h2>
+<p>Learn a latent space and use it to create.</p>
+</section>
+</div>
+<div class="week-row generative">
+<div class="week-topic">
+<p><span class="week-number">Week 13</span></p>
+<section id="autoencoders" class="level3">
+<h3 class="anchored" data-anchor-id="autoencoders">Autoencoders</h3>
+<p>Bottlenecks, reconstruction, denoising, and latent representations.</p>
+</section>
+</div>
+<div class="material-cell">
+<p><span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span></p>
+</div>
+<div class="links-cell">
+<p><span class="coming-soon">Latent-space explorer · Readings</span></p>
+</div>
+<div class="project-cell track-start">
+<p><span class="project-label">Generative mini-project</span><br>Learn and inspect a latent space.</p>
+</div>
+</div>
+<div class="week-row generative">
+<div class="week-topic">
+<p><span class="week-number">Week 14</span></p>
+<section id="variational-autoencoders" class="level3">
+<h3 class="anchored" data-anchor-id="variational-autoencoders">Variational Autoencoders</h3>
+<p>Latent distributions, reparameterization, KL divergence, and sampling.</p>
+</section>
+</div>
+<div class="material-cell">
+<p><span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span></p>
+</div>
+<div class="links-cell">
+<p><span class="coming-soon">VAE paper · Interactive explanation</span></p>
+</div>
+<div class="project-cell track-end">
+<p><span class="project-label">Mini-project · Due</span><br>Interpolation and reflection.</p>
+</div>
+</div>
+</div>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Deep Learning · ENSA Tétouan</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

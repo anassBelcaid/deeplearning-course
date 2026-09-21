@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 330" role="img" aria-labelledby="title desc">
+  <title id="title">Four unlabeled local loss landscapes</title>
+  <desc id="desc">Four panels labeled A through D show a rising line, falling line, flat line, and steep rising line around a marked parameter value.</desc>
+  <style>
+    .panel{fill:#fffdf7;stroke:#d9d5cc;stroke-width:3}.axis{stroke:#9aa1a6;stroke-width:2}.curve{fill:none;stroke:#2878c8;stroke-width:7;stroke-linecap:round}.point{fill:#ef5b45;stroke:#bd3e2d;stroke-width:3}.letter{fill:#17212b;font:700 25px "Courier New",monospace}.axis-label{fill:#657079;font:italic 20px Georgia,serif}
+  </style>
+  <g transform="translate(5,5)"><rect class="panel" width="270" height="315" rx="20"/><text class="letter" x="20" y="40">A</text><line class="axis" x1="35" y1="270" x2="238" y2="270"/><line class="axis" x1="35" y1="270" x2="35" y2="65"/><path class="curve" d="M65 240L215 92"/><circle class="point" cx="140" cy="166" r="10"/><text class="axis-label" x="225" y="296">w</text></g>
+  <g transform="translate(305,5)"><rect class="panel" width="270" height="315" rx="20"/><text class="letter" x="20" y="40">B</text><line class="axis" x1="35" y1="270" x2="238" y2="270"/><line class="axis" x1="35" y1="270" x2="35" y2="65"/><path class="curve" d="M65 92L215 240"/><circle class="point" cx="140" cy="166" r="10"/><text class="axis-label" x="225" y="296">w</text></g>
+  <g transform="translate(605,5)"><rect class="panel" width="270" height="315" rx="20"/><text class="letter" x="20" y="40">C</text><line class="axis" x1="35" y1="270" x2="238" y2="270"/><line class="axis" x1="35" y1="270" x2="35" y2="65"/><path class="curve" d="M65 166L215 166"/><circle class="point" cx="140" cy="166" r="10"/><text class="axis-label" x="225" y="296">w</text></g>
+  <g transform="translate(905,5)"><rect class="panel" width="270" height="315" rx="20"/><text class="letter" x="20" y="40">D</text><line class="axis" x1="35" y1="270" x2="238" y2="270"/><line class="axis" x1="35" y1="270" x2="35" y2="65"/><path class="curve" d="M112 250L168 76"/><circle class="point" cx="140" cy="163" r="10"/><text class="axis-label" x="225" y="296">w</text></g>
+</svg>

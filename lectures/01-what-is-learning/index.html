@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dr.&nbsp;A. Belcaid">
+
+<title>What Does It Mean to Learn? – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2e7c9b518fe54fcaa4a8b379123416fc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+<script src="../../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../schedule.html"> 
+<span class="menu-text">Schedule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../logistics.html"> 
+<span class="menu-text">Logistics</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#what-does-it-mean-to-learn" id="toc-what-does-it-mean-to-learn" class="nav-link active" data-scroll-target="#what-does-it-mean-to-learn">What does it mean to learn?</a></li>
+  <li><a href="#you-already-know-the-answer" id="toc-you-already-know-the-answer" class="nav-link" data-scroll-target="#you-already-know-the-answer">You already know the answer</a></li>
+  <li><a href="#a-computer-begins-somewhere-else" id="toc-a-computer-begins-somewhere-else" class="nav-link" data-scroll-target="#a-computer-begins-somewhere-else">A computer begins somewhere else</a></li>
+  <li><a href="#the-task-in-one-line" id="toc-the-task-in-one-line" class="nav-link" data-scroll-target="#the-task-in-one-line">The task in one line</a></li>
+  <li><a href="#why-rules-collapse" id="toc-why-rules-collapse" class="nav-link" data-scroll-target="#why-rules-collapse">Why rules collapse</a></li>
+  <li><a href="#machine-learning-changes-what-we-write" id="toc-machine-learning-changes-what-we-write" class="nav-link" data-scroll-target="#machine-learning-changes-what-we-write">Machine learning changes what we write</a></li>
+  <li><a href="#todays-map" id="toc-todays-map" class="nav-link" data-scroll-target="#todays-map">Today’s map</a></li>
+  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data">01 · Data</a>
+  <ul class="collapse">
+  <li><a href="#a-dataset-is-a-collection-of-promises" id="toc-a-dataset-is-a-collection-of-promises" class="nav-link" data-scroll-target="#a-dataset-is-a-collection-of-promises">A dataset is a collection of promises</a></li>
+  <li><a href="#which-model-did-we-train" id="toc-which-model-did-we-train" class="nav-link" data-scroll-target="#which-model-did-we-train">Which model did we train?</a></li>
+  <li><a href="#four-questions-before-training" id="toc-four-questions-before-training" class="nav-link" data-scroll-target="#four-questions-before-training">Four questions before training</a></li>
+  <li><a href="#classical-ml-chooses-the-representation" id="toc-classical-ml-chooses-the-representation" class="nav-link" data-scroll-target="#classical-ml-chooses-the-representation">Classical ML chooses the representation</a></li>
+  <li><a href="#deep-learning-learns-the-representation" id="toc-deep-learning-learns-the-representation" class="nav-link" data-scroll-target="#deep-learning-learns-the-representation">Deep learning learns the representation</a></li>
+  </ul></li>
+  <li><a href="#hypothesis" id="toc-hypothesis" class="nav-link" data-scroll-target="#hypothesis">02 · Hypothesis</a>
+  <ul class="collapse">
+  <li><a href="#a-hypothesis-class-is-a-menu-of-rules" id="toc-a-hypothesis-class-is-a-menu-of-rules" class="nav-link" data-scroll-target="#a-hypothesis-class-is-a-menu-of-rules">A hypothesis class is a menu of rules</a></li>
+  <li><a href="#nearest-neighbor-learning-without-parameters" id="toc-nearest-neighbor-learning-without-parameters" class="nav-link" data-scroll-target="#nearest-neighbor-learning-without-parameters">Nearest neighbor: learning without parameters</a></li>
+  <li><a href="#linear-classification-one-score-per-class" id="toc-linear-classification-one-score-per-class" class="nav-link" data-scroll-target="#linear-classification-one-score-per-class">Linear classification: one score per class</a></li>
+  <li><a href="#watch-the-scores-vote" id="toc-watch-the-scores-vote" class="nav-link" data-scroll-target="#watch-the-scores-vote">Watch the scores vote</a></li>
+  <li><a href="#same-architecture-different-rule" id="toc-same-architecture-different-rule" class="nav-link" data-scroll-target="#same-architecture-different-rule">Same architecture, different rule</a></li>
+  </ul></li>
+  <li><a href="#loss" id="toc-loss" class="nav-link" data-scroll-target="#loss">03 · Loss</a>
+  <ul class="collapse">
+  <li><a href="#accuracy-is-silent-during-training" id="toc-accuracy-is-silent-during-training" class="nav-link" data-scroll-target="#accuracy-is-silent-during-training">Accuracy is silent during training</a></li>
+  <li><a href="#two-views-of-the-same-mistake" id="toc-two-views-of-the-same-mistake" class="nav-link" data-scroll-target="#two-views-of-the-same-mistake">Two views of the same mistake</a></li>
+  <li><a href="#svm-loss-the-correct-class-needs-room" id="toc-svm-loss-the-correct-class-needs-room" class="nav-link" data-scroll-target="#svm-loss-the-correct-class-needs-room">SVM loss: the correct class needs room</a></li>
+  <li><a href="#compute-it-together" id="toc-compute-it-together" class="nav-link" data-scroll-target="#compute-it-together">Compute it together</a></li>
+  <li><a href="#softmax-scores-become-probabilities" id="toc-softmax-scores-become-probabilities" class="nav-link" data-scroll-target="#softmax-scores-become-probabilities">Softmax: scores become probabilities</a></li>
+  <li><a href="#cross-entropy-asks-for-the-correct-probability" id="toc-cross-entropy-asks-for-the-correct-probability" class="nav-link" data-scroll-target="#cross-entropy-asks-for-the-correct-probability">Cross-entropy asks for the correct probability</a></li>
+  <li><a href="#same-goal-different-pressure" id="toc-same-goal-different-pressure" class="nav-link" data-scroll-target="#same-goal-different-pressure">Same goal, different pressure</a></li>
+  </ul></li>
+  <li><a href="#optimization" id="toc-optimization" class="nav-link" data-scroll-target="#optimization">04 · Optimization</a>
+  <ul class="collapse">
+  <li><a href="#the-learning-loop" id="toc-the-learning-loop" class="nav-link" data-scroll-target="#the-learning-loop">The learning loop</a></li>
+  <li><a href="#loss-tells-us-where-optimization-moves-us" id="toc-loss-tells-us-where-optimization-moves-us" class="nav-link" data-scroll-target="#loss-tells-us-where-optimization-moves-us">Loss tells us where; optimization moves us</a></li>
+  </ul></li>
+  <li><a href="#evaluation" id="toc-evaluation" class="nav-link" data-scroll-target="#evaluation">05 · Evaluation</a>
+  <ul class="collapse">
+  <li><a href="#fitting-is-not-learning" id="toc-fitting-is-not-learning" class="nav-link" data-scroll-target="#fitting-is-not-learning">Fitting is not learning</a></li>
+  <li><a href="#three-datasets-three-jobs" id="toc-three-datasets-three-jobs" class="nav-link" data-scroll-target="#three-datasets-three-jobs">Three datasets, three jobs</a></li>
+  <li><a href="#split-the-thing-that-must-generalize" id="toc-split-the-thing-that-must-generalize" class="nav-link" data-scroll-target="#split-the-thing-that-must-generalize">Split the thing that must generalize</a></li>
+  <li><a href="#training-success-can-hide-test-failure" id="toc-training-success-can-hide-test-failure" class="nav-link" data-scroll-target="#training-success-can-hide-test-failure">Training success can hide test failure</a></li>
+  <li><a href="#read-the-mistakes" id="toc-read-the-mistakes" class="nav-link" data-scroll-target="#read-the-mistakes">Read the mistakes</a></li>
+  <li><a href="#the-complete-experiment" id="toc-the-complete-experiment" class="nav-link" data-scroll-target="#the-complete-experiment">The complete experiment</a></li>
+  <li><a href="#one-task-two-visits" id="toc-one-task-two-visits" class="nav-link" data-scroll-target="#one-task-two-visits">One task, two visits</a></li>
+  <li><a href="#five-questions-to-keep" id="toc-five-questions-to-keep" class="nav-link" data-scroll-target="#five-questions-to-keep">Five questions to keep</a></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.html"><i class="bi bi-file-slides"></i>RevealJS</a></li></ul></div></nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">What Does It Mean to Learn?</h1>
+<p class="subtitle lead">Image classification and the five ingredients of machine learning</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dr.&nbsp;A. Belcaid </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="what-does-it-mean-to-learn" class="level2 deck-title">
+<h2 class="deck-title anchored" data-anchor-id="what-does-it-mean-to-learn">What does it mean to learn?</h2>
+<div class="deck-title-grid">
+<div class="deck-title-copy">
+<p><span class="eyebrow">CHAPTER 01 · FOUNDATIONS</span></p>
+<section id="image-classification-and-the-five-ingredients-of-machine-learning" class="level3">
+<h3 class="anchored" data-anchor-id="image-classification-and-the-five-ingredients-of-machine-learning">Image classification and the five ingredients of machine learning</h3>
+<p>We will build one complete learning problem—not memorize a list of definitions.</p>
+<p><span class="deck-author">Dr.&nbsp;A. Belcaid</span></p>
+</section>
+</div>
+<div class="deck-title-art">
+<p><img src="assets/image-classification-hero.png" class="img-fluid" alt="An illustrated image-classification pipeline from examples to pixels, a learned representation, and class scores."></p>
+</div>
+</div>
+</section>
+<section id="you-already-know-the-answer" class="level2 question-slide">
+<h2 class="question-slide anchored" data-anchor-id="you-already-know-the-answer">You already know the answer</h2>
+<div class="big-question">
+<p>What is in this image?</p>
+</div>
+<div class="mystery-image">
+<div class="cat-shape">
+<i></i><i></i><span></span>
+</div>
+</div>
+<div class="fragment answer">
+<p>Most people answer <strong>cat</strong> before consciously listing any rule.</p>
+</div>
+<div class="fragment takeaway">
+<p>Easy to recognize does not mean easy to program.</p>
+</div>
+<div class="notes">
+<p>Ask for an answer immediately, then ask students to write a complete cat-detection rule. Their disagreement creates the motivation for learning from examples. 4 minutes.</p>
+</div>
+</section>
+<section id="a-computer-begins-somewhere-else" class="level2">
+<h2 class="anchored" data-anchor-id="a-computer-begins-somewhere-else">A computer begins somewhere else</h2>
+<div class="cs231n-figure pixel-figure">
+<p><img src="assets/cs231n-classify.png" class="img-fluid" alt="A cat image with one region enlarged into RGB pixel values, followed by four class probabilities."></p>
+</div>
+<div class="pixel-fact fragment">
+<p><span>one image</span> <strong><span class="math inline">\(248\times400\times3=297{,}600\)</span></strong> <span>numbers in <span class="math inline">\([0,255]\)</span></span></p>
+</div>
+<div class="fragment takeaway">
+<p>The model receives numbers—not objects, meaning, or common sense.</p>
+</div>
+<p class="source-note">
+Illustration: <a href="https://cs231n.github.io/classification/">CS231n, Image Classification notes</a>.
+</p>
+</section>
+<section id="the-task-in-one-line" class="level2">
+<h2 class="anchored" data-anchor-id="the-task-in-one-line">The task in one line</h2>
+<div class="classification-rule">
+<p><span class="input-chip">image <span class="math inline">\(x\)</span></span> <i>→</i> <span class="model-chip">classifier <span class="math inline">\(f_\theta\)</span></span> <i>→</i> <span class="output-chip">label <span class="math inline">\(\hat y\)</span></span></p>
+</div>
+<p><span class="math display">\[
+f_\theta:\mathbb R^{H\times W\times3}\longrightarrow\mathbb R^K,
+\qquad
+\hat y=\arg\max_j f_\theta(x)_j
+\]</span></p>
+<div class="fragment prediction-vector">
+<div class="prediction-label">
+<span>cat</span><i style="--prob:82%"></i><b>0.82</b>
+</div>
+<div>
+<span>dog</span><i style="--prob:10%"></i><b>0.10</b>
+</div>
+<div>
+<span>fox</span><i style="--prob:5%"></i><b>0.05</b>
+</div>
+<div>
+<span>car</span><i style="--prob:3%"></i><b>0.03</b>
+</div>
+<p>
+<span class="math inline">\(p(y\mid x)\in\mathbb R^K\)</span> &nbsp; and &nbsp; <span class="math inline">\(\sum_{k=1}^{K}p(y=k\mid x)=1\)</span>
+</p>
+</div>
+</section>
+<section id="why-rules-collapse" class="level2">
+<h2 class="anchored" data-anchor-id="why-rules-collapse">Why rules collapse</h2>
+<div class="cs231n-figure challenge-figure">
+<p><img src="assets/cs231n-challenges.jpeg" class="img-fluid" alt="Examples of viewpoint variation, scale variation, deformation, occlusion, illumination changes, and background clutter in image classification."></p>
+</div>
+<div class="fragment big-summary">
+<p>The label stays fixed while viewpoint, scale, shape, visibility, light, and background all change.</p>
+</div>
+<p class="source-note">
+Illustration: <a href="https://cs231n.github.io/classification/">CS231n, Image Classification notes</a>.
+</p>
+</section>
+<section id="machine-learning-changes-what-we-write" class="level2">
+<h2 class="anchored" data-anchor-id="machine-learning-changes-what-we-write">Machine learning changes what we write</h2>
+<div class="two-worlds">
+<div class="world rules">
+<p><span>HANDWRITTEN PROGRAM</span></p>
+<section id="we-write-the-final-rule" class="level3">
+<h3 class="anchored" data-anchor-id="we-write-the-final-rule">We write the final rule</h3>
+<p>pixels + rules about color, edges, shape → class</p>
+</section>
+</div>
+<div class="world learning">
+<p><span>LEARNING SYSTEM</span></p>
+<section id="we-write-a-procedure-for-finding-a-rule" class="level3">
+<h3 class="anchored" data-anchor-id="we-write-a-procedure-for-finding-a-rule">We write a procedure for finding a rule</h3>
+<p>labeled images + learning algorithm → classifier</p>
+</section>
+</div>
+</div>
+<div class="fragment takeaway">
+<p>The difficult design work does not disappear. It moves.</p>
+</div>
+</section>
+<section id="todays-map" class="level2">
+<h2 class="anchored" data-anchor-id="todays-map">Today’s map</h2>
+<div class="cell" data-fig-width="11" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  A[1 · DATA&lt;br/&gt;experience] --&gt; B[2 · HYPOTHESIS&lt;br/&gt;possible rules]
+  B --&gt; C[3 · LOSS&lt;br/&gt;what wrong costs]
+  C --&gt; D[4 · OPTIMIZATION&lt;br/&gt;search]
+  D --&gt; E[5 · EVALUATION&lt;br/&gt;evidence]
+  E -. better questions .-&gt; A
+
+  classDef first fill:#2878c8,color:#fff,stroke:#2878c8
+  classDef middle fill:#fffdf7,color:#17212b,stroke:#657079
+  classDef last fill:#ef5b45,color:#fff,stroke:#ef5b45
+  class A first
+  class B,C,D middle
+  class E last
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<div class="timeline">
+<p><strong>Part I · 15 min</strong> task &nbsp; · &nbsp; <strong>Part II · 25 min</strong> data &amp; hypotheses &nbsp; · &nbsp; <strong>Part III · 25 min</strong> losses &nbsp; · &nbsp; <strong>Part IV · 20 min</strong> evaluation</p>
+</div>
+</section>
+<section id="data" class="level1 section-slide data-section">
+<h1 class="section-slide data-section">01 · Data</h1>
+<section id="a-dataset-is-a-collection-of-promises" class="level2">
+<h2 class="anchored" data-anchor-id="a-dataset-is-a-collection-of-promises">A dataset is a collection of promises</h2>
+<p><span class="math display">\[
+\mathcal D=\{(x^{(i)},y^{(i)})\}_{i=1}^{n}
+\]</span></p>
+<div class="dataset-example">
+<div class="dataset-batch">
+<p><img src="assets/cs231n-cifar10-classes.jpg" class="img-fluid" alt="A labeled sample from CIFAR-10 with ten example images for each of ten classes."></p>
+</div>
+<div class="dataset-promises">
+<div>
+<b><span class="math inline">\(x^{(i)}\)</span></b><span>one image</span>
+</div>
+<div>
+<b><span class="math inline">\(y^{(i)}\)</span></b><span>its class label</span>
+</div>
+<div>
+<b><span class="math inline">\(\mathcal D\)</span></b><span>a sample of future reality</span>
+</div>
+</div>
+</div>
+<div class="fragment danger-line">
+<p>The last promise is the easiest to break.</p>
+</div>
+<p class="source-note">
+Example: <a href="https://cs231n.github.io/classification/">CIFAR-10 batch from CS231n</a>.
+</p>
+</section>
+<section id="which-model-did-we-train" class="level2">
+<h2 class="anchored" data-anchor-id="which-model-did-we-train">Which model did we train?</h2>
+<div class="shortcut-scene">
+<div class="shortcut-column">
+<p><span class="scene sky">BLUE WATER</span></p>
+<p><strong>Every ship</strong></p>
+</div>
+<div class="shortcut-column">
+<p><span class="scene road">GRAY ROAD</span></p>
+<p><strong>Every car</strong></p>
+</div>
+</div>
+<div class="fragment big-question">
+<p>Object classifier—or background classifier?</p>
+</div>
+<div class="fragment takeaway danger">
+<p>A shortcut can be predictive in the dataset and useless after deployment.</p>
+</div>
+</section>
+<section id="four-questions-before-training" class="level2">
+<h2 class="anchored" data-anchor-id="four-questions-before-training">Four questions before training</h2>
+<div class="four-questions">
+<div class="question-card">
+<p><b>01</b></p>
+<p>Who or what produced the images?</p>
+</div>
+<div class="question-card">
+<p><b>02</b></p>
+<p>Who decided the labels?</p>
+</div>
+<div class="question-card">
+<p><b>03</b></p>
+<p>Which classes or conditions are missing?</p>
+</div>
+<div class="question-card">
+<p><b>04</b></p>
+<p>Will tomorrow look like today?</p>
+</div>
+</div>
+</section>
+<section id="classical-ml-chooses-the-representation" class="level2">
+<h2 class="anchored" data-anchor-id="classical-ml-chooses-the-representation">Classical ML chooses the representation</h2>
+<div class="canny-stages">
+<p><img src="assets/canny-six-stages.png" class="img-fluid" alt="Six stages of Canny edge detection: grayscale, Gaussian smoothing, gradient magnitude, non-maximum suppression, double thresholding, and hysteresis."></p>
+</div>
+<div class="feature-pipeline">
+<p><span>RGB image</span><i>→</i><strong>Canny edge map</strong><i>→</i><span>SVM / linear classifier</span><i>→</i><span>class scores</span></p>
+</div>
+<div class="takeaway">
+<p>The human decides which visual properties the classifier gets to see.</p>
+</div>
+<p class="source-note">
+Pipeline generated for this course; algorithm: <a href="https://docs.opencv.org/5.0/tutorials/imgproc/imgtrans/canny_detector/canny_detector.html">Canny (1986), OpenCV reference</a>.
+</p>
+</section>
+<section id="deep-learning-learns-the-representation" class="level2">
+<h2 class="anchored" data-anchor-id="deep-learning-learns-the-representation">Deep learning learns the representation</h2>
+<div class="vgg-figure">
+<p><img src="assets/vgg16-course-diagram.svg" class="img-fluid" alt="VGG-16 architecture from an RGB image through five learned convolutional blocks to 1000 ImageNet classes."></p>
+</div>
+<div class="takeaway">
+<p>The feature extractor and classifier are optimized together, end-to-end. <strong>We will learn how every block works later in the course.</strong></p>
+</div>
+<p class="source-note">
+Architecture: <a href="https://arxiv.org/abs/1409.1556">Simonyan &amp; Zisserman, VGG (2014)</a>. Diagram created for this course.
+</p>
+</section>
+</section>
+<section id="hypothesis" class="level1 section-slide hypothesis-section">
+<h1 class="section-slide hypothesis-section">02 · Hypothesis</h1>
+<section id="a-hypothesis-class-is-a-menu-of-rules" class="level2">
+<h2 class="anchored" data-anchor-id="a-hypothesis-class-is-a-menu-of-rules">A hypothesis class is a menu of rules</h2>
+<div class="model-menu">
+<div class="model-card memory fragment">
+<p><span>MEMORY</span></p>
+<section id="k-nearest-neighbors" class="level3">
+<h3 class="anchored" data-anchor-id="k-nearest-neighbors"><span class="math inline">\(k\)</span>-nearest neighbors</h3>
+<p>Look for similar training images.</p>
+<p><img src="assets/cs231n-knn-neighbors.jpg" class="img-fluid" alt="CIFAR-10 query images followed by their nearest training images under pixel distance."></p>
+</section>
+</div>
+<div class="model-card linear fragment">
+<p><span>TEMPLATES</span></p>
+<section id="linear-classifier" class="level3">
+<h3 class="anchored" data-anchor-id="linear-classifier">Linear classifier</h3>
+<p>Score pixels with <span class="math inline">\(Wx+b\)</span>.</p>
+<p><img src="assets/cs231n-linear-regions.jpeg" class="img-fluid" alt="Images arranged in a two-dimensional space with linear decision boundaries for airplane, car, and deer classifiers."></p>
+</section>
+</div>
+<div class="model-card neural fragment">
+<p><span>FEATURES</span></p>
+<section id="neural-network" class="level3">
+<h3 class="anchored" data-anchor-id="neural-network">Neural network</h3>
+<p>Compose learned nonlinear layers.</p>
+<p><img src="assets/cs231n-neural-boundary.png" class="img-fluid" alt="A neural network fitting nonlinear decision regions to a three-class spiral dataset."></p>
+</section>
+</div>
+</div>
+<div class="fragment big-summary">
+<p>Choosing the class decides what can possibly be learned.</p>
+</div>
+<p class="source-note">
+Illustrations: <a href="https://cs231n.github.io/classification/">CS231n · nearest neighbors</a>, <a href="https://cs231n.github.io/linear-classify/">linear classifiers</a>, and <a href="https://cs231n.github.io/neural-networks-case-study/">neural-network case study</a>.
+</p>
+</section>
+<section id="nearest-neighbor-learning-without-parameters" class="level2">
+<h2 class="anchored" data-anchor-id="nearest-neighbor-learning-without-parameters">Nearest neighbor: learning without parameters</h2>
+<div class="neighbor-demo">
+<div class="query-tile">
+<p><span>?</span></p>
+<p><strong>query image</strong></p>
+</div>
+<div class="neighbor-arrow">
+<p>find the closest →</p>
+</div>
+<div class="neighbor-list">
+<div class="near">
+<b>cat</b><span><span class="math inline">\(d=4.2\)</span></span>
+</div>
+<div>
+<b>dog</b><span><span class="math inline">\(d=5.7\)</span></span>
+</div>
+<div>
+<b>ship</b><span><span class="math inline">\(d=9.1\)</span></span>
+</div>
+</div>
+</div>
+<p><span class="math display">\[
+d(x,x_i)=\lVert x-x_i\rVert_2
+\]</span></p>
+<div class="fragment takeaway danger">
+<p>One-pixel translation: same object, very different raw-pixel distance.</p>
+</div>
+</section>
+<section id="linear-classification-one-score-per-class" class="level2">
+<h2 class="anchored" data-anchor-id="linear-classification-one-score-per-class">Linear classification: one score per class</h2>
+<div class="linear-layout">
+<div class="linear-equation">
+<p><span class="math display">\[
+s=Wx+b
+\]</span></p>
+<p><span class="math display">\[
+W\in\mathbb R^{K\times D},
+\quad x\in\mathbb R^D,
+\quad s\in\mathbb R^K
+\]</span></p>
+</div>
+<div class="dimension-stack">
+<p><span><b>image</b><span class="math inline">\(x\in\mathbb R^{3072}\)</span></span> <i>×</i> <span><b>templates</b><span class="math inline">\(W\in\mathbb R^{10\times3072}\)</span></span> <i>+</i> <span><b>bias</b><span class="math inline">\(b\in\mathbb R^{10}\)</span></span></p>
+</div>
+</div>
+<div class="takeaway">
+<p>Row <span class="math inline">\(W_j\)</span> is a learned pixel template for class <span class="math inline">\(j\)</span>.</p>
+</div>
+</section>
+<section id="watch-the-scores-vote" class="level2">
+<h2 class="anchored" data-anchor-id="watch-the-scores-vote">Watch the scores vote</h2>
+<div class="score-board">
+<div class="score-image">
+<div class="mini-cat">
+<i></i><i></i><span></span>
+</div>
+</div>
+<div class="score-list">
+<div>
+<span>cat</span><i style="--w:55%"></i><b>3.2</b>
+</div>
+<div class="winner">
+<span>dog</span><i style="--w:88%"></i><b>5.1</b>
+</div>
+<div>
+<span>ship</span><i style="--w:10%"></i><b>−1.7</b>
+</div>
+</div>
+</div>
+<div class="fragment wrong-prediction">
+<p>Correct label: <strong>cat</strong> · prediction: <strong>dog</strong></p>
+</div>
+<div class="fragment big-question">
+<p>How wrong is this prediction?</p>
+</div>
+</section>
+<section id="same-architecture-different-rule" class="level2">
+<h2 class="anchored" data-anchor-id="same-architecture-different-rule">Same architecture, different rule</h2>
+<div class="big-question">
+<p>Two students train the same linear-classifier code and obtain different matrices <span class="math inline">\(W\)</span>.</p>
+</div>
+<div class="choice-row">
+<div class="choice">
+<p>Different hypothesis classes?</p>
+</div>
+<div class="choice">
+<p>Different hypotheses?</p>
+</div>
+</div>
+<div class="fragment answer">
+<p>Same hypothesis class. Different learned members of that class.</p>
+</div>
+</section>
+</section>
+<section id="loss" class="level1 section-slide loss-section">
+<h1 class="section-slide loss-section">03 · Loss</h1>
+<section id="accuracy-is-silent-during-training" class="level2">
+<h2 class="anchored" data-anchor-id="accuracy-is-silent-during-training">Accuracy is silent during training</h2>
+<div class="accuracy-steps">
+<div>
+<p><span class="math inline">\(s_{\text{cat}}=3.20\)</span></p>
+<p>wrong</p>
+</div>
+<div class="fragment">
+<p><span class="math inline">\(s_{\text{cat}}=3.21\)</span></p>
+<p>still wrong</p>
+</div>
+<div class="fragment">
+<p><span class="math inline">\(s_{\text{cat}}=3.22\)</span></p>
+<p>still wrong</p>
+</div>
+</div>
+<div class="fragment danger-line">
+<p>The parameters improved—but 0/1 error did not move.</p>
+</div>
+<div class="fragment takeaway">
+<p>A training loss must say <strong>how wrong</strong>, not only <strong>wrong or right</strong>.</p>
+</div>
+</section>
+<section id="two-views-of-the-same-mistake" class="level2">
+<h2 class="anchored" data-anchor-id="two-views-of-the-same-mistake">Two views of the same mistake</h2>
+<div class="loss-question-grid">
+<div class="loss-question margin">
+<p><span>SVM</span></p>
+<p>Is the correct score ahead by a sufficient <strong>margin</strong>?</p>
+</div>
+<div class="loss-question probability">
+<p><span>SOFTMAX</span></p>
+<p>How much <strong>probability</strong> belongs to the correct class?</p>
+</div>
+</div>
+<div class="same-scores">
+<p>Same scores: <span class="math inline">\([3.2,\ 5.1,\ -1.7]\)</span> · correct class: cat</p>
+</div>
+</section>
+<section id="svm-loss-the-correct-class-needs-room" class="level2">
+<h2 class="anchored" data-anchor-id="svm-loss-the-correct-class-needs-room">SVM loss: the correct class needs room</h2>
+<div class="margin-track">
+<p><span class="correct" style="--x:53%">cat · 3.2</span> <span class="margin-zone" style="--x:69%">required margin</span> <span class="rival" style="--x:85%">dog · 5.1</span></p>
+</div>
+<p><span class="math display">\[
+L_i^{\text{SVM}}
+=\sum_{j\ne y}\max(0,s_j-s_y+\Delta)
+\]</span></p>
+<div class="fragment takeaway">
+<p>Zero loss only when the correct score beats every rival by at least <span class="math inline">\(\Delta\)</span>.</p>
+</div>
+</section>
+<section id="compute-it-together" class="level2">
+<h2 class="anchored" data-anchor-id="compute-it-together">Compute it together</h2>
+<p>For <span class="math inline">\(s=[3.2,5.1,-1.7]\)</span>, <span class="math inline">\(y=\text{cat}\)</span>, and <span class="math inline">\(\Delta=1\)</span>:</p>
+<div class="exercise-prompt">
+<p><strong>Your turn:</strong> compute the multiclass SVM loss for this example.</p>
+</div>
+<div class="exercise-pause">
+<p><span>PAUSE</span><b>90 seconds</b><small>Write the two margin terms before calculating.</small></p>
+</div>
+<div class="fragment exercise-solution">
+<p><span class="solution-label">SOLUTION</span></p>
+<p><span class="math display">\[
+\begin{aligned}
+L_i^{\text{SVM}}
+&amp;=\max(0,5.1-3.2+1)\\
+&amp;\quad+\max(0,-1.7-3.2+1)\\[4pt]
+&amp;=\boxed{2.9}
+\end{aligned}
+\]</span></p>
+</div>
+<div class="fragment exercise-extension">
+<p>What change to the scores would make the loss exactly zero?</p>
+</div>
+</section>
+<section id="softmax-scores-become-probabilities" class="level2">
+<h2 class="anchored" data-anchor-id="softmax-scores-become-probabilities">Softmax: scores become probabilities</h2>
+<p><span class="math display">\[
+p_j=\frac{e^{s_j}}{\sum_k e^{s_k}}
+\]</span></p>
+<div class="probability-bars">
+<div>
+<p><span>cat</span><i style="--p:13%"></i><b>0.130</b></p>
+</div>
+<div class="wrong">
+<p><span>dog</span><i style="--p:87%"></i><b>0.869</b></p>
+</div>
+<div>
+<p><span>ship</span><i style="--p:1%"></i><b>0.001</b></p>
+</div>
+</div>
+<div class="fragment takeaway">
+<p>Softmax preserves ranking and forces the outputs to sum to one.</p>
+</div>
+</section>
+<section id="cross-entropy-asks-for-the-correct-probability" class="level2">
+<h2 class="anchored" data-anchor-id="cross-entropy-asks-for-the-correct-probability">Cross-entropy asks for the correct probability</h2>
+<p><span class="math display">\[
+L_i^{\text{CE}}=-\log p_y
+\]</span></p>
+<div class="ce-visual">
+<div>
+<span><span class="math inline">\(p_y=0.90\)</span></span><b><span class="math inline">\(L=0.11\)</span></b><i class="good"></i>
+</div>
+<div>
+<span><span class="math inline">\(p_y=0.50\)</span></span><b><span class="math inline">\(L=0.69\)</span></b><i class="middle"></i>
+</div>
+<div>
+<span><span class="math inline">\(p_y=0.13\)</span></span><b><span class="math inline">\(L=2.04\)</span></b><i class="bad"></i>
+</div>
+<div>
+<span><span class="math inline">\(p_y=0.01\)</span></span><b><span class="math inline">\(L=4.61\)</span></b><i class="terrible"></i>
+</div>
+</div>
+<div class="fragment big-summary">
+<p>Confidently wrong predictions are expensive.</p>
+</div>
+</section>
+<section id="same-goal-different-pressure" class="level2">
+<h2 class="anchored" data-anchor-id="same-goal-different-pressure">Same goal, different pressure</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Multiclass SVM</th>
+<th>Softmax cross-entropy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>View</td>
+<td>score margins</td>
+<td>class probabilities</td>
+</tr>
+<tr class="even">
+<td>Satisfied when</td>
+<td>correct class clears <span class="math inline">\(\Delta\)</span></td>
+<td>correct probability approaches 1</td>
+</tr>
+<tr class="odd">
+<td>Beyond correct</td>
+<td>stops after margin</td>
+<td>keeps rewarding confidence</td>
+</tr>
+<tr class="even">
+<td>Typical output</td>
+<td>uncalibrated scores</td>
+<td>probability-like distribution</td>
+</tr>
+</tbody>
+</table>
+<div class="takeaway">
+<p>Both prefer the correct class. They shape the score space differently.</p>
+</div>
+</section>
+</section>
+<section id="optimization" class="level1 section-slide optimization-section">
+<h1 class="section-slide optimization-section">04 · Optimization</h1>
+<section id="the-learning-loop" class="level2 loop-slide">
+<h2 class="loop-slide anchored" data-anchor-id="the-learning-loop">The learning loop</h2>
+<div class="cell" data-fig-width="13" data-fig-height="5.4" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  A[sample a mini-batch&lt;br/&gt;images + labels] --&gt; B[compute scores&lt;br/&gt;forward pass]
+  B --&gt; C[measure loss&lt;br/&gt;how wrong?]
+  C --&gt; D[compute gradient&lt;br/&gt;which direction?]
+  D --&gt; E[update parameters&lt;br/&gt;take one step]
+  E --&gt; A
+
+  classDef data fill:#dfeaff,stroke:#2878c8,color:#17212b
+  classDef model fill:#fffdf7,stroke:#657079,color:#17212b
+  classDef loss fill:#ffe3dc,stroke:#ef5b45,color:#17212b
+  classDef update fill:#fff1d9,stroke:#d58b16,color:#17212b
+  class A data
+  class B,D model
+  class C loss
+  class E update
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p><span class="math display">\[
+\theta\leftarrow\theta-\eta\nabla_\theta J(\theta)
+\]</span></p>
+</section>
+<section id="loss-tells-us-where-optimization-moves-us" class="level2">
+<h2 class="anchored" data-anchor-id="loss-tells-us-where-optimization-moves-us">Loss tells us where; optimization moves us</h2>
+<div class="optimization-roles">
+<div class="parameter-convergence">
+<p><img src="assets/parameter-convergence.svg" class="img-fluid" alt="Parameters following successive gradient updates through loss contours toward a minimum."></p>
+</div>
+<div class="role-stack">
+<div class="role-card loss-role">
+<p><span>LOSS</span></p>
+<p>Defines which predictions are preferable.</p>
+<p><span class="math display">\[J(\theta)\]</span></p>
+</div>
+<div class="role-card optimizer-role">
+<p><span>OPTIMIZER</span></p>
+<p>Chooses how parameters change.</p>
+<p><span class="math display">\[-\eta\nabla_\theta J\]</span></p>
+</div>
+</div>
+</div>
+<div class="takeaway">
+<p>We postpone the machinery—not the distinction—to the optimization chapter.</p>
+</div>
+</section>
+</section>
+<section id="evaluation" class="level1 section-slide evaluation-section">
+<h1 class="section-slide evaluation-section">05 · Evaluation</h1>
+<section id="fitting-is-not-learning" class="level2">
+<h2 class="anchored" data-anchor-id="fitting-is-not-learning">Fitting is not learning</h2>
+<div class="memorize-generalize">
+<div class="memory-panel">
+<p><span>MEMORIZE</span></p>
+<p>Training image → stored answer</p>
+<p><strong>train:</strong> excellent <strong>new images:</strong> uncertain</p>
+</div>
+<div class="general-panel">
+<p><span>GENERALIZE</span></p>
+<p>Training images → reusable structure</p>
+<p><strong>train:</strong> good <strong>new images:</strong> good</p>
+</div>
+</div>
+<div class="fragment takeaway">
+<p>Low training loss is an optimization result—not evidence of generalization.</p>
+</div>
+</section>
+<section id="three-datasets-three-jobs" class="level2">
+<h2 class="anchored" data-anchor-id="three-datasets-three-jobs">Three datasets, three jobs</h2>
+<div class="split-visual">
+<div class="split train">
+<p><span>TRAIN</span><b>70%</b></p>
+<p>fit <span class="math inline">\(\theta\)</span></p>
+</div>
+<div class="split validation">
+<p><span>VALIDATION</span><b>15%</b></p>
+<p>choose design</p>
+</div>
+<div class="split test">
+<p><span>TEST</span><b>15%</b></p>
+<p>estimate final behavior</p>
+</div>
+</div>
+<div class="fragment danger-line">
+<p>Using the test set to choose the model turns it into validation data.</p>
+</div>
+</section>
+<section id="split-the-thing-that-must-generalize" class="level2">
+<h2 class="anchored" data-anchor-id="split-the-thing-that-must-generalize">Split the thing that must generalize</h2>
+<div class="split-cases">
+<div>
+<p><strong>medical images</strong></p>
+<p>split by patient</p>
+</div>
+<div>
+<p><strong>video frames</strong></p>
+<p>split by video</p>
+</div>
+<div>
+<p><strong>product photos</strong></p>
+<p>split by physical object</p>
+</div>
+<div>
+<p><strong>forecasting</strong></p>
+<p>split by time</p>
+</div>
+</div>
+<div class="takeaway">
+<p>Random rows are not automatically independent examples.</p>
+</div>
+</section>
+<section id="training-success-can-hide-test-failure" class="level2">
+<h2 class="anchored" data-anchor-id="training-success-can-hide-test-failure">Training success can hide test failure</h2>
+<div class="generalization-scorecards">
+<div class="scorecase memorizer-case">
+<p><span>MODEL A</span></p>
+<section id="memorizer" class="level3">
+<h3 class="anchored" data-anchor-id="memorizer">Memorizer</h3>
+<div class="scorebar train">
+<b>training</b><i style="--score:99%"></i><strong>99%</strong>
+</div>
+<div class="scorebar test">
+<b>test</b><i style="--score:54%"></i><strong>54%</strong>
+</div>
+<p>
+Excellent fit. Poor generalization.
+</p>
+</section>
+</div>
+<div class="scorecase generalizer-case">
+<p><span>MODEL B</span></p>
+<section id="generalizer" class="level3">
+<h3 class="anchored" data-anchor-id="generalizer">Generalizer</h3>
+<div class="scorebar train">
+<b>training</b><i style="--score:92%"></i><strong>92%</strong>
+</div>
+<div class="scorebar test">
+<b>test</b><i style="--score:89%"></i><strong>89%</strong>
+</div>
+<p>
+Smaller training score. Better unseen behavior.
+</p>
+</section>
+</div>
+</div>
+<div class="fragment takeaway danger">
+<p>A training score measures fitting. A held-out score provides evidence about generalization.</p>
+</div>
+</section>
+<section id="read-the-mistakes" class="level2">
+<h2 class="anchored" data-anchor-id="read-the-mistakes">Read the mistakes</h2>
+<div class="error-gallery">
+<div class="error-card">
+<p><span>BLUR</span></p>
+<p>Is resolution the limitation?</p>
+</div>
+<div class="error-card">
+<p><span>OCCLUSION</span></p>
+<p>Is the object partly hidden?</p>
+</div>
+<div class="error-card">
+<p><span>SHORTCUT</span></p>
+<p>Is the background driving the score?</p>
+</div>
+<div class="error-card">
+<p><span>LABEL</span></p>
+<p>Is the target itself wrong?</p>
+</div>
+</div>
+<div class="big-summary">
+<p>Metrics tell us how much. Examples help us ask why.</p>
+</div>
+</section>
+<section id="the-complete-experiment" class="level2 experiment-slide">
+<h2 class="experiment-slide anchored" data-anchor-id="the-complete-experiment">The complete experiment</h2>
+<div class="cell" data-fig-width="13" data-fig-height="5.2" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  Q[define&lt;br/&gt;decision] --&gt; A[audit&lt;br/&gt;data]
+  A --&gt; S[design&lt;br/&gt;split]
+  S --&gt; B[establish&lt;br/&gt;baseline]
+  B --&gt; T[train&lt;br/&gt;model]
+  T --&gt; V[choose with&lt;br/&gt;validation]
+  V --&gt; E[evaluate&lt;br/&gt;once]
+
+  classDef start fill:#17212b,color:#fff,stroke:#17212b
+  classDef process fill:#fffdf7,color:#17212b,stroke:#657079
+  classDef finish fill:#ef5b45,color:#fff,stroke:#ef5b45
+  class Q start
+  class A,S,B,T,V process
+  class E finish
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<div class="takeaway">
+<p>This protocol is the smallest credible argument that learning occurred.</p>
+</div>
+</section>
+<section id="one-task-two-visits" class="level2">
+<h2 class="anchored" data-anchor-id="one-task-two-visits">One task, two visits</h2>
+<div class="return-map">
+<div class="visit classical">
+<p><span>NOW</span></p>
+<section id="classical-image-classification" class="level3">
+<h3 class="anchored" data-anchor-id="classical-image-classification">Classical image classification</h3>
+<p>handcrafted features + linear classifier</p>
+</section>
+</div>
+<div class="return-arrow">
+<p>→</p>
+</div>
+<div class="visit deep">
+<p><span>LATER</span></p>
+<section id="deep-image-classification" class="level3">
+<h3 class="anchored" data-anchor-id="deep-image-classification">Deep image classification</h3>
+<p>learned features + convolutional network</p>
+</section>
+</div>
+</div>
+<div class="fragment big-summary">
+<p>The hypothesis changes. The five ingredients remain.</p>
+</div>
+</section>
+<section id="five-questions-to-keep" class="level2 final-slide">
+<h2 class="final-slide anchored" data-anchor-id="five-questions-to-keep">Five questions to keep</h2>
+<div class="final-five">
+<div>
+<p><b>1</b><span>What experience?</span></p>
+</div>
+<div>
+<p><b>2</b><span>Which possible rules?</span></p>
+</div>
+<div>
+<p><b>3</b><span>What does wrong cost?</span></p>
+</div>
+<div>
+<p><b>4</b><span>How do parameters change?</span></p>
+</div>
+<div>
+<p><b>5</b><span>What evidence convinces us?</span></p>
+</div>
+</div>
+<div class="next">
+<p><strong>Next:</strong> build neurons and multilayer networks from elementary operations.</p>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Deep Learning · ENSA Tétouan</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

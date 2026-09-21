@@ -1,0 +1,2174 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dr.&nbsp;A. Belcaid">
+
+<title>Convolutional Neural Networks – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2e7c9b518fe54fcaa4a8b379123416fc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../schedule.html"> 
+<span class="menu-text">Schedule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../logistics.html"> 
+<span class="menu-text">Logistics</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#convolutional-neural-networks" id="toc-convolutional-neural-networks" class="nav-link active" data-scroll-target="#convolutional-neural-networks">Convolutional Neural Networks</a></li>
+  <li><a href="#from-pixels-to-a-convolutional-classifier" id="toc-from-pixels-to-a-convolutional-classifier" class="nav-link" data-scroll-target="#from-pixels-to-a-convolutional-classifier">From pixels to a convolutional classifier</a></li>
+  <li><a href="#why-images-need-spatial-structure-1" id="toc-why-images-need-spatial-structure-1" class="nav-link" data-scroll-target="#why-images-need-spatial-structure-1">01 · Why images need spatial structure</a>
+  <ul class="collapse">
+  <li><a href="#move-the-object-keep-the-answer" id="toc-move-the-object-keep-the-answer" class="nav-link" data-scroll-target="#move-the-object-keep-the-answer">Move the object; keep the answer</a></li>
+  <li><a href="#flattening-keeps-valuesand-breaks-the-map" id="toc-flattening-keeps-valuesand-breaks-the-map" class="nav-link" data-scroll-target="#flattening-keeps-valuesand-breaks-the-map">Flattening keeps values—and breaks the map</a></li>
+  <li><a href="#full-connectivity-spends-parameters-on-every-location" id="toc-full-connectivity-spends-parameters-on-every-location" class="nav-link" data-scroll-target="#full-connectivity-spends-parameters-on-every-location">Full connectivity spends parameters on every location</a></li>
+  <li><a href="#most-visual-evidence-is-local" id="toc-most-visual-evidence-is-local" class="nav-link" data-scroll-target="#most-visual-evidence-is-local">Most visual evidence is local</a></li>
+  <li><a href="#find-the-same-edge-three-times" id="toc-find-the-same-edge-three-times" class="nav-link" data-scroll-target="#find-the-same-edge-three-times">Find the same edge three times</a></li>
+  <li><a href="#the-label-stays-the-pixels-can-change-completely" id="toc-the-label-stays-the-pixels-can-change-completely" class="nav-link" data-scroll-target="#the-label-stays-the-pixels-can-change-completely">The label stays; the pixels can change completely</a></li>
+  <li><a href="#three-image-assumptions-become-one-architecture" id="toc-three-image-assumptions-become-one-architecture" class="nav-link" data-scroll-target="#three-image-assumptions-become-one-architecture">Three image assumptions become one architecture</a></li>
+  </ul></li>
+  <li><a href="#the-convolution-operation-1" id="toc-the-convolution-operation-1" class="nav-link" data-scroll-target="#the-convolution-operation-1">02 · The convolution operation</a>
+  <ul class="collapse">
+  <li><a href="#one-patch-produces-one-output-value" id="toc-one-patch-produces-one-output-value" class="nav-link" data-scroll-target="#one-patch-produces-one-output-value">One patch produces one output value</a></li>
+  <li><a href="#calculate-the-response-before-revealing-it" id="toc-calculate-the-response-before-revealing-it" class="nav-link" data-scroll-target="#calculate-the-response-before-revealing-it">Calculate the response before revealing it</a></li>
+  <li><a href="#slide-the-same-filter-write-the-next-value" id="toc-slide-the-same-filter-write-the-next-value" class="nav-link" data-scroll-target="#slide-the-same-filter-write-the-next-value">Slide the same filter; write the next value</a></li>
+  <li><a href="#a-feature-map-is-a-map-of-matches" id="toc-a-feature-map-is-a-map-of-matches" class="nav-link" data-scroll-target="#a-feature-map-is-a-map-of-matches">A feature map is a map of matches</a></li>
+  <li><a href="#filters-are-learnednot-chosen-by-hand" id="toc-filters-are-learnednot-chosen-by-hand" class="nav-link" data-scroll-target="#filters-are-learnednot-chosen-by-hand">Filters are learned—not chosen by hand</a></li>
+  <li><a href="#the-kernel-changes-what-the-response-emphasizes" id="toc-the-kernel-changes-what-the-response-emphasizes" class="nav-link" data-scroll-target="#the-kernel-changes-what-the-response-emphasizes">The kernel changes what the response emphasizes</a></li>
+  </ul></li>
+  <li><a href="#shape-padding-and-stride-1" id="toc-shape-padding-and-stride-1" class="nav-link" data-scroll-target="#shape-padding-and-stride-1">03 · Shape, padding, and stride</a>
+  <ul class="collapse">
+  <li><a href="#without-padding-every-convolution-shrinks-the-map" id="toc-without-padding-every-convolution-shrinks-the-map" class="nav-link" data-scroll-target="#without-padding-every-convolution-shrinks-the-map">Without padding, every convolution shrinks the map</a></li>
+  <li><a href="#padding-gives-the-filter-a-border-to-stand-on" id="toc-padding-gives-the-filter-a-border-to-stand-on" class="nav-link" data-scroll-target="#padding-gives-the-filter-a-border-to-stand-on">Padding gives the filter a border to stand on</a></li>
+  <li><a href="#stride-controls-how-far-the-filter-jumps" id="toc-stride-controls-how-far-the-filter-jumps" class="nav-link" data-scroll-target="#stride-controls-how-far-the-filter-jumps">Stride controls how far the filter jumps</a></li>
+  <li><a href="#count-startsnot-pixels" id="toc-count-startsnot-pixels" class="nav-link" data-scroll-target="#count-startsnot-pixels">Count starts—not pixels</a></li>
+  <li><a href="#width-and-height-use-the-same-reasoning" id="toc-width-and-height-use-the-same-reasoning" class="nav-link" data-scroll-target="#width-and-height-use-the-same-reasoning">Width and height use the same reasoning</a></li>
+  <li><a href="#your-turn-predict-the-output-shape" id="toc-your-turn-predict-the-output-shape" class="nav-link" data-scroll-target="#your-turn-predict-the-output-shape">Your turn: predict the output shape</a></li>
+  <li><a href="#choose-geometry-by-the-representation-you-need" id="toc-choose-geometry-by-the-representation-you-need" class="nav-link" data-scroll-target="#choose-geometry-by-the-representation-you-need">Choose geometry by the representation you need</a></li>
+  </ul></li>
+  <li><a href="#channels-and-feature-maps-1" id="toc-channels-and-feature-maps-1" class="nav-link" data-scroll-target="#channels-and-feature-maps-1">04 · Channels and feature maps</a>
+  <ul class="collapse">
+  <li><a href="#a-color-image-is-three-aligned-spatial-maps" id="toc-a-color-image-is-three-aligned-spatial-maps" class="nav-link" data-scroll-target="#a-color-image-is-three-aligned-spatial-maps">A color image is three aligned spatial maps</a></li>
+  <li><a href="#one-filter-must-span-every-input-channel" id="toc-one-filter-must-span-every-input-channel" class="nav-link" data-scroll-target="#one-filter-must-span-every-input-channel">One filter must span every input channel</a></li>
+  <li><a href="#one-filter-creates-one-feature-map" id="toc-one-filter-creates-one-feature-map" class="nav-link" data-scroll-target="#one-filter-creates-one-feature-map">One filter creates one feature map</a></li>
+  <li><a href="#read-a-convolution-as-a-shape-contract" id="toc-read-a-convolution-as-a-shape-contract" class="nav-link" data-scroll-target="#read-a-convolution-as-a-shape-contract">Read a convolution as a shape contract</a></li>
+  <li><a href="#how-many-parameters-does-this-layer-learn" id="toc-how-many-parameters-does-this-layer-learn" class="nav-link" data-scroll-target="#how-many-parameters-does-this-layer-learn">How many parameters does this layer learn?</a></li>
+  <li><a href="#trained-filters-become-different-visual-questions" id="toc-trained-filters-become-different-visual-questions" class="nav-link" data-scroll-target="#trained-filters-become-different-visual-questions">Trained filters become different visual questions</a></li>
+  <li><a href="#keep-the-two-channel-rules-separate" id="toc-keep-the-two-channel-rules-separate" class="nav-link" data-scroll-target="#keep-the-two-channel-rules-separate">Keep the two channel rules separate</a></li>
+  </ul></li>
+  <li><a href="#pooling-receptive-fields-and-pytorch-1" id="toc-pooling-receptive-fields-and-pytorch-1" class="nav-link" data-scroll-target="#pooling-receptive-fields-and-pytorch-1">05 · Pooling, receptive fields, and PyTorch</a>
+  <ul class="collapse">
+  <li><a href="#translate-the-shape-decision-into-nn.conv2d" id="toc-translate-the-shape-decision-into-nn.conv2d" class="nav-link" data-scroll-target="#translate-the-shape-decision-into-nn.conv2d">Translate the shape decision into <code>nn.Conv2d</code></a></li>
+  <li><a href="#why-reduce-a-feature-map" id="toc-why-reduce-a-feature-map" class="nav-link" data-scroll-target="#why-reduce-a-feature-map">Why reduce a feature map?</a></li>
+  <li><a href="#max-pooling-keeps-one-winner-per-window" id="toc-max-pooling-keeps-one-winner-per-window" class="nav-link" data-scroll-target="#max-pooling-keeps-one-winner-per-window">Max pooling keeps one winner per window</a></li>
+  <li><a href="#max-and-average-pooling-answer-different-questions" id="toc-max-and-average-pooling-answer-different-questions" class="nav-link" data-scroll-target="#max-and-average-pooling-answer-different-questions">Max and average pooling answer different questions</a></li>
+  <li><a href="#depth-lets-one-unit-combine-a-larger-pattern" id="toc-depth-lets-one-unit-combine-a-larger-pattern" class="nav-link" data-scroll-target="#depth-lets-one-unit-combine-a-larger-pattern">Depth lets one unit combine a larger pattern</a></li>
+  <li><a href="#global-average-pooling-turns-each-map-into-one-number" id="toc-global-average-pooling-turns-each-map-into-one-number" class="nav-link" data-scroll-target="#global-average-pooling-turns-each-map-into-one-number">Global average pooling turns each map into one number</a></li>
+  <li><a href="#pytorch-exposes-pooling-at-three-useful-levels" id="toc-pytorch-exposes-pooling-at-three-useful-levels" class="nav-link" data-scroll-target="#pytorch-exposes-pooling-at-three-useful-levels">PyTorch exposes pooling at three useful levels</a></li>
+  <li><a href="#the-complete-reduction-story" id="toc-the-complete-reduction-story" class="nav-link" data-scroll-target="#the-complete-reduction-story">The complete reduction story</a></li>
+  </ul></li>
+  <li><a href="#read-and-build-complete-cnns-1" id="toc-read-and-build-complete-cnns-1" class="nav-link" data-scroll-target="#read-and-build-complete-cnns-1">06 · Read and build complete CNNs</a>
+  <ul class="collapse">
+  <li><a href="#alexnet-can-we-read-this-model-now" id="toc-alexnet-can-we-read-this-model-now" class="nav-link" data-scroll-target="#alexnet-can-we-read-this-model-now">AlexNet: can we read this model now?</a></li>
+  <li><a href="#read-a-model-definition-as-a-network" id="toc-read-a-model-definition-as-a-network" class="nav-link" data-scroll-target="#read-a-model-definition-as-a-network">Read a model definition as a network</a></li>
+  <li><a href="#compose-two-feature-learning-blocks" id="toc-compose-two-feature-learning-blocks" class="nav-link" data-scroll-target="#compose-two-feature-learning-blocks">Compose two feature-learning blocks</a></li>
+  <li><a href="#your-turn-read-a-larger-printed-model" id="toc-your-turn-read-a-larger-printed-model" class="nav-link" data-scroll-target="#your-turn-read-a-larger-printed-model">Your turn: read a larger printed model</a></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.html"><i class="bi bi-file-slides"></i>RevealJS</a></li></ul></div></nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Convolutional Neural Networks</h1>
+<p class="subtitle lead">Learning spatial features from images</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dr.&nbsp;A. Belcaid </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="convolutional-neural-networks" class="level2 deck-title">
+<h2 class="deck-title anchored" data-anchor-id="convolutional-neural-networks">Convolutional Neural Networks</h2>
+<div class="deck-title-grid">
+<div class="deck-title-copy">
+<p><span class="eyebrow">CHAPTER 07 · LEARNING FROM IMAGES</span></p>
+<section id="learning-spatial-features-from-images" class="level3">
+<h3 class="anchored" data-anchor-id="learning-spatial-features-from-images">Learning spatial features from images</h3>
+<p>See exactly how a small learned filter becomes a feature map—and how those maps become an image classifier.</p>
+<p><span class="deck-author">Dr.&nbsp;A. Belcaid</span></p>
+</section>
+</div>
+<div class="deck-title-art convolution-hero">
+<p><img src="assets/convolution-hero.png" class="img-fluid" alt="A restrained geometric illustration of a small filter moving across an image grid to produce a feature map."></p>
+</div>
+</div>
+<p class="source-note">
+Lecture spine adapted from Stanford <a href="https://cs231n.github.io/convolutional-networks/">CS231n · Convolutional Neural Networks</a> <span class="citation" data-cites="cs231nnotes">(Li et al., n.d.)</span>.
+</p>
+<div class="notes">
+<p>The image on the right is the lecture’s visual promise: we will not treat convolution as a mysterious layer name. We will repeatedly show the input patch, the shared filter, the numerical operation, and the resulting feature map. The recurring implementation is the CIFAR-10 classifier begun in the PyTorch coding session.</p>
+</div>
+</section>
+<section id="from-pixels-to-a-convolutional-classifier" class="level2">
+<h2 class="anchored" data-anchor-id="from-pixels-to-a-convolutional-classifier">From pixels to a convolutional classifier</h2>
+<div class="cnn-toc">
+<div class="cnn-toc-item why-item">
+<p><span>01</span></p>
+<section id="why-images-need-spatial-structure" class="level3">
+<h3 class="anchored" data-anchor-id="why-images-need-spatial-structure">Why images need spatial structure</h3>
+</section>
+</div>
+<div class="cnn-toc-item operation-item">
+<p><span>02</span></p>
+<section id="the-convolution-operation" class="level3">
+<h3 class="anchored" data-anchor-id="the-convolution-operation">The convolution operation</h3>
+</section>
+</div>
+<div class="cnn-toc-item geometry-item">
+<p><span>03</span></p>
+<section id="shape-padding-and-stride" class="level3">
+<h3 class="anchored" data-anchor-id="shape-padding-and-stride">Shape, padding, and stride</h3>
+</section>
+</div>
+<div class="cnn-toc-item volume-item">
+<p><span>04</span></p>
+<section id="channels-and-feature-maps" class="level3">
+<h3 class="anchored" data-anchor-id="channels-and-feature-maps">Channels and feature maps</h3>
+</section>
+</div>
+<div class="cnn-toc-item field-item">
+<p><span>05</span></p>
+<section id="pooling-receptive-fields-and-pytorch" class="level3">
+<h3 class="anchored" data-anchor-id="pooling-receptive-fields-and-pytorch">Pooling, receptive fields, and PyTorch</h3>
+</section>
+</div>
+<div class="cnn-toc-item pytorch-item">
+<p><span>06</span></p>
+<section id="read-and-build-complete-cnns" class="level3">
+<h3 class="anchored" data-anchor-id="read-and-build-complete-cnns">Read and build complete CNNs</h3>
+</section>
+</div>
+</div>
+<div class="notes">
+<p>Use this as the contract for the lecture. Start from the concrete failure of flattening an image, then spend most of the time making convolution visible and computable. Separate spatial output geometry from channel mixing so students can reason about each axis. Pooling and receptive fields explain how local evidence becomes contextual evidence. The last section translates every mechanism into the <code>torch.nn</code> model used in the second coding session. Architecture history and residual networks belong to the next chapter.</p>
+</div>
+</section>
+<section id="why-images-need-spatial-structure-1" class="level1 section-slide cnn-section why-section" data-section-progress="1 / 6" style="--section-progress:16.667%">
+<h1 class="section-slide cnn-section why-section" data-section-progress="1 / 6" style="--section-progress:16.667%">01 · Why images need spatial structure</h1>
+<section id="move-the-object-keep-the-answer" class="level2">
+<h2 class="anchored" data-anchor-id="move-the-object-keep-the-answer">Move the object; keep the answer</h2>
+<div class="translation-stage">
+<div class="translation-example">
+<span>IMAGE A</span>
+<div class="scene-grid object-left" role="img" aria-label="A small boat-like object appears toward the left of an image grid.">
+<i></i>
+</div>
+<p><strong>boat</strong></p>
+</div>
+<div class="translation-motion" aria-hidden="true">
+<b>→</b><span>same pixels,<br>new position</span>
+</div>
+<div class="translation-example">
+<span>IMAGE B</span>
+<div class="scene-grid object-right" role="img" aria-label="The same small boat-like object appears toward the right of an image grid.">
+<i></i>
+</div>
+<p><strong>boat</strong></p>
+</div>
+</div>
+<div class="translation-question fragment">
+<p><span>DESIGN QUESTION</span> <strong>Should learning “boat on the left” be independent from learning “boat on the right”?</strong></p>
+</div>
+<div class="translation-answer fragment">
+<p>No.&nbsp;The useful evidence moved; its meaning did not.</p>
+</div>
+<div class="notes">
+<p>Begin with the prediction, not the mechanism. Ask students whether both images deserve the same label. They do. Then ask the design question. An ordinary fully connected model can learn both positions, but it has no built-in reason to reuse the detector learned at the first position. Avoid saying that CNNs are perfectly translation invariant; convolution is translation equivariant away from boundary and sampling effects, while pooling and aggregation can add limited robustness.</p>
+</div>
+</section>
+<section id="flattening-keeps-valuesand-breaks-the-map" class="level2">
+<h2 class="anchored" data-anchor-id="flattening-keeps-valuesand-breaks-the-map">Flattening keeps values—and breaks the map</h2>
+<div class="flattening-story">
+<div class="spatial-image-panel">
+<span>IMAGE TENSOR · 8 × 8</span>
+<div class="pixel-picture" role="img" aria-label="An eight by eight pixel grid containing a simple dark angular object.">
+<p><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i> <i></i><i></i><i></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i> <i></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i> <i></i><i class="on"></i><i class="on"></i><i></i><i></i><i class="on"></i><i class="on"></i><i></i> <i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i> <i></i><i class="on"></i><i class="on"></i><i></i><i></i><i class="on"></i><i class="on"></i><i></i> <i></i><i></i><i class="on"></i><i></i><i></i><i class="on"></i><i></i><i></i> <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></p>
+</div>
+<p><small>Neighbors in the grid describe edges, corners, and texture.</small></p>
+</div>
+<div class="flatten-arrow">
+<b>reshape</b><span>→</span>
+</div>
+<div class="flat-vector-panel">
+<span>VECTOR · 64</span>
+<div class="flat-pixels" aria-label="The same 64 pixel values arranged as a one-dimensional vector.">
+<p><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i class="on"></i><i class="on"></i><i></i><i></i><i class="on"></i><i class="on"></i><i></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i class="on"></i><i class="on"></i><i></i><i></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></p>
+</div>
+<p><small>Index 23 is close to 24—but what happened above, below, and diagonally?</small></p>
+</div>
+</div>
+<div class="flattening-verdict fragment">
+<p><span>THE NUMBERS SURVIVE</span> <strong>The two-dimensional neighborhood is no longer explicit to the layer.</strong></p>
+</div>
+<div class="notes">
+<p>Clarify the precise claim. Flattening is reversible if shape metadata is retained, so it does not mathematically destroy values. The problem is architectural: after flattening, a generic dense layer assigns an unrelated parameter to every input coordinate and does not encode which pixels were neighbors. It can relearn spatial relationships from data, but we have discarded a powerful prior that images give us for free.</p>
+</div>
+</section>
+<section id="full-connectivity-spends-parameters-on-every-location" class="level2">
+<h2 class="anchored" data-anchor-id="full-connectivity-spends-parameters-on-every-location">Full connectivity spends parameters on every location</h2>
+<div class="dense-neuron-question">
+<span>ONE HIDDEN UNIT</span><strong>How many incoming weights does it need?</strong>
+</div>
+<div class="dense-scale-comparison">
+<div class="dense-scale-case cifar-case">
+<span>CIFAR-10</span>
+<div class="dimension-cube">
+<b>32</b><b>32</b><b>3</b>
+</div>
+<p>
+<span class="math inline">\(32\times32\times3\)</span>
+</p>
+<p><strong class="fragment">3,072 weights</strong> <small class="fragment">for one neuron</small></p>
+</div>
+<div class="scale-jump fragment">
+<p><span>larger image</span><b>×39</b></p>
+</div>
+<div class="dense-scale-case photo-case">
+<span>SMALL PHOTO</span>
+<div class="dimension-cube">
+<b>200</b><b>200</b><b>3</b>
+</div>
+<p>
+<span class="math inline">\(200\times200\times3\)</span>
+</p>
+<p><strong class="fragment">120,000 weights</strong> <small class="fragment">for one neuron</small></p>
+</div>
+</div>
+<div class="dense-layer-total fragment">
+<p><span>ADD 1,000 HIDDEN UNITS</span> <strong>120 million weights in the first layer alone</strong></p>
+</div>
+<p class="source-note">
+Numerical motivation adapted from Stanford <a href="https://cs231n.github.io/convolutional-networks/#overview">CS231n · Architecture Overview</a> <span class="citation" data-cites="cs231nnotes">(Li et al., n.d.)</span>.
+</p>
+<div class="notes">
+<p>Let students calculate before revealing each count. CIFAR-10 is manageable, but the same dense design scales directly with image area. The 120-million figure excludes biases and all later layers. Parameter count is not the only issue; the more fundamental waste is that a useful local pattern has a separate weight set at every absolute position.</p>
+</div>
+</section>
+<section id="most-visual-evidence-is-local" class="level2">
+<h2 class="anchored" data-anchor-id="most-visual-evidence-is-local">Most visual evidence is local</h2>
+<div class="local-evidence-layout">
+<div class="local-scene">
+<div class="large-pixel-field" role="img" aria-label="A pixel field with three highlighted local windows containing a vertical edge, a corner, and a flat region.">
+<div class="local-window edge-window">
+<span>?</span>
+</div>
+<div class="local-window corner-window">
+<span>?</span>
+</div>
+<div class="local-window flat-window">
+<span>?</span>
+</div>
+</div>
+</div>
+<div class="local-observations">
+<div class="local-observation fragment">
+<span>PATCH 1</span><strong>vertical edge</strong><small>neighboring pixels change together</small>
+</div>
+<div class="local-observation fragment">
+<span>PATCH 2</span><strong>corner</strong><small>two local boundaries meet</small>
+</div>
+<div class="local-observation fragment">
+<span>PATCH 3</span><strong>flat region</strong><small>little local variation</small>
+</div>
+</div>
+</div>
+<div class="local-principle fragment">
+<p><strong>To detect a small pattern here, inspect a small neighborhood here.</strong> <span>This is <b>local connectivity</b>.</span></p>
+</div>
+<div class="notes">
+<p>Reveal the interpretations one patch at a time. A low-level visual pattern can often be decided from nearby pixels; a unit does not need to connect to the entire image to detect it. “Local” does not mean the final prediction only sees a small patch. Stacking layers grows the receptive field, which we will visualize later.</p>
+</div>
+</section>
+<section id="find-the-same-edge-three-times" class="level2">
+<h2 class="anchored" data-anchor-id="find-the-same-edge-three-times">Find the same edge three times</h2>
+<div class="edge-search-instruction">
+<span>VISUAL SEARCH</span><strong>One detector is shown in coral. Where else should we use it?</strong>
+</div>
+<div class="shared-detector-scene">
+<svg viewbox="0 0 1180 470" role="img" aria-label="One small edge detector is applied at three different positions of a stylized image, producing three responses.">
+<defs> <pattern id="cnn-grid" width="47" height="47" patternunits="userSpaceOnUse"><path d="M47 0H0V47" fill="none" stroke="#d1dbe1" stroke-width="2"></path></pattern> </defs> <rect x="20" y="20" width="470" height="423" rx="13" fill="#fdfcf8" stroke="#9fb2be" stroke-width="3"></rect> <rect x="20" y="20" width="470" height="423" rx="13" fill="url(#cnn-grid)"></rect> <path d="M120 85V190H220M275 105V255H385M105 315H225V405" fill="none" stroke="#244b68" stroke-width="28" stroke-linecap="square"></path> <g class="detector-first"><rect x="85" y="56" width="94" height="141" rx="8" fill="none" stroke="#ef5b45" stroke-width="8"></rect><path d="M179 126H585" stroke="#ef5b45" stroke-width="4"></path><circle cx="608" cy="126" r="25" fill="#ef5b45"></circle><text x="608" y="135" text-anchor="middle">✓</text></g> <g class="fragment"><rect x="240" y="76" width="94" height="188" rx="8" fill="none" stroke="#ef5b45" stroke-width="8"></rect><path d="M334 170H760" stroke="#ef5b45" stroke-width="4"></path><circle cx="783" cy="170" r="25" fill="#ef5b45"></circle><text x="783" y="179" text-anchor="middle">✓</text></g> <g class="fragment"><rect x="72" y="280" width="94" height="141" rx="8" fill="none" stroke="#ef5b45" stroke-width="8"></rect><path d="M166 350H935" stroke="#ef5b45" stroke-width="4"></path><circle cx="958" cy="350" r="25" fill="#ef5b45"></circle><text x="958" y="359" text-anchor="middle">✓</text></g> <g class="detector-key"><rect x="770" y="50" width="78" height="78" fill="#dceeff" stroke="#ef5b45" stroke-width="6"></rect><path d="M809 60V118" stroke="#244b68" stroke-width="17"></path><text x="875" y="83">same detector</text><text x="875" y="107">same weights</text></g>
+</svg>
+</div>
+<div class="sharing-conclusion fragment">
+<p><span>ONE PATTERN · MANY POSITIONS</span> <strong>Learn the detector once, then slide it across the image.</strong></p>
+</div>
+<div class="notes">
+<p>Pause after the first response and ask students to point to the other vertical edges. Reveal the other two uses. The detector’s parameters do not change as it moves. This is spatial parameter sharing, the decisive contrast with a dense layer’s separate parameter for every input-to-unit connection. The next section will make the detector numerical and name the sliding operation convolution.</p>
+</div>
+</section>
+<section id="the-label-stays-the-pixels-can-change-completely" class="level2">
+<h2 class="anchored" data-anchor-id="the-label-stays-the-pixels-can-change-completely">The label stays; the pixels can change completely</h2>
+<div class="real-challenges-figure">
+<p><img src="assets/cs231n-visual-challenges.jpeg" alt="Real photographs illustrate viewpoint variation, scale variation, deformation, occlusion, illumination changes, background clutter, and intra-class variation."></p>
+</div>
+<div class="challenge-demands">
+<div class="challenge-demand ignore-demand fragment">
+<p><span>IGNORE</span> <strong>changes that should not alter the class</strong></p>
+</div>
+<div class="challenge-demand notice-demand fragment">
+<p><span>NOTICE</span> <strong>small evidence that distinguishes one class from another</strong></p>
+</div>
+</div>
+<div class="challenge-tension fragment">
+<p><strong>The representation must become stable to nuisance variation without becoming blind to useful spatial detail.</strong></p>
+</div>
+<p class="source-note">
+Photographs and challenge taxonomy from Stanford <a href="https://cs231n.github.io/classification/#challenges">CS231n · Image Classification Challenges</a> <span class="citation" data-cites="cs231nnotes">(Li et al., n.d.)</span>.
+</p>
+<div class="notes">
+<p>Let students scan the photographs before reading the labels. Ask which changes should preserve the category and where the discriminative evidence remains. The two demands are in tension: a representation should suppress viewpoint, scale, deformation, occlusion, illumination, and background changes when they are irrelevant, yet preserve the details that separate classes. Do not claim that convolution alone grants invariance to every listed transformation. Local connectivity and shared filters provide an efficient starting bias; learned hierarchies, pooling, data augmentation, and training data contribute further robustness.</p>
+</div>
+</section>
+<section id="three-image-assumptions-become-one-architecture" class="level2">
+<h2 class="anchored" data-anchor-id="three-image-assumptions-become-one-architecture">Three image assumptions become one architecture</h2>
+<div class="spatial-synthesis">
+<div class="synthesis-evidence">
+<div>
+<span>WHAT WE OBSERVED</span><strong>Nearby pixels form useful patterns.</strong>
+</div>
+<div>
+<span>WHAT WE EXPECT</span><strong>The same pattern can matter anywhere.</strong>
+</div>
+<div>
+<span>WHAT DEPTH CAN DO</span><strong>Small patterns can compose into larger ones.</strong>
+</div>
+</div>
+<div class="synthesis-mapping">
+<div class="fragment">
+<b>local connectivity</b><span>inspect a patch</span>
+</div>
+<div class="fragment">
+<b>shared weights</b><span>reuse one detector</span>
+</div>
+<div class="fragment">
+<b>feature hierarchy</b><span>stack learned maps</span>
+</div>
+</div>
+</div>
+<div class="cnn-arrival fragment">
+<p><span>THE CONVOLUTIONAL IDEA</span> <strong>A small learned filter moves across the spatial grid and records where its pattern appears.</strong></p>
+</div>
+<p class="source-note">
+Conceptual progression follows Stanford <a href="https://cs231n.github.io/convolutional-networks/#conv">CS231n · Convolutional Layer</a> <span class="citation" data-cites="cs231nnotes">(Li et al., n.d.)</span>.
+</p>
+<div class="notes">
+<p>This is the abstraction only after the evidence. Map each observation to its architectural choice. Feature hierarchy is a promise for the receptive-field section, not something to fully explain here. End by pointing back to the cover image: input grid, small filter, output feature map. We are now ready to calculate a convolution one position at a time.</p>
+</div>
+</section>
+</section>
+<section id="the-convolution-operation-1" class="level1 section-slide cnn-section operation-section" data-section-progress="2 / 6" style="--section-progress:33.333%">
+<h1 class="section-slide cnn-section operation-section" data-section-progress="2 / 6" style="--section-progress:33.333%">02 · The convolution operation</h1>
+<section id="one-patch-produces-one-output-value" class="level2">
+<h2 class="anchored" data-anchor-id="one-patch-produces-one-output-value">One patch produces one output value</h2>
+<div class="one-position-layout">
+<div class="patch-stage">
+<span>INPUT IMAGE</span>
+<div class="conv-input-grid" aria-label="A five by five input grid with the upper-left three by three patch highlighted.">
+<p><i>1</i><i>1</i><i>0</i><i>0</i><i>0</i> <i>1</i><i>1</i><i>0</i><i>0</i><i>0</i> <i>1</i><i>1</i><i>0</i><i>1</i><i>1</i> <i>0</i><i>0</i><i>0</i><i>1</i><i>1</i> <i>0</i><i>0</i><i>0</i><i>1</i><i>1</i> <b class="patch-outline"></b></p>
+</div>
+</div>
+<div class="operation-symbol" aria-hidden="true">
+<span>×</span><small>elementwise</small>
+</div>
+<div class="filter-stage">
+<span>LEARNED FILTER</span>
+<div class="conv-filter-grid" aria-label="A three by three vertical edge filter.">
+<p><i>1</i><i>0</i><i>−1</i> <i>1</i><i>0</i><i>−1</i> <i>1</i><i>0</i><i>−1</i></p>
+</div>
+<p><small>3 × 3 weights</small></p>
+</div>
+<div class="operation-symbol" aria-hidden="true">
+<span>→</span><small>sum</small>
+</div>
+<div class="one-output-stage fragment">
+<span>FEATURE MAP</span>
+<div class="single-output-map" aria-label="The upper-left feature-map value is three.">
+<i>3</i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+<p><small>one location filled</small></p>
+</div>
+</div>
+<div class="one-position-rule fragment">
+<p><strong>Align → multiply matching cells → add the products → write one number.</strong></p>
+</div>
+<div class="notes">
+<p>Hold the slide before the output appears. The highlighted 3 by 3 patch contains a bright region on its left and zeros on its right, so it agrees with the positive-left, negative-right filter. Multiply corresponding cells and sum; the response is 3. Stress the correspondence: one patch and one filter produce one scalar at one spatial position in the output. Bias is omitted for the first calculation and added explicitly on the next slide.</p>
+</div>
+</section>
+<section id="calculate-the-response-before-revealing-it" class="level2">
+<h2 class="anchored" data-anchor-id="calculate-the-response-before-revealing-it">Calculate the response before revealing it</h2>
+<div class="conv-exercise-layout">
+<div class="exercise-matrices">
+<div class="matrix-card patch-matrix">
+<span>PATCH <span class="math inline">\(X\)</span></span>
+<div>
+<i>1</i><i>1</i><i>0</i><i>1</i><i>1</i><i>0</i><i>1</i><i>1</i><i>0</i>
+</div>
+</div>
+<b>⊙</b>
+<div class="matrix-card kernel-matrix">
+<span>FILTER <span class="math inline">\(K\)</span></span>
+<div>
+<i>1</i><i>0</i><i>−1</i><i>1</i><i>0</i><i>−1</i><i>1</i><i>0</i><i>−1</i>
+</div>
+</div>
+<b>+</b>
+<div class="bias-chip">
+<span>BIAS</span><strong>−1</strong>
+</div>
+</div>
+<div class="exercise-prompt">
+<p>The filter sees a bright region on the left. Compute the output activation <span class="math inline">\(y\)</span>.</p>
+</div>
+<div class="exercise-pause">
+<p><span>PAUSE</span><b>45 seconds</b><small>Multiply cell by cell; then add all nine products and the bias.</small></p>
+</div>
+<div class="conv-worked-solution fragment">
+<span>WORKED SOLUTION</span>
+<div class="product-strip">
+<i>1</i><i>0</i><i>0</i><i>1</i><i>0</i><i>0</i><i>1</i><i>0</i><i>0</i>
+</div>
+<p><strong><span class="math inline">\(y=(1+0+0)+(1+0+0)+(1+0+0)-1=2\)</span></strong></p>
+</div>
+</div>
+<div class="notes">
+<p>Enforce the pause. Students should obtain three positive products, no negative products, and then add the bias of minus one. Reveal the product strip before reading the compact equation. This is the affine operation performed at a single location. If a nonlinearity follows the convolution, it acts on this response afterward; do not mix that separate step into the convolution arithmetic.</p>
+</div>
+</section>
+<section id="slide-the-same-filter-write-the-next-value" class="level2">
+<h2 class="anchored" data-anchor-id="slide-the-same-filter-write-the-next-value">Slide the same filter; write the next value</h2>
+<div class="scan-contract">
+<span>FIXED FOR THIS EXAMPLE</span><strong>3 × 3 filter · stride 1 · no padding</strong>
+</div>
+<div class="scan-sequence">
+<svg viewbox="0 0 1270 500" role="img" aria-label="A three by three filter slides across a five by five input and writes responses into successive positions of a three by three feature map.">
+<defs><pattern id="scanGrid" width="72" height="72" patternunits="userSpaceOnUse"><path d="M72 0H0V72" fill="none" stroke="#aebdc7" stroke-width="2"></path></pattern></defs> <g class="scan-input"> <rect x="35" y="45" width="360" height="360" rx="10" fill="#edf3f6" stroke="#657687" stroke-width="3"></rect> <rect x="35" y="45" width="360" height="360" rx="10" fill="url(#scanGrid)"></rect> <rect x="35" y="45" width="144" height="216" fill="#8fb9d7" opacity=".72"></rect> <rect x="251" y="189" width="144" height="216" fill="#244b68" opacity=".88"></rect> <text x="35" y="30">INPUT 5 × 5</text> </g> <g class="scan-output"> <rect x="555" y="70" width="216" height="216" rx="10" fill="#fff" stroke="#657687" stroke-width="3"></rect> <path d="M627 70V286M699 70V286M555 142H771M555 214H771" stroke="#aebdc7" stroke-width="2"></path> <text x="555" y="55">FEATURE MAP 3 × 3</text> </g> <g class="scan-step scan-step-one"> <rect x="35" y="45" width="216" height="216" rx="8" fill="none" stroke="#ef5b45" stroke-width="9"></rect> <path d="M255 153 C390 153 425 95 555 95" fill="none" stroke="#ef5b45" stroke-width="5"></path> <circle cx="580" cy="95" r="25" fill="#ef5b45"></circle><text x="580" y="104" text-anchor="middle" class="response-text">3</text> </g> <g class="scan-step scan-step-two fragment"> <rect x="107" y="45" width="216" height="216" rx="8" fill="none" stroke="#d58b16" stroke-width="9"></rect> <path d="M327 153 C440 153 475 167 627 167" fill="none" stroke="#d58b16" stroke-width="5"></path> <circle cx="652" cy="167" r="25" fill="#d58b16"></circle><text x="652" y="176" text-anchor="middle" class="response-text">2</text> </g> <g class="scan-step scan-step-three fragment"> <rect x="179" y="45" width="216" height="216" rx="8" fill="none" stroke="#38865a" stroke-width="9"></rect> <path d="M399 153 C505 153 540 239 699 239" fill="none" stroke="#38865a" stroke-width="5"></path> <circle cx="724" cy="239" r="25" fill="#38865a"></circle><text x="724" y="248" text-anchor="middle" class="response-text">−1</text> </g> <g class="scan-reading fragment"> <rect x="845" y="88" width="365" height="252" rx="16" fill="#17212b"></rect> <text x="875" y="128" class="reading-label">READ EACH OUTPUT AS</text> <text x="875" y="178" class="reading-main">How strongly did</text><text x="875" y="215" class="reading-main">this patch match</text><text x="875" y="252" class="reading-main">this filter?</text> <text x="875" y="307" class="reading-small">same weights at every position</text> </g>
+</svg>
+</div>
+<div class="scan-takeaway fragment">
+<p>The output keeps a spatial map: nearby responses came from nearby input patches.</p>
+</div>
+<div class="notes">
+<p>Reveal the three filter positions in order. With stride one, the window moves one input cell horizontally and the response is written one output cell horizontally. Do not spend time verifying all three arithmetic values—the purpose is the spatial correspondence. Point out that a 5 by 5 input and a 3 by 3 filter admit three horizontal and three vertical valid placements, hence the 3 by 3 output. The general sizing rule belongs to the next section.</p>
+</div>
+</section>
+<section id="a-feature-map-is-a-map-of-matches" class="level2">
+<h2 class="anchored" data-anchor-id="a-feature-map-is-a-map-of-matches">A feature map is a map of matches</h2>
+<div class="match-map-layout">
+<div class="match-source">
+<span>INPUT</span>
+<div class="edge-pattern-image" role="img" aria-label="A stylized image containing several vertical boundaries at different contrasts.">
+<p><i class="edge-a"></i><i class="edge-b"></i><i class="edge-c"></i></p>
+</div>
+</div>
+<div class="match-filter">
+<span>VERTICAL-EDGE FILTER</span>
+<div>
+<i>1</i><i>0</i><i>−1</i><i>1</i><i>0</i><i>−1</i><i>1</i><i>0</i><i>−1</i>
+</div>
+<p><small>one learned pattern</small></p>
+</div>
+<div class="match-map fragment">
+<span>FEATURE MAP</span>
+<div class="response-heatmap" role="img" aria-label="A feature map with strong responses aligned to vertical boundaries in the input.">
+<p><i></i><i></i><i class="warm"></i><i class="hot"></i><i></i><i></i><i></i><i class="warm"></i> <i></i><i></i><i class="warm"></i><i class="hot"></i><i></i><i></i><i></i><i class="warm"></i> <i></i><i></i><i class="warm"></i><i class="hot"></i><i></i><i class="mild"></i><i></i><i class="warm"></i> <i></i><i></i><i class="warm"></i><i class="hot"></i><i></i><i class="mild"></i><i></i><i class="warm"></i> <i></i><i></i><i class="warm"></i><i class="hot"></i><i></i><i class="mild"></i><i></i><i class="warm"></i> <i></i><i></i><i class="warm"></i><i class="hot"></i><i></i><i></i><i></i><i class="warm"></i></p>
+</div>
+</div>
+</div>
+<div class="heatmap-legend fragment">
+<p><span>weak match</span><i></i><i></i><i></i><i></i><strong>strong match</strong></p>
+</div>
+<div class="feature-map-reading fragment">
+<p>High response = <em>this filter’s pattern</em> was present at <em>this position</em>.</p>
+</div>
+<div class="notes">
+<p>Read the result spatially. The feature map is not a compressed class label; it records where one learned pattern responds. Stronger contrast produces a stronger magnitude. Depending on the filter sign, the opposite edge direction can produce a negative response, which is not represented in this simplified positive heatmap. Later, multiple filters will produce multiple maps for different patterns.</p>
+</div>
+</section>
+<section id="filters-are-learnednot-chosen-by-hand" class="level2">
+<h2 class="anchored" data-anchor-id="filters-are-learnednot-chosen-by-hand">Filters are learned—not chosen by hand</h2>
+<div class="learning-filter-story">
+<div class="filter-before">
+<span>BEFORE TRAINING</span>
+<div class="learned-kernel noisy-kernel">
+<i>.2</i><i>−.1</i><i>.3</i><i>−.2</i><i>.1</i><i>.0</i><i>.1</i><i>−.3</i><i>.2</i>
+</div>
+<p><small>random weights</small></p>
+</div>
+<div class="gradient-journey">
+<div>
+<b>images</b><span>+</span><b>labels</b>
+</div>
+<p><strong>loss → backpropagation → optimizer</strong> <i>→</i></p>
+</div>
+<div class="filter-after fragment">
+<span>AFTER TRAINING</span>
+<div class="learned-kernel edge-kernel">
+<i>.8</i><i>.0</i><i>−.8</i><i>1.0</i><i>.1</i><i>−.9</i><i>.7</i><i>.0</i><i>−.7</i>
+</div>
+<p><small>one possible useful pattern</small></p>
+</div>
+</div>
+<div class="filter-learning-message fragment">
+<p><span>WHAT CHANGED?</span> <strong>Only the connectivity pattern was designed. The data shaped the numerical detector.</strong></p>
+</div>
+<div class="notes">
+<p>The hand-written edge filter was a transparent teaching device. In a CNN, filter values are ordinary parameters initialized numerically and updated by the optimizer using gradients. Training is not guaranteed to produce this exact edge detector, and deeper filters are rarely this directly interpretable. The architecture supplies locality and sharing; the dataset and loss determine which patterns become useful for prediction.</p>
+</div>
+</section>
+<section id="the-kernel-changes-what-the-response-emphasizes" class="level2">
+<h2 class="anchored" data-anchor-id="the-kernel-changes-what-the-response-emphasizes">The kernel changes what the response emphasizes</h2>
+<div class="kernel-source-chip">
+<span>SAME PHOTOGRAPH</span><strong>Only the 3 × 3 kernel changes</strong>
+</div>
+<div class="real-kernel-gallery">
+<div class="real-kernel-case smooth-case">
+<span>SMOOTH</span> <img src="assets/kernel-smooth.jpg" class="img-fluid" alt="The lighthouse photograph after applying a three-by-three averaging kernel.">
+<div class="mini-real-kernel">
+<i>⅑</i><i>⅑</i><i>⅑</i><i>⅑</i><i>⅑</i><i>⅑</i><i>⅑</i><i>⅑</i><i>⅑</i>
+</div>
+<p><strong>average nearby pixels</strong> <small>noise and fine detail respond less</small></p>
+</div>
+<div class="real-kernel-case edge-case fragment">
+<span>DETECT EDGES</span> <img src="assets/kernel-edges.jpg" class="img-fluid" alt="An edge response image emphasizing boundaries in the lighthouse photograph.">
+<div class="mini-real-kernel">
+<i>−1</i><i>−1</i><i>−1</i><i>−1</i><i>8</i><i>−1</i><i>−1</i><i>−1</i><i>−1</i>
+</div>
+<p><strong>respond to local change</strong> <small>flat regions approach zero</small></p>
+</div>
+<div class="real-kernel-case sharpen-case fragment">
+<span>SHARPEN</span> <img src="assets/kernel-sharpen.jpg" class="img-fluid" alt="The lighthouse photograph after applying a sharpening kernel.">
+<div class="mini-real-kernel">
+<i>0</i><i>−1</i><i>0</i><i>−1</i><i>5</i><i>−1</i><i>0</i><i>−1</i><i>0</i>
+</div>
+<p><strong>amplify local contrast</strong> <small>boundaries appear crisper</small></p>
+</div>
+</div>
+<div class="kernel-demo-link fragment">
+<p><span>TRY IT LIVE</span> <strong><a href="https://setosa.io/ev/image-kernels/">Image Kernels Explained Visually ↗</a></strong> <small>select a kernel · inspect one calculation · upload an image</small></p>
+</div>
+<p class="source-note">
+Examples generated for this course with explicit kernels. Photograph: <a href="https://commons.wikimedia.org/wiki/File:Burin_Lighthouse.jpg">“Burin Lighthouse” by MMMcMaster</a>, CC0. Interactive demo: <a href="https://setosa.io/ev/image-kernels/">Victor Powell · Image Kernels</a>.
+</p>
+<div class="notes">
+<p>Reveal one result at a time while keeping the photograph fixed. For smoothing, every output is a local average, so isolated changes and fine texture weaken. For edge detection, the weights sum to zero: a constant patch therefore gives zero, while a local intensity change produces a large magnitude. Sharpening retains the center and subtracts neighboring values, increasing local contrast. These are fixed illustrative kernels, not a catalogue students must memorize. A CNN learns filters appropriate to its loss rather than selecting these three by name. Open Victor Powell’s interactive demo if time permits; students can hover over a pixel to inspect its exact calculation.</p>
+</div>
+</section>
+</section>
+<section id="shape-padding-and-stride-1" class="level1 section-slide cnn-section geometry-section" data-section-progress="3 / 6" style="--section-progress:50%">
+<h1 class="section-slide cnn-section geometry-section" data-section-progress="3 / 6" style="--section-progress:50%">03 · Shape, padding, and stride</h1>
+<section id="without-padding-every-convolution-shrinks-the-map" class="level2">
+<h2 class="anchored" data-anchor-id="without-padding-every-convolution-shrinks-the-map">Without padding, every convolution shrinks the map</h2>
+<div class="shrink-story">
+<div class="shrink-grid-stage">
+<span>INPUT · 5 × 5</span>
+<div class="shrink-input" aria-label="A five by five grid with a three by three filter shown at the first and last legal positions.">
+<p><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i> <b class="first-valid"></b><b class="last-valid fragment"></b></p>
+</div>
+</div>
+<div class="shrink-travel fragment">
+<span>LEGAL TOP-LEFT POSITIONS</span>
+<div>
+<b>0</b><i>→</i><b>1</b><i>→</i><b>2</b>
+</div>
+<p><small>The 3 × 3 filter cannot start at column 3 or 4.</small></p>
+</div>
+<div class="shrink-output-stage fragment">
+<span>OUTPUT · 3 × 3</span>
+<div class="shrink-output">
+<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+<p><strong>5 − 3 + 1 = 3</strong></p>
+</div>
+</div>
+<div class="border-cost fragment">
+<p><span>BORDER COST</span><strong>Interior pixels participate in more patches than corner pixels.</strong></p>
+</div>
+<div class="notes">
+<p>Start horizontally. A 3-wide filter can begin at input columns 0, 1, or 2. Starting at 3 would require a column beyond the image. The exact same count applies vertically, giving a 3 by 3 output. The plus one counts the starting placement itself. Then mention the border asymmetry: without padding, a corner belongs to one 3 by 3 patch, while the center belongs to nine patches.</p>
+</div>
+</section>
+<section id="padding-gives-the-filter-a-border-to-stand-on" class="level2">
+<h2 class="anchored" data-anchor-id="padding-gives-the-filter-a-border-to-stand-on">Padding gives the filter a border to stand on</h2>
+<div class="padding-layout">
+<div class="padded-canvas-wrap">
+<span>ZERO PADDING · <span class="math inline">\(P=1\)</span></span>
+<div class="padded-canvas" aria-label="A five by five image surrounded by a one-cell zero border, with a three by three filter centered over a corner pixel.">
+<div class="padding-cells">
+<i>0</i><i>0</i><i>0</i><i>0</i><i>0</i><i>0</i><i>0</i><i>0</i><i class="data">1</i><i class="data">1</i><i class="data">1</i><i class="data">1</i><i class="data">1</i><i>0</i><i>0</i><i class="data">1</i><i class="data">1</i><i class="data">1</i><i class="data">1</i><i class="data">1</i><i>0</i><i>0</i><i class="data">1</i><i class="data">1</i><i class="data">1</i><i class="data">1</i><i class="data">1</i><i>0</i><i>0</i><i class="data">1</i><i class="data">1</i><i class="data">1</i><i class="data">1</i><i class="data">1</i><i>0</i><i>0</i><i class="data">1</i><i class="data">1</i><i class="data">1</i><i class="data">1</i><i class="data">1</i><i>0</i><i>0</i><i>0</i><i>0</i><i>0</i><i>0</i><i>0</i><i>0</i>
+</div>
+<p><b class="corner-filter"></b></p>
+</div>
+</div>
+<div class="padding-logic">
+<div class="padding-step fragment">
+<span>1</span>
+<p>
+The working width becomes <strong><span class="math inline">\(5+2P=7\)</span></strong>.
+</p>
+</div>
+<div class="padding-step fragment">
+<span>2</span>
+<p>
+The filter may now center on an original border pixel.
+</p>
+</div>
+<div class="padding-step fragment">
+<span>3</span>
+<p>
+Legal starts become <strong><span class="math inline">\(0,1,2,3,4\)</span></strong>.
+</p>
+</div>
+<div class="padding-result fragment">
+<span>RESULT</span><strong>5 × 5 → 5 × 5</strong><small>when K = 3, P = 1, S = 1</small>
+</div>
+</div>
+</div>
+<div class="padding-warning fragment">
+<p>Padding does not invent image evidence; it defines what the operation assumes beyond the boundary.</p>
+</div>
+<div class="notes">
+<p>The dark blue 5 by 5 region is the original image; the pale outer ring is one cell of zeros on every side. Padding one cell adds two cells to each spatial dimension, not one. Move the highlighted 3 by 3 filter to the upper-left legal position: its center now aligns with the original corner. With kernel 3, stride 1, and padding 1, the output preserves spatial size. Zero padding is common, but reflect and replicate padding encode different boundary assumptions.</p>
+</div>
+</section>
+<section id="stride-controls-how-far-the-filter-jumps" class="level2">
+<h2 class="anchored" data-anchor-id="stride-controls-how-far-the-filter-jumps">Stride controls how far the filter jumps</h2>
+<div class="stride-shared-setup">
+<span>SAME INPUT · SAME KERNEL · NO PADDING</span><strong>5 × 5 image · 3 × 3 kernel</strong>
+</div>
+<div class="stride-2d-comparison">
+<div class="stride-2d-case stride-one-2d">
+<div class="stride-2d-heading">
+<span>STRIDE 1</span><strong>move one cell</strong>
+</div>
+<div class="stride-2d-stage">
+<div class="stride-image-grid" role="img" aria-label="A three by three kernel over a five by five image; nine dots mark all placements reached with stride one.">
+<b class="stride-kernel-frame"></b>
+<div class="placement-dots nine-placements">
+<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+</div>
+<b class="stride-map-arrow">→</b>
+<div class="stride-result">
+<span>9 placements</span>
+<div class="stride-output-grid output-three">
+<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+<strong>3 × 3</strong>
+</div>
+</div>
+</div>
+<div class="stride-2d-case stride-two-2d fragment">
+<div class="stride-2d-heading">
+<span>STRIDE 2</span><strong>move two cells</strong>
+</div>
+<div class="stride-2d-stage">
+<div class="stride-image-grid" role="img" aria-label="A three by three kernel over a five by five image; four dots mark all placements reached with stride two.">
+<b class="stride-kernel-frame"></b>
+<div class="placement-dots four-placements">
+<i></i><i></i><i></i><i></i>
+</div>
+</div>
+<b class="stride-map-arrow">→</b>
+<div class="stride-result">
+<span>4 placements</span>
+<div class="stride-output-grid output-two">
+<i></i><i></i><i></i><i></i>
+</div>
+<strong>2 × 2</strong>
+</div>
+</div>
+</div>
+</div>
+<div class="stride-rule fragment">
+<p><span>STRIDE DOES TWO THINGS</span> <strong>reduces the output size</strong><i>·</i><strong>skips intermediate filter placements</strong></p>
+</div>
+<div class="notes">
+<p>Keep the input, 3 by 3 kernel, and padding fixed. The dots mark filter centers, hence one output value per dot. With stride one, the kernel starts at rows and columns 0, 1, 2: nine placements produce a 3 by 3 map. With stride two, it starts only at rows and columns 0 and 2: four placements produce a 2 by 2 map. The coral square shows the same first kernel placement in both cases. “Downsampling” is descriptive, not automatically beneficial: intermediate placements are never evaluated by the stride-two layer.</p>
+</div>
+</section>
+<section id="count-startsnot-pixels" class="level2">
+<h2 class="anchored" data-anchor-id="count-startsnot-pixels">Count starts—not pixels</h2>
+<div class="formula-derivation">
+<div class="derivation-track">
+<span>ONE SPATIAL AXIS</span>
+<div class="symbolic-axis">
+<div class="axis-padded">
+<b><span class="math inline">\(P\)</span></b>
+</div>
+<div class="axis-input">
+<b><span class="math inline">\(W_{in}\)</span></b>
+</div>
+<div class="axis-padded">
+<b><span class="math inline">\(P\)</span></b>
+</div>
+<div class="axis-kernel fragment">
+<b><span class="math inline">\(K\)</span></b>
+</div>
+</div>
+<p><small>Total working width: <span class="math inline">\(W_{in}+2P\)</span></small></p>
+</div>
+<div class="derivation-steps">
+<div class="derivation-step fragment">
+<span>1 · LAST START</span><strong>W<sub>in</sub> + 2P − K</strong><small>move until the filter’s far edge still fits</small>
+</div>
+<div class="derivation-step fragment">
+<span>2 · NUMBER OF MOVES</span><strong>⌊(W<sub>in</sub> + 2P − K) / S⌋</strong><small>each move advances S cells</small>
+</div>
+<div class="derivation-step fragment">
+<span>3 · COUNT THE FIRST POSITION</span><strong>+1</strong><small>zero moves is already one valid placement</small>
+</div>
+</div>
+</div>
+<div class="derived-width-formula fragment">
+<p><span>OUTPUT WIDTH</span> <span class="math display">\[W_{out}=\left\lfloor\frac{W_{in}+2P-K}{S}\right\rfloor+1\]</span></p>
+</div>
+<div class="notes">
+<p>Do not reveal all three steps together. The padded axis has total length W-in plus 2P. A K-wide filter’s last legal starting coordinate is total width minus K. Dividing by stride counts how many full jumps reach legal positions; the floor discards a final incomplete jump. Finally add one because a starting coordinate of zero is a valid placement before any move. This derivation assumes dilation one; dilation is deliberately outside this introductory formula.</p>
+</div>
+</section>
+<section id="width-and-height-use-the-same-reasoning" class="level2">
+<h2 class="anchored" data-anchor-id="width-and-height-use-the-same-reasoning">Width and height use the same reasoning</h2>
+<div class="two-axis-formula-layout">
+<div class="rectangular-input-demo">
+<span>RECTANGULAR INPUT</span>
+<div class="rectangular-grid" aria-label="A six-high by eight-wide input grid with one cell of padding and a three by three filter.">
+<b><span class="math inline">\(H_{in}=6\)</span></b><strong><span class="math inline">\(W_{in}=8\)</span></strong><i><span class="math inline">\(K=3\)</span></i>
+</div>
+<p><small><span class="math inline">\(P=1\)</span> on every side · <span class="math inline">\(S=2\)</span> on both axes</small></p>
+</div>
+<div class="axis-calculations">
+<div class="axis-calculation width-calc fragment">
+<span>WIDTH</span><strong>⌊(8 + 2 − 3) / 2⌋ + 1 = 4</strong>
+</div>
+<div class="axis-calculation height-calc fragment">
+<span>HEIGHT</span><strong>⌊(6 + 2 − 3) / 2⌋ + 1 = 3</strong>
+</div>
+<div class="rectangular-output fragment">
+<span>OUTPUT</span>
+<div aria-label="A three by four output grid">
+<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+<strong>3 × 4</strong>
+</div>
+</div>
+</div>
+<div class="two-axis-rule fragment">
+<p>If kernel, padding, or stride differ by axis, substitute <span class="math inline">\(K_h,P_h,S_h\)</span> and <span class="math inline">\(K_w,P_w,S_w\)</span> separately.</p>
+</div>
+<div class="notes">
+<p>Apply the one-dimensional derivation twice. Quarto and PyTorch shape convention is height then width, so the resulting spatial shape is 3 by 4 even though width was calculated first here. The symmetric scalar settings K=3, P=1, S=2 apply to both axes. PyTorch also accepts tuples, for example kernel size (3,5), in which case calculate each axis with its own values.</p>
+</div>
+</section>
+<section id="your-turn-predict-the-output-shape" class="level2">
+<h2 class="anchored" data-anchor-id="your-turn-predict-the-output-shape">Your turn: predict the output shape</h2>
+<div class="shape-exercise">
+<div class="shape-givens">
+<span>GIVENS</span>
+<div>
+<b>input</b><strong>32 × 32</strong>
+</div>
+<div>
+<b>kernel</b><strong>5 × 5</strong>
+</div>
+<div>
+<b>padding</b><strong>2</strong>
+</div>
+<div>
+<b>stride</b><strong>2</strong>
+</div>
+</div>
+<div class="shape-task">
+<p><span>TASK</span> <strong>Derive <span class="math inline">\(H_{out}\)</span> and <span class="math inline">\(W_{out}\)</span>.</strong> <small>Do not guess from “stride halves.” Count legal starts.</small></p>
+</div>
+<div class="exercise-pause">
+<p><span>PAUSE</span><b>60 seconds</b><small>Write the formula, substitute once, then explain the final <span class="math inline">\(+1\)</span>.</small></p>
+</div>
+<div class="shape-solution fragment">
+<span>WORKED SOLUTION</span>
+<div class="shape-substitution">
+<span class="math inline">\(\left\lfloor\dfrac{32+2(2)-5}{2}\right\rfloor+1=\lfloor15.5\rfloor+1=16\)</span>
+</div>
+<div class="shape-result">
+<b><span class="math inline">\(H_{out}=16\)</span></b><i>×</i><b><span class="math inline">\(W_{out}=16\)</span></b>
+</div>
+<p>
+The floor removes an incomplete final jump; <span class="math inline">\(+1\)</span> counts the starting placement.
+</p>
+</div>
+</div>
+<div class="notes">
+<p>Give students the full minute. Both axes share the same values, so one substitution is enough, but they must state both output dimensions. Ask one student to explain the floor and another to explain plus one. A useful verification is to compute the padded width 36: the last legal start is 31, and stride-two starts are 0 through 30, giving 16 positions.</p>
+</div>
+</section>
+<section id="choose-geometry-by-the-representation-you-need" class="level2">
+<h2 class="anchored" data-anchor-id="choose-geometry-by-the-representation-you-need">Choose geometry by the representation you need</h2>
+<div class="geometry-decisions">
+<div class="geometry-decision preserve-geometry">
+<span>PRESERVE SIZE</span>
+<div class="geometry-icons">
+<i class="geo-input"></i><b>→</b><i class="geo-same"></i>
+</div>
+<p><strong><span class="math inline">\(K=3,\;S=1,\;P=1\)</span></strong> <small>8 × 8 → 8 × 8</small></p>
+</div>
+<div class="geometry-decision shrink-geometry fragment">
+<span>SHRINK NATURALLY</span>
+<div class="geometry-icons">
+<i class="geo-input"></i><b>→</b><i class="geo-small"></i>
+</div>
+<p><strong><span class="math inline">\(K=3,\;S=1,\;P=0\)</span></strong> <small>8 × 8 → 6 × 6</small></p>
+</div>
+<div class="geometry-decision downsample-geometry fragment">
+<span>DOWNSAMPLE</span>
+<div class="geometry-icons">
+<i class="geo-input"></i><b>→</b><i class="geo-tiny"></i>
+</div>
+<p><strong><span class="math inline">\(K=3,\;S=2,\;P=1\)</span></strong> <small>8 × 8 → 4 × 4</small></p>
+</div>
+</div>
+<div class="geometry-checklist fragment">
+<p><span>BEFORE BUILDING THE NEXT LAYER</span> <strong>Write <span class="math inline">\((H,W)\)</span> → substitute → floor → add one → verify the result is positive.</strong></p>
+</div>
+<div class="geometry-demo-link fragment">
+<p><span>EXPLORE IT LIVE</span> <strong><a href="https://ezyang.github.io/convolution-visualizer/">Convolution Visualizer ↗</a></strong> <small>change input size · kernel · padding · stride</small></p>
+</div>
+<p class="source-note">
+Geometry conventions follow Stanford <a href="https://cs231n.github.io/convolutional-networks/#conv">CS231n · Spatial Arrangement</a> <span class="citation" data-cites="cs231nnotes">(Li et al., n.d.)</span>.
+</p>
+<div class="notes">
+<p>End with decisions, not algebra. Padding one with a 3 by 3 kernel and stride one is the familiar same-size pattern. No padding shrinks the map by two. Stride two with padding one roughly halves it; for even size 8 the exact result is 4. Make students calculate rather than rely on “roughly.” The checklist is the habit to carry into model construction and debugging. Open the visualizer and reproduce one of the three cards if time permits; students can change one parameter and immediately inspect the output geometry.</p>
+</div>
+</section>
+</section>
+<section id="channels-and-feature-maps-1" class="level1 section-slide cnn-section volume-section" data-section-progress="4 / 6" style="--section-progress:66.667%">
+<h1 class="section-slide cnn-section volume-section" data-section-progress="4 / 6" style="--section-progress:66.667%">04 · Channels and feature maps</h1>
+<section id="a-color-image-is-three-aligned-spatial-maps" class="level2">
+<h2 class="anchored" data-anchor-id="a-color-image-is-three-aligned-spatial-maps">A color image is three aligned spatial maps</h2>
+<div class="rgb-volume-layout">
+<div class="rgb-photo">
+<div class="rgb-scene" role="img" aria-label="A stylized color image containing a red-orange object, blue sky, and green ground.">
+<i></i>
+</div>
+<p><strong>one image</strong><small>height × width × color</small></p>
+</div>
+<div class="rgb-separation fragment">
+<div class="channel-sheet red-sheet">
+<span>R</span><i></i>
+</div>
+<div class="channel-sheet green-sheet">
+<span>G</span><i></i>
+</div>
+<div class="channel-sheet blue-sheet">
+<span>B</span><i></i>
+</div>
+</div>
+<div class="rgb-contract fragment">
+<span>PYTORCH SAMPLE SHAPE</span> <strong><span class="math inline">\((C,H,W)=(3,H,W)\)</span></strong>
+<div>
+<b>same row</b><b>same column</b><b>three measurements</b>
+</div>
+<p>
+Channels are aligned descriptions of each spatial position.
+</p>
+</div>
+</div>
+<div class="notes">
+<p>Separate “channel” from “object.” An RGB image has three aligned measurements at every pixel coordinate. PyTorch stores a single image channel-first as C, H, W. The three sheets do not represent three independent images, and channel order is not spatial depth in the physical scene. This distinction becomes essential when a filter combines channels.</p>
+</div>
+</section>
+<section id="one-filter-must-span-every-input-channel" class="level2">
+<h2 class="anchored" data-anchor-id="one-filter-must-span-every-input-channel">One filter must span every input channel</h2>
+<div class="depth-filter-layout">
+<div class="rgb-patch-stack">
+<span>ONE 3 × 3 RGB PATCH</span>
+<div class="patch-layer patch-r">
+<b>R</b><i>3 × 3</i>
+</div>
+<div class="patch-layer patch-g">
+<b>G</b><i>3 × 3</i>
+</div>
+<div class="patch-layer patch-b">
+<b>B</b><i>3 × 3</i>
+</div>
+</div>
+<div class="depth-match-symbol fragment">
+<p><span>⊙</span><small>channel by channel</small></p>
+</div>
+<div class="kernel-depth-stack fragment">
+<span>ONE FILTER</span>
+<div class="kernel-layer kernel-r">
+<b><span class="math inline">\(K_R\)</span></b><i>3 × 3</i>
+</div>
+<div class="kernel-layer kernel-g">
+<b><span class="math inline">\(K_G\)</span></b><i>3 × 3</i>
+</div>
+<div class="kernel-layer kernel-b">
+<b><span class="math inline">\(K_B\)</span></b><i>3 × 3</i>
+</div>
+<p><strong>shape: 3 × 3 × 3</strong></p>
+</div>
+<div class="channel-sum fragment">
+<span>SUM ALL CHANNELS</span>
+<div>
+<b>R response</b><i>+</i><b>G response</b><i>+</i><b>B response</b><i>+ bias</i>
+</div>
+<p><strong>one scalar</strong></p>
+</div>
+</div>
+<div class="depth-rule fragment">
+<p>The filter’s depth is not a choice: it must equal <span class="math inline">\(C_{in}\)</span>.</p>
+</div>
+<div class="notes">
+<p>Follow one spatial patch only. The filter has a separate 3 by 3 weight slice for red, green, and blue. Multiply each input-channel patch by its corresponding filter slice, sum all 27 products, then add one bias. The result is still one scalar. A filter cannot choose to have depth two when the input has three channels; its depth must match C-in.</p>
+</div>
+</section>
+<section id="one-filter-creates-one-feature-map" class="level2">
+<h2 class="anchored" data-anchor-id="one-filter-creates-one-feature-map">One filter creates one feature map</h2>
+<div class="filters-to-maps">
+<div class="shared-input-volume">
+<span>INPUT VOLUME</span>
+<div class="input-volume-drawing">
+<i></i><i></i><i></i>
+</div>
+<p><strong>3 × 32 × 32</strong></p>
+</div>
+<div class="volume-flow-arrow">
+→
+</div>
+<div class="filter-bank fragment">
+<span>FILTER BANK</span>
+<div>
+<i style="--f:#2878c8">1</i><i style="--f:#ef5b45">2</i><i style="--f:#d58b16">3</i><i style="--f:#38865a">4</i><i style="--f:#7655ad">5</i><i style="--f:#008e9b">6</i>
+</div>
+<p><strong>6 filters</strong><small>each filter spans all 3 input channels</small></p>
+</div>
+<div class="volume-flow-arrow fragment">
+→
+</div>
+<div class="output-map-stack fragment">
+<span>OUTPUT VOLUME</span>
+<div>
+<i style="--f:#2878c8"></i><i style="--f:#ef5b45"></i><i style="--f:#d58b16"></i><i style="--f:#38865a"></i><i style="--f:#7655ad"></i><i style="--f:#008e9b"></i>
+</div>
+<p><strong>6 × 30 × 30</strong><small><span class="math inline">\(K=3\)</span>, <span class="math inline">\(P=0\)</span>, <span class="math inline">\(S=1\)</span></small></p>
+</div>
+</div>
+<div class="map-count-rule fragment">
+<p><span>COUNT THE OUTPUT CHANNELS</span><strong><span class="math inline">\(C_{out}\)</span> = number of filters</strong></p>
+</div>
+<div class="notes">
+<p>Each filter slides over the same input volume and produces one two-dimensional response map. Six different filters therefore produce six maps, stacked as the six channels of the output volume. Spatial geometry is computed with the formula from Section 3: 32 becomes 30 here. Keep the two counts distinct: input channels determine each filter’s depth; the number of filters determines output channels.</p>
+</div>
+</section>
+<section id="read-a-convolution-as-a-shape-contract" class="level2">
+<h2 class="anchored" data-anchor-id="read-a-convolution-as-a-shape-contract">Read a convolution as a shape contract</h2>
+<div class="nchw-banner">
+<span>PYTORCH BATCH ORDER</span><strong>N × C × H × W</strong>
+</div>
+<div class="shape-contract-flow">
+<div class="contract-volume input-contract-volume">
+<p><span>INPUT</span><strong>(64, 3, 32, 32)</strong><small>64 RGB images</small></p>
+</div>
+<div class="contract-operator">
+<b>16 filters</b><span>3 × 3 · P=1 · S=1</span>
+</div>
+<div class="contract-volume output-contract-volume fragment">
+<p><span>OUTPUT</span><strong>(64, 16, 32, 32)</strong><small>16 maps per image</small></p>
+</div>
+</div>
+<div class="dimension-reasons">
+<div class="dimension-reason fragment">
+<p><b>N = 64</b><span>convolution processes every batch item</span></p>
+</div>
+<div class="dimension-reason fragment">
+<p><b>C<sub>out</sub> = 16</b><span>one channel per learned filter</span></p>
+</div>
+<div class="dimension-reason fragment">
+<p><b>H<sub>out</sub> = W<sub>out</sub> = 32</b><span>padding preserves spatial size</span></p>
+</div>
+</div>
+<div class="notes">
+<p>Read the tuple from left to right. Convolution does not mix examples, so batch size remains 64. Sixteen filters create sixteen output maps for every image. Kernel 3, padding 1, stride 1 preserves 32 by 32. This is the debugging contract students should state before writing a layer. Emphasize that PyTorch uses NCHW, whereas image files or NumPy arrays often arrive as HWC.</p>
+</div>
+</section>
+<section id="how-many-parameters-does-this-layer-learn" class="level2">
+<h2 class="anchored" data-anchor-id="how-many-parameters-does-this-layer-learn">How many parameters does this layer learn?</h2>
+<div class="parameter-count-layout">
+<div class="parameter-filter-visual">
+<span>ONE FILTER</span>
+<div class="parameter-slices">
+<i>3 × 3</i><i>3 × 3</i><i>3 × 3</i>
+</div>
+<p><strong><span class="math inline">\(3\cdot3\cdot3=27\)</span> weights</strong> <small>plus one bias</small></p>
+</div>
+<div class="parameter-bank-visual fragment">
+<span>16 FILTERS</span>
+<div class="filter-count-dots">
+<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+<p><strong><span class="math inline">\(16(27+1)=448\)</span></strong> <small>learnable parameters</small></p>
+</div>
+</div>
+<div class="parameter-formula fragment">
+<span>GENERAL RULE</span>
+<div class="parameter-equation">
+#θ = C<sub>out</sub> (C<sub>in</sub>K<sub>h</sub>K<sub>w</sub> + 1)
+</div>
+<p><strong>Parameter count does not depend on image height or width.</strong></p>
+</div>
+<div class="notes">
+<p>Count one filter before multiplying by the number of filters. Each output filter owns C-in times K-h times K-w weights and one scalar bias. With three input channels and a 3 by 3 kernel, that is 27 plus one. Sixteen filters give 448. The spatial reuse is visible in the formula: H and W do not appear. If bias is disabled, remove the plus one.</p>
+</div>
+</section>
+<section id="trained-filters-become-different-visual-questions" class="level2">
+<h2 class="anchored" data-anchor-id="trained-filters-become-different-visual-questions">Trained filters become different visual questions</h2>
+<div class="trained-evidence-layout">
+<div class="trained-filters-panel">
+<p><span>ALEXNET · FIRST-LAYER FILTERS</span> <img src="assets/alexnet-conv1-filters.jpeg" class="img-fluid" alt="A grid of trained first-layer AlexNet filters, including oriented edges and color-sensitive patterns."> <strong>different weights → different patterns</strong></p>
+</div>
+<div class="trained-activations-panel fragment">
+<p><span>ONE IMAGE · MANY ACTIVATION MAPS</span> <img src="assets/alexnet-conv1-activations.jpeg" class="img-fluid" alt="A grid of first-layer AlexNet activation maps for one input image."> <strong>different filters → different response maps</strong></p>
+</div>
+</div>
+<div class="trained-reading fragment">
+<p><span>DO NOT ASK “WHAT DOES THE LAYER SEE?”</span> <strong>Ask: which filter, and where does its feature map respond?</strong></p>
+</div>
+<p class="source-note">
+Trained filters and activations reproduced from Stanford <a href="https://cs231n.github.io/understanding-cnn/#vis">CS231n · Visualizing ConvNets</a> <span class="citation" data-cites="cs231nnotes">(Li et al., n.d.)</span>.
+</p>
+<div class="notes">
+<p>Give students time to inspect the filters. First-layer filters often resemble oriented edges, color transitions, and blobs. The activation panel shows one response map per filter for one image; bright locations indicate strong positive response. These are examples from a trained AlexNet, not a universal dictionary. Deeper-layer filters span input feature channels rather than raw RGB, so their weights are harder to visualize directly.</p>
+</div>
+</section>
+<section id="keep-the-two-channel-rules-separate" class="level2">
+<h2 class="anchored" data-anchor-id="keep-the-two-channel-rules-separate">Keep the two channel rules separate</h2>
+<div class="channel-summary">
+<div class="channel-summary-rule input-channel-rule">
+<span>INPUT CHANNELS</span> <strong>set each filter’s depth</strong>
+<div>
+C<sub>in</sub> = 3 → every filter has 3 slices
+</div>
+</div>
+<div class="channel-summary-rule output-channel-rule fragment">
+<span>OUTPUT CHANNELS</span> <strong>count the filters</strong>
+<div>
+16 filters → C<sub>out</sub> = 16 maps
+</div>
+</div>
+</div>
+<div class="channel-summary-shape fragment">
+<p><span>COMPLETE CONTRACT</span> <strong>(N, C<sub>in</sub>, H, W) → convolution → (N, C<sub>out</sub>, H<sub>out</sub>, W<sub>out</sub>)</strong></p>
+</div>
+<div class="channel-check fragment">
+<p>Before the next layer, verify channels and spatial geometry independently.</p>
+</div>
+<div class="notes">
+<p>Close by asking two rapid questions. If input has 32 channels, how deep is every filter? Thirty-two. If the layer has 64 filters, how many output maps? Sixty-four. Then read the full shape contract. This separation prevents the most common conceptual mistake before implementing a CNN.</p>
+</div>
+</section>
+</section>
+<section id="pooling-receptive-fields-and-pytorch-1" class="level1 section-slide cnn-section building-section" data-section-progress="5 / 6" style="--section-progress:83.333%">
+<h1 class="section-slide cnn-section building-section" data-section-progress="5 / 6" style="--section-progress:83.333%">05 · Pooling, receptive fields, and PyTorch</h1>
+<section id="translate-the-shape-decision-into-nn.conv2d" class="level2">
+<h2 class="anchored" data-anchor-id="translate-the-shape-decision-into-nn.conv2d">Translate the shape decision into <code>nn.Conv2d</code></h2>
+<div class="conv-api-layout">
+<div class="light-code-editor conv-api-editor">
+<div class="editor-bar">
+<span>PYTORCH LAYER</span><strong>features.py</strong>
+</div>
+<pre><code><span class="py-comment"># (N, 3, 32, 32) → (N, 16, 32, 32)</span>
+conv = nn.Conv2d(
+    in_channels=<span class="py-num">3</span>,
+    out_channels=<span class="py-num">16</span>,
+    kernel_size=<span class="py-num">3</span>,
+    stride=<span class="py-num">1</span>,
+    padding=<span class="py-num">1</span>,
+)
+
+y = conv(x)
+<span class="py-kw">print</span>(y.shape)
+<span class="py-output"># torch.Size([64, 16, 32, 32])</span></code></pre>
+</div>
+<div class="conv-api-map">
+<div>
+<span>in_channels = 3</span><strong>filter depth</strong><small>must match C<sub>in</sub></small>
+</div>
+<div class="fragment">
+<span>out_channels = 16</span><strong>number of filters</strong><small>becomes C<sub>out</sub></small>
+</div>
+<div class="fragment">
+<span>kernel_size = 3</span><strong>3 × 3 local window</strong><small>one integer applies to both axes</small>
+</div>
+<div class="fragment">
+<span>stride = 1 · padding = 1</span><strong>movement and border</strong><small>preserve 32 × 32 here</small>
+</div>
+</div>
+</div>
+<div class="conv-api-takeaway fragment">
+<p><span>DECLARATION ≠ EXECUTION</span><strong><code>nn.Conv2d(...)</code> owns the learnable filters; <code>conv(x)</code> applies them to a batch.</strong></p>
+</div>
+<div class="notes">
+<p>Connect every constructor argument to the visual contract from the preceding section. In-channels fixes the depth of every filter; out-channels counts independently learned filters. Kernel size, stride, and padding control spatial geometry. Creating the module allocates and registers parameters—it does not process data. The forward call applies the same filter bank to all 64 images. Ask students to predict the output before revealing the printed shape.</p>
+</div>
+</section>
+<section id="why-reduce-a-feature-map" class="level2">
+<h2 class="anchored" data-anchor-id="why-reduce-a-feature-map">Why reduce a feature map?</h2>
+<div class="pooling-motivation-layout">
+<div class="pooling-map-large">
+<span>EARLY FEATURE MAP</span>
+<div class="pooling-signal-map" aria-label="A large feature map with a highlighted local response">
+<i></i><b></b>
+</div>
+<p><strong>precise location</strong><small>32 × 32 values</small></p>
+</div>
+<div class="pooling-motive-arrow fragment">
+<p><span>→</span><small>summarize<br>neighborhoods</small></p>
+</div>
+<div class="pooling-map-small fragment">
+<span>REDUCED MAP</span>
+<div class="pooled-signal-map" aria-label="A smaller feature map retaining a strong response">
+<i></i><b></b>
+</div>
+<p><strong>coarser location</strong><small>16 × 16 values</small></p>
+</div>
+<div class="pooling-tradeoff fragment">
+<span>THE TRADE</span>
+<div>
+<b>keep</b>
+<p>
+the strongest local evidence
+</p>
+</div>
+<div>
+<b>lose</b>
+<p>
+some exact position
+</p>
+</div>
+<div>
+<b>gain</b>
+<p>
+less computation downstream
+</p>
+</div>
+</div>
+</div>
+<div class="notes">
+<p>Start from a feature map, not a raw image. The highlighted response might mean an edge or texture was found. Pooling summarizes nearby responses and reduces spatial resolution. It does not create new channels and normally has no learned weights. The benefit is cheaper later computation and tolerance to small shifts; the cost is discarded spatial detail. This is a design trade, not an automatic improvement.</p>
+</div>
+</section>
+<section id="max-pooling-keeps-one-winner-per-window" class="level2">
+<h2 class="anchored" data-anchor-id="max-pooling-keeps-one-winner-per-window">Max pooling keeps one winner per window</h2>
+<div class="maxpool-worked-layout">
+<div class="maxpool-input">
+<span>4 × 4 FEATURE MAP</span>
+<div class="numeric-map four-map">
+<p><i>1</i><i>3</i><i>2</i><i>0</i> <i>4</i><i class="winner">6</i><i>1</i><i class="winner">5</i> <i>2</i><i>1</i><i>3</i><i>2</i> <i>0</i><i class="winner">7</i><i>4</i><i class="winner">8</i></p>
+</div>
+<p><small>window 2 × 2 · stride 2</small></p>
+</div>
+<div class="pool-window-arrow fragment">
+<span>→</span><small>maximum<br>of each color block</small>
+</div>
+<div class="maxpool-output fragment">
+<span>2 × 2 OUTPUT</span>
+<div class="numeric-map two-map">
+<i>6</i><i>5</i><i>7</i><i>8</i>
+</div>
+<p><strong>no weighted sum</strong><small>no learnable parameters</small></p>
+</div>
+</div>
+<div class="maxpool-rule fragment">
+<p><span>ONE CHANNEL AT A TIME</span><strong>Max pooling changes H and W—not the number of channels.</strong></p>
+</div>
+<div class="notes">
+<p>Trace each non-overlapping 2 by 2 region. The maximum becomes one output value: 6, 5, 7, and 8. Pooling applies independently to every feature map, so C is preserved. Unlike convolution, there is no dot product, bias, or filter bank. With kernel two and stride two, each spatial dimension is halved when it is even.</p>
+</div>
+</section>
+<section id="max-and-average-pooling-answer-different-questions" class="level2">
+<h2 class="anchored" data-anchor-id="max-and-average-pooling-answer-different-questions">Max and average pooling answer different questions</h2>
+<div class="pooling-question">
+For the patch <strong>[1, 2; 3, 8]</strong>, what evidence should survive?
+</div>
+<div class="pooling-choice-layout">
+<div class="pool-choice max-choice">
+<span>MAX POOL</span>
+<div class="choice-patch">
+<i>1</i><i>2</i><i>3</i><i class="winner">8</i>
+</div>
+<strong>→ 8</strong>
+<p>
+“Was the feature strongly present anywhere?”
+</p>
+</div>
+<div class="pool-choice average-choice fragment">
+<span>AVERAGE POOL</span>
+<div class="choice-patch">
+<i>1</i><i>2</i><i>3</i><i>8</i>
+</div>
+<strong>→ 3.5</strong>
+<p>
+“How much feature evidence was present overall?”
+</p>
+</div>
+</div>
+<div class="pooling-choice-note fragment">
+<p>The output shape can be identical; the retained information is not.</p>
+</div>
+<div class="notes">
+<p>Use the same input patch to isolate the aggregation rule. Max pooling preserves the strongest detection; average pooling measures mean activity. Neither is universally best. Max pooling was historically common in classification CNNs, while learned strided convolutions and global average pooling are also common architectural choices. The important question is what information the reduction should preserve.</p>
+</div>
+</section>
+<section id="depth-lets-one-unit-combine-a-larger-pattern" class="level2">
+<h2 class="anchored" data-anchor-id="depth-lets-one-unit-combine-a-larger-pattern">Depth lets one unit combine a larger pattern</h2>
+<div class="receptive-question">
+<span>CONCRETE QUESTION</span><strong>How could one later unit respond to an eye-like part?</strong>
+</div>
+<div class="receptive-depth-story">
+<div class="receptive-stage rf-edge">
+<span>LAYER 1 · 3 × 3 VIEW</span>
+<div class="rf-window rf-three" role="img" aria-label="A three by three receptive field containing a short diagonal edge">
+<i></i><i></i><i></i><i></i><i class="signal"></i><i class="signal"></i><i></i><i class="signal"></i><i></i>
+</div>
+<p><strong>short edges</strong> <small>combine nearby pixels</small></p>
+</div>
+<div class="receptive-arrow fragment">
+<b>→</b><small>combine neighboring<br>edge responses</small>
+</div>
+<div class="receptive-stage rf-curve fragment">
+<span>LAYER 2 · 5 × 5 VIEW</span>
+<div class="rf-window rf-five" role="img" aria-label="A five by five receptive field containing joined edge responses that form a curve">
+<i></i><i></i><i class="signal"></i><i class="signal"></i><i></i><i></i><i class="signal"></i><i></i><i></i><i class="signal"></i><i class="signal"></i><i></i><i></i><i></i><i></i><i></i><i class="signal"></i><i></i><i></i><i class="signal"></i><i></i><i></i><i class="signal"></i><i class="signal"></i><i></i>
+</div>
+<p><strong>curves and corners</strong> <small>combine compatible edges</small></p>
+</div>
+<div class="receptive-arrow fragment">
+<b>→</b><small>combine neighboring<br>motif responses</small>
+</div>
+<div class="receptive-stage rf-part fragment">
+<span>LAYER 3 · 7 × 7 VIEW</span>
+<div class="eye-part" role="img" aria-label="An eye-like visual part assembled from an outer curve and a dark center">
+<i></i>
+</div>
+<p><strong>an eye-like part</strong> <small>combine motifs over a wider region</small></p>
+</div>
+</div>
+<div class="receptive-growth fragment">
+<span>THREE 3 × 3 CONVOLUTIONS · STRIDE 1</span>
+<div>
+<b>start</b><strong>1</strong><i>→ +2</i><strong>3</strong><i>→ +2</i><strong>5</strong><i>→ +2</i><strong>7</strong>
+</div>
+<p>
+Each layer can use a wider region of the original image.
+</p>
+</div>
+<p class="source-note">
+Course-made illustration. Receptive-field arithmetic follows the convolution relationships in Stanford CS231n <span class="citation" data-cites="cs231nnotes">(Li et al., n.d.)</span>.
+</p>
+<div class="notes">
+<p>Begin with the eye-like target on the right, then work from left to right. A first-layer unit can only combine a small patch of pixels, so a short oriented edge is a plausible feature. A second-layer unit receives neighboring first-layer responses and can combine compatible edges into a curve or corner. A third-layer unit can combine those motifs over a seven-by-seven region. For stride-one three-by-three convolutions, begin with one input pixel and add two pixels to the receptive-field width at every layer: one, three, five, seven. Say “could learn,” not “must learn”: depth provides the spatial scope and compositional mechanism, while training determines the actual features.</p>
+</div>
+</section>
+<section id="global-average-pooling-turns-each-map-into-one-number" class="level2">
+<h2 class="anchored" data-anchor-id="global-average-pooling-turns-each-map-into-one-number">Global average pooling turns each map into one number</h2>
+<div class="global-pool-layout">
+<div class="global-map-stack">
+<span>16 FEATURE MAPS</span>
+<div class="global-stack">
+<i></i><i></i><i></i><i></i>
+</div>
+<p><strong>(N, 16, 8, 8)</strong></p>
+</div>
+<div class="global-pool-operation fragment">
+<span>AVERAGE ALL H × W LOCATIONS</span>
+<div>
+<b>map 1</b><i>→</i><strong>0.72</strong>
+</div>
+<div>
+<b>map 2</b><i>→</i><strong>0.11</strong>
+</div>
+<div>
+<b>⋮</b><i></i><strong>⋮</strong>
+</div>
+<div>
+<b>map 16</b><i>→</i><strong>0.64</strong>
+</div>
+</div>
+<div class="global-vector fragment">
+<span>ONE VALUE PER CHANNEL</span>
+<div>
+<i>.72</i><i>.11</i><i>…</i><i>.64</i>
+</div>
+<p><strong>(N, 16, 1, 1)</strong> <small>then flatten → (N, 16)</small></p>
+</div>
+</div>
+<div class="global-pool-insight fragment">
+<p><span>LOCALIZATION → PRESENCE</span><strong>“Where did the feature fire?” becomes “How much did it fire?”</strong></p>
+</div>
+<div class="notes">
+<p>Contrast local pooling with global average pooling. Local pooling slides a small window and keeps a smaller spatial map. Global pooling uses the entire spatial extent as one window, producing one scalar for each channel. It therefore removes spatial location completely while retaining a summary of each learned feature. This often forms a compact bridge from convolutional features to a classifier.</p>
+</div>
+</section>
+<section id="pytorch-exposes-pooling-at-three-useful-levels" class="level2">
+<h2 class="anchored" data-anchor-id="pytorch-exposes-pooling-at-three-useful-levels">PyTorch exposes pooling at three useful levels</h2>
+<div class="pool-api-layout">
+<div class="light-code-editor pool-api-editor">
+<div class="editor-bar">
+<span>POOLING OPERATIONS</span><strong>pooling.py</strong>
+</div>
+<pre><code><span class="py-comment"># x.shape: (64, 16, 32, 32)</span>
+pool = nn.MaxPool2d(
+    kernel_size=<span class="py-num">2</span>,
+    stride=<span class="py-num">2</span>,
+)
+
+y = pool(x)
+<span class="py-kw">print</span>(y.shape)
+<span class="py-output"># torch.Size([64, 16, 16, 16])</span></code></pre>
+</div>
+<div class="pool-api-decisions">
+<div>
+<span>WORKED ABOVE</span><strong><code>nn.MaxPool2d</code></strong><small>strongest value in each local window</small>
+</div>
+<div class="fragment">
+<span>LOCAL MEAN</span><strong><code>nn.AvgPool2d</code></strong><small>average value in each local window</small>
+</div>
+<div class="fragment">
+<span>FIXED OUTPUT SIZE</span><strong><code>nn.AdaptiveAvgPool2d</code></strong><small>average into the requested H<sub>out</sub> × W<sub>out</sub></small>
+</div>
+<div class="fragment">
+<span>FIXED OUTPUT SIZE</span><strong><code>nn.AdaptiveMaxPool2d</code></strong><small>maximum into the requested H<sub>out</sub> × W<sub>out</sub></small>
+</div>
+</div>
+</div>
+<div class="pool-api-check fragment">
+<p>All these pooling methods operate independently on tensors shaped (N, C, H, W); none changes C.</p>
+</div>
+<div class="notes">
+<p>Present modules because they fit naturally inside nn.Sequential and model definitions. Functional equivalents also exist in torch.nn.functional: max_pool2d, avg_pool2d, and adaptive_avg_pool2d. Adaptive pooling is convenient when input resolution may vary because students specify the desired output size rather than calculating a kernel manually. For global average pooling, output size one is the clearest intent.</p>
+</div>
+</section>
+<section id="the-complete-reduction-story" class="level2">
+<h2 class="anchored" data-anchor-id="the-complete-reduction-story">The complete reduction story</h2>
+<div class="reduction-story">
+<div class="reduction-stage conv-stage">
+<span>CONVOLUTION</span>
+<div class="stage-volume stage-full">
+
+</div>
+<p><strong>(N, 16, 32, 32)</strong><small>learn new local features</small></p>
+</div>
+<div class="story-arrow">
+→
+</div>
+<div class="reduction-stage local-stage fragment">
+<span>LOCAL POOL</span>
+<div class="stage-volume stage-half">
+
+</div>
+<p><strong>(N, 16, 16, 16)</strong><small>keep coarse spatial evidence</small></p>
+</div>
+<div class="story-arrow fragment">
+→
+</div>
+<div class="reduction-stage global-stage fragment">
+<span>GLOBAL POOL</span>
+<div class="stage-vector">
+<i></i><i></i><i></i><i></i>
+</div>
+<p><strong>(N, 16)</strong><small>one summary per feature</small></p>
+</div>
+</div>
+<div class="reduction-story-rule fragment">
+<p><strong>Convolution changes what is represented.</strong><span>Pooling changes how precisely it is located.</span></p>
+</div>
+<div class="notes">
+<p>Finish by telling the complete shape story. Convolution learns features and can change channels. Local pooling reduces spatial precision while retaining a grid. Global pooling removes the grid and leaves one summary per channel. This prepares students to assemble a complete model in the final section. Stress that pooling never mixes examples in the batch and ordinarily never mixes channels.</p>
+</div>
+</section>
+</section>
+<section id="read-and-build-complete-cnns-1" class="level1 section-slide cnn-section case-section" data-section-progress="6 / 6" style="--section-progress:100%">
+<h1 class="section-slide cnn-section case-section" data-section-progress="6 / 6" style="--section-progress:100%">06 · Read and build complete CNNs</h1>
+<section id="alexnet-can-we-read-this-model-now" class="level2">
+<h2 class="anchored" data-anchor-id="alexnet-can-we-read-this-model-now">AlexNet: can we read this model now?</h2>
+<div class="alexnet-paper-figure">
+<p><img src="assets/alexnet-figure-2.png" alt="The original AlexNet architecture diagram, split across two GPUs, with five convolutional layers followed by three dense layers."></p>
+</div>
+<div class="alexnet-paper-prompt">
+<p><span>READ LEFT → RIGHT</span><strong>Which shapes, convolutions, and pooling operations can you already explain?</strong></p>
+</div>
+<p class="source-note">
+Original Figure 2 from “ImageNet Classification with Deep Convolutional Neural Networks,” Krizhevsky, Sutskever &amp; Hinton <span class="citation" data-cites="krizhevsky2012imagenet">(Krizhevsky et al. 2012)</span>. <a href="https://proceedings.neurips.cc/paper_files/paper/2012/file/c399862d3b9d6b76c8436e924a68c45b-Paper.pdf">Read the paper ↗</a>
+</p>
+<div class="notes">
+<p>Show the historical figure without translating or simplifying it first. Give students time to inspect the real architecture and retrieve the vocabulary developed so far: filters, channel counts, spatial sizes, stride, max pooling, and dense layers. The upper and lower paths reflect the original model’s split across two GPUs. Stop here before unpacking the architecture in subsequent slides.</p>
+</div>
+</section>
+<section id="read-a-model-definition-as-a-network" class="level2">
+<h2 class="anchored" data-anchor-id="read-a-model-definition-as-a-network">Read a model definition as a network</h2>
+<div class="keras-reading-layout">
+<div class="light-code-editor keras-simple-editor">
+<div class="editor-bar">
+<span>PYTORCH · SEQUENTIAL</span><strong>small_cnn.py</strong>
+</div>
+<pre><code>model = nn.Sequential(
+    nn.Conv2d(<span class="py-num">1</span>, <span class="py-num">8</span>, kernel_size=<span class="py-num">3</span>, padding=<span class="py-num">1</span>),
+    nn.ReLU(),
+    nn.MaxPool2d(kernel_size=<span class="py-num">2</span>),
+    nn.Flatten(),
+    nn.Linear(<span class="py-num">8 * 14 * 14</span>, <span class="py-num">10</span>)
+)</code></pre>
+</div>
+<div class="keras-network-diagram">
+<div class="keras-stage input-stage">
+<span>INPUT</span><strong>(N, 1, 28, 28)</strong><small>batch · channels · height · width</small>
+</div>
+<i>→</i>
+<div class="keras-stage learned-stage fragment">
+<span>8 FILTERS</span><strong>(N, 8, 28, 28)</strong><small>Conv 3 × 3 → ReLU</small>
+</div>
+<i class="fragment">→</i>
+<div class="keras-stage pool-stage fragment">
+<span>POOL /2</span><strong>(N, 8, 14, 14)</strong><small>no learned weights</small>
+</div>
+<i class="fragment">→</i>
+<div class="keras-stage head-stage fragment">
+<span>CLASSIFIER</span><strong>1,568 → 10</strong><small>Flatten → Dense</small>
+</div>
+</div>
+</div>
+<div class="keras-reading-rule fragment">
+<p><span>READ TOP → BOTTOM</span><strong>Each line transforms the output shape of the line before it.</strong></p>
+</div>
+<div class="notes">
+<p>Use this deliberately small example to establish the reading direction in the framework students already know. PyTorch tensors use channels-first notation: batch, channels, height, width. Padding one preserves 28 by 28, Conv2d creates eight output channels, and pooling halves only the spatial dimensions. Flatten converts 8 times 14 times 14 into 1,568 values before Linear produces ten class scores. Point to one code line and then its matching stage in the diagram; the diagram is a translation of the code, not a second architecture.</p>
+</div>
+</section>
+<section id="compose-two-feature-learning-blocks" class="level2">
+<h2 class="anchored" data-anchor-id="compose-two-feature-learning-blocks">Compose two feature-learning blocks</h2>
+<div class="two-block-reading-layout">
+<div class="light-code-editor two-block-editor">
+<div class="editor-bar">
+<span>PYTORCH · SEQUENTIAL</span><strong>two_block_cnn.py</strong>
+</div>
+<pre><code>model = nn.Sequential(
+    nn.Conv2d(<span class="py-num">3</span>, <span class="py-num">16</span>, <span class="py-num">3</span>, padding=<span class="py-num">1</span>),
+    nn.ReLU(),
+    nn.MaxPool2d(<span class="py-num">2</span>),
+
+    nn.Conv2d(<span class="py-num">16</span>, <span class="py-num">32</span>, <span class="py-num">3</span>, padding=<span class="py-num">1</span>),
+    nn.ReLU(),
+    nn.MaxPool2d(<span class="py-num">2</span>),
+
+    nn.Flatten(),
+    nn.Linear(<span class="py-num">32 * 8 * 8</span>, <span class="py-num">10</span>)
+)</code></pre>
+</div>
+<div class="two-block-network" aria-label="Equivalent two-block convolutional network with tensor shapes">
+<div class="network-input">
+<span>INPUT</span><strong>N × 3 × 32 × 32</strong>
+</div>
+<i>↓</i>
+<div class="network-block block-one fragment">
+<span>BLOCK 1</span>
+<div>
+<b>Conv 3→16</b><b>ReLU</b><b>Pool /2</b>
+</div>
+<p><strong>N × 16 × 16 × 16</strong></p>
+</div>
+<i class="fragment">↓</i>
+<div class="network-block block-two fragment">
+<span>BLOCK 2</span>
+<div>
+<b>Conv 16→32</b><b>ReLU</b><b>Pool /2</b>
+</div>
+<p><strong>N × 32 × 8 × 8</strong></p>
+</div>
+<i class="fragment">↓</i>
+<div class="network-head fragment">
+<span>CLASSIFIER</span><strong>2,048 → 10</strong><small>Flatten → Linear</small>
+</div>
+</div>
+</div>
+<div class="two-block-pattern fragment">
+<p><span>THE REPEATED PATTERN</span><strong>Convolution changes the feature channels; pooling changes the spatial resolution.</strong></p>
+</div>
+<div class="notes">
+<p>Read the code and drawing together. The input is a batch of 32 by 32 RGB images. In each block, padding one lets the 3 by 3 convolution preserve height and width, ReLU preserves the entire shape, and max pooling halves height and width. The first block changes 3 channels into 16 and ends at 16 by 16. The second changes 16 channels into 32 and ends at 8 by 8. Flatten therefore receives 32 times 8 times 8, or 2,048 values per image. Use the repeated colors and aligned labels to make the composition visible without naming it as a classical architecture.</p>
+</div>
+</section>
+<section id="your-turn-read-a-larger-printed-model" class="level2">
+<h2 class="anchored" data-anchor-id="your-turn-read-a-larger-printed-model">Your turn: read a larger printed model</h2>
+<div class="keras-summary-exercise">
+<div class="light-code-editor keras-summary-editor">
+<div class="editor-bar">
+<span>PYTORCH · PRINT(MODEL)</span><strong>three_block_cnn</strong>
+</div>
+<pre><code>Sequential(
+  (0): Conv2d(3, 16, kernel_size=(3, 3),
+              stride=(1, 1), padding=(1, 1))
+  (1): ReLU()
+  (2): MaxPool2d(kernel_size=2, stride=2)
+  (3): Conv2d(16, 32, kernel_size=(3, 3),
+              stride=(1, 1), padding=(1, 1))
+  (4): ReLU()
+  (5): MaxPool2d(kernel_size=2, stride=2)
+  (6): Conv2d(32, 64, kernel_size=(3, 3),
+              stride=(1, 1), padding=(1, 1))
+  (7): ReLU()
+  (8): AdaptiveAvgPool2d(output_size=(1, 1))
+  (9): Flatten(start_dim=1, end_dim=-1)
+  (10): Linear(in_features=64, out_features=10)
+)</code></pre>
+</div>
+<div class="summary-reading-task">
+<span>EXACT TASK</span> <strong>Input: (N, 3, 32, 32). Recover the architecture.</strong>
+<div>
+<b>1</b><small>How many layers own learned weights?</small>
+</div>
+<div>
+<b>2</b><small>Where does resolution change?</small>
+</div>
+<div>
+<b>3</b><small>Which lines have no learned parameters?</small>
+</div>
+</div>
+</div>
+<div class="pause-panel summary-pause">
+<p><strong>PAUSE · 90 seconds</strong><span>Track (C, H, W) after every row; keep the batch size <code>N</code> unchanged.</span></p>
+</div>
+<div class="summary-reading-solution fragment">
+<span>WORKED READING</span>
+<div>
+<strong>4 learned layers</strong><small>3 convolutions + 1 dense classifier</small>
+</div>
+<div>
+<strong>32 → 16 → 8 → 1</strong><small>two local pools, then global average pooling</small>
+</div>
+<div>
+<strong>ReLU + pooling</strong><small>change values or shape, but own no learned weights</small>
+</div>
+</div>
+<div class="notes">
+<p>Honor the pause before revealing the reading. Students should identify learned layers by operation semantics, not by counting every printed row: the three convolutions and the linear layer own parameters; the ReLU and pooling operations do not. The two max-pooling rows halve height and width. Adaptive average pooling collapses the remaining 8 by 8 grid to one number per channel, so the linear layer receives 64 features. The indices are the order assigned by Sequential. This architecture is intentionally unnamed: the aim is to read compositions, not preview the named architecture families of the next lecture.</p>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Deep Learning · ENSA Tétouan</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

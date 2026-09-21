@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dr.&nbsp;A. Belcaid">
+<meta name="description" content="Step-by-step backward pass for a two-layer sigmoid network using message passing and matrix gradients">
+
+<title>Backpropagation Through a Two-Layer Binary Classifier – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e90830a6c3a870e8aa2cd7457ccbff49.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../schedule.html"> 
+<span class="menu-text">Schedule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../logistics.html"> 
+<span class="menu-text">Logistics</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#network-and-notation" id="toc-network-and-notation" class="nav-link active" data-scroll-target="#network-and-notation"><span class="header-section-number">1</span> Network and notation</a></li>
+  <li><a href="#forward-pass-store-what-backward-will-need" id="toc-forward-pass-store-what-backward-will-need" class="nav-link" data-scroll-target="#forward-pass-store-what-backward-will-need"><span class="header-section-number">2</span> Forward pass: store what backward will need</a></li>
+  <li><a href="#backward-pass-one-block-at-a-time" id="toc-backward-pass-one-block-at-a-time" class="nav-link" data-scroll-target="#backward-pass-one-block-at-a-time"><span class="header-section-number">3</span> Backward pass, one block at a time</a>
+  <ul class="collapse">
+  <li><a href="#step-0-seed-the-loss" id="toc-step-0-seed-the-loss" class="nav-link" data-scroll-target="#step-0-seed-the-loss"><span class="header-section-number">3.1</span> Step 0: seed the loss</a></li>
+  <li><a href="#step-1-binary-cross-entropy-sends-a-message-to-hat-y" id="toc-step-1-binary-cross-entropy-sends-a-message-to-hat-y" class="nav-link" data-scroll-target="#step-1-binary-cross-entropy-sends-a-message-to-hat-y"><span class="header-section-number">3.2</span> Step 1: binary cross-entropy sends a message to <span class="math inline">\(\hat y\)</span></a></li>
+  <li><a href="#step-2-the-output-sigmoid-sends-a-message-to-z_2" id="toc-step-2-the-output-sigmoid-sends-a-message-to-z_2" class="nav-link" data-scroll-target="#step-2-the-output-sigmoid-sends-a-message-to-z_2"><span class="header-section-number">3.3</span> Step 2: the output sigmoid sends a message to <span class="math inline">\(z_2\)</span></a></li>
+  <li><a href="#step-3-the-second-affine-layer-sends-three-messages" id="toc-step-3-the-second-affine-layer-sends-three-messages" class="nav-link" data-scroll-target="#step-3-the-second-affine-layer-sends-three-messages"><span class="header-section-number">3.4</span> Step 3: the second affine layer sends three messages</a></li>
+  <li><a href="#step-4-the-hidden-sigmoid-sends-a-message-to-mathbf-z_1" id="toc-step-4-the-hidden-sigmoid-sends-a-message-to-mathbf-z_1" class="nav-link" data-scroll-target="#step-4-the-hidden-sigmoid-sends-a-message-to-mathbf-z_1"><span class="header-section-number">3.5</span> Step 4: the hidden sigmoid sends a message to <span class="math inline">\(\mathbf z_1\)</span></a></li>
+  <li><a href="#step-5-the-first-affine-layer-reaches-the-parameters-and-input" id="toc-step-5-the-first-affine-layer-reaches-the-parameters-and-input" class="nav-link" data-scroll-target="#step-5-the-first-affine-layer-reaches-the-parameters-and-input"><span class="header-section-number">3.6</span> Step 5: the first affine layer reaches the parameters and input</a></li>
+  </ul></li>
+  <li><a href="#the-complete-backward-pass" id="toc-the-complete-backward-pass" class="nav-link" data-scroll-target="#the-complete-backward-pass"><span class="header-section-number">4</span> The complete backward pass</a></li>
+  <li><a href="#shape-audit" id="toc-shape-audit" class="nav-link" data-scroll-target="#shape-audit"><span class="header-section-number">5</span> Shape audit</a></li>
+  <li><a href="#mini-batches" id="toc-mini-batches" class="nav-link" data-scroll-target="#mini-batches"><span class="header-section-number">6</span> Mini-batches</a></li>
+  <li><a href="#a-final-self-check" id="toc-a-final-self-check" class="nav-link" data-scroll-target="#a-final-self-check"><span class="header-section-number">7</span> A final self-check</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="two-layer-derivation.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Backpropagation Through a Two-Layer Binary Classifier</h1>
+<p class="subtitle lead">A complete symbolic derivation from binary cross-entropy to the first layer</p>
+</div>
+
+<div>
+  <div class="description">
+    Step-by-step backward pass for a two-layer sigmoid network using message passing and matrix gradients
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dr.&nbsp;A. Belcaid </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>This note is the complete derivation referenced in the backpropagation lecture. Its purpose is to make every gradient message explicit without interrupting the lecture with a long sequence of algebra.</p>
+<div class="callout callout-style-simple callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>The rule used at every node
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A node first <strong>adds all gradient messages received from its children</strong>. It then multiplies that accumulated gradient by the appropriate local derivative and sends the result to each parent.</p>
+<blockquote class="blockquote">
+<p>Receive and add. Transform locally. Send backward.</p>
+</blockquote>
+</div>
+</div>
+<section id="network-and-notation" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="network-and-notation"><span class="header-section-number">1</span> Network and notation</h2>
+<p>We consider one training example with input <span class="math inline">\(\mathbf x\in\mathbb R^D\)</span> and binary target <span class="math inline">\(y\in\{0,1\}\)</span>. The hidden layer contains <span class="math inline">\(H\)</span> units. Vectors are column vectors:</p>
+<p><span class="math display">\[
+W_1\in\mathbb R^{H\times D},\qquad
+\mathbf b_1\in\mathbb R^H,qquad
+W_2\in\mathbb R^{1\times H},\qquad
+b_2\in\mathbb R.
+\]</span></p>
+<p>The forward pass is</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathbf z_1 &amp;= W_1\mathbf x+\mathbf b_1,\\
+\mathbf h &amp;= \sigma(\mathbf z_1),\\
+z_2 &amp;= W_2\mathbf h+b_2,\\
+\hat y &amp;= \sigma(z_2),\\
+\mathcal L &amp;= -\left[y\log\hat y+(1-y)\log(1-\hat y)\right].
+\end{aligned}
+\]</span></p>
+<div id="fig-two-layer-graph" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-two-layer-graph-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/03-backpropagation/assets/two-layer-loss-graph.svg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-two-layer-graph-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: The symbolic computation graph used in the lecture: values are blue circles, parameters are purple rounded rectangles, affine maps are square blocks, sigmoid activations are purple circles, and binary cross-entropy is the coral loss node.
+</figcaption>
+</figure>
+</div>
+<p>We write</p>
+<p><span class="math display">\[
+\mathbf g_v \equiv \frac{\partial\mathcal L}{\partial \mathbf v}
+\]</span></p>
+<p>for the gradient message accumulated at a value <span class="math inline">\(\mathbf v\)</span>. For a scalar, the boldface is omitted.</p>
+</section>
+<section id="forward-pass-store-what-backward-will-need" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="forward-pass-store-what-backward-will-need"><span class="header-section-number">2</span> Forward pass: store what backward will need</h2>
+<p>Backpropagation reuses the values computed during the forward pass. Store</p>
+<p><span class="math display">\[
+\mathbf x,quad \mathbf z_1,quad \mathbf h,quad z_2,quad \hat y,quad y.
+\]</span></p>
+<p>The sigmoid derivative can then be evaluated from its stored output:</p>
+<p><span class="math display">\[
+\sigma'(z)=\sigma(z)(1-\sigma(z)).
+\]</span></p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p>The backward pass does not repeatedly expand the complete nested formula. Each block differentiates only its own input-output relationship.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="backward-pass-one-block-at-a-time" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="backward-pass-one-block-at-a-time"><span class="header-section-number">3</span> Backward pass, one block at a time</h2>
+<section id="step-0-seed-the-loss" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="step-0-seed-the-loss"><span class="header-section-number">3.1</span> Step 0: seed the loss</h3>
+<p>The loss is the final scalar, so its incoming sensitivity to itself is</p>
+<p><span class="math display">\[
+g_{\mathcal L}=\frac{\partial\mathcal L}{\partial\mathcal L}=1.
+\]</span></p>
+<p>Every following step has the same structure:</p>
+<p><span class="math display">\[
+\text{outgoing message}
+=\text{incoming message}\times\text{local derivative}.
+\]</span></p>
+</section>
+<section id="step-1-binary-cross-entropy-sends-a-message-to-hat-y" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="step-1-binary-cross-entropy-sends-a-message-to-hat-y"><span class="header-section-number">3.2</span> Step 1: binary cross-entropy sends a message to <span class="math inline">\(\hat y\)</span></h3>
+<p>The local derivative is</p>
+<p><span class="math display">\[
+\frac{\partial\mathcal L}{\partial\hat y}
+=-\frac{y}{\hat y}+\frac{1-y}{1-\hat y}.
+\]</span></p>
+<p>Therefore</p>
+<p><span class="math display">\[
+g_{\hat y}
+=g_{\mathcal L}\frac{\partial\mathcal L}{\partial\hat y}
+=-\frac{y}{\hat y}+\frac{1-y}{1-\hat y}.
+\]</span></p>
+<p>This expression can become numerically large when <span class="math inline">\(\hat y\)</span> is extremely close to zero or one. The next step reveals why software libraries usually combine sigmoid and BCE into one stable operation.</p>
+</section>
+<section id="step-2-the-output-sigmoid-sends-a-message-to-z_2" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="step-2-the-output-sigmoid-sends-a-message-to-z_2"><span class="header-section-number">3.3</span> Step 2: the output sigmoid sends a message to <span class="math inline">\(z_2\)</span></h3>
+<p>The sigmoid’s local derivative is</p>
+<p><span class="math display">\[
+\frac{\partial\hat y}{\partial z_2}=\hat y(1-\hat y).
+\]</span></p>
+<p>Multiply the incoming message by this local derivative:</p>
+<p><span class="math display">\[
+\begin{aligned}
+g_{z_2}
+&amp;=g_{\hat y}\frac{\partial\hat y}{\partial z_2}\\
+&amp;=\left(-\frac{y}{\hat y}+\frac{1-y}{1-\hat y}\right)\hat y(1-\hat y)\\
+&amp;=-y(1-\hat y)+(1-y)\hat y\\
+&amp;=\boxed{\hat y-y}.
+\end{aligned}
+\]</span></p>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Sigmoid plus BCE is one simple backward message
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For binary cross-entropy applied to a sigmoid output,</p>
+<p><span class="math display">\[
+\boxed{g_{z_2}=\hat y-y}.
+\]</span></p>
+<p>This is the prediction error in logit space. Stable implementations compute BCE directly from logits and produce this message without separately forming the potentially unstable fractions above.</p>
+</div>
+</div>
+</section>
+<section id="step-3-the-second-affine-layer-sends-three-messages" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="step-3-the-second-affine-layer-sends-three-messages"><span class="header-section-number">3.4</span> Step 3: the second affine layer sends three messages</h3>
+<p>The second affine layer is</p>
+<p><span class="math display">\[
+z_2=W_2\mathbf h+b_2.
+\]</span></p>
+<p>It receives the scalar message <span class="math inline">\(g_{z_2}\)</span>. The local rule for a linear layer gives</p>
+<p><span class="math display">\[
+\boxed{\frac{\partial\mathcal L}{\partial W_2}
+=g_{z_2}\mathbf h^\top}
+\qquad [1\times H],
+\]</span></p>
+<p><span class="math display">\[
+\boxed{\frac{\partial\mathcal L}{\partial b_2}=g_{z_2}}
+\qquad [\text{scalar}],
+\]</span></p>
+<p>and the message sent to the hidden activation is</p>
+<p><span class="math display">\[
+\boxed{\mathbf g_h
+=W_2^\top g_{z_2}}
+\qquad [H\times1].
+\]</span></p>
+<p>The transpose is forced by the message-passing interpretation: every hidden activation must receive the contribution carried through its outgoing weight.</p>
+</section>
+<section id="step-4-the-hidden-sigmoid-sends-a-message-to-mathbf-z_1" class="level3" data-number="3.5">
+<h3 data-number="3.5" class="anchored" data-anchor-id="step-4-the-hidden-sigmoid-sends-a-message-to-mathbf-z_1"><span class="header-section-number">3.5</span> Step 4: the hidden sigmoid sends a message to <span class="math inline">\(\mathbf z_1\)</span></h3>
+<p>The hidden sigmoid acts elementwise:</p>
+<p><span class="math display">\[
+\mathbf h=\sigma(\mathbf z_1).
+\]</span></p>
+<p>Its local derivative is the vector</p>
+<p><span class="math display">\[
+\mathbf h\odot(1-\mathbf h),
+\]</span></p>
+<p>where <span class="math inline">\(\odot\)</span> denotes elementwise multiplication. Hence</p>
+<p><span class="math display">\[
+\boxed{
+\mathbf g_{z_1}
+=\mathbf g_h\odot\mathbf h\odot(1-\mathbf h)}
+\qquad [H\times1].
+\]</span></p>
+<p>Each hidden unit independently receives its accumulated downstream message and gates it by its own sigmoid derivative.</p>
+</section>
+<section id="step-5-the-first-affine-layer-reaches-the-parameters-and-input" class="level3" data-number="3.6">
+<h3 data-number="3.6" class="anchored" data-anchor-id="step-5-the-first-affine-layer-reaches-the-parameters-and-input"><span class="header-section-number">3.6</span> Step 5: the first affine layer reaches the parameters and input</h3>
+<p>The first affine layer is</p>
+<p><span class="math display">\[
+\mathbf z_1=W_1\mathbf x+\mathbf b_1.
+\]</span></p>
+<p>Applying the same linear-layer rule gives</p>
+<p><span class="math display">\[
+\boxed{\frac{\partial\mathcal L}{\partial W_1}
+=\mathbf g_{z_1}\mathbf x^\top}
+\qquad [H\times D],
+\]</span></p>
+<p><span class="math display">\[
+\boxed{\frac{\partial\mathcal L}{\partial\mathbf b_1}
+=\mathbf g_{z_1}}
+\qquad [H\times1],
+\]</span></p>
+<p>and, if a gradient with respect to the input is required,</p>
+<p><span class="math display">\[
+\boxed{\frac{\partial\mathcal L}{\partial\mathbf x}
+=W_1^\top\mathbf g_{z_1}}
+\qquad [D\times1].
+\]</span></p>
+<p>The formulas are identical to those used for the second affine layer. Only the dimensions change.</p>
+</section>
+</section>
+<section id="the-complete-backward-pass" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="the-complete-backward-pass"><span class="header-section-number">4</span> The complete backward pass</h2>
+<p>The entire derivation can now be written as a short right-to-left program:</p>
+<p><span class="math display">\[
+\begin{aligned}
+g_{z_2} &amp;= \hat y-y,\\
+\nabla_{W_2}\mathcal L &amp;= g_{z_2}\mathbf h^\top,
+&amp;\nabla_{b_2}\mathcal L &amp;= g_{z_2},\\
+\mathbf g_h &amp;= W_2^\top g_{z_2},\\
+\mathbf g_{z_1} &amp;= \mathbf g_h\odot\mathbf h\odot(1-\mathbf h),\\
+\nabla_{W_1}\mathcal L &amp;= \mathbf g_{z_1}\mathbf x^\top,
+&amp;\nabla_{\mathbf b_1}\mathcal L &amp;= \mathbf g_{z_1},\\
+\mathbf g_x &amp;= W_1^\top\mathbf g_{z_1}.
+\end{aligned}
+\]</span></p>
+<div class="callout callout-style-simple callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>What to remember
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><strong>BCE plus sigmoid:</strong> error message <span class="math inline">\(\hat y-y\)</span>.</li>
+<li><strong>Sigmoid:</strong> multiply elementwise by <span class="math inline">\(h(1-h)\)</span>.</li>
+<li><strong>Linear layer:</strong> transpose to inputs, outer product to weights, copy to bias.</li>
+<li><strong>Several downstream paths:</strong> add their gradient messages before applying the local derivative.</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="shape-audit" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="shape-audit"><span class="header-section-number">5</span> Shape audit</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 30%">
+<col style="width: 40%">
+<col style="width: 30%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Quantity</th>
+<th style="text-align: right;">Shape</th>
+<th>Backward expression</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(g_{z_2}\)</span></td>
+<td style="text-align: right;">scalar</td>
+<td><span class="math inline">\(\hat y-y\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\nabla_{W_2}\mathcal L\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\times H\)</span></td>
+<td><span class="math inline">\(g_{z_2}\mathbf h^\top\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\nabla_{b_2}\mathcal L\)</span></td>
+<td style="text-align: right;">scalar</td>
+<td><span class="math inline">\(g_{z_2}\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\mathbf g_h\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(H\times1\)</span></td>
+<td><span class="math inline">\(W_2^\top g_{z_2}\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\mathbf g_{z_1}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(H\times1\)</span></td>
+<td><span class="math inline">\(\mathbf g_h\odot\mathbf h\odot(1-\mathbf h)\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\nabla_{W_1}\mathcal L\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(H\times D\)</span></td>
+<td><span class="math inline">\(\mathbf g_{z_1}\mathbf x^\top\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\nabla_{\mathbf b_1}\mathcal L\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(H\times1\)</span></td>
+<td><span class="math inline">\(\mathbf g_{z_1}\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\mathbf g_x\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(D\times1\)</span></td>
+<td><span class="math inline">\(W_1^\top\mathbf g_{z_1}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Every parameter gradient has exactly the same shape as its parameter. This is one of the fastest checks for a transposition error.</p>
+</section>
+<section id="mini-batches" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="mini-batches"><span class="header-section-number">6</span> Mini-batches</h2>
+<p>For a batch of <span class="math inline">\(N\)</span> examples, a common row-major convention is</p>
+<p><span class="math display">\[
+X\in\mathbb R^{N\times D},\qquad
+Z_1=XW_1+B_1,qquad
+H=\sigma(Z_1).
+\]</span></p>
+<p>With this convention, the weight gradients become</p>
+<p><span class="math display">\[
+\nabla_{W_2}\mathcal L=H^\top G_{Z_2},
+\qquad
+\nabla_{W_1}\mathcal L=X^\top G_{Z_1},
+\]</span></p>
+<p>and bias gradients sum over the batch dimension:</p>
+<p><span class="math display">\[
+\nabla_{b_2}\mathcal L=\sum_{n=1}^{N}(G_{Z_2})_n,
+\qquad
+\nabla_{\mathbf b_1}\mathcal L=\sum_{n=1}^{N}(G_{Z_1})_{n,:}.
+\]</span></p>
+<p>If the loss is defined as a batch mean, divide these accumulated parameter gradients by <span class="math inline">\(N\)</span>. The apparent change in matrix order comes only from switching between column-vector and row-major batch conventions; the underlying messages are unchanged.</p>
+</section>
+<section id="a-final-self-check" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="a-final-self-check"><span class="header-section-number">7</span> A final self-check</h2>
+<p>Before trusting an implementation, verify:</p>
+<ol type="1">
+<li>The backward pass visits blocks in the reverse of the forward order.</li>
+<li>Every local derivative is evaluated using a stored forward value.</li>
+<li>Contributions from multiple children are added.</li>
+<li>Every parameter gradient matches its parameter’s shape.</li>
+<li>The sigmoid–BCE output message is <span class="math inline">\(\hat y-y\)</span>.</li>
+<li>A finite-difference gradient check agrees with the analytic gradient on a tiny network.</li>
+</ol>
+<p>Backpropagation is not one enormous derivative. It is a disciplined protocol for passing, accumulating, and locally transforming small derivative messages.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Deep Learning · ENSA Tétouan</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

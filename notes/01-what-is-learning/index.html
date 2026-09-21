@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dr.&nbsp;A. Belcaid">
+<meta name="description" content="From examples to a rule that works on data we have not seen">
+
+<title>What Does It Mean to Learn? – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e90830a6c3a870e8aa2cd7457ccbff49.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+<script src="../../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../schedule.html"> 
+<span class="menu-text">Schedule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../logistics.html"> 
+<span class="menu-text">Logistics</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#one-image-one-label" id="toc-one-image-one-label" class="nav-link active" data-scroll-target="#one-image-one-label"><span class="header-section-number">1</span> One image, one label</a></li>
+  <li><a href="#the-five-ingredients-of-learning" id="toc-the-five-ingredients-of-learning" class="nav-link" data-scroll-target="#the-five-ingredients-of-learning"><span class="header-section-number">2</span> The five ingredients of learning</a>
+  <ul class="collapse">
+  <li><a href="#ingredient-1-data-what-counts-as-experience" id="toc-ingredient-1-data-what-counts-as-experience" class="nav-link" data-scroll-target="#ingredient-1-data-what-counts-as-experience"><span class="header-section-number">2.1</span> Ingredient 1 — Data: what counts as experience?</a></li>
+  <li><a href="#ingredient-2-hypothesis-what-rules-may-the-learner-choose" id="toc-ingredient-2-hypothesis-what-rules-may-the-learner-choose" class="nav-link" data-scroll-target="#ingredient-2-hypothesis-what-rules-may-the-learner-choose"><span class="header-section-number">2.2</span> Ingredient 2 — Hypothesis: what rules may the learner choose?</a></li>
+  <li><a href="#ingredient-3-loss-how-wrong-is-a-score-vector" id="toc-ingredient-3-loss-how-wrong-is-a-score-vector" class="nav-link" data-scroll-target="#ingredient-3-loss-how-wrong-is-a-score-vector"><span class="header-section-number">2.3</span> Ingredient 3 — Loss: how wrong is a score vector?</a></li>
+  <li><a href="#ingredient-4-optimization-how-do-scores-improve" id="toc-ingredient-4-optimization-how-do-scores-improve" class="nav-link" data-scroll-target="#ingredient-4-optimization-how-do-scores-improve"><span class="header-section-number">2.4</span> Ingredient 4 — Optimization: how do scores improve?</a></li>
+  <li><a href="#ingredient-5-evaluation-did-we-solve-the-task" id="toc-ingredient-5-evaluation-did-we-solve-the-task" class="nav-link" data-scroll-target="#ingredient-5-evaluation-did-we-solve-the-task"><span class="header-section-number">2.5</span> Ingredient 5 — Evaluation: did we solve the task?</a></li>
+  </ul></li>
+  <li><a href="#fitting-is-not-learning" id="toc-fitting-is-not-learning" class="nav-link" data-scroll-target="#fitting-is-not-learning"><span class="header-section-number">3</span> Fitting is not learning</a></li>
+  <li><a href="#train-validation-and-test-are-different-jobs" id="toc-train-validation-and-test-are-different-jobs" class="nav-link" data-scroll-target="#train-validation-and-test-are-different-jobs"><span class="header-section-number">4</span> Train, validation, and test are different jobs</a>
+  <ul class="collapse">
+  <li><a href="#the-training-set" id="toc-the-training-set" class="nav-link" data-scroll-target="#the-training-set"><span class="header-section-number">4.1</span> The training set</a></li>
+  <li><a href="#the-validation-set" id="toc-the-validation-set" class="nav-link" data-scroll-target="#the-validation-set"><span class="header-section-number">4.2</span> The validation set</a></li>
+  <li><a href="#the-test-set" id="toc-the-test-set" class="nav-link" data-scroll-target="#the-test-set"><span class="header-section-number">4.3</span> The test set</a></li>
+  <li><a href="#split-by-the-unit-that-must-generalize" id="toc-split-by-the-unit-that-must-generalize" class="nav-link" data-scroll-target="#split-by-the-unit-that-must-generalize"><span class="header-section-number">4.4</span> Split by the unit that must generalize</a></li>
+  </ul></li>
+  <li><a href="#classical-machine-learning-and-deep-learning" id="toc-classical-machine-learning-and-deep-learning" class="nav-link" data-scroll-target="#classical-machine-learning-and-deep-learning"><span class="header-section-number">5</span> Classical machine learning and deep learning</a></li>
+  <li><a href="#parameters-are-learned-hyperparameters-are-chosen" id="toc-parameters-are-learned-hyperparameters-are-chosen" class="nav-link" data-scroll-target="#parameters-are-learned-hyperparameters-are-chosen"><span class="header-section-number">6</span> Parameters are learned; hyperparameters are chosen</a></li>
+  <li><a href="#baselines-make-improvement-meaningful" id="toc-baselines-make-improvement-meaningful" class="nav-link" data-scroll-target="#baselines-make-improvement-meaningful"><span class="header-section-number">7</span> Baselines make improvement meaningful</a></li>
+  <li><a href="#read-the-errors-not-only-the-score" id="toc-read-the-errors-not-only-the-score" class="nav-link" data-scroll-target="#read-the-errors-not-only-the-score"><span class="header-section-number">8</span> Read the errors, not only the score</a></li>
+  <li><a href="#the-complete-learning-protocol" id="toc-the-complete-learning-protocol" class="nav-link" data-scroll-target="#the-complete-learning-protocol"><span class="header-section-number">9</span> The complete learning protocol</a></li>
+  <li><a href="#what-can-still-go-wrong" id="toc-what-can-still-go-wrong" class="nav-link" data-scroll-target="#what-can-still-go-wrong"><span class="header-section-number">10</span> What can still go wrong?</a></li>
+  <li><a href="#reading-and-practice" id="toc-reading-and-practice" class="nav-link" data-scroll-target="#reading-and-practice"><span class="header-section-number">11</span> Reading and practice</a></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">12</span> Chapter summary</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">13</span> Exercises</a>
+  <ul class="collapse">
+  <li><a href="#conceptual" id="toc-conceptual" class="nav-link" data-scroll-target="#conceptual"><span class="header-section-number">13.1</span> Conceptual</a></li>
+  <li><a href="#design" id="toc-design" class="nav-link" data-scroll-target="#design"><span class="header-section-number">13.2</span> Design</a></li>
+  <li><a href="#mathematical" id="toc-mathematical" class="nav-link" data-scroll-target="#mathematical"><span class="header-section-number">13.3</span> Mathematical</a></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">What Does It Mean to Learn?</h1>
+<p class="subtitle lead">Chapter 1 · Foundations</p>
+</div>
+
+<div>
+  <div class="description">
+    From examples to a rule that works on data we have not seen
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dr.&nbsp;A. Belcaid </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="chapter-opening">
+<div class="chapter-kicker">
+<p>PART I · FOUNDATIONS</p>
+</div>
+<div class="chapter-cover">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="assets/chapter-cover.png" class="img-fluid figure-img" alt="A visual overview of supervised learning, from labeled examples through learned class regions to a prediction on an unseen image."></p>
+<figcaption>Examples flow through a learned representation into geometric class regions and a prediction for a previously unseen image. Original course illustration generated for this chapter.</figcaption>
+</figure>
+</div>
+</div>
+<p>We will solve the same classification problem twice in this course: first with classical machine learning, then with deep learning. The tools will change; the five ingredients of learning will not.</p>
+</div>
+<section id="by-the-end-of-this-chapter-you-should-be-able-to" class="level3 unnumbered unlisted learning-objectives">
+<h3 class="unnumbered unlisted anchored" data-anchor-id="by-the-end-of-this-chapter-you-should-be-able-to">By the end of this chapter, you should be able to</h3>
+<ol type="1">
+<li>Formulate image classification as a supervised-learning problem.</li>
+<li>Compare nearest-neighbor, linear, and neural-network hypothesis classes.</li>
+<li>Compute multiclass SVM and softmax cross-entropy losses from class scores.</li>
+<li>Separate the training objective from the metrics used to evaluate a classifier.</li>
+<li>Explain why training performance is not evidence of generalization.</li>
+</ol>
+</section>
+<section id="one-image-one-label" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="one-image-one-label"><span class="header-section-number">1</span> One image, one label</h2>
+<p>Consider a tiny color image with width <span class="math inline">\(W\)</span>, height <span class="math inline">\(H\)</span>, and three color channels. To us it may be a cat. To a computer it begins as a tensor</p>
+<p><span class="math display">\[
+x \in \mathbb{R}^{H\times W\times 3}.
+\]</span></p>
+<p>For a <span class="math inline">\(32\times32\)</span> RGB image, <span class="math inline">\(x\)</span> contains <span class="math inline">\(32\cdot32\cdot3=3072\)</span> numbers. The classification task is to map those numbers to one label from a finite set:</p>
+<p><span class="math display">\[
+y \in \{1,\ldots,K\}.
+\]</span></p>
+<div id="fig-pixels" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pixels-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/01-what-is-learning/assets/cs231n-classify.png" class="img-fluid figure-img" style="width:72.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pixels-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: A computer receives pixel intensities rather than the semantic object we perceive. The enlarged patch makes the input representation explicit; the values on the right illustrate a classifier’s output. Source: Stanford CS231n course notes <span class="citation" data-cites="cs231nnotes">(<a href="#ref-cs231nnotes" role="doc-biblioref">Li et al., n.d.</a>)</span>.
+</figcaption>
+</figure>
+</div>
+<div class="class-gallery" aria-label="Example image classes">
+<p><span><i>01</i>airplane</span><span><i>02</i>car</span><span><i>03</i>bird</span><span><i>04</i>cat</span><span><i>05</i>deer</span><span><i>06</i>dog</span><span><i>07</i>frog</span><span><i>08</i>horse</span><span><i>09</i>ship</span><span><i>10</i>truck</span></p>
+</div>
+<p>The label is simple. The rule is not. A cat may occupy five pixels or the whole image; face left or right; appear in sunlight or shadow; be partly hidden; and share colors and textures with a dog. Meanwhile, changing many pixel values can leave the class completely unchanged. These nuisance variations are central to visual recognition: the desired prediction should be insensitive to within-class changes while remaining sensitive to differences between classes <span class="citation" data-cites="deng2009imagenet">(<a href="#ref-deng2009imagenet" role="doc-biblioref">Deng et al. 2009</a>)</span>.</p>
+<div id="fig-vision-challenges" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-vision-challenges-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/01-what-is-learning/assets/cs231n-challenges.jpeg" class="img-fluid figure-img" style="width:96.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-vision-challenges-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Common sources of visual variation: viewpoint, scale, deformation, occlusion, illumination, background clutter, and within-class diversity. Source: Stanford CS231n course notes <span class="citation" data-cites="cs231nnotes">(<a href="#ref-cs231nnotes" role="doc-biblioref">Li et al., n.d.</a>)</span>.
+</figcaption>
+</figure>
+</div>
+<div class="paradigm-compare">
+<div class="paradigm-card">
+<p><span>Handwritten vision program</span></p>
+<p><strong>Pixels + rules about edges, colors, and shapes → class</strong></p>
+<p>We must anticipate every relevant variation.</p>
+</div>
+<div class="paradigm-card accent">
+<p><span>Image classifier</span></p>
+<p><strong>Labeled images + learning algorithm → classifier</strong></p>
+<p>The data helps determine the rule.</p>
+</div>
+</div>
+<p>This does not remove the programmer. We still define the labels, collect the images, choose the possible classifiers, define what errors cost, decide how to search, and design the evaluation. Learning replaces one difficult act—writing the final rule—with five explicit design problems. The history of ImageNet illustrates how dataset scale and label organization can reshape the kinds of visual systems researchers can build <span class="citation" data-cites="deng2009imagenet">(<a href="#ref-deng2009imagenet" role="doc-biblioref">Deng et al. 2009</a>)</span>, while AlexNet demonstrated how a sufficiently expressive learned model could exploit that scale <span class="citation" data-cites="krizhevsky2012imagenet">(<a href="#ref-krizhevsky2012imagenet" role="doc-biblioref">Krizhevsky et al. 2012</a>)</span>.</p>
+<div class="key-idea">
+<p><strong>Image classification is a useful laboratory for machine learning.</strong> The input is concrete, mistakes are visible, and the same five-part formulation supports both a classical linear classifier and a modern deep network.</p>
+</div>
+</section>
+<section id="the-five-ingredients-of-learning" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="the-five-ingredients-of-learning"><span class="header-section-number">2</span> The five ingredients of learning</h2>
+<p>Let one example be a pair</p>
+<p><span class="math display">\[
+(x, y),
+\]</span></p>
+<p>where <span class="math inline">\(x\)</span> is an image and <span class="math inline">\(y\)</span> is its class label.</p>
+<p>A dataset of <span class="math inline">\(n\)</span> examples is</p>
+<p><span class="math display">\[
+\mathcal{D} = \{(x^{(i)}, y^{(i)})\}_{i=1}^{n}.
+\]</span></p>
+<p>The superscript <span class="math inline">\((i)\)</span> identifies an example; it is not an exponent.</p>
+<div class="five-objects">
+<div class="object-card">
+<p><b>01</b><span>Data</span></p>
+<p><span class="math inline">\(\mathcal{D}\)</span> records past examples.</p>
+</div>
+<div class="object-card">
+<p><b>02</b><span>Hypothesis</span></p>
+<p><span class="math inline">\(f_\theta\)</span> maps an input to a prediction.</p>
+</div>
+<div class="object-card">
+<p><b>03</b><span>Loss</span></p>
+<p><span class="math inline">\(\ell\)</span> scores each mistake.</p>
+</div>
+<div class="object-card">
+<p><b>04</b><span>Optimization</span></p>
+<p>An algorithm searches for <span class="math inline">\(\theta\)</span>.</p>
+</div>
+<div class="object-card">
+<p><b>05</b><span>Evaluation</span></p>
+<p>Metrics test useful behavior.</p>
+</div>
+</div>
+<section id="ingredient-1-data-what-counts-as-experience" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="ingredient-1-data-what-counts-as-experience"><span class="header-section-number">2.1</span> Ingredient 1 — Data: what counts as experience?</h3>
+<p>For a <span class="math inline">\(K\)</span>-class image problem, the training data is a collection</p>
+<p><span class="math display">\[
+\mathcal D = \{(x^{(i)},y^{(i)})\}_{i=1}^{n},
+\qquad x^{(i)}\in\mathbb R^{H\times W\times3},
+\quad y^{(i)}\in\{1,\ldots,K\}.
+\]</span></p>
+<p>But “an image and its label” hides important choices.</p>
+<div id="fig-cifar-batch" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-cifar-batch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/01-what-is-learning/assets/cs231n-cifar10-classes.jpg" class="img-fluid figure-img" style="width:82.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cifar-batch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: A labeled CIFAR-10 sample: ten small natural-image classes with substantial variation inside each row. CIFAR-10 contains 60,000 <span class="math inline">\(32\times32\)</span> RGB images and is useful here because both the inputs and labels can be inspected directly <span class="citation" data-cites="krizhevsky2009cifar">(<a href="#ref-krizhevsky2009cifar" role="doc-biblioref">Krizhevsky 2009</a>)</span>. Image arrangement: Stanford CS231n course notes <span class="citation" data-cites="cs231nnotes">(<a href="#ref-cs231nnotes" role="doc-biblioref">Li et al., n.d.</a>)</span>.
+</figcaption>
+</figure>
+</div>
+<div class="data-questions">
+<p><span><b>Sampling</b>Which cameras, locations, objects, and conditions produced the images?</span> <span><b>Labels</b>Who decided the class, and what happens when the image is ambiguous?</span> <span><b>Balance</b>Do common classes dominate rare but important ones?</span> <span><b>Representation</b>Raw pixels, resized pixels, or handcrafted features?</span></p>
+</div>
+<p>Classical computer vision often transforms the pixels into handcrafted features <span class="math inline">\(\phi(x)\)</span>—color histograms, edges, or local descriptors—before learning a classifier. Canny edges <span class="citation" data-cites="canny1986computational">(<a href="#ref-canny1986computational" role="doc-biblioref">Canny 1986</a>)</span> and histograms of oriented gradients <span class="citation" data-cites="dalal2005histograms">(<a href="#ref-dalal2005histograms" role="doc-biblioref">Dalal and Triggs 2005</a>)</span> are canonical examples: the designer decides in advance which measurements should survive. Deep learning instead learns useful features together with the classifier, an idea usually called <strong>representation learning</strong> <span class="citation" data-cites="bengio2013representation">(<a href="#ref-bengio2013representation" role="doc-biblioref">Bengio et al. 2013</a>)</span>.</p>
+<div class="feature-pipeline">
+<div>
+<b>Classical ML</b><span>image</span><i>→</i><span>handcrafted <span class="math inline">\(\phi(x)\)</span></span><i>→</i><span>classifier</span>
+</div>
+<div>
+<b>Deep learning</b><span>image</span><i>→</i><span>learned features</span><i>→</i><span>classifier</span>
+</div>
+</div>
+<section id="a-concrete-classical-representation-canny-edges" class="level4 unnumbered unlisted">
+<h4 class="unnumbered unlisted anchored" data-anchor-id="a-concrete-classical-representation-canny-edges">A concrete classical representation: Canny edges</h4>
+<p>The Canny detector makes the idea of a handcrafted representation tangible. Starting from an image, it applies a sequence chosen by the algorithm designer:</p>
+<ol type="1">
+<li>convert intensities to grayscale;</li>
+<li>suppress noise with a Gaussian filter;</li>
+<li>compute gradient magnitude and orientation;</li>
+<li>thin candidate edges with non-maximum suppression;</li>
+<li>distinguish strong and weak responses using two thresholds;</li>
+<li>retain weak responses only when hysteresis connects them to strong edges.</li>
+</ol>
+<div id="fig-canny" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-canny-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/01-what-is-learning/assets/canny-six-stages.png" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-canny-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Six stages of the Canny edge detector. The figure was generated for this course with the standard OpenCV sample image; the procedure follows Canny’s original formulation <span class="citation" data-cites="canny1986computational">(<a href="#ref-canny1986computational" role="doc-biblioref">Canny 1986</a>)</span>.
+</figcaption>
+</figure>
+</div>
+<p>A classical pipeline might now train an SVM on this edge map. The Canny parameters and the decision to privilege edges are not learned from the classification labels—they are part of our representation design.</p>
+</section>
+<section id="a-learned-representation-vgg-16" class="level4 unnumbered unlisted">
+<h4 class="unnumbered unlisted anchored" data-anchor-id="a-learned-representation-vgg-16">A learned representation: VGG-16</h4>
+<p>In a convolutional network, the transformation itself contains learned parameters. VGG-16 stacks small <span class="math inline">\(3\times3\)</span> convolutions into five blocks; spatial resolution decreases while the number and abstraction of feature maps increase <span class="citation" data-cites="simonyan2015vgg">(<a href="#ref-simonyan2015vgg" role="doc-biblioref">Simonyan and Zisserman 2015</a>)</span>. The final layers turn the learned representation into class scores.</p>
+<div id="fig-vgg" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-vgg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/01-what-is-learning/assets/vgg16-course-diagram.svg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-vgg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: A course schematic of VGG-16. The architecture contains 13 convolutional layers followed by three learned classifiers and was trained for large-scale ImageNet recognition <span class="citation" data-cites="simonyan2015vgg">(<a href="#ref-simonyan2015vgg" role="doc-biblioref">Simonyan and Zisserman 2015</a>)</span>. We will derive convolution, pooling, and every block later in the course.
+</figcaption>
+</figure>
+</div>
+<p>The contrast is not “simple versus magical.” Both pipelines encode assumptions. In the classical case, many assumptions live in <span class="math inline">\(\phi\)</span>; in the deep case, the architecture specifies a family of representations and optimization selects one from data.</p>
+<p>If every ship is photographed against blue water while cars appear on gray roads, “blue background” may become a highly predictive shortcut. The model can score well without learning the object we intended. Shortcut learning is not limited to deep networks, but expressive networks are particularly capable of exploiting any stable predictive cue in the training distribution <span class="citation" data-cites="geirhos2020shortcut">(<a href="#ref-geirhos2020shortcut" role="doc-biblioref">Geirhos et al. 2020</a>)</span>.</p>
+</section>
+</section>
+<section id="ingredient-2-hypothesis-what-rules-may-the-learner-choose" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="ingredient-2-hypothesis-what-rules-may-the-learner-choose"><span class="header-section-number">2.2</span> Ingredient 2 — Hypothesis: what rules may the learner choose?</h3>
+<p>A hypothesis is a candidate prediction rule. A hypothesis class <span class="math inline">\(\mathcal H\)</span> is the collection of rules the algorithm is allowed to choose from.</p>
+<p><span class="math display">\[
+f_\theta : \mathbb R^{H\times W\times3} \rightarrow \mathbb R^K.
+\]</span></p>
+<p>The model produces one <strong>score</strong> for each class:</p>
+<p><span class="math display">\[
+s=f_\theta(x)=[s_1,\ldots,s_K]^\top,
+\qquad \widehat y=\arg\max_j s_j.
+\]</span></p>
+<p>The largest score wins. Scores need not be probabilities; they are simply the model’s preferences before a loss interprets them.</p>
+<div class="approach-ladder">
+<div class="approach-card">
+<p><span>MEMORY-BASED</span></p>
+<section id="k-nearest-neighbors" class="level4 unnumbered unlisted">
+<h4 class="unnumbered unlisted anchored" data-anchor-id="k-nearest-neighbors"><span class="math inline">\(k\)</span>-nearest neighbors</h4>
+<p>Store the training images. Predict using the labels of visually nearby examples.</p>
+<p><strong>Strength:</strong> almost no training. <strong>Weakness:</strong> distance between raw pixels is fragile.</p>
+</section>
+</div>
+<div class="approach-card linear">
+<p><span>PARAMETRIC</span></p>
+<section id="linear-classifier" class="level4 unnumbered unlisted">
+<h4 class="unnumbered unlisted anchored" data-anchor-id="linear-classifier">Linear classifier</h4>
+<p>Compute class scores with <span class="math inline">\(s=Wx+b\)</span>.</p>
+<p><strong>Strength:</strong> fast and interpretable. <strong>Weakness:</strong> one linear template per class.</p>
+</section>
+</div>
+<div class="approach-card neural">
+<p><span>REPRESENTATION LEARNING</span></p>
+<section id="neural-network" class="level4 unnumbered unlisted">
+<h4 class="unnumbered unlisted anchored" data-anchor-id="neural-network">Neural network</h4>
+<p>Compose nonlinear layers and learn the features used by the classifier.</p>
+<p><strong>Strength:</strong> expressive. <strong>Weakness:</strong> more data, computation, and design choices.</p>
+</section>
+</div>
+</div>
+<p>These three choices differ in what they can express and in where they store information. Nearest neighbor retains examples and compares a query at prediction time <span class="citation" data-cites="cover1967nearest">(<a href="#ref-cover1967nearest" role="doc-biblioref">Cover and Hart 1967</a>)</span>. A linear classifier compresses training information into one weight vector per class. A neural network composes linear maps with nonlinearities and can learn intermediate features <span class="citation" data-cites="rumelhart1986backprop bengio2013representation">(<a href="#ref-rumelhart1986backprop" role="doc-biblioref">Rumelhart et al. 1986</a>; <a href="#ref-bengio2013representation" role="doc-biblioref">Bengio et al. 2013</a>)</span>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><span class="math inline">\(k\)</span>-nearest neighbors</th>
+<th>Linear classifier</th>
+<th>Neural network</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img src="../../lectures/01-what-is-learning/assets/cs231n-knn-neighbors.jpg" class="img-fluid" alt="A query followed by raw-pixel nearest neighbors."></td>
+<td><img src="../../lectures/01-what-is-learning/assets/cs231n-linear-regions.jpeg" class="img-fluid" alt="Images and three linear decision boundaries."></td>
+<td><img src="../../lectures/01-what-is-learning/assets/cs231n-neural-boundary.png" class="img-fluid" alt="Nonlinear regions learned for a spiral dataset."></td>
+</tr>
+</tbody>
+</table>
+<p>The nearest-neighbor and linear illustrations come from the Stanford CS231n notes; the neural boundary comes from its minimal neural-network case study <span class="citation" data-cites="cs231nnotes">(<a href="#ref-cs231nnotes" role="doc-biblioref">Li et al., n.d.</a>)</span>. The point is not that the most complex hypothesis always wins. The point is that choosing <span class="math inline">\(\mathcal H\)</span> decides which regularities can possibly be learned.</p>
+<section id="the-linear-classifier-in-detail" class="level4 unnumbered unlisted">
+<h4 class="unnumbered unlisted anchored" data-anchor-id="the-linear-classifier-in-detail">The linear classifier in detail</h4>
+<p>Flatten the image into a vector <span class="math inline">\(x\in\mathbb R^D\)</span>, where <span class="math inline">\(D=H\times W\times3\)</span>. A multiclass linear classifier uses</p>
+<p><span class="math display">\[
+s=Wx+b,
+\qquad W\in\mathbb R^{K\times D},
+\quad b\in\mathbb R^K.
+\]</span></p>
+<p>Row <span class="math inline">\(W_j\)</span> acts like a learned template for class <span class="math inline">\(j\)</span>. Its score is</p>
+<p><span class="math display">\[
+s_j=W_jx+b_j.
+\]</span></p>
+<p>The geometry is visible even after projecting images into two dimensions: each row of <span class="math inline">\(W\)</span> defines a linear score surface, and class boundaries occur where two scores are equal. A single linear classifier therefore cannot carve arbitrary disconnected regions. Neural networks overcome this restriction by composing several learned transformations, not by changing the definition of a class score.</p>
+<div class="score-demo">
+<div class="score-input">
+<span>one image</span><b><span class="math inline">\(x\in\mathbb R^{3072}\)</span></b>
+</div>
+<i>×</i>
+<div class="score-input">
+<span>class templates</span><b><span class="math inline">\(W\in\mathbb R^{10\times3072}\)</span></b>
+</div>
+<i>+</i>
+<div class="score-input">
+<span>bias</span><b><span class="math inline">\(b\in\mathbb R^{10}\)</span></b>
+</div>
+<i>→</i>
+<div class="score-output">
+<span>10 scores</span><b><span class="math inline">\(s\in\mathbb R^{10}\)</span></b>
+</div>
+</div>
+<div class="margin-question">
+<p><strong>Check your understanding</strong></p>
+<p>Two students train the same linear-classifier code but obtain different matrices <span class="math inline">\(W\)</span>. Did they choose different hypothesis classes or different hypotheses?</p>
+<details>
+<summary>
+Reveal the answer
+</summary>
+They use the same hypothesis class but learned different hypotheses—different members of that class.
+</details>
+</div>
+</section>
+</section>
+<section id="ingredient-3-loss-how-wrong-is-a-score-vector" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="ingredient-3-loss-how-wrong-is-a-score-vector"><span class="header-section-number">2.3</span> Ingredient 3 — Loss: how wrong is a score vector?</h3>
+<p>A hard error—right or wrong—is useful for reporting accuracy but poor for learning. It does not distinguish “barely wrong” from “confidently wrong,” and small parameter changes usually do not change it. A training loss provides a graded signal.</p>
+<p>We will compare two iconic multiclass losses using the same example. Suppose the scores for an image are</p>
+<p><span class="math display">\[
+s=[3.2,\ 5.1,\ -1.7],
+\qquad y=1.
+\]</span></p>
+<p>Class 1 is correct, but class 2 has the largest score. How should we express this mistake?</p>
+<div class="score-bars">
+<div>
+<span>class 1 · correct</span><i style="--score:53%"></i><b>3.2</b>
+</div>
+<div class="winner">
+<span>class 2 · predicted</span><i style="--score:85%"></i><b>5.1</b>
+</div>
+<div>
+<span>class 3</span><i style="--score:8%"></i><b>-1.7</b>
+</div>
+</div>
+<section id="multiclass-svm-loss-demand-a-margin" class="level4 unnumbered unlisted">
+<h4 class="unnumbered unlisted anchored" data-anchor-id="multiclass-svm-loss-demand-a-margin">Multiclass SVM loss: demand a margin</h4>
+<p>The SVM family formalizes classification through separating surfaces and margins <span class="citation" data-cites="cortes1995support">(<a href="#ref-cortes1995support" role="doc-biblioref">Cortes and Vapnik 1995</a>)</span>. In the multiclass form used here, the loss requires the correct score <span class="math inline">\(s_y\)</span> to exceed every incorrect score by at least a margin <span class="math inline">\(\Delta\)</span>:</p>
+<p><span class="math display">\[
+L_i^{\text{SVM}}
+=\sum_{j\ne y}\max\left(0,\ s_j-s_y+\Delta\right).
+\]</span></p>
+<div class="margin-question">
+<p><strong>Practice before reading the solution</strong></p>
+<p>For <span class="math inline">\(s=[3.2,5.1,-1.7]\)</span>, correct class <span class="math inline">\(y=1\)</span>, and <span class="math inline">\(\Delta=1\)</span>, write one hinge term for each incorrect class and compute their sum. Pause for 90 seconds.</p>
+<details>
+<summary>
+Reveal the worked solution
+</summary>
+<p><span class="math display">\[
+L_i^{\text{SVM}}
+=\max(0,5.1-3.2+1)
++\max(0,-1.7-3.2+1)
+=2.9.
+\]</span></p>
+The dog score contributes <span class="math inline">\(2.9\)</span> because it exceeds the correct score instead of trailing by one. The third class contributes zero because it is already safely below the required margin.
+</details>
+</div>
+<p>The loss becomes zero only when the correct class wins by a sufficient margin. Once that margin is satisfied, pushing the score farther gives no additional reward.</p>
+</section>
+<section id="softmax-cross-entropy-demand-probability" class="level4 unnumbered unlisted">
+<h4 class="unnumbered unlisted anchored" data-anchor-id="softmax-cross-entropy-demand-probability">Softmax cross-entropy: demand probability</h4>
+<p>Softmax converts scores into a normalized positive vector that can be interpreted as a class distribution for the loss:</p>
+<p><span class="math display">\[
+p_j=\frac{e^{s_j}}{\sum_{k=1}^{K}e^{s_k}}.
+\]</span></p>
+<p>For numerical stability, implementations subtract <span class="math inline">\(\max_k s_k\)</span> before exponentiating. This changes none of the probabilities. For our scores,</p>
+<p><span class="math display">\[
+p\approx[0.130,\ 0.869,\ 0.001].
+\]</span></p>
+<p>Cross-entropy is the negative log-probability of the correct class:</p>
+<p><span class="math display">\[
+L_i^{\text{CE}}=-\log p_y\approx-\log(0.130)=2.04.
+\]</span></p>
+<p>The logarithm makes confident errors expensive: assigning <span class="math inline">\(p_y=0.9\)</span> costs about <span class="math inline">\(0.11\)</span>, while <span class="math inline">\(p_y=0.01\)</span> costs about <span class="math inline">\(4.61\)</span>. The resulting softmax values should not automatically be treated as trustworthy real-world probabilities; modern networks can be systematically miscalibrated even when their accuracy is high <span class="citation" data-cites="guo2017calibration">(<a href="#ref-guo2017calibration" role="doc-biblioref">Guo et al. 2017</a>)</span>.</p>
+<div class="loss-compare">
+<div class="loss-card">
+<p><span>SVM · margin view</span></p>
+<p>“Is the correct score ahead of every rival by enough?”</p>
+<p>Zero loss after the margin is satisfied.</p>
+</div>
+<div class="loss-card softmax">
+<p><span>Softmax · probability view</span></p>
+<p>“How much probability did the model assign to the correct class?”</p>
+<p>Continues rewarding greater confidence.</p>
+</div>
+</div>
+<p>Both losses prefer the correct class. They differ in the geometry of the pressure they apply to scores. Modern classification networks most often use softmax cross-entropy, but the SVM loss makes the idea of a classification margin especially visible.</p>
+<p>Over the complete dataset, we minimize the empirical risk, often with a regularization penalty:</p>
+<p><span class="math display">\[
+J(\theta)
+=\frac1n\sum_{i=1}^{n}L_i(\theta)
++\lambda R(\theta).
+\]</span></p>
+<p>The data loss rewards correct predictions. The regularizer expresses a preference among solutions—for example, smaller weights.</p>
+<div class="warning-note">
+<p><strong>Loss is not the same as the final metric.</strong> We choose a differentiable loss to train the model and use application-relevant metrics to judge the resulting behavior.</p>
+</div>
+</section>
+</section>
+<section id="ingredient-4-optimization-how-do-scores-improve" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="ingredient-4-optimization-how-do-scores-improve"><span class="header-section-number">2.4</span> Ingredient 4 — Optimization: how do scores improve?</h3>
+<p>The loss converts learning into a search problem. We start with some parameters, measure the loss, estimate how each parameter should change, and update the parameters. Mini-batch training belongs to the broad stochastic-approximation tradition initiated by Robbins and Monro <span class="citation" data-cites="robbins1951stochastic">(<a href="#ref-robbins1951stochastic" role="doc-biblioref">Robbins and Monro 1951</a>)</span>; backpropagation supplies gradients efficiently for layered networks <span class="citation" data-cites="rumelhart1986backprop">(<a href="#ref-rumelhart1986backprop" role="doc-biblioref">Rumelhart et al. 1986</a>)</span>. Schematically:</p>
+<div class="learning-loop">
+<p><span>sample data</span><i>→</i><span>predict</span><i>→</i><span>measure loss</span><i>→</i><span>compute change</span><i>→</i><span>update <span class="math inline">\(\theta\)</span></span></p>
+</div>
+<p>For a linear classifier, optimization changes the class templates <span class="math inline">\(W\)</span> and biases <span class="math inline">\(b\)</span>. For a neural network, it may change millions of weights. In either case, one gradient-based step has the form</p>
+<p><span class="math display">\[
+\theta\leftarrow\theta-\eta\nabla_\theta J(\theta),
+\]</span></p>
+<p>where <span class="math inline">\(\eta\)</span> is the learning rate. Later chapters will explain why this direction is useful, how backpropagation computes the gradient, and why the choice of optimizer matters. For now, keep the conceptual distinction clear:</p>
+<div id="fig-parameter-convergence" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-parameter-convergence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/01-what-is-learning/assets/parameter-convergence.svg" class="img-fluid figure-img" style="width:76.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-parameter-convergence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: A two-parameter picture of optimization. Each point is a new parameter vector; the trajectory seeks progressively lower contours of the objective. Real networks live in vastly higher-dimensional spaces, so this is an explanatory projection rather than a literal landscape.
+</figcaption>
+</figure>
+</div>
+<blockquote class="blockquote">
+<p>The <strong>loss</strong> defines where we want to go. The <strong>optimizer</strong> is the procedure used to move there.</p>
+</blockquote>
+</section>
+<section id="ingredient-5-evaluation-did-we-solve-the-task" class="level3" data-number="2.5">
+<h3 data-number="2.5" class="anchored" data-anchor-id="ingredient-5-evaluation-did-we-solve-the-task"><span class="header-section-number">2.5</span> Ingredient 5 — Evaluation: did we solve the task?</h3>
+<p>Training loss answers a narrow question:</p>
+<blockquote class="blockquote">
+<p>How well does this model fit the examples used to adjust its parameters?</p>
+</blockquote>
+<p>The question we actually care about is broader:</p>
+<blockquote class="blockquote">
+<p>How well will this model perform on a new example drawn from the situation where it will be used?</p>
+</blockquote>
+<p>The gap between those questions is the central difficulty of machine learning. Evaluation needs both <strong>held-out data</strong> and <strong>metrics that expose the mistakes we care about</strong>.</p>
+<div class="metric-gallery">
+<p><span><b>Accuracy</b>How often is the top prediction correct?</span> <span><b>Top-<span class="math inline">\(k\)</span> accuracy</b>Is the correct label among the <span class="math inline">\(k\)</span> highest scores?</span> <span><b>Confusion matrix</b>Which classes are confused with which?</span> <span><b>Per-class recall</b>Which classes does the model systematically miss?</span></p>
+</div>
+<p>For a balanced ten-class benchmark, accuracy is a useful headline. It is not a complete diagnosis. A confusion matrix might reveal that cats are repeatedly classified as dogs, while trucks are nearly perfect. Looking at erroneous images may reveal blur, occlusion, unusual viewpoints—or a faulty label.</p>
+</section>
+</section>
+<section id="fitting-is-not-learning" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="fitting-is-not-learning"><span class="header-section-number">3</span> Fitting is not learning</h2>
+<p>Suppose we give a model the labels of 1,000 training images. A sufficiently expressive model might memorize every image-label pair. It could achieve zero training error while having learned nothing useful about new images.</p>
+<div class="fit-generalize">
+<div class="fit-panel memorize">
+<p><span class="panel-label">Memorization</span></p>
+<p>Training examples → stored answers</p>
+<p><strong>Seen data:</strong> excellent <strong>New data:</strong> uncertain</p>
+</div>
+<div class="fit-panel generalize">
+<p><span class="panel-label">Generalization</span></p>
+<p>Training examples → reusable structure</p>
+<p><strong>Seen data:</strong> good <strong>New data:</strong> good</p>
+</div>
+</div>
+<p>The distinction becomes clearer with numbers. Imagine that two candidate models are evaluated on the same representative held-out set:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 21%">
+<col style="width: 28%">
+<col style="width: 28%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Model</th>
+<th style="text-align: right;">Training accuracy</th>
+<th style="text-align: right;">Test accuracy</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A · memorizer</td>
+<td style="text-align: right;"><strong>99%</strong></td>
+<td style="text-align: right;">54%</td>
+<td>Excellent fit, large generalization gap</td>
+</tr>
+<tr class="even">
+<td>B · generalizer</td>
+<td style="text-align: right;">92%</td>
+<td style="text-align: right;"><strong>89%</strong></td>
+<td>Slightly worse fit, much stronger unseen behavior</td>
+</tr>
+</tbody>
+</table>
+<p>If deployment resembles the test distribution, Model B is the stronger learning result. Choosing Model A because its training number is larger would confuse optimization success with task success. This example also shows why a single statement such as “the model achieved 99%” is meaningless unless the dataset split is named.</p>
+<p>We say a model <strong>generalizes</strong> when it performs well on relevant examples that were not used to fit it.</p>
+<p>The ideal quantity is the expected risk over the unknown data-generating distribution <span class="math inline">\(P\)</span>:</p>
+<p><span class="math display">\[
+R(\theta)
+= \mathbb{E}_{(x,y)\sim P}
+\left[\ell\big(f_\theta(x),y\big)\right].
+\]</span></p>
+<p>We cannot calculate this expectation exactly because <span class="math inline">\(P\)</span> is unknown. We estimate performance using held-out data that imitates future use. This empirical-risk view is a central organizing idea in statistical learning and modern deep-learning treatments <span class="citation" data-cites="goodfellow2016deep">(<a href="#ref-goodfellow2016deep" role="doc-biblioref">Goodfellow et al. 2016</a>)</span>.</p>
+<div class="key-idea">
+<p>Low training loss is an optimization result. Low loss on genuinely unseen, representative data is evidence of learning.</p>
+</div>
+</section>
+<section id="train-validation-and-test-are-different-jobs" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="train-validation-and-test-are-different-jobs"><span class="header-section-number">4</span> Train, validation, and test are different jobs</h2>
+<p>A useful experimental protocol divides available data into three disjoint subsets.</p>
+<div class="split-diagram">
+<div class="split-block train">
+<p><span>TRAIN</span><b>Fit parameters</b></p>
+<p>Used repeatedly by the optimizer.</p>
+</div>
+<div class="split-block validation">
+<p><span>VALIDATION</span><b>Make design choices</b></p>
+<p>Used to compare models and settings.</p>
+</div>
+<div class="split-block test">
+<p><span>TEST</span><b>Estimate final performance</b></p>
+<p>Used after decisions are complete.</p>
+</div>
+</div>
+<section id="the-training-set" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="the-training-set"><span class="header-section-number">4.1</span> The training set</h3>
+<p>The optimizer uses training examples to update <span class="math inline">\(\theta\)</span>. Seeing this data many times is expected.</p>
+</section>
+<section id="the-validation-set" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="the-validation-set"><span class="header-section-number">4.2</span> The validation set</h3>
+<p>The validation set guides decisions that are not learned directly by the optimizer: architecture size, regularization strength, learning rate, preprocessing, and when to stop training. These choices are called <strong>hyperparameters</strong>.</p>
+<p>Because we repeatedly inspect validation results, we gradually adapt to the validation set. It is not a perfectly unbiased final evaluation.</p>
+</section>
+<section id="the-test-set" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="the-test-set"><span class="header-section-number">4.3</span> The test set</h3>
+<p>The test set is reserved for the end. It estimates how the completed procedure may behave on new data. If we repeatedly use test results to redesign the model, the test set quietly becomes another validation set.</p>
+<div class="definition-box">
+<p><strong>Data leakage</strong> occurs when information unavailable at prediction time influences training or model selection. Leakage makes evaluation look better than real deployment <span class="citation" data-cites="kaufman2012leakage">(<a href="#ref-kaufman2012leakage" role="doc-biblioref">Kaufman et al. 2012</a>)</span>.</p>
+</div>
+</section>
+<section id="split-by-the-unit-that-must-generalize" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="split-by-the-unit-that-must-generalize"><span class="header-section-number">4.4</span> Split by the unit that must generalize</h3>
+<p>Randomly splitting individual rows is not always valid. Imagine ten photographs of each physical object. If photographs of the same object appear in both training and test sets, the model may recognize that object rather than learn its class.</p>
+<p>The split should follow the unit of independence required by the application:</p>
+<ul>
+<li>split by <strong>patient</strong>, not medical image;</li>
+<li>split by <strong>speaker</strong>, not audio clip;</li>
+<li>split by <strong>object or scene</strong>, not photograph;</li>
+<li>split by <strong>time</strong> when predicting the future;</li>
+<li>sometimes split by <strong>location</strong> when deploying elsewhere.</li>
+</ul>
+<div class="margin-question">
+<p><strong>Design checkpoint</strong></p>
+<p>A company wants to predict machine failure next month using five years of sensor logs. Why might a random row-level split be misleading?</p>
+<details>
+<summary>
+Reveal the answer
+</summary>
+Training could contain observations recorded after validation or test observations, leaking future operating conditions into the past. A chronological split better represents forecasting.
+</details>
+</div>
+</section>
+</section>
+<section id="classical-machine-learning-and-deep-learning" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="classical-machine-learning-and-deep-learning"><span class="header-section-number">5</span> Classical machine learning and deep learning</h2>
+<p>We will revisit image classification later with convolutional neural networks. It is important to see what changes and what remains invariant.</p>
+<div class="classical-deep">
+<div class="system-column classical">
+<p><span>CLASSICAL PIPELINE</span></p>
+<section id="engineer-then-learn" class="level3 unnumbered unlisted">
+<h3 class="unnumbered unlisted anchored" data-anchor-id="engineer-then-learn">Engineer, then learn</h3>
+<ol type="1">
+<li>Resize and normalize the image.</li>
+<li>Design features such as color or edge histograms.</li>
+<li>Train an SVM or linear classifier.</li>
+<li>Evaluate on held-out images.</li>
+</ol>
+<p>The representation <span class="math inline">\(\phi(x)\)</span> is largely designed by a human.</p>
+</section>
+</div>
+<div class="system-column deep">
+<p><span>DEEP-LEARNING PIPELINE</span></p>
+<section id="learn-the-representation" class="level3 unnumbered unlisted">
+<h3 class="unnumbered unlisted anchored" data-anchor-id="learn-the-representation">Learn the representation</h3>
+<ol type="1">
+<li>Resize and normalize the image.</li>
+<li>Pass pixels through several learned layers.</li>
+<li>Produce class scores and optimize end-to-end.</li>
+<li>Evaluate on held-out images.</li>
+</ol>
+<p>The representation is learned jointly with the classifier.</p>
+</section>
+</div>
+</div>
+<p>The deep model is not a different definition of learning. It is a richer hypothesis class with many more parameters and a learned feature extractor. We still need data, a loss, optimization, and honest evaluation.</p>
+</section>
+<section id="parameters-are-learned-hyperparameters-are-chosen" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="parameters-are-learned-hyperparameters-are-chosen"><span class="header-section-number">6</span> Parameters are learned; hyperparameters are chosen</h2>
+<div class="comparison-table">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Learned parameters</th>
+<th>Chosen hyperparameters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Weights and biases</td>
+<td>Network depth and width</td>
+</tr>
+<tr class="even">
+<td>Updated using training data</td>
+<td>Learning rate</td>
+</tr>
+<tr class="odd">
+<td>Part of the fitted prediction rule</td>
+<td>Batch size</td>
+</tr>
+<tr class="even">
+<td>Often millions or billions</td>
+<td>Regularization strength</td>
+</tr>
+<tr class="odd">
+<td>Denoted here by <span class="math inline">\(\theta\)</span></td>
+<td>Selected using validation evidence</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The boundary is conceptual, not universal. A quantity is a parameter if the learning procedure adjusts it from training data; it is a hyperparameter if it is controlled by the practitioner or an outer selection process.</p>
+</section>
+<section id="baselines-make-improvement-meaningful" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="baselines-make-improvement-meaningful"><span class="header-section-number">7</span> Baselines make improvement meaningful</h2>
+<p>A score has no meaning without comparison. On a balanced ten-class dataset, random guessing averages 10% accuracy. On an imbalanced dataset, always predicting the largest class can score surprisingly well while ignoring every rare class.</p>
+<p>Before building a complex model, establish simple baselines:</p>
+<ul>
+<li>majority-class prediction;</li>
+<li>random prediction with the observed class frequencies;</li>
+<li><span class="math inline">\(1\)</span>-nearest neighbor on raw pixels;</li>
+<li>a linear classifier on pixels or handcrafted features;</li>
+<li>the previous production system, if one exists;</li>
+<li>human performance, when it can be measured responsibly.</li>
+</ul>
+<p>A baseline tests whether the pipeline and metric behave sensibly. It also tells us whether complexity buys anything.</p>
+</section>
+<section id="read-the-errors-not-only-the-score" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="read-the-errors-not-only-the-score"><span class="header-section-number">8</span> Read the errors, not only the score</h2>
+<p>Suppose two classifiers both achieve 72% accuracy. They may still behave very differently.</p>
+<div class="error-comparison">
+<div class="error-model">
+<p><span>MODEL A</span></p>
+<p>Good on vehicles, weak on animals. Often confuses cats with dogs and deer with horses.</p>
+</div>
+<div class="error-model">
+<p><span>MODEL B</span></p>
+<p>Moderate on every class. Most failures occur on dark, cropped, or blurry images.</p>
+</div>
+</div>
+<p>A confusion matrix <span class="math inline">\(C\in\mathbb N^{K\times K}\)</span> records how often true class <span class="math inline">\(i\)</span> is predicted as class <span class="math inline">\(j\)</span>. Its diagonal contains correct decisions; off-diagonal cells expose systematic confusions.</p>
+<p>For class <span class="math inline">\(k\)</span>, we can also treat “class <span class="math inline">\(k\)</span>” as positive and all other classes as negative:</p>
+<p><span class="math display">\[
+\operatorname{precision}_k=\frac{TP_k}{TP_k+FP_k},
+\qquad
+\operatorname{recall}_k=\frac{TP_k}{TP_k+FN_k}.
+\]</span></p>
+<p>The most informative evaluation combines aggregate metrics, per-class metrics, and a gallery of representative mistakes. Numbers tell us <strong>how much</strong> the system fails; examples help us ask <strong>why</strong>.</p>
+</section>
+<section id="the-complete-learning-protocol" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="the-complete-learning-protocol"><span class="header-section-number">9</span> The complete learning protocol</h2>
+<div class="cell" data-fig-width="12" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  Q[define&lt;br/&gt;decision] --&gt; A[audit&lt;br/&gt;data]
+  A --&gt; S[design&lt;br/&gt;split]
+  S --&gt; B[establish&lt;br/&gt;baseline]
+  B --&gt; T[train&lt;br/&gt;model]
+  T --&gt; V[choose with&lt;br/&gt;validation]
+  V --&gt; E[evaluate&lt;br/&gt;once]
+
+  classDef start fill:#17212b,color:#fff,stroke:#17212b
+  classDef process fill:#fffdf7,color:#17212b,stroke:#657079
+  classDef finish fill:#ef5b45,color:#fff,stroke:#ef5b45
+  class Q start
+  class A,S,B,T,V process
+  class E finish
+</pre>
+</div>
+<p></p><figcaption> The smallest complete experimental argument: define the decision, audit the data, protect the split, establish a baseline, fit parameters, make choices with validation data, and evaluate the completed procedure once.</figcaption> </figure><p></p>
+</div>
+</div>
+</div>
+<div class="protocol">
+<div class="protocol-step">
+<b>1</b><span>Define the decision</span>
+<p>
+State the input, output, user, and cost of mistakes.
+</p>
+</div>
+<div class="protocol-step">
+<b>2</b><span>Audit the data</span>
+<p>
+Understand collection, labels, missing cases, and possible shortcuts.
+</p>
+</div>
+<div class="protocol-step">
+<b>3</b><span>Choose the split</span>
+<p>
+Protect the unit—person, plant, time, or location—that must generalize.
+</p>
+</div>
+<div class="protocol-step">
+<b>4</b><span>Establish baselines</span>
+<p>
+Make sure the task and metric demand real learning.
+</p>
+</div>
+<div class="protocol-step">
+<b>5</b><span>Fit on training data</span>
+<p>
+Use the optimizer to adjust model parameters.
+</p>
+</div>
+<div class="protocol-step">
+<b>6</b><span>Decide with validation data</span>
+<p>
+Compare designs without touching the test set.
+</p>
+</div>
+<div class="protocol-step">
+<b>7</b><span>Evaluate once</span>
+<p>
+Report test performance and important failure modes.
+</p>
+</div>
+</div>
+<p>This is not merely a classroom ritual. It is the smallest credible argument that a learned system may work outside its training file.</p>
+</section>
+<section id="what-can-still-go-wrong" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="what-can-still-go-wrong"><span class="header-section-number">10</span> What can still go wrong?</h2>
+<p>Even a clean experimental split cannot guarantee success after deployment.</p>
+<p><strong>Distribution shift.</strong> The future may differ from the dataset: another camera, region, season, population, or policy. A random split from one dataset cannot by itself certify behavior under such changes.</p>
+<p><strong>Shortcut learning.</strong> The model may exploit a predictive artifact that does not represent the intended phenomenon <span class="citation" data-cites="geirhos2020shortcut">(<a href="#ref-geirhos2020shortcut" role="doc-biblioref">Geirhos et al. 2020</a>)</span>.</p>
+<p><strong>Label limitations.</strong> Targets may be noisy, subjective, delayed, or encode historical bias.</p>
+<p><strong>Metric mismatch.</strong> A numerical score may ignore the real cost borne by users.</p>
+<p><strong>Feedback loops.</strong> Once deployed, model decisions can change the data later collected.</p>
+<div class="warning-note">
+<p>A model does not “understand the task” in the human sense. It discovers statistical structure that helps optimize the objective on the data it receives. Whether that structure is useful, robust, and acceptable remains an empirical and human question.</p>
+</div>
+</section>
+<section id="reading-and-practice" class="level2" data-number="11">
+<h2 data-number="11" class="anchored" data-anchor-id="reading-and-practice"><span class="header-section-number">11</span> Reading and practice</h2>
+<p>The purpose of these resources is not to repeat the chapter. Each one adds a different perspective: a formal reference, a practitioner’s argument, a visual explanation, or an opportunity to make a decision yourself.</p>
+<div class="resource-list">
+<div class="resource-card read required">
+<div class="resource-icon" aria-hidden="true">
+<p>◫</p>
+</div>
+<div class="resource-body">
+<p><span class="resource-meta">READ · REQUIRED</span></p>
+<section id="image-classification-data-driven-approach" class="level3" data-number="11.1">
+<h3 data-number="11.1" class="anchored" data-anchor-id="image-classification-data-driven-approach"><span class="header-section-number">11.1</span> <a href="https://cs231n.github.io/classification/">Image Classification: Data-driven Approach</a></h3>
+<p><strong>Stanford CS231n course notes</strong></p>
+<p>Read through the nearest-neighbor classifier and validation-set discussion. Focus on why raw-pixel distance is a weak visual similarity measure and how the train/validation/test protocol shapes model selection.</p>
+</section>
+</div>
+</div>
+<div class="resource-card read required">
+<div class="resource-icon" aria-hidden="true">
+<p>◫</p>
+</div>
+<div class="resource-body">
+<p><span class="resource-meta">READ · REFERENCE</span></p>
+<section id="machine-learning-basics" class="level3" data-number="11.2">
+<h3 data-number="11.2" class="anchored" data-anchor-id="machine-learning-basics"><span class="header-section-number">11.2</span> <a href="https://www.deeplearningbook.org/contents/ml.html">Machine Learning Basics</a></h3>
+<p><strong>Deep Learning, Chapter 5 · Ian Goodfellow, Yoshua Bengio, and Aaron Courville</strong></p>
+<p>Read Sections 5.1–5.3 for a more formal treatment of learning algorithms, capacity, overfitting, hyperparameters, and estimators. Concentrate on the concepts; detailed derivations can wait.</p>
+</section>
+</div>
+</div>
+<div class="resource-card paper">
+<div class="resource-icon" aria-hidden="true">
+<p>▤</p>
+</div>
+<div class="resource-body">
+<p><span class="resource-meta">PAPER · RECOMMENDED</span></p>
+<section id="a-few-useful-things-to-know-about-machine-learning" class="level3" data-number="11.3">
+<h3 data-number="11.3" class="anchored" data-anchor-id="a-few-useful-things-to-know-about-machine-learning"><span class="header-section-number">11.3</span> <a href="https://homes.cs.washington.edu/~pedrod/papers/cacm12.pdf">A Few Useful Things to Know About Machine Learning</a></h3>
+<p><strong>Pedro Domingos · Communications of the ACM, 2012</strong></p>
+<p>A compact practitioner’s essay about generalization, representation, overfitting, data, and the traps hidden inside apparently successful experiments. After reading, select one claim you disagree with or would qualify.</p>
+</section>
+</div>
+</div>
+<div class="resource-card watch">
+<div class="resource-icon" aria-hidden="true">
+<p>▶</p>
+</div>
+<div class="resource-body">
+<p><span class="resource-meta">WATCH · OPTIONAL</span></p>
+<section id="but-what-is-a-neural-network" class="level3" data-number="11.4">
+<h3 data-number="11.4" class="anchored" data-anchor-id="but-what-is-a-neural-network"><span class="header-section-number">11.4</span> <a href="https://www.3blue1brown.com/lessons/neural-networks">But what is a neural network?</a></h3>
+<p><strong>3Blue1Brown · Neural Networks, Chapter 1</strong></p>
+<p>A visual preview of the model family we begin constructing next week. Watch for the distinction between the architecture we choose and the parameters learned from examples.</p>
+</section>
+</div>
+</div>
+<div class="resource-card practice">
+<div class="resource-icon" aria-hidden="true">
+<p>✎</p>
+</div>
+<div class="resource-body">
+<p><span class="resource-meta">PRACTICE · REQUIRED</span></p>
+<section id="accuracy-precision-and-recall" class="level3" data-number="11.5">
+<h3 data-number="11.5" class="anchored" data-anchor-id="accuracy-precision-and-recall"><span class="header-section-number">11.5</span> <a href="https://developers.google.com/machine-learning/crash-course/classification/accuracy-precision-recall">Accuracy, precision, and recall</a></h3>
+<p><strong>Google Machine Learning Crash Course</strong></p>
+<p>Work through the classification-metric checks. Before revealing each answer, decide which error matters and compute the quantity by hand.</p>
+</section>
+</div>
+</div>
+</div>
+<section id="bring-one-thought-to-class" class="level3 unnumbered unlisted reading-prompt">
+<h3 class="unnumbered unlisted anchored" data-anchor-id="bring-one-thought-to-class">Bring one thought to class</h3>
+<p>Choose one resource and write down either a claim that changed your view, a claim you question, or an example where the evaluation protocol could fail. We will begin the next discussion from these observations.</p>
+</section>
+</section>
+<section id="chapter-summary" class="level2" data-number="12">
+<h2 data-number="12" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">12</span> Chapter summary</h2>
+<div class="summary-box">
+<ul>
+<li>Image classification maps a tensor of pixel values to one of <span class="math inline">\(K\)</span> labels and is a concrete supervised-learning problem.</li>
+<li>Nearest-neighbor, linear, and neural models define increasingly expressive hypothesis classes.</li>
+<li>SVM loss demands a score margin; softmax cross-entropy rewards probability assigned to the correct class.</li>
+<li>A differentiable loss trains the model; accuracy, confusion matrices, and per-class metrics evaluate its behavior.</li>
+<li>Fitting the training data is not the goal. The goal is useful performance on relevant unseen data.</li>
+<li>Training data fits parameters, validation data guides design, and test data supports final evaluation.</li>
+<li>Deep learning learns the representation jointly with the classifier, but the five ingredients do not change.</li>
+</ul>
+</div>
+</section>
+<section id="exercises" class="level2" data-number="13">
+<h2 data-number="13" class="anchored" data-anchor-id="exercises"><span class="header-section-number">13</span> Exercises</h2>
+<section id="conceptual" class="level3" data-number="13.1">
+<h3 data-number="13.1" class="anchored" data-anchor-id="conceptual"><span class="header-section-number">13.1</span> Conceptual</h3>
+<ol type="1">
+<li>A model obtains 100% training accuracy and 62% test accuracy. Give three distinct explanations for the gap.</li>
+<li>Explain why selecting the best of 200 models using test accuracy makes that accuracy optimistic.</li>
+<li>Explain why Euclidean distance between raw image pixels can change dramatically after translating an object by one pixel.</li>
+<li>Two image classifiers have equal accuracy. List three analyses that could still make one preferable.</li>
+</ol>
+</section>
+<section id="design" class="level3" data-number="13.2">
+<h3 data-number="13.2" class="anchored" data-anchor-id="design"><span class="header-section-number">13.2</span> Design</h3>
+<ol start="5" type="1">
+<li>Choose one image-classification application—plant disease, traffic signs, waste sorting, or medical imaging—and write a one-page learning specification containing:
+<ul>
+<li>input and target;</li>
+<li>data-collection process;</li>
+<li>unit of splitting;</li>
+<li>baseline;</li>
+<li>primary metric;</li>
+<li>two possible sources of leakage;</li>
+<li>one likely distribution shift.</li>
+</ul></li>
+</ol>
+</section>
+<section id="mathematical" class="level3" data-number="13.3">
+<h3 data-number="13.3" class="anchored" data-anchor-id="mathematical"><span class="header-section-number">13.3</span> Mathematical</h3>
+<ol start="6" type="1">
+<li>A three-class model produces <span class="math inline">\(s=[-1.2,2.4,1.7]\)</span> and the correct class is 3. Compute the multiclass SVM loss using <span class="math inline">\(\Delta=1\)</span>.</li>
+<li>For the same scores, compute the softmax probabilities and cross-entropy loss. Use the stable form obtained by first subtracting the largest score.</li>
+<li>An image classifier produces <span class="math inline">\(TP=36\)</span>, <span class="math inline">\(TN=50\)</span>, <span class="math inline">\(FP=10\)</span>, and <span class="math inline">\(FN=4\)</span> for the class “pedestrian.” Compute accuracy, precision, and recall. Which number best communicates its ability to find pedestrians?</li>
+</ol>
+</section>
+</section>
+<section id="references" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="references">References</h2>
+<div class="next-chapter">
+<p><span>Next · Chapter 2</span></p>
+<section id="from-a-linear-score-to-a-neural-network" class="level2 unnumbered unlisted">
+<h2 class="unnumbered unlisted anchored" data-anchor-id="from-a-linear-score-to-a-neural-network">From a linear score to a neural network</h2>
+<p>We will build neurons and multilayer networks from elementary operations, then ask what additional functions depth allows us to represent.</p>
+</section>
+</div>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-bengio2013representation" class="csl-entry" role="listitem">
+Bengio, Yoshua, Aaron Courville, and Pascal Vincent. 2013. <span>“Representation Learning: A Review and New Perspectives.”</span> <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em> 35 (8): 1798–828. <a href="https://doi.org/10.1109/TPAMI.2013.50">https://doi.org/10.1109/TPAMI.2013.50</a>.
+</div>
+<div id="ref-canny1986computational" class="csl-entry" role="listitem">
+Canny, John. 1986. <span>“A Computational Approach to Edge Detection.”</span> <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em> PAMI-8 (6): 679–98. <a href="https://doi.org/10.1109/TPAMI.1986.4767851">https://doi.org/10.1109/TPAMI.1986.4767851</a>.
+</div>
+<div id="ref-cortes1995support" class="csl-entry" role="listitem">
+Cortes, Corinna, and Vladimir Vapnik. 1995. <span>“Support-Vector Networks.”</span> <em>Machine Learning</em> 20: 273–97. <a href="https://doi.org/10.1007/BF00994018">https://doi.org/10.1007/BF00994018</a>.
+</div>
+<div id="ref-cover1967nearest" class="csl-entry" role="listitem">
+Cover, Thomas M., and Peter E. Hart. 1967. <span>“Nearest Neighbor Pattern Classification.”</span> <em>IEEE Transactions on Information Theory</em> 13 (1): 21–27. <a href="https://doi.org/10.1109/TIT.1967.1053964">https://doi.org/10.1109/TIT.1967.1053964</a>.
+</div>
+<div id="ref-dalal2005histograms" class="csl-entry" role="listitem">
+Dalal, Navneet, and Bill Triggs. 2005. <span>“Histograms of Oriented Gradients for Human Detection.”</span> <em>IEEE Computer Society Conference on Computer Vision and Pattern Recognition</em> 1: 886–93. <a href="https://doi.org/10.1109/CVPR.2005.177">https://doi.org/10.1109/CVPR.2005.177</a>.
+</div>
+<div id="ref-deng2009imagenet" class="csl-entry" role="listitem">
+Deng, Jia, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li Fei-Fei. 2009. <span>“ImageNet: A Large-Scale Hierarchical Image Database.”</span> <em>IEEE Conference on Computer Vision and Pattern Recognition</em>, 248–55. <a href="https://doi.org/10.1109/CVPR.2009.5206848">https://doi.org/10.1109/CVPR.2009.5206848</a>.
+</div>
+<div id="ref-geirhos2020shortcut" class="csl-entry" role="listitem">
+Geirhos, Robert, Jørn-Henrik Jacobsen, Claudio Michaelis, et al. 2020. <span>“Shortcut Learning in Deep Neural Networks.”</span> <em>Nature Machine Intelligence</em> 2: 665–73. <a href="https://doi.org/10.1038/s42256-020-00257-z">https://doi.org/10.1038/s42256-020-00257-z</a>.
+</div>
+<div id="ref-goodfellow2016deep" class="csl-entry" role="listitem">
+Goodfellow, Ian, Yoshua Bengio, and Aaron Courville. 2016. <em>Deep Learning</em>. MIT Press. <a href="https://www.deeplearningbook.org/">https://www.deeplearningbook.org/</a>.
+</div>
+<div id="ref-guo2017calibration" class="csl-entry" role="listitem">
+Guo, Chuan, Geoff Pleiss, Yu Sun, and Kilian Q. Weinberger. 2017. <span>“On Calibration of Modern Neural Networks.”</span> <em>Proceedings of the 34th International Conference on Machine Learning</em> 70: 1321–30. <a href="https://proceedings.mlr.press/v70/guo17a.html">https://proceedings.mlr.press/v70/guo17a.html</a>.
+</div>
+<div id="ref-kaufman2012leakage" class="csl-entry" role="listitem">
+Kaufman, Shachar, Saharon Rosset, Claudia Perlich, and Ori Stitelman. 2012. <span>“Leakage in Data Mining: Formulation, Detection, and Avoidance.”</span> <em>ACM Transactions on Knowledge Discovery from Data</em> 6 (4): 15:1–21. <a href="https://doi.org/10.1145/2382577.2382579">https://doi.org/10.1145/2382577.2382579</a>.
+</div>
+<div id="ref-krizhevsky2009cifar" class="csl-entry" role="listitem">
+Krizhevsky, Alex. 2009. <em>Learning Multiple Layers of Features from Tiny Images</em>. University of Toronto. <a href="https://www.cs.toronto.edu/~kriz/learning-features-2009-TR.pdf">https://www.cs.toronto.edu/~kriz/learning-features-2009-TR.pdf</a>.
+</div>
+<div id="ref-krizhevsky2012imagenet" class="csl-entry" role="listitem">
+Krizhevsky, Alex, Ilya Sutskever, and Geoffrey E. Hinton. 2012. <span>“ImageNet Classification with Deep Convolutional Neural Networks.”</span> <em>Advances in Neural Information Processing Systems</em> 25. <a href="https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks">https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks</a>.
+</div>
+<div id="ref-cs231nnotes" class="csl-entry" role="listitem">
+Li, Fei-Fei, Andrej Karpathy, and Justin Johnson. n.d. <em>CS231n: Deep Learning for Computer Vision—Course Notes</em>. <a href="https://cs231n.github.io/">https://cs231n.github.io/</a>.
+</div>
+<div id="ref-robbins1951stochastic" class="csl-entry" role="listitem">
+Robbins, Herbert, and Sutton Monro. 1951. <span>“A Stochastic Approximation Method.”</span> <em>The Annals of Mathematical Statistics</em> 22 (3): 400–407. <a href="https://doi.org/10.1214/aoms/1177729586">https://doi.org/10.1214/aoms/1177729586</a>.
+</div>
+<div id="ref-rumelhart1986backprop" class="csl-entry" role="listitem">
+Rumelhart, David E., Geoffrey E. Hinton, and Ronald J. Williams. 1986. <span>“Learning Representations by Back-Propagating Errors.”</span> <em>Nature</em> 323: 533–36. <a href="https://doi.org/10.1038/323533a0">https://doi.org/10.1038/323533a0</a>.
+</div>
+<div id="ref-simonyan2015vgg" class="csl-entry" role="listitem">
+Simonyan, Karen, and Andrew Zisserman. 2015. <span>“Very Deep Convolutional Networks for Large-Scale Image Recognition.”</span> <em>International Conference on Learning Representations</em>. <a href="https://arxiv.org/abs/1409.1556">https://arxiv.org/abs/1409.1556</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Deep Learning · ENSA Tétouan</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
