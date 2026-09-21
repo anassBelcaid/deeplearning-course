@@ -8,7 +8,7 @@ project:
 
 website:
   title: "Deep Learning"
-  site-url: "https://anassbelcaid.github.io/deeplearning/"
+  site-url: "https://anassbelcaid.github.io/deeplearning-course/"
   navbar:
     pinned: true
     logo: assets/mark.svg
@@ -25,7 +25,7 @@ website:
         text: Logistics
     right:
       - icon: github
-        href: https://github.com/anassBelcaid/deeplearning
+        href: https://github.com/anassBelcaid/deeplearning-course
         aria-label: Course repository
   page-footer:
     left: "Deep Learning · ENSA Tétouan"

@@ -22,7 +22,7 @@ This laboratory is an exploration, not a training exercise. You will load a ligh
 All expensive and repetitive machinery is supplied. There is no dataset loader, optimizer, loss, backward pass, or training loop. Your job is to change images and visualization choices, inspect what happens, and explain the evidence.
 
 <a class="btn btn-primary" href="starter/seeing_every_pixel.html">View notebook</a>
-<a class="btn btn-secondary" href="/labs/09-semantic-segmentation/starter/seeing_every_pixel.ipynb?download=1" download="seeing_every_pixel.ipynb">Download notebook</a>
+<a class="btn btn-secondary" href="starter/seeing_every_pixel.ipynb?download=1" download="seeing_every_pixel.ipynb">Download notebook</a>
 
 ## What you will investigate
 
