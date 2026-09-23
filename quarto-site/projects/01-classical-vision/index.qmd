@@ -33,7 +33,7 @@ This is the first part of a three-model sequence inspired by Stanford CS231n: **
 
 [Open notebook](starter/knn_cifar10.ipynb){.btn .btn-primary}
 
-<a class="btn btn-secondary" href="https://raw.githubusercontent.com/anassBelcaid/deeplearning/redesign/quarto-2026/quarto-site/projects/01-classical-vision/starter/knn_cifar10.ipynb" download="knn_cifar10.ipynb">Download the notebook</a>
+<a class="btn btn-secondary" href="starter/knn_cifar10.ipynb?download=1" download="knn_cifar10.ipynb">Download the notebook</a>
 
 [Open in Google Colab](https://colab.research.google.com/github/anassBelcaid/deeplearning/blob/redesign/quarto-2026/quarto-site/projects/01-classical-vision/starter/knn_cifar10.ipynb){.btn .btn-secondary}
 
