@@ -38,9 +38,9 @@ This is deliberately a manual exercise. The amount of careful calculus and check
 
 [Open notebook](starter/softmax_cifar10.ipynb){.btn .btn-primary}
 
-<a class="btn btn-secondary" href="https://raw.githubusercontent.com/anassBelcaid/deeplearning/redesign/quarto-2026/quarto-site/projects/01-classical-vision/starter/softmax_cifar10.ipynb" download="softmax_cifar10.ipynb">Download the notebook</a>
+<a class="btn btn-secondary" href="starter/softmax_cifar10.ipynb?download=1" download="softmax_cifar10.ipynb">Download the notebook</a>
 
-[Open in Google Colab](https://colab.research.google.com/github/anassBelcaid/deeplearning/blob/redesign/quarto-2026/quarto-site/projects/01-classical-vision/starter/softmax_cifar10.ipynb){.btn .btn-secondary}
+[Open in Google Colab](https://colab.research.google.com/github/anassBelcaid/deeplearning-course/blob/main/quarto-site/projects/01-classical-vision/starter/softmax_cifar10.ipynb){.btn .btn-secondary}
 
 ## What you implement
 
