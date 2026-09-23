@@ -1,286 +1,168 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
-
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.18">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="author" content="Dr.&nbsp;A. Belcaid">
-
-<title>What Does It Mean to Learn? – Deep Learning</title>
-<style>
-/* Default styles provided by pandoc.
-** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
-*/
-span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: 1.5em;}
-div.column{flex: auto;}
-@media screen {
-div.columns{gap: min(4vw, 1.5em);}
-div.column{overflow-x: auto;}
-}
-div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-ul.task-list{list-style: none;}
-ul.task-list li input[type="checkbox"] {
-  width: 0.8em;
-  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
-  vertical-align: middle;
-}
-</style>
-
-
-<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<html lang="en"><head>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabby.min.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-2e7c9b518fe54fcaa4a8b379123416fc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
-<script id="quarto-search-options" type="application/json">{
-  "location": "navbar",
-  "copy-button": false,
-  "collapse-after": 3,
-  "panel-placement": "end",
-  "type": "overlay",
-  "limit": 50,
-  "keyboard-shortcut": [
-    "f",
-    "/",
-    "s"
-  ],
-  "show-item-context": false,
-  "language": {
-    "search-no-results-text": "No results",
-    "search-matching-documents-text": "matching documents",
-    "search-copy-link-title": "Copy link to search",
-    "search-hide-matches-text": "Hide additional matches",
-    "search-more-match-text": "more match in this document",
-    "search-more-matches-text": "more matches in this document",
-    "search-clear-button-title": "Clear",
-    "search-text-placeholder": "",
-    "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit",
-    "search-label": "Search"
-  }
-}</script>
-<style>html{ scroll-behavior: smooth; }</style>
-<script src="../../site_libs/quarto-diagram/mermaid.min.js"></script>
-<script src="../../site_libs/quarto-diagram/mermaid-init.js"></script>
-<link href="../../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.10.18">
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
+  <meta name="author" content="Dr.&nbsp;A. Belcaid">
+  <title>Deep Learning – What Does It Mean to Learn?</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
     }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<link rel="stylesheet" href="../../styles.css">
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-f3e585dc122d45960ea2c31f625881dd.css">
+  <link rel="stylesheet" href="slides.css">
+  <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <script src="../../site_libs/quarto-diagram/mermaid-postprocess-shim.js"></script>
 </head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
 
-<body class="floating nav-fixed quarto-light">
+<section id="title-slide" data-visibility="hidden" class="quarto-title-block center">
+  <h1 class="title">What Does It Mean to Learn?</h1>
+  <p class="subtitle">Image classification and the five ingredients of machine learning</p>
 
-<div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../assets/mark.svg" alt="" class="navbar-logo light-content">
-    <img src="../../assets/mark.svg" alt="" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">Deep Learning</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll me-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../index.html"> 
-<span class="menu-text">Home</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../schedule.html"> 
-<span class="menu-text">Schedule</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../notes.html"> 
-<span class="menu-text">Notes</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../projects.html"> 
-<span class="menu-text">Projects</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../logistics.html"> 
-<span class="menu-text">Logistics</span></a>
-  </li>  
-</ul>
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="https://edstem.org/us/courses/102787/"> 
-<span class="menu-text">ED</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Dr.&nbsp;A. Belcaid
 </div>
-      </div> <!-- /container-fluid -->
-    </nav>
-</header>
-<!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
-<!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#what-does-it-mean-to-learn" id="toc-what-does-it-mean-to-learn" class="nav-link active" data-scroll-target="#what-does-it-mean-to-learn">What does it mean to learn?</a></li>
-  <li><a href="#you-already-know-the-answer" id="toc-you-already-know-the-answer" class="nav-link" data-scroll-target="#you-already-know-the-answer">You already know the answer</a></li>
-  <li><a href="#a-computer-begins-somewhere-else" id="toc-a-computer-begins-somewhere-else" class="nav-link" data-scroll-target="#a-computer-begins-somewhere-else">A computer begins somewhere else</a></li>
-  <li><a href="#the-task-in-one-line" id="toc-the-task-in-one-line" class="nav-link" data-scroll-target="#the-task-in-one-line">The task in one line</a></li>
-  <li><a href="#why-rules-collapse" id="toc-why-rules-collapse" class="nav-link" data-scroll-target="#why-rules-collapse">Why rules collapse</a></li>
-  <li><a href="#machine-learning-changes-what-we-write" id="toc-machine-learning-changes-what-we-write" class="nav-link" data-scroll-target="#machine-learning-changes-what-we-write">Machine learning changes what we write</a></li>
-  <li><a href="#todays-map" id="toc-todays-map" class="nav-link" data-scroll-target="#todays-map">Today’s map</a></li>
-  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data">01 · Data</a>
-  <ul class="collapse">
-  <li><a href="#a-dataset-is-a-collection-of-promises" id="toc-a-dataset-is-a-collection-of-promises" class="nav-link" data-scroll-target="#a-dataset-is-a-collection-of-promises">A dataset is a collection of promises</a></li>
-  <li><a href="#which-model-did-we-train" id="toc-which-model-did-we-train" class="nav-link" data-scroll-target="#which-model-did-we-train">Which model did we train?</a></li>
-  <li><a href="#four-questions-before-training" id="toc-four-questions-before-training" class="nav-link" data-scroll-target="#four-questions-before-training">Four questions before training</a></li>
-  <li><a href="#classical-ml-chooses-the-representation" id="toc-classical-ml-chooses-the-representation" class="nav-link" data-scroll-target="#classical-ml-chooses-the-representation">Classical ML chooses the representation</a></li>
-  <li><a href="#deep-learning-learns-the-representation" id="toc-deep-learning-learns-the-representation" class="nav-link" data-scroll-target="#deep-learning-learns-the-representation">Deep learning learns the representation</a></li>
-  </ul></li>
-  <li><a href="#hypothesis" id="toc-hypothesis" class="nav-link" data-scroll-target="#hypothesis">02 · Hypothesis</a>
-  <ul class="collapse">
-  <li><a href="#a-hypothesis-class-is-a-menu-of-rules" id="toc-a-hypothesis-class-is-a-menu-of-rules" class="nav-link" data-scroll-target="#a-hypothesis-class-is-a-menu-of-rules">A hypothesis class is a menu of rules</a></li>
-  <li><a href="#nearest-neighbor-learning-without-parameters" id="toc-nearest-neighbor-learning-without-parameters" class="nav-link" data-scroll-target="#nearest-neighbor-learning-without-parameters">Nearest neighbor: learning without parameters</a></li>
-  <li><a href="#linear-classification-one-score-per-class" id="toc-linear-classification-one-score-per-class" class="nav-link" data-scroll-target="#linear-classification-one-score-per-class">Linear classification: one score per class</a></li>
-  <li><a href="#watch-the-scores-vote" id="toc-watch-the-scores-vote" class="nav-link" data-scroll-target="#watch-the-scores-vote">Watch the scores vote</a></li>
-  <li><a href="#same-architecture-different-rule" id="toc-same-architecture-different-rule" class="nav-link" data-scroll-target="#same-architecture-different-rule">Same architecture, different rule</a></li>
-  </ul></li>
-  <li><a href="#loss" id="toc-loss" class="nav-link" data-scroll-target="#loss">03 · Loss</a>
-  <ul class="collapse">
-  <li><a href="#accuracy-is-silent-during-training" id="toc-accuracy-is-silent-during-training" class="nav-link" data-scroll-target="#accuracy-is-silent-during-training">Accuracy is silent during training</a></li>
-  <li><a href="#two-views-of-the-same-mistake" id="toc-two-views-of-the-same-mistake" class="nav-link" data-scroll-target="#two-views-of-the-same-mistake">Two views of the same mistake</a></li>
-  <li><a href="#svm-loss-the-correct-class-needs-room" id="toc-svm-loss-the-correct-class-needs-room" class="nav-link" data-scroll-target="#svm-loss-the-correct-class-needs-room">SVM loss: the correct class needs room</a></li>
-  <li><a href="#compute-it-together" id="toc-compute-it-together" class="nav-link" data-scroll-target="#compute-it-together">Compute it together</a></li>
-  <li><a href="#softmax-scores-become-probabilities" id="toc-softmax-scores-become-probabilities" class="nav-link" data-scroll-target="#softmax-scores-become-probabilities">Softmax: scores become probabilities</a></li>
-  <li><a href="#cross-entropy-asks-for-the-correct-probability" id="toc-cross-entropy-asks-for-the-correct-probability" class="nav-link" data-scroll-target="#cross-entropy-asks-for-the-correct-probability">Cross-entropy asks for the correct probability</a></li>
-  <li><a href="#same-goal-different-pressure" id="toc-same-goal-different-pressure" class="nav-link" data-scroll-target="#same-goal-different-pressure">Same goal, different pressure</a></li>
-  </ul></li>
-  <li><a href="#optimization" id="toc-optimization" class="nav-link" data-scroll-target="#optimization">04 · Optimization</a>
-  <ul class="collapse">
-  <li><a href="#the-learning-loop" id="toc-the-learning-loop" class="nav-link" data-scroll-target="#the-learning-loop">The learning loop</a></li>
-  <li><a href="#loss-tells-us-where-optimization-moves-us" id="toc-loss-tells-us-where-optimization-moves-us" class="nav-link" data-scroll-target="#loss-tells-us-where-optimization-moves-us">Loss tells us where; optimization moves us</a></li>
-  </ul></li>
-  <li><a href="#evaluation" id="toc-evaluation" class="nav-link" data-scroll-target="#evaluation">05 · Evaluation</a>
-  <ul class="collapse">
-  <li><a href="#fitting-is-not-learning" id="toc-fitting-is-not-learning" class="nav-link" data-scroll-target="#fitting-is-not-learning">Fitting is not learning</a></li>
-  <li><a href="#three-datasets-three-jobs" id="toc-three-datasets-three-jobs" class="nav-link" data-scroll-target="#three-datasets-three-jobs">Three datasets, three jobs</a></li>
-  <li><a href="#split-the-thing-that-must-generalize" id="toc-split-the-thing-that-must-generalize" class="nav-link" data-scroll-target="#split-the-thing-that-must-generalize">Split the thing that must generalize</a></li>
-  <li><a href="#training-success-can-hide-test-failure" id="toc-training-success-can-hide-test-failure" class="nav-link" data-scroll-target="#training-success-can-hide-test-failure">Training success can hide test failure</a></li>
-  <li><a href="#read-the-mistakes" id="toc-read-the-mistakes" class="nav-link" data-scroll-target="#read-the-mistakes">Read the mistakes</a></li>
-  <li><a href="#the-complete-experiment" id="toc-the-complete-experiment" class="nav-link" data-scroll-target="#the-complete-experiment">The complete experiment</a></li>
-  <li><a href="#one-task-two-visits" id="toc-one-task-two-visits" class="nav-link" data-scroll-target="#one-task-two-visits">One task, two visits</a></li>
-  <li><a href="#five-questions-to-keep" id="toc-five-questions-to-keep" class="nav-link" data-scroll-target="#five-questions-to-keep">Five questions to keep</a></li>
-  </ul></li>
-  </ul>
-<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.html"><i class="bi bi-file-slides"></i>RevealJS</a></li></ul></div></nav>
-</nav>
-<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
-<!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-    </div>
-<!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">What Does It Mean to Learn?</h1>
-<p class="subtitle lead">Image classification and the five ingredients of machine learning</p>
+</div>
 </div>
 
-
-
-<div class="quarto-title-meta">
-
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>Dr.&nbsp;A. Belcaid </p>
-          </div>
-  </div>
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<section id="what-does-it-mean-to-learn" class="level2 deck-title">
-<h2 class="deck-title anchored" data-anchor-id="what-does-it-mean-to-learn">What does it mean to learn?</h2>
+</section>
+<section id="what-does-it-mean-to-learn" class="slide level2 deck-title">
+<h2>What does it mean to learn?</h2>
 <div class="deck-title-grid">
 <div class="deck-title-copy">
 <p><span class="eyebrow">CHAPTER 01 · FOUNDATIONS</span></p>
-<section id="image-classification-and-the-five-ingredients-of-machine-learning" class="level3">
-<h3 class="anchored" data-anchor-id="image-classification-and-the-five-ingredients-of-machine-learning">Image classification and the five ingredients of machine learning</h3>
+<h3 id="image-classification-and-the-five-ingredients-of-machine-learning">Image classification and the five ingredients of machine learning</h3>
 <p>We will build one complete learning problem—not memorize a list of definitions.</p>
 <p><span class="deck-author">Dr.&nbsp;A. Belcaid</span></p>
-</section>
 </div>
 <div class="deck-title-art">
-<p><img src="assets/image-classification-hero.png" class="img-fluid" alt="An illustrated image-classification pipeline from examples to pixels, a learned representation, and class scores."></p>
+<p><img data-src="assets/image-classification-hero.png" alt="An illustrated image-classification pipeline from examples to pixels, a learned representation, and class scores."></p>
 </div>
 </div>
 </section>
-<section id="you-already-know-the-answer" class="level2 question-slide">
-<h2 class="question-slide anchored" data-anchor-id="you-already-know-the-answer">You already know the answer</h2>
+<section id="you-already-know-the-answer" class="slide level2 question-slide">
+<h2>You already know the answer</h2>
 <div class="big-question">
 <p>What is in this image?</p>
 </div>
@@ -295,14 +177,24 @@ window.Quarto = {
 <div class="fragment takeaway">
 <p>Easy to recognize does not mean easy to program.</p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Ask for an answer immediately, then ask students to write a complete cat-detection rule. Their disagreement creates the motivation for learning from examples. 4 minutes.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="a-computer-begins-somewhere-else" class="level2">
-<h2 class="anchored" data-anchor-id="a-computer-begins-somewhere-else">A computer begins somewhere else</h2>
+<section id="a-computer-begins-somewhere-else" class="slide level2">
+<h2>A computer begins somewhere else</h2>
 <div class="cs231n-figure pixel-figure">
-<p><img src="assets/cs231n-classify.png" class="img-fluid" alt="A cat image with one region enlarged into RGB pixel values, followed by four class probabilities."></p>
+<p><img data-src="assets/cs231n-classify.png" alt="A cat image with one region enlarged into RGB pixel values, followed by four class probabilities."></p>
 </div>
 <div class="pixel-fact fragment">
 <p><span>one image</span> <strong><span class="math inline">\(248\times400\times3=297{,}600\)</span></strong> <span>numbers in <span class="math inline">\([0,255]\)</span></span></p>
@@ -314,8 +206,8 @@ window.Quarto = {
 Illustration: <a href="https://cs231n.github.io/classification/">CS231n, Image Classification notes</a>.
 </p>
 </section>
-<section id="the-task-in-one-line" class="level2">
-<h2 class="anchored" data-anchor-id="the-task-in-one-line">The task in one line</h2>
+<section id="the-task-in-one-line" class="slide level2">
+<h2>The task in one line</h2>
 <div class="classification-rule">
 <p><span class="input-chip">image <span class="math inline">\(x\)</span></span> <i>→</i> <span class="model-chip">classifier <span class="math inline">\(f_\theta\)</span></span> <i>→</i> <span class="output-chip">label <span class="math inline">\(\hat y\)</span></span></p>
 </div>
@@ -342,10 +234,10 @@ f_\theta:\mathbb R^{H\times W\times3}\longrightarrow\mathbb R^K,
 </p>
 </div>
 </section>
-<section id="why-rules-collapse" class="level2">
-<h2 class="anchored" data-anchor-id="why-rules-collapse">Why rules collapse</h2>
+<section id="why-rules-collapse" class="slide level2">
+<h2>Why rules collapse</h2>
 <div class="cs231n-figure challenge-figure">
-<p><img src="assets/cs231n-challenges.jpeg" class="img-fluid" alt="Examples of viewpoint variation, scale variation, deformation, occlusion, illumination changes, and background clutter in image classification."></p>
+<p><img data-src="assets/cs231n-challenges.jpeg" alt="Examples of viewpoint variation, scale variation, deformation, occlusion, illumination changes, and background clutter in image classification."></p>
 </div>
 <div class="fragment big-summary">
 <p>The label stays fixed while viewpoint, scale, shape, visibility, light, and background all change.</p>
@@ -354,49 +246,99 @@ f_\theta:\mathbb R^{H\times W\times3}\longrightarrow\mathbb R^K,
 Illustration: <a href="https://cs231n.github.io/classification/">CS231n, Image Classification notes</a>.
 </p>
 </section>
-<section id="machine-learning-changes-what-we-write" class="level2">
-<h2 class="anchored" data-anchor-id="machine-learning-changes-what-we-write">Machine learning changes what we write</h2>
+<section id="machine-learning-changes-what-we-write" class="slide level2">
+<h2>Machine learning changes what we write</h2>
 <div class="two-worlds">
 <div class="world rules">
 <p><span>HANDWRITTEN PROGRAM</span></p>
-<section id="we-write-the-final-rule" class="level3">
-<h3 class="anchored" data-anchor-id="we-write-the-final-rule">We write the final rule</h3>
+<h3 id="we-write-the-final-rule">We write the final rule</h3>
 <p>pixels + rules about color, edges, shape → class</p>
-</section>
 </div>
 <div class="world learning">
 <p><span>LEARNING SYSTEM</span></p>
-<section id="we-write-a-procedure-for-finding-a-rule" class="level3">
-<h3 class="anchored" data-anchor-id="we-write-a-procedure-for-finding-a-rule">We write a procedure for finding a rule</h3>
+<h3 id="we-write-a-procedure-for-finding-a-rule">We write a procedure for finding a rule</h3>
 <p>labeled images + learning algorithm → classifier</p>
-</section>
 </div>
 </div>
 <div class="fragment takeaway">
 <p>The difficult design work does not disappear. It moves.</p>
 </div>
 </section>
-<section id="todays-map" class="level2">
-<h2 class="anchored" data-anchor-id="todays-map">Today’s map</h2>
-<div class="cell" data-fig-width="11" data-layout-align="default">
+<section id="todays-map" class="slide level2">
+<h2>Today’s map</h2>
+<div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
-<p></p><figure class="figure"><p></p>
+<p></p><figure class=""><p></p>
 <div>
-<pre class="mermaid mermaid-js">flowchart LR
-  A[1 · DATA&lt;br/&gt;experience] --&gt; B[2 · HYPOTHESIS&lt;br/&gt;possible rules]
-  B --&gt; C[3 · LOSS&lt;br/&gt;what wrong costs]
-  C --&gt; D[4 · OPTIMIZATION&lt;br/&gt;search]
-  D --&gt; E[5 · EVALUATION&lt;br/&gt;evidence]
-  E -. better questions .-&gt; A
-
-  classDef first fill:#2878c8,color:#fff,stroke:#2878c8
-  classDef middle fill:#fffdf7,color:#17212b,stroke:#657079
-  classDef last fill:#ef5b45,color:#fff,stroke:#ef5b45
-  class A first
-  class B,C,D middle
-  class E last
-</pre>
+<svg id="mermaid-figure-1" width="1056" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" class="flowchart" style="; display: block; margin: auto auto auto auto" viewbox="0 0 1101.953125 153" role="graphics-document document" aria-roledescription="flowchart-v2" height="480">
+<style>#mermaid-figure-1{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#mermaid-figure-1 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#mermaid-figure-1 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#mermaid-figure-1 .error-icon{fill:#552222;}#mermaid-figure-1 .error-text{fill:#552222;stroke:#552222;}#mermaid-figure-1 .edge-thickness-normal{stroke-width:1px;}#mermaid-figure-1 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-figure-1 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-figure-1 .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-figure-1 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-figure-1 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-figure-1 .marker{fill:#333333;stroke:#333333;}#mermaid-figure-1 .marker.cross{stroke:#333333;}#mermaid-figure-1 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-figure-1 p{margin:0;}#mermaid-figure-1 .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#333;}#mermaid-figure-1 .cluster-label text{fill:#333;}#mermaid-figure-1 .cluster-label span{color:#333;}#mermaid-figure-1 .cluster-label span p{background-color:transparent;}#mermaid-figure-1 .label text,#mermaid-figure-1 span{fill:#333;color:#333;}#mermaid-figure-1 .node rect,#mermaid-figure-1 .node circle,#mermaid-figure-1 .node ellipse,#mermaid-figure-1 .node polygon,#mermaid-figure-1 .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#mermaid-figure-1 .rough-node .label text,#mermaid-figure-1 .node .label text,#mermaid-figure-1 .image-shape .label,#mermaid-figure-1 .icon-shape .label{text-anchor:middle;}#mermaid-figure-1 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-figure-1 .rough-node .label,#mermaid-figure-1 .node .label,#mermaid-figure-1 .image-shape .label,#mermaid-figure-1 .icon-shape .label{text-align:center;}#mermaid-figure-1 .node.clickable{cursor:pointer;}#mermaid-figure-1 .root .anchor path{fill:#333333!important;stroke-width:0;stroke:#333333;}#mermaid-figure-1 .arrowheadPath{fill:#333333;}#mermaid-figure-1 .edgePath .path{stroke:#333333;stroke-width:2.0px;}#mermaid-figure-1 .flowchart-link{stroke:#333333;fill:none;}#mermaid-figure-1 .edgeLabel{background-color:rgba(232,232,232, 0.8);text-align:center;}#mermaid-figure-1 .edgeLabel p{background-color:rgba(232,232,232, 0.8);}#mermaid-figure-1 .edgeLabel rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#mermaid-figure-1 .labelBkg{background-color:rgba(232, 232, 232, 0.5);}#mermaid-figure-1 .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#mermaid-figure-1 .cluster text{fill:#333;}#mermaid-figure-1 .cluster span{color:#333;}#mermaid-figure-1 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(80, 100%, 96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-figure-1 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#333;}#mermaid-figure-1 rect.text{fill:none;stroke-width:0;}#mermaid-figure-1 .icon-shape,#mermaid-figure-1 .image-shape{background-color:rgba(232,232,232, 0.8);text-align:center;}#mermaid-figure-1 .icon-shape p,#mermaid-figure-1 .image-shape p{background-color:rgba(232,232,232, 0.8);padding:2px;}#mermaid-figure-1 .icon-shape rect,#mermaid-figure-1 .image-shape rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#mermaid-figure-1 .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#mermaid-figure-1 .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#mermaid-figure-1 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}#mermaid-figure-1 .first>*{fill:#2878c8!important;color:#fff!important;stroke:#2878c8!important;}#mermaid-figure-1 .first span{fill:#2878c8!important;color:#fff!important;stroke:#2878c8!important;}#mermaid-figure-1 .first tspan{fill:#fff!important;}#mermaid-figure-1 .middle>*{fill:#fffdf7!important;color:#17212b!important;stroke:#657079!important;}#mermaid-figure-1 .middle span{fill:#fffdf7!important;color:#17212b!important;stroke:#657079!important;}#mermaid-figure-1 .middle tspan{fill:#17212b!important;}#mermaid-figure-1 .last>*{fill:#ef5b45!important;color:#fff!important;stroke:#ef5b45!important;}#mermaid-figure-1 .last span{fill:#ef5b45!important;color:#fff!important;stroke:#ef5b45!important;}#mermaid-figure-1 .last tspan{fill:#fff!important;}</style>
+<g><marker id="mermaid-1790181673079_flowchart-v2-pointEnd" class="marker flowchart-v2" viewbox="0 0 10 10" refx="5" refy="5" markerunits="userSpaceOnUse" markerwidth="8" markerheight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1790181673079_flowchart-v2-pointStart" class="marker flowchart-v2" viewbox="0 0 10 10" refx="4.5" refy="5" markerunits="userSpaceOnUse" markerwidth="8" markerheight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1790181673079_flowchart-v2-circleEnd" class="marker flowchart-v2" viewbox="0 0 10 10" refx="11" refy="5" markerunits="userSpaceOnUse" markerwidth="11" markerheight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1790181673079_flowchart-v2-circleStart" class="marker flowchart-v2" viewbox="0 0 10 10" refx="-1" refy="5" markerunits="userSpaceOnUse" markerwidth="11" markerheight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1790181673079_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewbox="0 0 11 11" refx="12" refy="5.2" markerunits="userSpaceOnUse" markerwidth="11" markerheight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1790181673079_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewbox="0 0 11 11" refx="-1" refy="5.2" markerunits="userSpaceOnUse" markerwidth="11" markerheight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path d="M146.281,58.419L150.448,56.516C154.615,54.613,162.948,50.806,170.615,48.903C178.281,47,185.281,47,188.781,47L192.281,47" id="L_A_B_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_A_B_0" data-points="W3sieCI6MTQ2LjI4MTI1LCJ5Ijo1OC40MTkwODcxMzY5Mjk0Nn0seyJ4IjoxNzEuMjgxMjUsInkiOjQ3fSx7IngiOjE5Ni4yODEyNSwieSI6NDd9XQ==" marker-end="url(#mermaid-1790181673079_flowchart-v2-pointEnd)"></path><path d="M382.531,47L386.698,47C390.865,47,399.198,47,406.865,47C414.531,47,421.531,47,425.031,47L428.531,47" id="L_B_C_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_B_C_0" data-points="W3sieCI6MzgyLjUzMTI1LCJ5Ijo0N30seyJ4Ijo0MDcuNTMxMjUsInkiOjQ3fSx7IngiOjQzMi41MzEyNSwieSI6NDd9XQ==" marker-end="url(#mermaid-1790181673079_flowchart-v2-pointEnd)"></path><path d="M616.141,47L620.307,47C624.474,47,632.807,47,640.474,47C648.141,47,655.141,47,658.641,47L662.141,47" id="L_C_D_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_C_D_0" data-points="W3sieCI6NjE2LjE0MDYyNSwieSI6NDd9LHsieCI6NjQxLjE0MDYyNSwieSI6NDd9LHsieCI6NjY2LjE0MDYyNSwieSI6NDd9XQ==" marker-end="url(#mermaid-1790181673079_flowchart-v2-pointEnd)"></path><path d="M861.844,47L866.01,47C870.177,47,878.51,47,886.219,48.312C893.927,49.624,901.01,52.249,904.551,53.561L908.093,54.873" id="L_D_E_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_D_E_0" data-points="W3sieCI6ODYxLjg0Mzc1LCJ5Ijo0N30seyJ4Ijo4ODYuODQzNzUsInkiOjQ3fSx7IngiOjkxMS44NDM3NSwieSI6NTYuMjYyODc0NDUzMDQ2MTF9XQ==" marker-end="url(#mermaid-1790181673079_flowchart-v2-pointEnd)"></path><path d="M911.844,123.737L907.677,125.281C903.51,126.825,895.177,129.912,870.535,131.456C845.893,133,804.943,133,763.992,133C723.042,133,682.091,133,642.148,133C602.206,133,563.271,133,524.336,133C485.401,133,446.466,133,407.311,133C368.156,133,328.781,133,289.406,133C250.031,133,210.656,133,187.408,131.374C164.161,129.748,157.04,126.495,153.48,124.869L149.92,123.243" id="L_E_A_0" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_E_A_0" data-points="W3sieCI6OTExLjg0Mzc1LCJ5IjoxMjMuNzM3MTI1NTQ2OTUzODl9LHsieCI6ODg2Ljg0Mzc1LCJ5IjoxMzN9LHsieCI6NzYzLjk5MjE4NzUsInkiOjEzM30seyJ4Ijo2NDEuMTQwNjI1LCJ5IjoxMzN9LHsieCI6NTI0LjMzNTkzNzUsInkiOjEzM30seyJ4Ijo0MDcuNTMxMjUsInkiOjEzM30seyJ4IjoyODkuNDA2MjUsInkiOjEzM30seyJ4IjoxNzEuMjgxMjUsInkiOjEzM30seyJ4IjoxNDYuMjgxMjUsInkiOjEyMS41ODA5MTI4NjMwNzA1NH1d" marker-end="url(#mermaid-1790181673079_flowchart-v2-pointEnd)"></path></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_A_B_0" transform="translate(0, 0)"><foreignobject width="0" height="0">
+<div class="labelBkg" data-xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;">
+<span class="edgeLabel"></span>
+</div>
+</foreignobject></g></g><g class="edgeLabel"><g class="label" data-id="L_B_C_0" transform="translate(0, 0)"><foreignobject width="0" height="0">
+<div class="labelBkg" data-xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;">
+<span class="edgeLabel"></span>
+</div>
+</foreignobject></g></g><g class="edgeLabel"><g class="label" data-id="L_C_D_0" transform="translate(0, 0)"><foreignobject width="0" height="0">
+<div class="labelBkg" data-xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;">
+<span class="edgeLabel"></span>
+</div>
+</foreignobject></g></g><g class="edgeLabel"><g class="label" data-id="L_D_E_0" transform="translate(0, 0)"><foreignobject width="0" height="0">
+<div class="labelBkg" data-xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;">
+<span class="edgeLabel"></span>
+</div>
+</foreignobject></g></g><g class="edgeLabel" transform="translate(524.3359375, 133)"><g class="label" data-id="L_E_A_0" transform="translate(-56.9296875, -12)"><foreignobject width="113.859375" height="24">
+<div class="labelBkg" data-xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;">
+<span class="edgeLabel">
+<p>
+better questions
+</p>
+</span>
+</div>
+</foreignobject></g></g></g><g class="nodes"><g class="node default first" id="flowchart-A-0" transform="translate(77.140625, 90)"><rect class="basic label-container" style="fill:#2878c8 !important;stroke:#2878c8 !important" x="-69.140625" y="-39" width="138.28125" height="78"></rect><g class="label" style="color:#fff !important" transform="translate(-39.140625, -24)"><rect></rect><foreignobject width="78.28125" height="48">
+<div style="color: rgb(255, 255, 255) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span style="color:#fff !important" class="nodeLabel">
+<p>
+1 · DATA<br>experience
+</p>
+</span>
+</div>
+</foreignobject></g></g><g class="node default middle" id="flowchart-B-1" transform="translate(289.40625, 47)"><rect class="basic label-container" style="fill:#fffdf7 !important;stroke:#657079 !important" x="-93.125" y="-39" width="186.25" height="78"></rect><g class="label" style="color:#17212b !important" transform="translate(-63.125, -24)"><rect></rect><foreignobject width="126.25" height="48">
+<div style="color: rgb(23, 33, 43) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span style="color:#17212b !important" class="nodeLabel">
+<p>
+2 · HYPOTHESIS<br>possible rules
+</p>
+</span>
+</div>
+</foreignobject></g></g><g class="node default middle" id="flowchart-C-3" transform="translate(524.3359375, 47)"><rect class="basic label-container" style="fill:#fffdf7 !important;stroke:#657079 !important" x="-91.8046875" y="-39" width="183.609375" height="78"></rect><g class="label" style="color:#17212b !important" transform="translate(-61.8046875, -24)"><rect></rect><foreignobject width="123.609375" height="48">
+<div style="color: rgb(23, 33, 43) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span style="color:#17212b !important" class="nodeLabel">
+<p>
+3 · LOSS<br>what wrong costs
+</p>
+</span>
+</div>
+</foreignobject></g></g><g class="node default middle" id="flowchart-D-5" transform="translate(763.9921875, 47)"><rect class="basic label-container" style="fill:#fffdf7 !important;stroke:#657079 !important" x="-97.8515625" y="-39" width="195.703125" height="78"></rect><g class="label" style="color:#17212b !important" transform="translate(-67.8515625, -24)"><rect></rect><foreignobject width="135.703125" height="48">
+<div style="color: rgb(23, 33, 43) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span style="color:#17212b !important" class="nodeLabel">
+<p>
+4 · OPTIMIZATION<br>search
+</p>
+</span>
+</div>
+</foreignobject></g></g><g class="node default last" id="flowchart-E-7" transform="translate(1002.8984375, 90)"><rect class="basic label-container" style="fill:#ef5b45 !important;stroke:#ef5b45 !important" x="-91.0546875" y="-39" width="182.109375" height="78"></rect><g class="label" style="color:#fff !important" transform="translate(-61.0546875, -24)"><rect></rect><foreignobject width="122.109375" height="48">
+<div style="color: rgb(255, 255, 255) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span style="color:#fff !important" class="nodeLabel">
+<p>
+5 · EVALUATION<br>evidence
+</p>
+</span>
+</div>
+</foreignobject></g></g></g></g></g>
+</svg>
 </div>
 <p></p></figure><p></p>
 </div>
@@ -406,16 +348,19 @@ Illustration: <a href="https://cs231n.github.io/classification/">CS231n, Image C
 <p><strong>Part I · 15 min</strong> task &nbsp; · &nbsp; <strong>Part II · 25 min</strong> data &amp; hypotheses &nbsp; · &nbsp; <strong>Part III · 25 min</strong> losses &nbsp; · &nbsp; <strong>Part IV · 20 min</strong> evaluation</p>
 </div>
 </section>
-<section id="data" class="level1 section-slide data-section">
-<h1 class="section-slide data-section">01 · Data</h1>
-<section id="a-dataset-is-a-collection-of-promises" class="level2">
-<h2 class="anchored" data-anchor-id="a-dataset-is-a-collection-of-promises">A dataset is a collection of promises</h2>
+<section>
+<section id="data" class="title-slide slide level1 section-slide data-section center">
+<h1>01 · Data</h1>
+
+</section>
+<section id="a-dataset-is-a-collection-of-promises" class="slide level2">
+<h2>A dataset is a collection of promises</h2>
 <p><span class="math display">\[
 \mathcal D=\{(x^{(i)},y^{(i)})\}_{i=1}^{n}
 \]</span></p>
 <div class="dataset-example">
 <div class="dataset-batch">
-<p><img src="assets/cs231n-cifar10-classes.jpg" class="img-fluid" alt="A labeled sample from CIFAR-10 with ten example images for each of ten classes."></p>
+<p><img data-src="assets/cs231n-cifar10-classes.jpg" alt="A labeled sample from CIFAR-10 with ten example images for each of ten classes."></p>
 </div>
 <div class="dataset-promises">
 <div>
@@ -436,8 +381,8 @@ Illustration: <a href="https://cs231n.github.io/classification/">CS231n, Image C
 Example: <a href="https://cs231n.github.io/classification/">CIFAR-10 batch from CS231n</a>.
 </p>
 </section>
-<section id="which-model-did-we-train" class="level2">
-<h2 class="anchored" data-anchor-id="which-model-did-we-train">Which model did we train?</h2>
+<section id="which-model-did-we-train" class="slide level2">
+<h2>Which model did we train?</h2>
 <div class="shortcut-scene">
 <div class="shortcut-column">
 <p><span class="scene sky">BLUE WATER</span></p>
@@ -455,8 +400,8 @@ Example: <a href="https://cs231n.github.io/classification/">CIFAR-10 batch from 
 <p>A shortcut can be predictive in the dataset and useless after deployment.</p>
 </div>
 </section>
-<section id="four-questions-before-training" class="level2">
-<h2 class="anchored" data-anchor-id="four-questions-before-training">Four questions before training</h2>
+<section id="four-questions-before-training" class="slide level2">
+<h2>Four questions before training</h2>
 <div class="four-questions">
 <div class="question-card">
 <p><b>01</b></p>
@@ -476,10 +421,10 @@ Example: <a href="https://cs231n.github.io/classification/">CIFAR-10 batch from 
 </div>
 </div>
 </section>
-<section id="classical-ml-chooses-the-representation" class="level2">
-<h2 class="anchored" data-anchor-id="classical-ml-chooses-the-representation">Classical ML chooses the representation</h2>
+<section id="classical-ml-chooses-the-representation" class="slide level2">
+<h2>Classical ML chooses the representation</h2>
 <div class="canny-stages">
-<p><img src="assets/canny-six-stages.png" class="img-fluid" alt="Six stages of Canny edge detection: grayscale, Gaussian smoothing, gradient magnitude, non-maximum suppression, double thresholding, and hysteresis."></p>
+<p><img data-src="assets/canny-six-stages.png" alt="Six stages of Canny edge detection: grayscale, Gaussian smoothing, gradient magnitude, non-maximum suppression, double thresholding, and hysteresis."></p>
 </div>
 <div class="feature-pipeline">
 <p><span>RGB image</span><i>→</i><strong>Canny edge map</strong><i>→</i><span>SVM / linear classifier</span><i>→</i><span>class scores</span></p>
@@ -491,10 +436,10 @@ Example: <a href="https://cs231n.github.io/classification/">CIFAR-10 batch from 
 Pipeline generated for this course; algorithm: <a href="https://docs.opencv.org/5.0/tutorials/imgproc/imgtrans/canny_detector/canny_detector.html">Canny (1986), OpenCV reference</a>.
 </p>
 </section>
-<section id="deep-learning-learns-the-representation" class="level2">
-<h2 class="anchored" data-anchor-id="deep-learning-learns-the-representation">Deep learning learns the representation</h2>
+<section id="deep-learning-learns-the-representation" class="slide level2">
+<h2>Deep learning learns the representation</h2>
 <div class="vgg-figure">
-<p><img src="assets/vgg16-course-diagram.svg" class="img-fluid" alt="VGG-16 architecture from an RGB image through five learned convolutional blocks to 1000 ImageNet classes."></p>
+<p><img data-src="assets/vgg16-course-diagram.svg" alt="VGG-16 architecture from an RGB image through five learned convolutional blocks to 1000 ImageNet classes."></p>
 </div>
 <div class="takeaway">
 <p>The feature extractor and classifier are optimized together, end-to-end. <strong>We will learn how every block works later in the course.</strong></p>
@@ -502,36 +447,32 @@ Pipeline generated for this course; algorithm: <a href="https://docs.opencv.org/
 <p class="source-note">
 Architecture: <a href="https://arxiv.org/abs/1409.1556">Simonyan &amp; Zisserman, VGG (2014)</a>. Diagram created for this course.
 </p>
+</section></section>
+<section>
+<section id="hypothesis" class="title-slide slide level1 section-slide hypothesis-section center">
+<h1>02 · Hypothesis</h1>
+
 </section>
-</section>
-<section id="hypothesis" class="level1 section-slide hypothesis-section">
-<h1 class="section-slide hypothesis-section">02 · Hypothesis</h1>
-<section id="a-hypothesis-class-is-a-menu-of-rules" class="level2">
-<h2 class="anchored" data-anchor-id="a-hypothesis-class-is-a-menu-of-rules">A hypothesis class is a menu of rules</h2>
+<section id="a-hypothesis-class-is-a-menu-of-rules" class="slide level2">
+<h2>A hypothesis class is a menu of rules</h2>
 <div class="model-menu">
 <div class="model-card memory fragment">
 <p><span>MEMORY</span></p>
-<section id="k-nearest-neighbors" class="level3">
-<h3 class="anchored" data-anchor-id="k-nearest-neighbors"><span class="math inline">\(k\)</span>-nearest neighbors</h3>
+<h3 id="k-nearest-neighbors"><span class="math inline">\(k\)</span>-nearest neighbors</h3>
 <p>Look for similar training images.</p>
-<p><img src="assets/cs231n-knn-neighbors.jpg" class="img-fluid" alt="CIFAR-10 query images followed by their nearest training images under pixel distance."></p>
-</section>
+<p><img data-src="assets/cs231n-knn-neighbors.jpg" alt="CIFAR-10 query images followed by their nearest training images under pixel distance."></p>
 </div>
 <div class="model-card linear fragment">
 <p><span>TEMPLATES</span></p>
-<section id="linear-classifier" class="level3">
-<h3 class="anchored" data-anchor-id="linear-classifier">Linear classifier</h3>
+<h3 id="linear-classifier">Linear classifier</h3>
 <p>Score pixels with <span class="math inline">\(Wx+b\)</span>.</p>
-<p><img src="assets/cs231n-linear-regions.jpeg" class="img-fluid" alt="Images arranged in a two-dimensional space with linear decision boundaries for airplane, car, and deer classifiers."></p>
-</section>
+<p><img data-src="assets/cs231n-linear-regions.jpeg" alt="Images arranged in a two-dimensional space with linear decision boundaries for airplane, car, and deer classifiers."></p>
 </div>
 <div class="model-card neural fragment">
 <p><span>FEATURES</span></p>
-<section id="neural-network" class="level3">
-<h3 class="anchored" data-anchor-id="neural-network">Neural network</h3>
+<h3 id="neural-network">Neural network</h3>
 <p>Compose learned nonlinear layers.</p>
-<p><img src="assets/cs231n-neural-boundary.png" class="img-fluid" alt="A neural network fitting nonlinear decision regions to a three-class spiral dataset."></p>
-</section>
+<p><img data-src="assets/cs231n-neural-boundary.png" alt="A neural network fitting nonlinear decision regions to a three-class spiral dataset."></p>
 </div>
 </div>
 <div class="fragment big-summary">
@@ -541,8 +482,8 @@ Architecture: <a href="https://arxiv.org/abs/1409.1556">Simonyan &amp; Zisserman
 Illustrations: <a href="https://cs231n.github.io/classification/">CS231n · nearest neighbors</a>, <a href="https://cs231n.github.io/linear-classify/">linear classifiers</a>, and <a href="https://cs231n.github.io/neural-networks-case-study/">neural-network case study</a>.
 </p>
 </section>
-<section id="nearest-neighbor-learning-without-parameters" class="level2">
-<h2 class="anchored" data-anchor-id="nearest-neighbor-learning-without-parameters">Nearest neighbor: learning without parameters</h2>
+<section id="nearest-neighbor-learning-without-parameters" class="slide level2">
+<h2>Nearest neighbor: learning without parameters</h2>
 <div class="neighbor-demo">
 <div class="query-tile">
 <p><span>?</span></p>
@@ -570,8 +511,8 @@ d(x,x_i)=\lVert x-x_i\rVert_2
 <p>One-pixel translation: same object, very different raw-pixel distance.</p>
 </div>
 </section>
-<section id="linear-classification-one-score-per-class" class="level2">
-<h2 class="anchored" data-anchor-id="linear-classification-one-score-per-class">Linear classification: one score per class</h2>
+<section id="linear-classification-one-score-per-class" class="slide level2">
+<h2>Linear classification: one score per class</h2>
 <div class="linear-layout">
 <div class="linear-equation">
 <p><span class="math display">\[
@@ -591,8 +532,8 @@ W\in\mathbb R^{K\times D},
 <p>Row <span class="math inline">\(W_j\)</span> is a learned pixel template for class <span class="math inline">\(j\)</span>.</p>
 </div>
 </section>
-<section id="watch-the-scores-vote" class="level2">
-<h2 class="anchored" data-anchor-id="watch-the-scores-vote">Watch the scores vote</h2>
+<section id="watch-the-scores-vote" class="slide level2">
+<h2>Watch the scores vote</h2>
 <div class="score-board">
 <div class="score-image">
 <div class="mini-cat">
@@ -618,8 +559,8 @@ W\in\mathbb R^{K\times D},
 <p>How wrong is this prediction?</p>
 </div>
 </section>
-<section id="same-architecture-different-rule" class="level2">
-<h2 class="anchored" data-anchor-id="same-architecture-different-rule">Same architecture, different rule</h2>
+<section id="same-architecture-different-rule" class="slide level2">
+<h2>Same architecture, different rule</h2>
 <div class="big-question">
 <p>Two students train the same linear-classifier code and obtain different matrices <span class="math inline">\(W\)</span>.</p>
 </div>
@@ -634,12 +575,14 @@ W\in\mathbb R^{K\times D},
 <div class="fragment answer">
 <p>Same hypothesis class. Different learned members of that class.</p>
 </div>
+</section></section>
+<section>
+<section id="loss" class="title-slide slide level1 section-slide loss-section center">
+<h1>03 · Loss</h1>
+
 </section>
-</section>
-<section id="loss" class="level1 section-slide loss-section">
-<h1 class="section-slide loss-section">03 · Loss</h1>
-<section id="accuracy-is-silent-during-training" class="level2">
-<h2 class="anchored" data-anchor-id="accuracy-is-silent-during-training">Accuracy is silent during training</h2>
+<section id="accuracy-is-silent-during-training" class="slide level2">
+<h2>Accuracy is silent during training</h2>
 <div class="accuracy-steps">
 <div>
 <p><span class="math inline">\(s_{\text{cat}}=3.20\)</span></p>
@@ -661,8 +604,8 @@ W\in\mathbb R^{K\times D},
 <p>A training loss must say <strong>how wrong</strong>, not only <strong>wrong or right</strong>.</p>
 </div>
 </section>
-<section id="two-views-of-the-same-mistake" class="level2">
-<h2 class="anchored" data-anchor-id="two-views-of-the-same-mistake">Two views of the same mistake</h2>
+<section id="two-views-of-the-same-mistake" class="slide level2">
+<h2>Two views of the same mistake</h2>
 <div class="loss-question-grid">
 <div class="loss-question margin">
 <p><span>SVM</span></p>
@@ -677,8 +620,8 @@ W\in\mathbb R^{K\times D},
 <p>Same scores: <span class="math inline">\([3.2,\ 5.1,\ -1.7]\)</span> · correct class: cat</p>
 </div>
 </section>
-<section id="svm-loss-the-correct-class-needs-room" class="level2">
-<h2 class="anchored" data-anchor-id="svm-loss-the-correct-class-needs-room">SVM loss: the correct class needs room</h2>
+<section id="svm-loss-the-correct-class-needs-room" class="slide level2">
+<h2>SVM loss: the correct class needs room</h2>
 <div class="margin-track">
 <p><span class="correct" style="--x:53%">cat · 3.2</span> <span class="margin-zone" style="--x:69%">required margin</span> <span class="rival" style="--x:85%">dog · 5.1</span></p>
 </div>
@@ -690,8 +633,8 @@ L_i^{\text{SVM}}
 <p>Zero loss only when the correct score beats every rival by at least <span class="math inline">\(\Delta\)</span>.</p>
 </div>
 </section>
-<section id="compute-it-together" class="level2">
-<h2 class="anchored" data-anchor-id="compute-it-together">Compute it together</h2>
+<section id="compute-it-together" class="slide level2">
+<h2>Compute it together</h2>
 <p>For <span class="math inline">\(s=[3.2,5.1,-1.7]\)</span>, <span class="math inline">\(y=\text{cat}\)</span>, and <span class="math inline">\(\Delta=1\)</span>:</p>
 <div class="exercise-prompt">
 <p><strong>Your turn:</strong> compute the multiclass SVM loss for this example.</p>
@@ -714,8 +657,8 @@ L_i^{\text{SVM}}
 <p>What change to the scores would make the loss exactly zero?</p>
 </div>
 </section>
-<section id="softmax-scores-become-probabilities" class="level2">
-<h2 class="anchored" data-anchor-id="softmax-scores-become-probabilities">Softmax: scores become probabilities</h2>
+<section id="softmax-scores-become-probabilities" class="slide level2">
+<h2>Softmax: scores become probabilities</h2>
 <p><span class="math display">\[
 p_j=\frac{e^{s_j}}{\sum_k e^{s_k}}
 \]</span></p>
@@ -734,8 +677,8 @@ p_j=\frac{e^{s_j}}{\sum_k e^{s_k}}
 <p>Softmax preserves ranking and forces the outputs to sum to one.</p>
 </div>
 </section>
-<section id="cross-entropy-asks-for-the-correct-probability" class="level2">
-<h2 class="anchored" data-anchor-id="cross-entropy-asks-for-the-correct-probability">Cross-entropy asks for the correct probability</h2>
+<section id="cross-entropy-asks-for-the-correct-probability" class="slide level2">
+<h2>Cross-entropy asks for the correct probability</h2>
 <p><span class="math display">\[
 L_i^{\text{CE}}=-\log p_y
 \]</span></p>
@@ -757,9 +700,9 @@ L_i^{\text{CE}}=-\log p_y
 <p>Confidently wrong predictions are expensive.</p>
 </div>
 </section>
-<section id="same-goal-different-pressure" class="level2">
-<h2 class="anchored" data-anchor-id="same-goal-different-pressure">Same goal, different pressure</h2>
-<table class="caption-top table">
+<section id="same-goal-different-pressure" class="slide level2">
+<h2>Same goal, different pressure</h2>
+<table class="caption-top">
 <colgroup>
 <col style="width: 33%">
 <col style="width: 33%">
@@ -798,33 +741,83 @@ L_i^{\text{CE}}=-\log p_y
 <div class="takeaway">
 <p>Both prefer the correct class. They shape the score space differently.</p>
 </div>
+</section></section>
+<section>
+<section id="optimization" class="title-slide slide level1 section-slide optimization-section center">
+<h1>04 · Optimization</h1>
+
 </section>
-</section>
-<section id="optimization" class="level1 section-slide optimization-section">
-<h1 class="section-slide optimization-section">04 · Optimization</h1>
-<section id="the-learning-loop" class="level2 loop-slide">
-<h2 class="loop-slide anchored" data-anchor-id="the-learning-loop">The learning loop</h2>
-<div class="cell" data-fig-width="13" data-fig-height="5.4" data-layout-align="default">
+<section id="the-learning-loop" class="slide level2 loop-slide">
+<h2>The learning loop</h2>
+<div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
-<p></p><figure class="figure"><p></p>
+<p></p><figure class=""><p></p>
 <div>
-<pre class="mermaid mermaid-js">flowchart LR
-  A[sample a mini-batch&lt;br/&gt;images + labels] --&gt; B[compute scores&lt;br/&gt;forward pass]
-  B --&gt; C[measure loss&lt;br/&gt;how wrong?]
-  C --&gt; D[compute gradient&lt;br/&gt;which direction?]
-  D --&gt; E[update parameters&lt;br/&gt;take one step]
-  E --&gt; A
-
-  classDef data fill:#dfeaff,stroke:#2878c8,color:#17212b
-  classDef model fill:#fffdf7,stroke:#657079,color:#17212b
-  classDef loss fill:#ffe3dc,stroke:#ef5b45,color:#17212b
-  classDef update fill:#fff1d9,stroke:#d58b16,color:#17212b
-  class A data
-  class B,D model
-  class C loss
-  class E update
-</pre>
+<svg id="mermaid-figure-3" width="1248" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" class="flowchart" style="; display: block; margin: auto auto auto auto" viewbox="0 0 1125.21875 131" role="graphics-document document" aria-roledescription="flowchart-v2" height="518">
+<style>#mermaid-figure-3{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#mermaid-figure-3 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#mermaid-figure-3 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#mermaid-figure-3 .error-icon{fill:#552222;}#mermaid-figure-3 .error-text{fill:#552222;stroke:#552222;}#mermaid-figure-3 .edge-thickness-normal{stroke-width:1px;}#mermaid-figure-3 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-figure-3 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-figure-3 .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-figure-3 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-figure-3 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-figure-3 .marker{fill:#333333;stroke:#333333;}#mermaid-figure-3 .marker.cross{stroke:#333333;}#mermaid-figure-3 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-figure-3 p{margin:0;}#mermaid-figure-3 .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#333;}#mermaid-figure-3 .cluster-label text{fill:#333;}#mermaid-figure-3 .cluster-label span{color:#333;}#mermaid-figure-3 .cluster-label span p{background-color:transparent;}#mermaid-figure-3 .label text,#mermaid-figure-3 span{fill:#333;color:#333;}#mermaid-figure-3 .node rect,#mermaid-figure-3 .node circle,#mermaid-figure-3 .node ellipse,#mermaid-figure-3 .node polygon,#mermaid-figure-3 .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#mermaid-figure-3 .rough-node .label text,#mermaid-figure-3 .node .label text,#mermaid-figure-3 .image-shape .label,#mermaid-figure-3 .icon-shape .label{text-anchor:middle;}#mermaid-figure-3 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-figure-3 .rough-node .label,#mermaid-figure-3 .node .label,#mermaid-figure-3 .image-shape .label,#mermaid-figure-3 .icon-shape .label{text-align:center;}#mermaid-figure-3 .node.clickable{cursor:pointer;}#mermaid-figure-3 .root .anchor path{fill:#333333!important;stroke-width:0;stroke:#333333;}#mermaid-figure-3 .arrowheadPath{fill:#333333;}#mermaid-figure-3 .edgePath .path{stroke:#333333;stroke-width:2.0px;}#mermaid-figure-3 .flowchart-link{stroke:#333333;fill:none;}#mermaid-figure-3 .edgeLabel{background-color:rgba(232,232,232, 0.8);text-align:center;}#mermaid-figure-3 .edgeLabel p{background-color:rgba(232,232,232, 0.8);}#mermaid-figure-3 .edgeLabel rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#mermaid-figure-3 .labelBkg{background-color:rgba(232, 232, 232, 0.5);}#mermaid-figure-3 .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#mermaid-figure-3 .cluster text{fill:#333;}#mermaid-figure-3 .cluster span{color:#333;}#mermaid-figure-3 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(80, 100%, 96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-figure-3 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#333;}#mermaid-figure-3 rect.text{fill:none;stroke-width:0;}#mermaid-figure-3 .icon-shape,#mermaid-figure-3 .image-shape{background-color:rgba(232,232,232, 0.8);text-align:center;}#mermaid-figure-3 .icon-shape p,#mermaid-figure-3 .image-shape p{background-color:rgba(232,232,232, 0.8);padding:2px;}#mermaid-figure-3 .icon-shape rect,#mermaid-figure-3 .image-shape rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#mermaid-figure-3 .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#mermaid-figure-3 .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#mermaid-figure-3 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}#mermaid-figure-3 .data>*{fill:#dfeaff!important;stroke:#2878c8!important;color:#17212b!important;}#mermaid-figure-3 .data span{fill:#dfeaff!important;stroke:#2878c8!important;color:#17212b!important;}#mermaid-figure-3 .data tspan{fill:#17212b!important;}#mermaid-figure-3 .model>*{fill:#fffdf7!important;stroke:#657079!important;color:#17212b!important;}#mermaid-figure-3 .model span{fill:#fffdf7!important;stroke:#657079!important;color:#17212b!important;}#mermaid-figure-3 .model tspan{fill:#17212b!important;}#mermaid-figure-3 .loss>*{fill:#ffe3dc!important;stroke:#ef5b45!important;color:#17212b!important;}#mermaid-figure-3 .loss span{fill:#ffe3dc!important;stroke:#ef5b45!important;color:#17212b!important;}#mermaid-figure-3 .loss tspan{fill:#17212b!important;}#mermaid-figure-3 .update>*{fill:#fff1d9!important;stroke:#d58b16!important;color:#17212b!important;}#mermaid-figure-3 .update span{fill:#fff1d9!important;stroke:#d58b16!important;color:#17212b!important;}#mermaid-figure-3 .update tspan{fill:#17212b!important;}</style>
+<g><marker id="mermaid-1790181673433_flowchart-v2-pointEnd" class="marker flowchart-v2" viewbox="0 0 10 10" refx="5" refy="5" markerunits="userSpaceOnUse" markerwidth="8" markerheight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1790181673433_flowchart-v2-pointStart" class="marker flowchart-v2" viewbox="0 0 10 10" refx="4.5" refy="5" markerunits="userSpaceOnUse" markerwidth="8" markerheight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1790181673433_flowchart-v2-circleEnd" class="marker flowchart-v2" viewbox="0 0 10 10" refx="11" refy="5" markerunits="userSpaceOnUse" markerwidth="11" markerheight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1790181673433_flowchart-v2-circleStart" class="marker flowchart-v2" viewbox="0 0 10 10" refx="-1" refy="5" markerunits="userSpaceOnUse" markerwidth="11" markerheight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1790181673433_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewbox="0 0 11 11" refx="12" refy="5.2" markerunits="userSpaceOnUse" markerwidth="11" markerheight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1790181673433_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewbox="0 0 11 11" refx="-1" refy="5.2" markerunits="userSpaceOnUse" markerwidth="11" markerheight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path d="M211.172,54.307L215.339,53.089C219.505,51.872,227.839,49.436,235.505,48.218C243.172,47,250.172,47,253.672,47L257.172,47" id="L_A_B_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_A_B_0" data-points="W3sieCI6MjExLjE3MTg3NSwieSI6NTQuMzA3Mjg4NzczNjgzODl9LHsieCI6MjM2LjE3MTg3NSwieSI6NDd9LHsieCI6MjYxLjE3MTg3NSwieSI6NDd9XQ==" marker-end="url(#mermaid-1790181673433_flowchart-v2-pointEnd)"></path><path d="M434.109,47L438.276,47C442.443,47,450.776,47,458.443,47C466.109,47,473.109,47,476.609,47L480.109,47" id="L_B_C_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_B_C_0" data-points="W3sieCI6NDM0LjEwOTM3NSwieSI6NDd9LHsieCI6NDU5LjEwOTM3NSwieSI6NDd9LHsieCI6NDg0LjEwOTM3NSwieSI6NDd9XQ==" marker-end="url(#mermaid-1790181673433_flowchart-v2-pointEnd)"></path><path d="M639.266,47L643.432,47C647.599,47,655.932,47,663.599,47C671.266,47,678.266,47,681.766,47L685.266,47" id="L_C_D_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_C_D_0" data-points="W3sieCI6NjM5LjI2NTYyNSwieSI6NDd9LHsieCI6NjY0LjI2NTYyNSwieSI6NDd9LHsieCI6Njg5LjI2NTYyNSwieSI6NDd9XQ==" marker-end="url(#mermaid-1790181673433_flowchart-v2-pointEnd)"></path><path d="M872.906,47L877.073,47C881.24,47,889.573,47,897.268,48.069C904.964,49.138,912.021,51.275,915.549,52.344L919.078,53.413" id="L_D_E_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_D_E_0" data-points="W3sieCI6ODcyLjkwNjI1LCJ5Ijo0N30seyJ4Ijo4OTcuOTA2MjUsInkiOjQ3fSx7IngiOjkyMi45MDYyNSwieSI6NTQuNTcyMjY5MTIyNTM3NzN9XQ==" marker-end="url(#mermaid-1790181673433_flowchart-v2-pointEnd)"></path><path d="M922.906,113.428L918.74,114.69C914.573,115.952,906.24,118.476,882.603,119.738C858.966,121,820.026,121,781.086,121C742.146,121,703.206,121,666.639,121C630.073,121,595.88,121,561.688,121C527.495,121,493.302,121,457.628,121C421.953,121,384.797,121,347.641,121C310.484,121,273.328,121,251.223,119.969C229.118,118.938,222.065,116.877,218.538,115.846L215.011,114.815" id="L_E_A_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_E_A_0" data-points="W3sieCI6OTIyLjkwNjI1LCJ5IjoxMTMuNDI3NzMwODc3NDYyMjd9LHsieCI6ODk3LjkwNjI1LCJ5IjoxMjF9LHsieCI6NzgxLjA4NTkzNzUsInkiOjEyMX0seyJ4Ijo2NjQuMjY1NjI1LCJ5IjoxMjF9LHsieCI6NTYxLjY4NzUsInkiOjEyMX0seyJ4Ijo0NTkuMTA5Mzc1LCJ5IjoxMjF9LHsieCI6MzQ3LjY0MDYyNSwieSI6MTIxfSx7IngiOjIzNi4xNzE4NzUsInkiOjEyMX0seyJ4IjoyMTEuMTcxODc1LCJ5IjoxMTMuNjkyNzExMjI2MzE2MX1d" marker-end="url(#mermaid-1790181673433_flowchart-v2-pointEnd)"></path></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_A_B_0" transform="translate(0, 0)"><foreignobject width="0" height="0">
+<div class="labelBkg" data-xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;">
+<span class="edgeLabel"></span>
+</div>
+</foreignobject></g></g><g class="edgeLabel"><g class="label" data-id="L_B_C_0" transform="translate(0, 0)"><foreignobject width="0" height="0">
+<div class="labelBkg" data-xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;">
+<span class="edgeLabel"></span>
+</div>
+</foreignobject></g></g><g class="edgeLabel"><g class="label" data-id="L_C_D_0" transform="translate(0, 0)"><foreignobject width="0" height="0">
+<div class="labelBkg" data-xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;">
+<span class="edgeLabel"></span>
+</div>
+</foreignobject></g></g><g class="edgeLabel"><g class="label" data-id="L_D_E_0" transform="translate(0, 0)"><foreignobject width="0" height="0">
+<div class="labelBkg" data-xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;">
+<span class="edgeLabel"></span>
+</div>
+</foreignobject></g></g><g class="edgeLabel"><g class="label" data-id="L_E_A_0" transform="translate(0, 0)"><foreignobject width="0" height="0">
+<div class="labelBkg" data-xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;">
+<span class="edgeLabel"></span>
+</div>
+</foreignobject></g></g></g><g class="nodes"><g class="node default data" id="flowchart-A-0" transform="translate(109.5859375, 84)"><rect class="basic label-container" style="fill:#dfeaff !important;stroke:#2878c8 !important" x="-101.5859375" y="-39" width="203.171875" height="78"></rect><g class="label" style="color:#17212b !important" transform="translate(-71.5859375, -24)"><rect></rect><foreignobject width="143.171875" height="48">
+<div style="color: rgb(23, 33, 43) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span style="color:#17212b !important" class="nodeLabel">
+<p>
+sample a mini-batch<br>images + labels
+</p>
+</span>
+</div>
+</foreignobject></g></g><g class="node default model" id="flowchart-B-1" transform="translate(347.640625, 47)"><rect class="basic label-container" style="fill:#fffdf7 !important;stroke:#657079 !important" x="-86.46875" y="-39" width="172.9375" height="78"></rect><g class="label" style="color:#17212b !important" transform="translate(-56.46875, -24)"><rect></rect><foreignobject width="112.9375" height="48">
+<div style="color: rgb(23, 33, 43) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span style="color:#17212b !important" class="nodeLabel">
+<p>
+compute scores<br>forward pass
+</p>
+</span>
+</div>
+</foreignobject></g></g><g class="node default loss" id="flowchart-C-3" transform="translate(561.6875, 47)"><rect class="basic label-container" style="fill:#ffe3dc !important;stroke:#ef5b45 !important" x="-77.578125" y="-39" width="155.15625" height="78"></rect><g class="label" style="color:#17212b !important" transform="translate(-47.578125, -24)"><rect></rect><foreignobject width="95.15625" height="48">
+<div style="color: rgb(23, 33, 43) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span style="color:#17212b !important" class="nodeLabel">
+<p>
+measure loss<br>how wrong?
+</p>
+</span>
+</div>
+</foreignobject></g></g><g class="node default model" id="flowchart-D-5" transform="translate(781.0859375, 47)"><rect class="basic label-container" style="fill:#fffdf7 !important;stroke:#657079 !important" x="-91.8203125" y="-39" width="183.640625" height="78"></rect><g class="label" style="color:#17212b !important" transform="translate(-61.8203125, -24)"><rect></rect><foreignobject width="123.640625" height="48">
+<div style="color: rgb(23, 33, 43) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span style="color:#17212b !important" class="nodeLabel">
+<p>
+compute gradient<br>which direction?
+</p>
+</span>
+</div>
+</foreignobject></g></g><g class="node default update" id="flowchart-E-7" transform="translate(1020.0625, 84)"><rect class="basic label-container" style="fill:#fff1d9 !important;stroke:#d58b16 !important" x="-97.15625" y="-39" width="194.3125" height="78"></rect><g class="label" style="color:#17212b !important" transform="translate(-67.15625, -24)"><rect></rect><foreignobject width="134.3125" height="48">
+<div style="color: rgb(23, 33, 43) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span style="color:#17212b !important" class="nodeLabel">
+<p>
+update parameters<br>take one step
+</p>
+</span>
+</div>
+</foreignobject></g></g></g></g></g>
+</svg>
 </div>
 <p></p></figure><p></p>
 </div>
@@ -834,11 +827,11 @@ L_i^{\text{CE}}=-\log p_y
 \theta\leftarrow\theta-\eta\nabla_\theta J(\theta)
 \]</span></p>
 </section>
-<section id="loss-tells-us-where-optimization-moves-us" class="level2">
-<h2 class="anchored" data-anchor-id="loss-tells-us-where-optimization-moves-us">Loss tells us where; optimization moves us</h2>
+<section id="loss-tells-us-where-optimization-moves-us" class="slide level2">
+<h2>Loss tells us where; optimization moves us</h2>
 <div class="optimization-roles">
 <div class="parameter-convergence">
-<p><img src="assets/parameter-convergence.svg" class="img-fluid" alt="Parameters following successive gradient updates through loss contours toward a minimum."></p>
+<p><img data-src="assets/parameter-convergence.svg" alt="Parameters following successive gradient updates through loss contours toward a minimum."></p>
 </div>
 <div class="role-stack">
 <div class="role-card loss-role">
@@ -856,12 +849,14 @@ L_i^{\text{CE}}=-\log p_y
 <div class="takeaway">
 <p>We postpone the machinery—not the distinction—to the optimization chapter.</p>
 </div>
+</section></section>
+<section>
+<section id="evaluation" class="title-slide slide level1 section-slide evaluation-section center">
+<h1>05 · Evaluation</h1>
+
 </section>
-</section>
-<section id="evaluation" class="level1 section-slide evaluation-section">
-<h1 class="section-slide evaluation-section">05 · Evaluation</h1>
-<section id="fitting-is-not-learning" class="level2">
-<h2 class="anchored" data-anchor-id="fitting-is-not-learning">Fitting is not learning</h2>
+<section id="fitting-is-not-learning" class="slide level2">
+<h2>Fitting is not learning</h2>
 <div class="memorize-generalize">
 <div class="memory-panel">
 <p><span>MEMORIZE</span></p>
@@ -878,8 +873,8 @@ L_i^{\text{CE}}=-\log p_y
 <p>Low training loss is an optimization result—not evidence of generalization.</p>
 </div>
 </section>
-<section id="three-datasets-three-jobs" class="level2">
-<h2 class="anchored" data-anchor-id="three-datasets-three-jobs">Three datasets, three jobs</h2>
+<section id="three-datasets-three-jobs" class="slide level2">
+<h2>Three datasets, three jobs</h2>
 <div class="split-visual">
 <div class="split train">
 <p><span>TRAIN</span><b>70%</b></p>
@@ -898,8 +893,8 @@ L_i^{\text{CE}}=-\log p_y
 <p>Using the test set to choose the model turns it into validation data.</p>
 </div>
 </section>
-<section id="split-the-thing-that-must-generalize" class="level2">
-<h2 class="anchored" data-anchor-id="split-the-thing-that-must-generalize">Split the thing that must generalize</h2>
+<section id="split-the-thing-that-must-generalize" class="slide level2">
+<h2>Split the thing that must generalize</h2>
 <div class="split-cases">
 <div>
 <p><strong>medical images</strong></p>
@@ -922,13 +917,12 @@ L_i^{\text{CE}}=-\log p_y
 <p>Random rows are not automatically independent examples.</p>
 </div>
 </section>
-<section id="training-success-can-hide-test-failure" class="level2">
-<h2 class="anchored" data-anchor-id="training-success-can-hide-test-failure">Training success can hide test failure</h2>
+<section id="training-success-can-hide-test-failure" class="slide level2">
+<h2>Training success can hide test failure</h2>
 <div class="generalization-scorecards">
 <div class="scorecase memorizer-case">
 <p><span>MODEL A</span></p>
-<section id="memorizer" class="level3">
-<h3 class="anchored" data-anchor-id="memorizer">Memorizer</h3>
+<h3 id="memorizer">Memorizer</h3>
 <div class="scorebar train">
 <b>training</b><i style="--score:99%"></i><strong>99%</strong>
 </div>
@@ -938,12 +932,10 @@ L_i^{\text{CE}}=-\log p_y
 <p>
 Excellent fit. Poor generalization.
 </p>
-</section>
 </div>
 <div class="scorecase generalizer-case">
 <p><span>MODEL B</span></p>
-<section id="generalizer" class="level3">
-<h3 class="anchored" data-anchor-id="generalizer">Generalizer</h3>
+<h3 id="generalizer">Generalizer</h3>
 <div class="scorebar train">
 <b>training</b><i style="--score:92%"></i><strong>92%</strong>
 </div>
@@ -953,15 +945,14 @@ Excellent fit. Poor generalization.
 <p>
 Smaller training score. Better unseen behavior.
 </p>
-</section>
 </div>
 </div>
 <div class="fragment takeaway danger">
 <p>A training score measures fitting. A held-out score provides evidence about generalization.</p>
 </div>
 </section>
-<section id="read-the-mistakes" class="level2">
-<h2 class="anchored" data-anchor-id="read-the-mistakes">Read the mistakes</h2>
+<section id="read-the-mistakes" class="slide level2">
+<h2>Read the mistakes</h2>
 <div class="error-gallery">
 <div class="error-card">
 <p><span>BLUR</span></p>
@@ -984,28 +975,97 @@ Smaller training score. Better unseen behavior.
 <p>Metrics tell us how much. Examples help us ask why.</p>
 </div>
 </section>
-<section id="the-complete-experiment" class="level2 experiment-slide">
-<h2 class="experiment-slide anchored" data-anchor-id="the-complete-experiment">The complete experiment</h2>
-<div class="cell" data-fig-width="13" data-fig-height="5.2" data-layout-align="default">
+<section id="the-complete-experiment" class="slide level2 experiment-slide">
+<h2>The complete experiment</h2>
+<div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
-<p></p><figure class="figure"><p></p>
+<p></p><figure class=""><p></p>
 <div>
-<pre class="mermaid mermaid-js">flowchart LR
-  Q[define&lt;br/&gt;decision] --&gt; A[audit&lt;br/&gt;data]
-  A --&gt; S[design&lt;br/&gt;split]
-  S --&gt; B[establish&lt;br/&gt;baseline]
-  B --&gt; T[train&lt;br/&gt;model]
-  T --&gt; V[choose with&lt;br/&gt;validation]
-  V --&gt; E[evaluate&lt;br/&gt;once]
-
-  classDef start fill:#17212b,color:#fff,stroke:#17212b
-  classDef process fill:#fffdf7,color:#17212b,stroke:#657079
-  classDef finish fill:#ef5b45,color:#fff,stroke:#ef5b45
-  class Q start
-  class A,S,B,T,V process
-  class E finish
-</pre>
+<svg id="mermaid-figure-2" width="1248" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" class="flowchart" style="; display: block; margin: auto auto auto auto" viewbox="0 0 1128.296875 94" role="graphics-document document" aria-roledescription="flowchart-v2" height="499">
+<style>#mermaid-figure-2{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#mermaid-figure-2 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#mermaid-figure-2 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#mermaid-figure-2 .error-icon{fill:#552222;}#mermaid-figure-2 .error-text{fill:#552222;stroke:#552222;}#mermaid-figure-2 .edge-thickness-normal{stroke-width:1px;}#mermaid-figure-2 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-figure-2 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-figure-2 .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-figure-2 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-figure-2 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-figure-2 .marker{fill:#333333;stroke:#333333;}#mermaid-figure-2 .marker.cross{stroke:#333333;}#mermaid-figure-2 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-figure-2 p{margin:0;}#mermaid-figure-2 .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#333;}#mermaid-figure-2 .cluster-label text{fill:#333;}#mermaid-figure-2 .cluster-label span{color:#333;}#mermaid-figure-2 .cluster-label span p{background-color:transparent;}#mermaid-figure-2 .label text,#mermaid-figure-2 span{fill:#333;color:#333;}#mermaid-figure-2 .node rect,#mermaid-figure-2 .node circle,#mermaid-figure-2 .node ellipse,#mermaid-figure-2 .node polygon,#mermaid-figure-2 .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#mermaid-figure-2 .rough-node .label text,#mermaid-figure-2 .node .label text,#mermaid-figure-2 .image-shape .label,#mermaid-figure-2 .icon-shape .label{text-anchor:middle;}#mermaid-figure-2 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-figure-2 .rough-node .label,#mermaid-figure-2 .node .label,#mermaid-figure-2 .image-shape .label,#mermaid-figure-2 .icon-shape .label{text-align:center;}#mermaid-figure-2 .node.clickable{cursor:pointer;}#mermaid-figure-2 .root .anchor path{fill:#333333!important;stroke-width:0;stroke:#333333;}#mermaid-figure-2 .arrowheadPath{fill:#333333;}#mermaid-figure-2 .edgePath .path{stroke:#333333;stroke-width:2.0px;}#mermaid-figure-2 .flowchart-link{stroke:#333333;fill:none;}#mermaid-figure-2 .edgeLabel{background-color:rgba(232,232,232, 0.8);text-align:center;}#mermaid-figure-2 .edgeLabel p{background-color:rgba(232,232,232, 0.8);}#mermaid-figure-2 .edgeLabel rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#mermaid-figure-2 .labelBkg{background-color:rgba(232, 232, 232, 0.5);}#mermaid-figure-2 .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#mermaid-figure-2 .cluster text{fill:#333;}#mermaid-figure-2 .cluster span{color:#333;}#mermaid-figure-2 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(80, 100%, 96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-figure-2 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#333;}#mermaid-figure-2 rect.text{fill:none;stroke-width:0;}#mermaid-figure-2 .icon-shape,#mermaid-figure-2 .image-shape{background-color:rgba(232,232,232, 0.8);text-align:center;}#mermaid-figure-2 .icon-shape p,#mermaid-figure-2 .image-shape p{background-color:rgba(232,232,232, 0.8);padding:2px;}#mermaid-figure-2 .icon-shape rect,#mermaid-figure-2 .image-shape rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#mermaid-figure-2 .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#mermaid-figure-2 .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#mermaid-figure-2 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}#mermaid-figure-2 .start>*{fill:#17212b!important;color:#fff!important;stroke:#17212b!important;}#mermaid-figure-2 .start span{fill:#17212b!important;color:#fff!important;stroke:#17212b!important;}#mermaid-figure-2 .start tspan{fill:#fff!important;}#mermaid-figure-2 .process>*{fill:#fffdf7!important;color:#17212b!important;stroke:#657079!important;}#mermaid-figure-2 .process span{fill:#fffdf7!important;color:#17212b!important;stroke:#657079!important;}#mermaid-figure-2 .process tspan{fill:#17212b!important;}#mermaid-figure-2 .finish>*{fill:#ef5b45!important;color:#fff!important;stroke:#ef5b45!important;}#mermaid-figure-2 .finish span{fill:#ef5b45!important;color:#fff!important;stroke:#ef5b45!important;}#mermaid-figure-2 .finish tspan{fill:#fff!important;}</style>
+<g><marker id="mermaid-1790181673264_flowchart-v2-pointEnd" class="marker flowchart-v2" viewbox="0 0 10 10" refx="5" refy="5" markerunits="userSpaceOnUse" markerwidth="8" markerheight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1790181673264_flowchart-v2-pointStart" class="marker flowchart-v2" viewbox="0 0 10 10" refx="4.5" refy="5" markerunits="userSpaceOnUse" markerwidth="8" markerheight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1790181673264_flowchart-v2-circleEnd" class="marker flowchart-v2" viewbox="0 0 10 10" refx="11" refy="5" markerunits="userSpaceOnUse" markerwidth="11" markerheight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1790181673264_flowchart-v2-circleStart" class="marker flowchart-v2" viewbox="0 0 10 10" refx="-1" refy="5" markerunits="userSpaceOnUse" markerwidth="11" markerheight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1790181673264_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewbox="0 0 11 11" refx="12" refy="5.2" markerunits="userSpaceOnUse" markerwidth="11" markerheight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1790181673264_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewbox="0 0 11 11" refx="-1" refy="5.2" markerunits="userSpaceOnUse" markerwidth="11" markerheight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path d="M126.703,47L130.87,47C135.036,47,143.37,47,151.036,47C158.703,47,165.703,47,169.203,47L172.703,47" id="L_Q_A_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Q_A_0" data-points="W3sieCI6MTI2LjcwMzEyNSwieSI6NDd9LHsieCI6MTUxLjcwMzEyNSwieSI6NDd9LHsieCI6MTc2LjcwMzEyNSwieSI6NDd9XQ==" marker-end="url(#mermaid-1790181673264_flowchart-v2-pointEnd)"></path><path d="M271.406,47L275.573,47C279.74,47,288.073,47,295.74,47C303.406,47,310.406,47,313.906,47L317.406,47" id="L_A_S_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_A_S_0" data-points="W3sieCI6MjcxLjQwNjI1LCJ5Ijo0N30seyJ4IjoyOTYuNDA2MjUsInkiOjQ3fSx7IngiOjMyMS40MDYyNSwieSI6NDd9XQ==" marker-end="url(#mermaid-1790181673264_flowchart-v2-pointEnd)"></path><path d="M428.563,47L432.729,47C436.896,47,445.229,47,452.896,47C460.563,47,467.563,47,471.063,47L474.563,47" id="L_S_B_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_S_B_0" data-points="W3sieCI6NDI4LjU2MjUsInkiOjQ3fSx7IngiOjQ1My41NjI1LCJ5Ijo0N30seyJ4Ijo0NzguNTYyNSwieSI6NDd9XQ==" marker-end="url(#mermaid-1790181673264_flowchart-v2-pointEnd)"></path><path d="M601.719,47L605.885,47C610.052,47,618.385,47,626.052,47C633.719,47,640.719,47,644.219,47L647.719,47" id="L_B_T_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_B_T_0" data-points="W3sieCI6NjAxLjcxODc1LCJ5Ijo0N30seyJ4Ijo2MjYuNzE4NzUsInkiOjQ3fSx7IngiOjY1MS43MTg3NSwieSI6NDd9XQ==" marker-end="url(#mermaid-1790181673264_flowchart-v2-pointEnd)"></path><path d="M755.297,47L759.464,47C763.63,47,771.964,47,779.63,47C787.297,47,794.297,47,797.797,47L801.297,47" id="L_T_V_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_T_V_0" data-points="W3sieCI6NzU1LjI5Njg3NSwieSI6NDd9LHsieCI6NzgwLjI5Njg3NSwieSI6NDd9LHsieCI6ODA1LjI5Njg3NSwieSI6NDd9XQ==" marker-end="url(#mermaid-1790181673264_flowchart-v2-pointEnd)"></path><path d="M949.797,47L953.964,47C958.13,47,966.464,47,974.13,47C981.797,47,988.797,47,992.297,47L995.797,47" id="L_V_E_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_V_E_0" data-points="W3sieCI6OTQ5Ljc5Njg3NSwieSI6NDd9LHsieCI6OTc0Ljc5Njg3NSwieSI6NDd9LHsieCI6OTk5Ljc5Njg3NSwieSI6NDd9XQ==" marker-end="url(#mermaid-1790181673264_flowchart-v2-pointEnd)"></path></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_Q_A_0" transform="translate(0, 0)"><foreignobject width="0" height="0">
+<div class="labelBkg" data-xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;">
+<span class="edgeLabel"></span>
+</div>
+</foreignobject></g></g><g class="edgeLabel"><g class="label" data-id="L_A_S_0" transform="translate(0, 0)"><foreignobject width="0" height="0">
+<div class="labelBkg" data-xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;">
+<span class="edgeLabel"></span>
+</div>
+</foreignobject></g></g><g class="edgeLabel"><g class="label" data-id="L_S_B_0" transform="translate(0, 0)"><foreignobject width="0" height="0">
+<div class="labelBkg" data-xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;">
+<span class="edgeLabel"></span>
+</div>
+</foreignobject></g></g><g class="edgeLabel"><g class="label" data-id="L_B_T_0" transform="translate(0, 0)"><foreignobject width="0" height="0">
+<div class="labelBkg" data-xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;">
+<span class="edgeLabel"></span>
+</div>
+</foreignobject></g></g><g class="edgeLabel"><g class="label" data-id="L_T_V_0" transform="translate(0, 0)"><foreignobject width="0" height="0">
+<div class="labelBkg" data-xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;">
+<span class="edgeLabel"></span>
+</div>
+</foreignobject></g></g><g class="edgeLabel"><g class="label" data-id="L_V_E_0" transform="translate(0, 0)"><foreignobject width="0" height="0">
+<div class="labelBkg" data-xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;">
+<span class="edgeLabel"></span>
+</div>
+</foreignobject></g></g></g><g class="nodes"><g class="node default start" id="flowchart-Q-0" transform="translate(67.3515625, 47)"><rect class="basic label-container" style="fill:#17212b !important;stroke:#17212b !important" x="-59.3515625" y="-39" width="118.703125" height="78"></rect><g class="label" style="color:#fff !important" transform="translate(-29.3515625, -24)"><rect></rect><foreignobject width="58.703125" height="48">
+<div style="color: rgb(255, 255, 255) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span style="color:#fff !important" class="nodeLabel">
+<p>
+define<br>decision
+</p>
+</span>
+</div>
+</foreignobject></g></g><g class="node default process" id="flowchart-A-1" transform="translate(224.0546875, 47)"><rect class="basic label-container" style="fill:#fffdf7 !important;stroke:#657079 !important" x="-47.3515625" y="-39" width="94.703125" height="78"></rect><g class="label" style="color:#17212b !important" transform="translate(-17.3515625, -24)"><rect></rect><foreignobject width="34.703125" height="48">
+<div style="color: rgb(23, 33, 43) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span style="color:#17212b !important" class="nodeLabel">
+<p>
+audit<br>data
+</p>
+</span>
+</div>
+</foreignobject></g></g><g class="node default process" id="flowchart-S-3" transform="translate(374.984375, 47)"><rect class="basic label-container" style="fill:#fffdf7 !important;stroke:#657079 !important" x="-53.578125" y="-39" width="107.15625" height="78"></rect><g class="label" style="color:#17212b !important" transform="translate(-23.578125, -24)"><rect></rect><foreignobject width="47.15625" height="48">
+<div style="color: rgb(23, 33, 43) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span style="color:#17212b !important" class="nodeLabel">
+<p>
+design<br>split
+</p>
+</span>
+</div>
+</foreignobject></g></g><g class="node default process" id="flowchart-B-5" transform="translate(540.140625, 47)"><rect class="basic label-container" style="fill:#fffdf7 !important;stroke:#657079 !important" x="-61.578125" y="-39" width="123.15625" height="78"></rect><g class="label" style="color:#17212b !important" transform="translate(-31.578125, -24)"><rect></rect><foreignobject width="63.15625" height="48">
+<div style="color: rgb(23, 33, 43) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span style="color:#17212b !important" class="nodeLabel">
+<p>
+establish<br>baseline
+</p>
+</span>
+</div>
+</foreignobject></g></g><g class="node default process" id="flowchart-T-7" transform="translate(703.5078125, 47)"><rect class="basic label-container" style="fill:#fffdf7 !important;stroke:#657079 !important" x="-51.7890625" y="-39" width="103.578125" height="78"></rect><g class="label" style="color:#17212b !important" transform="translate(-21.7890625, -24)"><rect></rect><foreignobject width="43.578125" height="48">
+<div style="color: rgb(23, 33, 43) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span style="color:#17212b !important" class="nodeLabel">
+<p>
+train<br>model
+</p>
+</span>
+</div>
+</foreignobject></g></g><g class="node default process" id="flowchart-V-9" transform="translate(877.546875, 47)"><rect class="basic label-container" style="fill:#fffdf7 !important;stroke:#657079 !important" x="-72.25" y="-39" width="144.5" height="78"></rect><g class="label" style="color:#17212b !important" transform="translate(-42.25, -24)"><rect></rect><foreignobject width="84.5" height="48">
+<div style="color: rgb(23, 33, 43) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span style="color:#17212b !important" class="nodeLabel">
+<p>
+choose with<br>validation
+</p>
+</span>
+</div>
+</foreignobject></g></g><g class="node default finish" id="flowchart-E-11" transform="translate(1060.046875, 47)"><rect class="basic label-container" style="fill:#ef5b45 !important;stroke:#ef5b45 !important" x="-60.25" y="-39" width="120.5" height="78"></rect><g class="label" style="color:#fff !important" transform="translate(-30.25, -24)"><rect></rect><foreignobject width="60.5" height="48">
+<div style="color: rgb(255, 255, 255) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span style="color:#fff !important" class="nodeLabel">
+<p>
+evaluate<br>once
+</p>
+</span>
+</div>
+</foreignobject></g></g></g></g></g>
+</svg>
 </div>
 <p></p></figure><p></p>
 </div>
@@ -1015,33 +1075,29 @@ Smaller training score. Better unseen behavior.
 <p>This protocol is the smallest credible argument that learning occurred.</p>
 </div>
 </section>
-<section id="one-task-two-visits" class="level2">
-<h2 class="anchored" data-anchor-id="one-task-two-visits">One task, two visits</h2>
+<section id="one-task-two-visits" class="slide level2">
+<h2>One task, two visits</h2>
 <div class="return-map">
 <div class="visit classical">
 <p><span>NOW</span></p>
-<section id="classical-image-classification" class="level3">
-<h3 class="anchored" data-anchor-id="classical-image-classification">Classical image classification</h3>
+<h3 id="classical-image-classification">Classical image classification</h3>
 <p>handcrafted features + linear classifier</p>
-</section>
 </div>
 <div class="return-arrow">
 <p>→</p>
 </div>
 <div class="visit deep">
 <p><span>LATER</span></p>
-<section id="deep-image-classification" class="level3">
-<h3 class="anchored" data-anchor-id="deep-image-classification">Deep image classification</h3>
+<h3 id="deep-image-classification">Deep image classification</h3>
 <p>learned features + convolutional network</p>
-</section>
 </div>
 </div>
 <div class="fragment big-summary">
 <p>The hypothesis changes. The five ingredients remain.</p>
 </div>
 </section>
-<section id="five-questions-to-keep" class="level2 final-slide">
-<h2 class="final-slide anchored" data-anchor-id="five-questions-to-keep">Five questions to keep</h2>
+<section id="five-questions-to-keep" class="slide level2 final-slide">
+<h2>Five questions to keep</h2>
 <div class="final-five">
 <div>
 <p><b>1</b><span>What experience?</span></p>
@@ -1064,432 +1120,390 @@ Smaller training score. Better unseen behavior.
 </div>
 
 
-</section>
-</section>
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+<p>Deep Learning · Chapter 1</p>
+</div>
+</div></div>
 
-</main> <!-- /main -->
-<script id="quarto-html-after-body" type="application/javascript">
-  window.document.addEventListener("DOMContentLoaded", function (event) {
-    const icon = "";
-    const anchorJS = new window.AnchorJS();
-    anchorJS.options = {
-      placement: 'right',
-      icon: icon
-    };
-    anchorJS.add('.anchored');
-    const isCodeAnnotation = (el) => {
-      for (const clz of el.classList) {
-        if (clz.startsWith('code-annotation-')) {                     
-          return true;
-        }
-      }
-      return false;
-    }
-    const onCopySuccess = function(e) {
-      // button target
-      const button = e.trigger;
-      // don't keep focus
-      button.blur();
-      // flash "checked"
-      button.classList.add('code-copy-button-checked');
-      var currentTitle = button.getAttribute("title");
-      button.setAttribute("title", "Copied!");
-      let tooltip;
-      if (window.bootstrap) {
-        button.setAttribute("data-bs-toggle", "tooltip");
-        button.setAttribute("data-bs-placement", "left");
-        button.setAttribute("data-bs-title", "Copied!");
-        tooltip = new bootstrap.Tooltip(button, 
-          { trigger: "manual", 
-            customClass: "code-copy-button-tooltip",
-            offset: [0, -8]});
-        tooltip.show();    
-      }
-      setTimeout(function() {
-        if (tooltip) {
-          tooltip.hide();
-          button.removeAttribute("data-bs-title");
-          button.removeAttribute("data-bs-toggle");
-          button.removeAttribute("data-bs-placement");
-        }
-        button.setAttribute("title", currentTitle);
-        button.classList.remove('code-copy-button-checked');
-      }, 1000);
-      // clear code selection
-      e.clearSelection();
-    }
-    const getTextToCopy = function(trigger) {
-      const outerScaffold = trigger.parentElement.cloneNode(true);
-      const codeEl = outerScaffold.querySelector('code');
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-      text: getTextToCopy
-    });
-    clipboard.on('success', onCopySuccess);
-    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-        text: getTextToCopy,
-        container: window.document.getElementById('quarto-embedded-source-code-modal')
-      });
-      clipboardModal.on('success', onCopySuccess);
-    }
-      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
-      var isInternal = (href) => {
-          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-      }
-      // Inspect non-navigation links and adorn them if external
-     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-      for (var i=0; i<links.length; i++) {
-        const link = links[i];
-        if (!isInternal(link.href)) {
-          // undo the damage that might have been done by quarto-nav.js in the case of
-          // links that we want to consider external
-          if (link.dataset.originalHref !== undefined) {
-            link.href = link.dataset.originalHref;
-          }
-            // target, if specified
-            link.setAttribute("target", "_blank");
-            if (link.getAttribute("rel") === null) {
-              link.setAttribute("rel", "noopener");
-            }
-        }
-      }
-    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-      const config = {
-        allowHTML: true,
-        maxWidth: 500,
-        delay: 100,
-        arrow: false,
-        appendTo: function(el) {
-            return el.parentElement;
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="../../site_libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="../../site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="../../site_libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="../../site_libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="../../site_libs/revealjs/plugin/search/search.js"></script>
+  <script src="../../site_libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="../../site_libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': false,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'fade',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1440,
+
+        height: 900,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 5.5e-2,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
         },
-        interactive: true,
-        interactiveBorder: 10,
-        theme: 'quarto',
-        placement: 'bottom-start',
-      };
-      if (contentFn) {
-        config.content = contentFn;
-      }
-      if (onTriggerFn) {
-        config.onTrigger = onTriggerFn;
-      }
-      if (onUntriggerFn) {
-        config.onUntrigger = onUntriggerFn;
-      }
-      window.tippy(el, config); 
-    }
-    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-    for (var i=0; i<noterefs.length; i++) {
-      const ref = noterefs[i];
-      tippyHover(ref, function() {
-        // use id or data attribute instead here
-        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-        try { href = new URL(href).hash; } catch {}
-        const id = href.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note) {
-          return note.innerHTML;
-        } else {
-          return "";
-        }
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
       });
-    }
-    const xrefs = window.document.querySelectorAll('a.quarto-xref');
-    const processXRef = (id, note) => {
-      // Strip column container classes
-      const stripColumnClz = (el) => {
-        el.classList.remove("page-full", "page-columns");
-        if (el.children) {
-          for (const child of el.children) {
-            stripColumnClz(child);
-          }
-        }
-      }
-      stripColumnClz(note)
-      if (id === null || id.startsWith('sec-')) {
-        // Special case sections, only their first couple elements
-        const container = document.createElement("div");
-        if (note.children && note.children.length > 2) {
-          container.appendChild(note.children[0].cloneNode(true));
-          for (let i = 1; i < note.children.length; i++) {
-            const child = note.children[i];
-            if (child.tagName === "P" && child.innerText === "") {
-              continue;
-            } else {
-              container.appendChild(child.cloneNode(true));
-              break;
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
             }
           }
-          if (window.Quarto?.typesetMath) {
-            window.Quarto.typesetMath(container);
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
           }
-          return container.innerHTML
-        } else {
-          if (window.Quarto?.typesetMath) {
-            window.Quarto.typesetMath(note);
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
           }
-          return note.innerHTML;
+          return codeEl.innerText;
         }
-      } else {
-        // Remove any anchor links if they are present
-        const anchorLink = note.querySelector('a.anchorjs-link');
-        if (anchorLink) {
-          anchorLink.remove();
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
         }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(note);
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
         }
-        if (note.classList.contains("callout")) {
-          return note.outerHTML;
-        } else {
-          return note.innerHTML;
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
         }
-      }
-    }
-    for (var i=0; i<xrefs.length; i++) {
-      const xref = xrefs[i];
-      tippyHover(xref, undefined, function(instance) {
-        instance.disable();
-        let url = xref.getAttribute('href');
-        let hash = undefined; 
-        if (url.startsWith('#')) {
-          hash = url;
-        } else {
-          try { hash = new URL(url).hash; } catch {}
-        }
-        if (hash) {
-          const id = hash.replace(/^#\/?/, "");
-          const note = window.document.getElementById(id);
-          if (note !== null) {
-            try {
-              const html = processXRef(id, note.cloneNode(true));
-              instance.setContent(html);
-            } finally {
-              instance.enable();
-              instance.show();
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
             }
           } else {
-            // See if we can fetch this
-            fetch(url.split('#')[0])
-            .then(res => res.text())
-            .then(html => {
-              const parser = new DOMParser();
-              const htmlDoc = parser.parseFromString(html, "text/html");
-              const note = htmlDoc.getElementById(id);
-              if (note !== null) {
-                const html = processXRef(id, note);
-                instance.setContent(html);
-              } 
-            }).finally(() => {
-              instance.enable();
-              instance.show();
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
             });
           }
-        } else {
-          // See if we can fetch a full url (with no hash to target)
-          // This is a special case and we should probably do some content thinning / targeting
-          fetch(url)
-          .then(res => res.text())
-          .then(html => {
-            const parser = new DOMParser();
-            const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.querySelector('main.content');
-            if (note !== null) {
-              // This should only happen for chapter cross references
-              // (since there is no id in the URL)
-              // remove the first header
-              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-                note.children[0].remove();
-              }
-              const html = processXRef(null, note);
-              instance.setContent(html);
-            } 
-          }).finally(() => {
-            instance.enable();
-            instance.show();
-          });
         }
-      }, function(instance) {
       });
-    }
-        let selectedAnnoteEl;
-        const selectorForAnnotation = ( cell, annotation) => {
-          let cellAttr = 'data-code-cell="' + cell + '"';
-          let lineAttr = 'data-code-annotation="' +  annotation + '"';
-          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
-          return selector;
-        }
-        const selectCodeLines = (annoteEl) => {
-          const doc = window.document;
-          const targetCell = annoteEl.getAttribute("data-target-cell");
-          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
-          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
-          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
-          const lineIds = lines.map((line) => {
-            return targetCell + "-" + line;
-          })
-          let top = null;
-          let height = null;
-          let parent = null;
-          if (lineIds.length > 0) {
-              //compute the position of the single el (top and bottom and make a div)
-              const el = window.document.getElementById(lineIds[0]);
-              top = el.offsetTop;
-              height = el.offsetHeight;
-              parent = el.parentElement.parentElement;
-            if (lineIds.length > 1) {
-              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-              height = bottom - top;
-            }
-            if (top !== null && height !== null && parent !== null) {
-              // cook up a div (if necessary) and position it 
-              let div = window.document.getElementById("code-annotation-line-highlight");
-              if (div === null) {
-                div = window.document.createElement("div");
-                div.setAttribute("id", "code-annotation-line-highlight");
-                div.style.position = 'absolute';
-                parent.appendChild(div);
-              }
-              div.style.top = top - 2 + "px";
-              div.style.height = height + 4 + "px";
-              div.style.left = 0;
-              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-              if (gutterDiv === null) {
-                gutterDiv = window.document.createElement("div");
-                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-                gutterDiv.style.position = 'absolute';
-                const codeCell = window.document.getElementById(targetCell);
-                const gutter = codeCell.querySelector('.code-annotation-gutter');
-                gutter.appendChild(gutterDiv);
-              }
-              gutterDiv.style.top = top - 2 + "px";
-              gutterDiv.style.height = height + 4 + "px";
-            }
-            selectedAnnoteEl = annoteEl;
-          }
-        };
-        const unselectCodeLines = () => {
-          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
-          elementsIds.forEach((elId) => {
-            const div = window.document.getElementById(elId);
-            if (div) {
-              div.remove();
-            }
-          });
-          selectedAnnoteEl = undefined;
-        };
-          // Handle positioning of the toggle
-      window.addEventListener(
-        "resize",
-        throttle(() => {
-          elRect = undefined;
-          if (selectedAnnoteEl) {
-            selectCodeLines(selectedAnnoteEl);
-          }
-        }, 10)
-      );
-      function throttle(fn, ms) {
-      let throttle = false;
-      let timer;
-        return (...args) => {
-          if(!throttle) { // first call gets through
-              fn.apply(this, args);
-              throttle = true;
-          } else { // all the others get throttled
-              if(timer) clearTimeout(timer); // cancel #2
-              timer = setTimeout(() => {
-                fn.apply(this, args);
-                timer = throttle = false;
-              }, ms);
-          }
-        };
-      }
-        // Attach click handler to the DT
-        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
-        for (const annoteDlNode of annoteDls) {
-          annoteDlNode.addEventListener('click', (event) => {
-            const clickedEl = event.target;
-            if (clickedEl !== selectedAnnoteEl) {
-              unselectCodeLines();
-              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
-              if (activeEl) {
-                activeEl.classList.remove('code-annotation-active');
-              }
-              selectCodeLines(clickedEl);
-              clickedEl.classList.add('code-annotation-active');
-            } else {
-              // Unselect the line
-              unselectCodeLines();
-              clickedEl.classList.remove('code-annotation-active');
-            }
-          });
-        }
-    const findCites = (el) => {
-      const parentEl = el.parentElement;
-      if (parentEl) {
-        const cites = parentEl.dataset.cites;
-        if (cites) {
-          return {
-            el,
-            cites: cites.split(' ')
-          };
-        } else {
-          return findCites(el.parentElement)
-        }
-      } else {
-        return undefined;
-      }
-    };
-    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-    for (var i=0; i<bibliorefs.length; i++) {
-      const ref = bibliorefs[i];
-      const citeInfo = findCites(ref);
-      if (citeInfo) {
-        tippyHover(citeInfo.el, function() {
-          var popup = window.document.createElement('div');
-          citeInfo.cites.forEach(function(cite) {
-            var citeDiv = window.document.createElement('div');
-            citeDiv.classList.add('hanging-indent');
-            citeDiv.classList.add('csl-entry');
-            var biblioDiv = window.document.getElementById('ref-' + cite);
-            if (biblioDiv) {
-              citeDiv.innerHTML = biblioDiv.innerHTML;
-            }
-            popup.appendChild(citeDiv);
-          });
-          return popup.innerHTML;
-        });
-      }
-    }
-  });
-  </script>
-</div> <!-- /content -->
-<footer class="footer">
-  <div class="nav-footer">
-    <div class="nav-footer-left">
-<p>Deep Learning · ENSA Tétouan</p>
-</div>   
-    <div class="nav-footer-center">
-      &nbsp;
-    </div>
-    <div class="nav-footer-right">
-<p>Built with Quarto</p>
-</div>
-  </div>
-</footer>
+      </script>
+    
 
-
-
-
-<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

@@ -1,389 +1,305 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
-
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.18">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="author" content="Dr.&nbsp;A. Belcaid">
-
-<title>Backpropagation: From Error to Credit – Deep Learning</title>
-<style>
-/* Default styles provided by pandoc.
-** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
-*/
-span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: 1.5em;}
-div.column{flex: auto;}
-@media screen {
-div.columns{gap: min(4vw, 1.5em);}
-div.column{overflow-x: auto;}
-}
-div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-ul.task-list{list-style: none;}
-ul.task-list li input[type="checkbox"] {
-  width: 0.8em;
-  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
-  vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
-</style>
-
-
-<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<html lang="en"><head>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabby.min.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-2e7c9b518fe54fcaa4a8b379123416fc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
-<script id="quarto-search-options" type="application/json">{
-  "location": "navbar",
-  "copy-button": false,
-  "collapse-after": 3,
-  "panel-placement": "end",
-  "type": "overlay",
-  "limit": 50,
-  "keyboard-shortcut": [
-    "f",
-    "/",
-    "s"
-  ],
-  "show-item-context": false,
-  "language": {
-    "search-no-results-text": "No results",
-    "search-matching-documents-text": "matching documents",
-    "search-copy-link-title": "Copy link to search",
-    "search-hide-matches-text": "Hide additional matches",
-    "search-more-match-text": "more match in this document",
-    "search-more-matches-text": "more matches in this document",
-    "search-clear-button-title": "Clear",
-    "search-text-placeholder": "",
-    "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit",
-    "search-label": "Search"
-  }
-}</script>
-<style>html{ scroll-behavior: smooth; }</style>
+<link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.10.18">
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
+  <meta name="author" content="Dr.&nbsp;A. Belcaid">
+  <title>Deep Learning – Backpropagation: From Error to Credit</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
     }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<link rel="stylesheet" href="../../styles.css">
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-f3e585dc122d45960ea2c31f625881dd.css">
+  <link rel="stylesheet" href="../01-what-is-learning/slides.css">
+  <link rel="stylesheet" href="week3.css">
+  <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
 </head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
 
-<body class="floating nav-fixed quarto-light">
+<section id="title-slide" data-visibility="hidden" class="quarto-title-block center">
+  <h1 class="title">Backpropagation: From Error to Credit</h1>
+  <p class="subtitle">Local derivatives, computation graphs, and gradient flow</p>
 
-<div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../assets/mark.svg" alt="" class="navbar-logo light-content">
-    <img src="../../assets/mark.svg" alt="" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">Deep Learning</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll me-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../index.html"> 
-<span class="menu-text">Home</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../schedule.html"> 
-<span class="menu-text">Schedule</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../notes.html"> 
-<span class="menu-text">Notes</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../projects.html"> 
-<span class="menu-text">Projects</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../logistics.html"> 
-<span class="menu-text">Logistics</span></a>
-  </li>  
-</ul>
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="https://edstem.org/us/courses/102787/"> 
-<span class="menu-text">ED</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Dr.&nbsp;A. Belcaid
 </div>
-      </div> <!-- /container-fluid -->
-    </nav>
-</header>
-<!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
-<!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#backpropagation-from-error-to-credit" id="toc-backpropagation-from-error-to-credit" class="nav-link active" data-scroll-target="#backpropagation-from-error-to-credit">Backpropagation: from error to credit</a></li>
-  <li><a href="#todays-journey" id="toc-todays-journey" class="nav-link" data-scroll-target="#todays-journey">Today’s journey</a></li>
-  <li><a href="#the-credit-assignment-problem" id="toc-the-credit-assignment-problem" class="nav-link" data-scroll-target="#the-credit-assignment-problem">01 · The credit assignment problem</a>
-  <ul class="collapse">
-  <li><a href="#a-confident-mistake" id="toc-a-confident-mistake" class="nav-link" data-scroll-target="#a-confident-mistake">A confident mistake</a></li>
-  <li><a href="#one-number-many-suspects" id="toc-one-number-many-suspects" class="nav-link" data-scroll-target="#one-number-many-suspects">One number, many suspects</a></li>
-  <li><a href="#start-with-one-suspect" id="toc-start-with-one-suspect" class="nav-link" data-scroll-target="#start-with-one-suspect">Start with one suspect</a></li>
-  </ul></li>
-  <li><a href="#one-variable-1" id="toc-one-variable-1" class="nav-link" data-scroll-target="#one-variable-1">02 · One variable</a>
-  <ul class="collapse">
-  <li><a href="#what-happens-as-the-nudge-shrinks" id="toc-what-happens-as-the-nudge-shrinks" class="nav-link" data-scroll-target="#what-happens-as-the-nudge-shrinks">What happens as the nudge shrinks?</a></li>
-  <li><a href="#the-derivative-is-a-local-promise" id="toc-the-derivative-is-a-local-promise" class="nav-link" data-scroll-target="#the-derivative-is-a-local-promise">The derivative is a local promise</a></li>
-  <li><a href="#exercise-read-the-local-signal" id="toc-exercise-read-the-local-signal" class="nav-link" data-scroll-target="#exercise-read-the-local-signal">Exercise · Read the local signal</a></li>
-  <li><a href="#challenge-can-algebra-reach-the-first-node" id="toc-challenge-can-algebra-reach-the-first-node" class="nav-link" data-scroll-target="#challenge-can-algebra-reach-the-first-node">Challenge · Can algebra reach the first node?</a></li>
-  <li><a href="#correctbut-the-bookkeeping-does-not-scale" id="toc-correctbut-the-bookkeeping-does-not-scale" class="nav-link" data-scroll-target="#correctbut-the-bookkeeping-does-not-scale">Correct—but the bookkeeping does not scale</a></li>
-  <li><a href="#each-operation-knows-one-derivative" id="toc-each-operation-knows-one-derivative" class="nav-link" data-scroll-target="#each-operation-knows-one-derivative">Each operation knows one derivative</a></li>
-  <li><a href="#backpropagation-assembles-the-same-answer" id="toc-backpropagation-assembles-the-same-answer" class="nav-link" data-scroll-target="#backpropagation-assembles-the-same-answer">Backpropagation assembles the same answer</a></li>
-  <li><a href="#exercise-build-a-neurons-graph" id="toc-exercise-build-a-neurons-graph" class="nav-link" data-scroll-target="#exercise-build-a-neurons-graph">Exercise · Build a neuron’s graph</a></li>
-  <li><a href="#worked-solution-the-forward-graph" id="toc-worked-solution-the-forward-graph" class="nav-link" data-scroll-target="#worked-solution-the-forward-graph">Worked solution · The forward graph</a></li>
-  <li><a href="#exercise-send-the-credit-backward" id="toc-exercise-send-the-credit-backward" class="nav-link" data-scroll-target="#exercise-send-the-credit-backward">Exercise · Send the credit backward</a></li>
-  <li><a href="#worked-solution-backpropagate" id="toc-worked-solution-backpropagate" class="nav-link" data-scroll-target="#worked-solution-backpropagate">Worked solution · Backpropagate</a></li>
-  </ul></li>
-  <li><a href="#multiple-paths" id="toc-multiple-paths" class="nav-link" data-scroll-target="#multiple-paths">03 · Multiple paths</a>
-  <ul class="collapse">
-  <li><a href="#one-input-reaches-the-result-twice" id="toc-one-input-reaches-the-result-twice" class="nav-link" data-scroll-target="#one-input-reaches-the-result-twice">One input reaches the result twice</a></li>
-  <li><a href="#exercise-one-weight-two-paths" id="toc-exercise-one-weight-two-paths" class="nav-link" data-scroll-target="#exercise-one-weight-two-paths">Exercise · One weight, two paths</a></li>
-  <li><a href="#exercise-open-one-linear-neuron" id="toc-exercise-open-one-linear-neuron" class="nav-link" data-scroll-target="#exercise-open-one-linear-neuron">Exercise · Open one linear neuron</a></li>
-  <li><a href="#one-neuron-sends-three-kinds-of-message" id="toc-one-neuron-sends-three-kinds-of-message" class="nav-link" data-scroll-target="#one-neuron-sends-three-kinds-of-message">One neuron sends three kinds of message</a></li>
-  <li><a href="#backpropagation-is-message-passing" id="toc-backpropagation-is-message-passing" class="nav-link" data-scroll-target="#backpropagation-is-message-passing">Backpropagation is message passing</a></li>
-  <li><a href="#from-three-neurons-to-one-linear-layer-rule" id="toc-from-three-neurons-to-one-linear-layer-rule" class="nav-link" data-scroll-target="#from-three-neurons-to-one-linear-layer-rule">From three neurons to one linear-layer rule</a></li>
-  <li><a href="#restore-the-full-two-layer-network" id="toc-restore-the-full-two-layer-network" class="nav-link" data-scroll-target="#restore-the-full-two-layer-network">Restore the full two-layer network</a></li>
-  </ul></li>
-  <li><a href="#backward-rule-toolbox" id="toc-backward-rule-toolbox" class="nav-link" data-scroll-target="#backward-rule-toolbox">04 · Backward-rule toolbox</a>
-  <ul class="collapse">
-  <li><a href="#core-transformation-blocks" id="toc-core-transformation-blocks" class="nav-link" data-scroll-target="#core-transformation-blocks">Core transformation blocks</a></li>
-  <li><a href="#gates-probabilities-and-losses" id="toc-gates-probabilities-and-losses" class="nav-link" data-scroll-target="#gates-probabilities-and-losses">Gates, probabilities, and losses</a></li>
-  </ul></li>
-  <li><a href="#automatic-differentiation" id="toc-automatic-differentiation" class="nav-link" data-scroll-target="#automatic-differentiation">05 · Automatic differentiation</a>
-  <ul class="collapse">
-  <li><a href="#the-same-graphnow-automatic" id="toc-the-same-graphnow-automatic" class="nav-link" data-scroll-target="#the-same-graphnow-automatic">The same graph—now automatic</a></li>
-  <li><a href="#inspect-the-value-objects-created-by-code" id="toc-inspect-the-value-objects-created-by-code" class="nav-link" data-scroll-target="#inspect-the-value-objects-created-by-code">Inspect the <code>Value</code> objects created by code</a></li>
-  <li><a href="#what-does-backward-actually-do" id="toc-what-does-backward-actually-do" class="nav-link" data-scroll-target="#what-does-backward-actually-do">What does <code>backward()</code> actually do?</a></li>
-  <li><a href="#coding-session-build-the-black-box" id="toc-coding-session-build-the-black-box" class="nav-link" data-scroll-target="#coding-session-build-the-black-box">Coding session · Build the black box</a></li>
-  </ul></li>
-  <li><a href="#what-gradients-reveal" id="toc-what-gradients-reveal" class="nav-link" data-scroll-target="#what-gradients-reveal">06 · What gradients reveal</a>
-  <ul class="collapse">
-  <li><a href="#read-a-gradient-before-using-it" id="toc-read-a-gradient-before-using-it" class="nav-link" data-scroll-target="#read-a-gradient-before-using-it">Read a gradient before using it</a></li>
-  <li><a href="#read-gradient-flow-across-layers" id="toc-read-gradient-flow-across-layers" class="nav-link" data-scroll-target="#read-gradient-flow-across-layers">Read gradient flow across layers</a></li>
-  <li><a href="#backpropagation-in-five-moves" id="toc-backpropagation-in-five-moves" class="nav-link" data-scroll-target="#backpropagation-in-five-moves">Backpropagation in five moves</a></li>
-  </ul></li>
-  </ul>
-<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.html"><i class="bi bi-file-slides"></i>RevealJS</a></li></ul></div></nav>
-</nav>
-<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
-<!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-    </div>
-<!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Backpropagation: From Error to Credit</h1>
-<p class="subtitle lead">Local derivatives, computation graphs, and gradient flow</p>
+</div>
 </div>
 
-
-
-<div class="quarto-title-meta">
-
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>Dr.&nbsp;A. Belcaid </p>
-          </div>
-  </div>
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<section id="backpropagation-from-error-to-credit" class="level2 deck-title">
-<h2 class="deck-title anchored" data-anchor-id="backpropagation-from-error-to-credit">Backpropagation: from error to credit</h2>
+</section>
+<section id="backpropagation-from-error-to-credit" class="slide level2 deck-title">
+<h2>Backpropagation: from error to credit</h2>
 <div class="deck-title-grid">
 <div class="deck-title-copy">
 <p><span class="eyebrow">CHAPTER 03 · FROM SCRATCH</span></p>
-<section id="local-derivatives-computation-graphs-and-gradient-flow" class="level3">
-<h3 class="anchored" data-anchor-id="local-derivatives-computation-graphs-and-gradient-flow">Local derivatives, computation graphs, and gradient flow</h3>
+<h3 id="local-derivatives-computation-graphs-and-gradient-flow">Local derivatives, computation graphs, and gradient flow</h3>
 <p>The loss says <strong>how wrong</strong> we are. Backpropagation asks: <strong>who contributed—and by how much?</strong></p>
 <p><span class="deck-author">Dr.&nbsp;A. Belcaid</span></p>
-</section>
 </div>
 <div class="deck-title-art backprop-hero">
-<p><img src="assets/backpropagation-hero.png" class="img-fluid" alt="A two-layer neural computation graph with blue signals flowing forward and coral gradient paths branching backward from a scalar loss."></p>
+<p><img data-src="assets/backpropagation-hero.png" alt="A two-layer neural computation graph with blue signals flowing forward and coral gradient paths branching backward from a scalar loss."></p>
 </div>
 </div>
 </section>
-<section id="todays-journey" class="level2">
-<h2 class="anchored" data-anchor-id="todays-journey">Today’s journey</h2>
+<section id="todays-journey" class="slide level2">
+<h2>Today’s journey</h2>
 <div class="backprop-roadmap">
 <div class="roadmap-stop scalar-stop">
 <p><span>01</span></p>
-<section id="one-variable" class="level3">
-<h3 class="anchored" data-anchor-id="one-variable">One variable</h3>
+<h3 id="one-variable">One variable</h3>
 <p>Derivative as sensitivity</p>
-</section>
 </div>
 <div class="roadmap-arrow">
 <p>→</p>
 </div>
 <div class="roadmap-stop">
 <p><span>02</span></p>
-<section id="a-chain" class="level3">
-<h3 class="anchored" data-anchor-id="a-chain">A chain</h3>
+<h3 id="a-chain">A chain</h3>
 <p>Multiply local derivatives</p>
-</section>
 </div>
 <div class="roadmap-arrow">
 <p>→</p>
 </div>
 <div class="roadmap-stop">
 <p><span>03</span></p>
-<section id="many-variables" class="level3">
-<h3 class="anchored" data-anchor-id="many-variables">Many variables</h3>
+<h3 id="many-variables">Many variables</h3>
 <p>Route partial derivatives</p>
-</section>
 </div>
 <div class="roadmap-arrow">
 <p>→</p>
 </div>
 <div class="roadmap-stop branch-stop">
 <p><span>04</span></p>
-<section id="branches" class="level3">
-<h3 class="anchored" data-anchor-id="branches">Branches</h3>
+<h3 id="branches">Branches</h3>
 <p>Accumulate gradient paths</p>
-</section>
 </div>
 <div class="roadmap-arrow">
 <p>→</p>
 </div>
 <div class="roadmap-stop network-stop">
 <p><span>05</span></p>
-<section id="two-layer-mlp" class="level3">
-<h3 class="anchored" data-anchor-id="two-layer-mlp">Two-layer MLP</h3>
+<h3 id="two-layer-mlp">Two-layer MLP</h3>
 <p>One complete backward pass</p>
-</section>
 </div>
 <div class="roadmap-arrow">
 <p>→</p>
 </div>
 <div class="roadmap-stop diagnostic-stop">
 <p><span>06</span></p>
-<section id="gradient-signals" class="level3">
-<h3 class="anchored" data-anchor-id="gradient-signals">Gradient signals</h3>
+<h3 id="gradient-signals">Gradient signals</h3>
 <p>What they reveal—and hide</p>
-</section>
 </div>
 </div>
 <div class="roadmap-question fragment">
 <p><span>One rule travels through the whole graph:</span> <strong>incoming gradient × local derivative</strong></p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Preview the conceptual progression only. Emphasize that we begin with familiar single-variable calculus, then add one complication at a time until the same rule works for a neural network. Parameter updates belong to the optimization lecture.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="the-credit-assignment-problem" class="level1 section-slide credit-section" data-section-progress="1 / 6" style="--section-progress:16.667%">
-<h1 class="section-slide credit-section" data-section-progress="1 / 6" style="--section-progress:16.667%">01 · The credit assignment problem</h1>
-<section id="a-confident-mistake" class="level2">
-<h2 class="anchored" data-anchor-id="a-confident-mistake">A confident mistake</h2>
+<section>
+<section id="the-credit-assignment-problem" class="title-slide slide level1 section-slide credit-section center" data-section-progress="1 / 6" style="--section-progress:16.667%">
+<h1>01 · The credit assignment problem</h1>
+
+</section>
+<section id="a-confident-mistake" class="slide level2">
+<h2>A confident mistake</h2>
 <div class="mistake-scene">
 <div class="mistake-example">
 <p><span class="example-label">ONE TRAINING EXAMPLE</span></p>
@@ -411,12 +327,22 @@ window.Quarto = {
 <div class="fragment intro-conclusion">
 <p><span>The loss confirms the mistake.</span> <strong>It does not identify what caused it.</strong></p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Begin with the prediction, not the definition. Ask whether 0.12 is good for the true class. Reveal the loss only after students judge the output. The exact architecture is deliberately hidden for now; all we know is that the model is confidently wrong.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="one-number-many-suspects" class="level2">
-<h2 class="anchored" data-anchor-id="one-number-many-suspects">One number, many suspects</h2>
+<section id="one-number-many-suspects" class="slide level2">
+<h2>One number, many suspects</h2>
 <div class="credit-scene">
 <div class="parameter-field">
 <p><span class="example-label">TRAINABLE PARAMETERS</span></p>
@@ -437,12 +363,22 @@ window.Quarto = {
 <div class="fragment credit-definition">
 <p>That is the <strong>credit assignment problem</strong>.</p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Contrast the dimensionalities: many parameters enter the computation, but the loss compresses the outcome to one scalar. “Credit” can be positive or negative: a parameter may push the loss up or down. Avoid implying moral blame; responsibility means sensitivity of the loss to a small change.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="start-with-one-suspect" class="level2">
-<h2 class="anchored" data-anchor-id="start-with-one-suspect">Start with one suspect</h2>
+<section id="start-with-one-suspect" class="slide level2">
+<h2>Start with one suspect</h2>
 <div class="nudge-comparison">
 <div class="nudge-state">
 <p><span>BEFORE</span> <strong>w = 0.40</strong> <b>𝓛(w) = 2.12</b></p>
@@ -468,15 +404,27 @@ window.Quarto = {
 <span>magnitude</span><strong>strength</strong>
 </div>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Treat these as illustrative values, not a completed optimization step. Ask students to interpret the sign before revealing the takeaway. This finite change motivates the derivative as the limiting local sensitivity. We will next formalize it with single-variable calculus.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="one-variable-1" class="title-slide slide level1 section-slide scalar-section center" data-section-progress="2 / 6" style="--section-progress:33.333%">
+<h1>02 · One variable</h1>
+
 </section>
-</section>
-<section id="one-variable-1" class="level1 section-slide scalar-section" data-section-progress="2 / 6" style="--section-progress:33.333%">
-<h1 class="section-slide scalar-section" data-section-progress="2 / 6" style="--section-progress:33.333%">02 · One variable</h1>
-<section id="what-happens-as-the-nudge-shrinks" class="level2">
-<h2 class="anchored" data-anchor-id="what-happens-as-the-nudge-shrinks">What happens as the nudge shrinks?</h2>
+<section id="what-happens-as-the-nudge-shrinks" class="slide level2">
+<h2>What happens as the nudge shrinks?</h2>
 <div class="limit-question">
 <p>At <span class="math inline">\(w=0.40\)</span>, estimate how the loss responds to a smaller and smaller change in <strong>one</strong> weight.</p>
 </div>
@@ -497,15 +445,25 @@ window.Quarto = {
 <div class="fragment limit-result">
 <p><span>as Δw → 0</span> <strong>d𝓛/dw → −4</strong></p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Ask students to predict the third row after seeing the first two. These illustrative measurements are consistent with the previous slide and approach −4. Emphasize that the derivative is not a new kind of quantity; it is the stabilized local sensitivity as the nudge vanishes.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="the-derivative-is-a-local-promise" class="level2">
-<h2 class="anchored" data-anchor-id="the-derivative-is-a-local-promise">The derivative is a local promise</h2>
+<section id="the-derivative-is-a-local-promise" class="slide level2">
+<h2>The derivative is a local promise</h2>
 <div class="sensitivity-layout">
 <div class="sensitivity-plot">
-<p><img src="assets/local-sensitivity.svg" class="img-fluid" alt="A smooth loss curve with a descending tangent at w equals 0.40 and small changes delta w and delta L marked."></p>
+<p><img data-src="assets/local-sensitivity.svg" alt="A smooth loss curve with a descending tangent at w equals 0.40 and small changes delta w and delta L marked."></p>
 </div>
 <div class="local-promise">
 <p><span>NEAR <span class="math inline">\(w=0.40\)</span></span></p>
@@ -523,14 +481,24 @@ window.Quarto = {
 <div class="fragment local-warning">
 <p>Local means <strong>near this value of <span class="math inline">\(w\)</span></strong>—not everywhere on the curve.</p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Connect the derivative to a tangent only after the numerical limiting process. Ask students to predict whether the loss moves up or down for a positive nudge. The tangent is a local linear model of the loss, not a global description.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="exercise-read-the-local-signal" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-read-the-local-signal">Exercise · Read the local signal</h2>
+<section id="exercise-read-the-local-signal" class="slide level2">
+<h2>Exercise · Read the local signal</h2>
 <div class="gradient-sign-figure">
-<p><img src="assets/gradient-signs.svg" class="img-fluid" alt="Four local loss plots: A rises, B falls, C is flat, and D rises steeply at the marked parameter value."></p>
+<p><img data-src="assets/gradient-signs.svg" alt="Four local loss plots: A rises, B falls, C is flat, and D rises steeply at the marked parameter value."></p>
 </div>
 <div class="exercise-prompt">
 <p>For each marked point, decide: is <span class="math inline">\(d\mathcal L/dw\)</span> positive, negative, or zero—and where is its magnitude largest?</p>
@@ -553,12 +521,22 @@ window.Quarto = {
 <b>D</b><span>largest magnitude</span>
 </div>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Have students answer with hand signals: thumbs up, down, or flat for A–C, then identify D as the strongest sensitivity. Do not discuss parameter updates; the task is only to read what the derivative reveals locally.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="challenge-can-algebra-reach-the-first-node" class="level2">
-<h2 class="anchored" data-anchor-id="challenge-can-algebra-reach-the-first-node">Challenge · Can algebra reach the first node?</h2>
+<section id="challenge-can-algebra-reach-the-first-node" class="slide level2">
+<h2>Challenge · Can algebra reach the first node?</h2>
 <div class="long-expression">
 <p><span class="math display">\[
 \mathcal L(x)=\left[(x^2+1)^3-2\right]^2,
@@ -582,36 +560,66 @@ window.Quarto = {
 =2(6)\cdot3(2)^2\cdot2=288
 \]</span></p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Give students a genuine attempt. They already know enough calculus to solve this expression algebraically. The purpose is not to make the derivative mysterious; it is to make the bookkeeping cost visible. Reveal 288, then ask what happens when the expression contains thousands of operations.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="correctbut-the-bookkeeping-does-not-scale" class="level2">
-<h2 class="anchored" data-anchor-id="correctbut-the-bookkeeping-does-not-scale">Correct—but the bookkeeping does not scale</h2>
+<section id="correctbut-the-bookkeeping-does-not-scale" class="slide level2">
+<h2>Correct—but the bookkeeping does not scale</h2>
 <div class="scalar-graph-figure">
-<p><img src="assets/scalar-chain-forward.svg" class="img-fluid" alt="A two-row computation graph evaluates the nested expression from x equals 1 through five operations to loss 36, storing the intermediate values a, b, c, and d."></p>
+<p><img data-src="assets/scalar-chain-forward.svg" alt="A two-row computation graph evaluates the nested expression from x equals 1 through five operations to loss 36, storing the intermediate values a, b, c, and d."></p>
 </div>
 <div class="fragment forward-summary">
 <p><span>same expression</span><strong>five small operations · four remembered values</strong></p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Read the graph left to right and have students supply each value before revealing it verbally. The variable names are bookkeeping: each operation now has one small input-output relationship that can be differentiated independently.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="each-operation-knows-one-derivative" class="level2">
-<h2 class="anchored" data-anchor-id="each-operation-knows-one-derivative">Each operation knows one derivative</h2>
+<section id="each-operation-knows-one-derivative" class="slide level2">
+<h2>Each operation knows one derivative</h2>
 <div class="scalar-graph-figure">
-<p><img src="assets/scalar-chain-local.svg" class="img-fluid" alt="The same two-row computation graph with a coral local-derivative badge attached to each of the five operation nodes."></p>
+<p><img data-src="assets/scalar-chain-local.svg" alt="The same two-row computation graph with a coral local-derivative badge attached to each of the five operation nodes."></p>
 </div>
 <div class="fragment local-rule-card">
 <p><span>local view</span><strong>Each operation differentiates only itself.</strong></p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Reveal one local derivative at a time from left to right. Ask for the generic derivative first, then substitute the stored forward value. No node needs to know the entire expression or the final answer.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="backpropagation-assembles-the-same-answer" class="level2">
-<h2 class="anchored" data-anchor-id="backpropagation-assembles-the-same-answer">Backpropagation assembles the same answer</h2>
+<section id="backpropagation-assembles-the-same-answer" class="slide level2">
+<h2>Backpropagation assembles the same answer</h2>
 <div class="r-stack backprop-step-stack">
 <img src="assets/scalar-backprop-step-0.svg" alt="The scalar computation graph with identifiers and operation symbols only; all forward values have already been stored.">
 <img class="fragment fade-in-then-out" src="assets/scalar-backprop-step-1.svg" alt="Backward step 1 highlights the final square and computes d loss over d d equals 12.">
@@ -620,12 +628,22 @@ window.Quarto = {
 <img class="fragment fade-in-then-out" src="assets/scalar-backprop-step-4.svg" alt="Backward step 4 highlights add one and computes d loss over d a equals 144.">
 <img class="fragment fade-in" src="assets/scalar-backprop-step-5.svg" alt="Backward step 5 highlights the first square and computes d loss over d x equals 288.">
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Advance through the five graph states. At each step, point first to the incoming sensitivity, then to the highlighted operation’s local derivative, and only then read the result in the external panel. The nodes remain uncluttered throughout. The final value 288 exactly matches the algebraic solution.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="exercise-build-a-neurons-graph" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-build-a-neurons-graph">Exercise · Build a neuron’s graph</h2>
+<section id="exercise-build-a-neurons-graph" class="slide level2">
+<h2>Exercise · Build a neuron’s graph</h2>
 <div class="long-expression neuron-exercise-formula">
 <p><span class="math display">\[
 z=wx+b,\qquad \hat y=\sigma(z),\qquad
@@ -644,27 +662,47 @@ x=2,\qquad w=1,\qquad b=-1,\qquad y=1
 <div class="fragment exercise-solution">
 <p><span class="solution-label">READY?</span> Compare your graph on the next slide.</p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Do not let students differentiate yet. First check whether their graph has four leaves, an affine operation, a sigmoid operation, and a loss operation. This separates graph construction from gradient bookkeeping.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="worked-solution-the-forward-graph" class="level2">
-<h2 class="anchored" data-anchor-id="worked-solution-the-forward-graph">Worked solution · The forward graph</h2>
+<section id="worked-solution-the-forward-graph" class="slide level2">
+<h2>Worked solution · The forward graph</h2>
 <div class="neuron-exercise-figure">
-<p><img src="assets/neuron-exercise-forward.svg" class="img-fluid" alt="Computation graph for one sigmoid neuron with inputs x, w, b, and target y. The graph evaluates an affine map, sigmoid, and squared-error loss."></p>
+<p><img data-src="assets/neuron-exercise-forward.svg" alt="Computation graph for one sigmoid neuron with inputs x, w, b, and target y. The graph evaluates an affine map, sigmoid, and squared-error loss."></p>
 </div>
 <div class="fragment graph-question">
 <p>The values are stored. From which node must the backward pass begin?</p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Trace the forward values aloud: z equals 1, prediction equals 0.731, and loss equals 0.036. Then ask for the seed sensitivity at the loss. The answer is one.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="exercise-send-the-credit-backward" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-send-the-credit-backward">Exercise · Send the credit backward</h2>
+<section id="exercise-send-the-credit-backward" class="slide level2">
+<h2>Exercise · Send the credit backward</h2>
 <div class="exercise-backprop-grid">
 <div class="exercise-reference-graph">
-<p><img src="assets/neuron-exercise-forward.svg" class="img-fluid" alt="The completed forward graph remains visible as a reference while students backpropagate."></p>
+<p><img data-src="assets/neuron-exercise-forward.svg" alt="The completed forward graph remains visible as a reference while students backpropagate."></p>
 </div>
 <div class="exercise-prompt backprop-task">
 <p>Compute <span class="math display">\[
@@ -681,23 +719,35 @@ x=2,\qquad w=1,\qquad b=-1,\qquad y=1
 <p><span class="solution-label">WORKED SOLUTION</span> Advance once more and check one operation at a time.</p>
 </div>
 </section>
-<section id="worked-solution-backpropagate" class="level2">
-<h2 class="anchored" data-anchor-id="worked-solution-backpropagate">Worked solution · Backpropagate</h2>
+<section id="worked-solution-backpropagate" class="slide level2">
+<h2>Worked solution · Backpropagate</h2>
 <div class="r-stack backprop-step-stack neuron-backprop-stack">
 <img src="assets/neuron-exercise-forward.svg" alt="The completed forward graph for the sigmoid-neuron exercise.">
 <img class="fragment fade-in-then-out" src="assets/neuron-exercise-backprop-1.svg" alt="The loss step computes the sensitivity with respect to the prediction.">
 <img class="fragment fade-in-then-out" src="assets/neuron-exercise-backprop-2.svg" alt="The sigmoid step computes the sensitivity with respect to the logit.">
 <img class="fragment fade-in" src="assets/neuron-exercise-backprop-3.svg" alt="The affine step sends gradients to w, b, and x.">
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Reveal only one operation at a time. At the affine map, emphasize the new structural idea: one node receives an incoming sensitivity and sends a different gradient to each of its three parents. This prepares the multivariate section without introducing optimization.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="multiple-paths" class="title-slide slide level1 section-slide multivariable-section center" data-section-progress="3 / 6" style="--section-progress:50%">
+<h1>03 · Multiple paths</h1>
+
 </section>
-</section>
-<section id="multiple-paths" class="level1 section-slide multivariable-section" data-section-progress="3 / 6" style="--section-progress:50%">
-<h1 class="section-slide multivariable-section" data-section-progress="3 / 6" style="--section-progress:50%">03 · Multiple paths</h1>
-<section id="one-input-reaches-the-result-twice" class="level2">
-<h2 class="anchored" data-anchor-id="one-input-reaches-the-result-twice">One input reaches the result twice</h2>
+<section id="one-input-reaches-the-result-twice" class="slide level2">
+<h2>One input reaches the result twice</h2>
 <div class="multivariable-intro-layout">
 <div class="multivariable-cards">
 <div class="multi-rule-card">
@@ -726,15 +776,25 @@ x(t)=\cos t,\qquad y(t)=t^2.
 </div>
 </div>
 <div class="multivariable-path-graph">
-<p><img src="assets/two-path-chain-rule.svg" class="img-fluid" alt="A computation graph in which t branches to x and y, and both paths meet at f. Each edge is labeled by its local derivative."></p>
+<p><img data-src="assets/two-path-chain-rule.svg" alt="A computation graph in which t branches to x and y, and both paths meet at f. Each edge is labeled by its local derivative."></p>
 </div>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Keep the graph visible throughout. First trace the left path from t through x to f, then the right path through y. Ask whether the two effects should replace or reinforce one another before revealing the plus sign. In the example, compute the four local derivatives first and only then substitute x equals cosine t and y equals t squared.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="exercise-one-weight-two-paths" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-one-weight-two-paths">Exercise · One weight, two paths</h2>
+<section id="exercise-one-weight-two-paths" class="slide level2">
+<h2>Exercise · One weight, two paths</h2>
 <div class="regularization-formula">
 <p><span class="math display">\[
 \mathcal L_{\text{total}}
@@ -745,7 +805,7 @@ x(t)=\cos t,\qquad y(t)=t^2.
 </div>
 <div class="regularization-layout">
 <div class="regularization-graph">
-<p><img src="assets/neuron-with-regularization.svg" class="img-fluid" alt="The weight w reaches the total loss through both the neuron data-loss path and an L2 regularization path."></p>
+<p><img data-src="assets/neuron-with-regularization.svg" alt="The weight w reaches the total loss through both the neuron data-loss path and an L2 regularization path."></p>
 </div>
 <div class="regularization-question">
 <p>From the previous exercise: <span class="math display">\[
@@ -766,14 +826,24 @@ x(t)=\cos t,\qquad y(t)=t^2.
 =\boxed{-0.0058}.
 \]</span></p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Ask for the sign of the regularization contribution before computing it. The data term pushes w upward under gradient descent because its gradient is negative; the regularizer pushes w toward zero because its contribution is positive. The point here is path addition, not the optimization update itself.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="exercise-open-one-linear-neuron" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-open-one-linear-neuron">Exercise · Open one linear neuron</h2>
+<section id="exercise-open-one-linear-neuron" class="slide level2">
+<h2>Exercise · Open one linear neuron</h2>
 <div class="linear-layer-figure">
-<p><img src="assets/linear-layer-4x3.svg" class="img-fluid" alt="A four-input, three-output linear layer feeding a scalar loss. The four edges producing h1 and the incoming gradient from the loss are highlighted."></p>
+<p><img data-src="assets/linear-layer-4x3.svg" alt="A four-input, three-output linear layer feeding a scalar loss. The four edges producing h1 and the incoming gradient from the loss are highlighted."></p>
 </div>
 <div class="linear-layer-question">
 <p>Given <span class="math inline">\(g_1=\partial\mathcal{L}/\partial h_1\)</span>, what messages should <span class="math inline">\(h_1\)</span> send to its four weights, four inputs, and bias?</p>
@@ -781,12 +851,22 @@ x(t)=\cos t,\qquad y(t)=t^2.
 <div class="exercise-pause compact-pause">
 <p><span>PAUSE</span><b>90 seconds</b><small>Use incoming gradient × local derivative. Start from the scalar equation for h₁.</small></p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>The gray connections establish the full layer, but keep attention on the four blue edges into h1. The coral arrow is the gradient arriving from everything downstream. Students only need the scalar rule learned in the previous section.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="one-neuron-sends-three-kinds-of-message" class="level2">
-<h2 class="anchored" data-anchor-id="one-neuron-sends-three-kinds-of-message">One neuron sends three kinds of message</h2>
+<section id="one-neuron-sends-three-kinds-of-message" class="slide level2">
+<h2>One neuron sends three kinds of message</h2>
 <div class="linear-neuron-equation">
 <p><span class="math display">\[
 h_1=w_{11}x_1+w_{12}x_2+w_{13}x_3+w_{14}x_4+b_1,
@@ -815,24 +895,44 @@ h_1=w_{11}x_1+w_{12}x_2+w_{13}x_3+w_{14}x_4+b_1,
 <div class="fragment linear-message-summary">
 <p>The formulas differ only because each edge has a different <strong>local derivative</strong>.</p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Reveal weights, inputs, and bias separately. For each card, ask students to name the incoming message and the local derivative before reading the product. The vertical bar on the input gradient is important: h1 supplies only one of three path contributions.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="backpropagation-is-message-passing" class="level2">
-<h2 class="anchored" data-anchor-id="backpropagation-is-message-passing">Backpropagation is message passing</h2>
+<section id="backpropagation-is-message-passing" class="slide level2">
+<h2>Backpropagation is message passing</h2>
 <div class="message-passing-figure">
-<p><img src="assets/gradient-message-passing.svg" class="img-fluid" alt="A generic node receives gradient messages from two children, adds them, and sends locally transformed messages to three parents."></p>
+<p><img data-src="assets/gradient-message-passing.svg" alt="A generic node receives gradient messages from two children, adds them, and sends locally transformed messages to three parents."></p>
 </div>
 <div class="fragment message-passing-rule">
 <p><strong>Receive and add</strong> messages from children. <strong>Multiply locally and send</strong> messages to parents.</p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Use family language carefully: parents produced v in the forward pass; children consumed v. Backpropagation reverses the direction. If several children used v, their messages add at v. The accumulated gradient is then multiplied by a different local derivative for each parent edge.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="from-three-neurons-to-one-linear-layer-rule" class="level2">
-<h2 class="anchored" data-anchor-id="from-three-neurons-to-one-linear-layer-rule">From three neurons to one linear-layer rule</h2>
+<section id="from-three-neurons-to-one-linear-layer-rule" class="slide level2">
+<h2>From three neurons to one linear-layer rule</h2>
 <div class="linear-matrix-forward">
 <p><span class="math display">\[
 \mathbf h=W\mathbf x+\mathbf b,
@@ -884,14 +984,24 @@ W\in\mathbb R^{3\times4},
 <div class="fragment matrix-rule-takeaway" data-fragment-index="4">
 <p>These are three forms of the same rule: <strong>incoming gradient × local derivative</strong>.</p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Check dimensions before interpreting the equations. W transpose appears because each input must collect one contribution from every output neuron. The weight gradient is an outer product because every output message pairs with every input value.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="restore-the-full-two-layer-network" class="level2">
-<h2 class="anchored" data-anchor-id="restore-the-full-two-layer-network">Restore the full two-layer network</h2>
+<section id="restore-the-full-two-layer-network" class="slide level2">
+<h2>Restore the full two-layer network</h2>
 <div class="computation-graph-figure">
-<p><img src="assets/two-layer-loss-graph.svg" class="img-fluid" alt="Forward computation graph for a two-layer binary classifier. Input x and parameters W1 and b1 enter an affine operation and sigmoid; parameters W2 and b2 enter a second affine operation and sigmoid; the prediction and target y enter binary cross-entropy to produce loss L."></p>
+<p><img data-src="assets/two-layer-loss-graph.svg" alt="Forward computation graph for a two-layer binary classifier. Input x and parameters W1 and b1 enter an affine operation and sigmoid; parameters W2 and b2 enter a second affine operation and sigmoid; the prediction and target y enter binary cross-entropy to produce loss L."></p>
 </div>
 <div class="fragment graph-question">
 <p>Every block receives a gradient message, applies its local rule, and sends new messages to its parents.</p>
@@ -899,15 +1009,27 @@ W\in\mathbb R^{3\times4},
 <div class="fragment derivation-reference">
 <p><span>FULL WORKED DERIVATION</span> <a href="../../notes/03-backpropagation/two-layer-derivation.html">Read online</a> · <a href="../../notes/03-backpropagation/two-layer-derivation.pdf">Download PDF</a></p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>First read the established graph from left to right, then trace the backward order from the loss to the first affine map. The linear blocks use the matrix rules just derived; sigmoid and BCE contribute their own local derivative rules. No block needs to know the entire network.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="backward-rule-toolbox" class="title-slide slide level1 section-slide toolbox-section center" data-section-progress="4 / 6" style="--section-progress:66.667%">
+<h1>04 · Backward-rule toolbox</h1>
+
 </section>
-</section>
-<section id="backward-rule-toolbox" class="level1 section-slide toolbox-section" data-section-progress="4 / 6" style="--section-progress:66.667%">
-<h1 class="section-slide toolbox-section" data-section-progress="4 / 6" style="--section-progress:66.667%">04 · Backward-rule toolbox</h1>
-<section id="core-transformation-blocks" class="level2">
-<h2 class="anchored" data-anchor-id="core-transformation-blocks">Core transformation blocks</h2>
+<section id="core-transformation-blocks" class="slide level2">
+<h2>Core transformation blocks</h2>
 <div class="toolbox-grid">
 <div class="fragment toolbox-card linear-tool-card">
 <p><span class="toolbox-name">LINEAR</span></p>
@@ -958,12 +1080,22 @@ g_x=g_y(1-y^2)
 <p><strong class="toolbox-memory">one minus output squared</strong></p>
 </div>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Reveal one card at a time. For every card, ask students to identify the stored forward value, the incoming message, and the local derivative. Linear is the only block here that sends three kinds of message; sigmoid and tanh are elementwise gates.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="gates-probabilities-and-losses" class="level2">
-<h2 class="anchored" data-anchor-id="gates-probabilities-and-losses">Gates, probabilities, and losses</h2>
+<section id="gates-probabilities-and-losses" class="slide level2">
+<h2>Gates, probabilities, and losses</h2>
 <div class="toolbox-grid">
 <div class="fragment toolbox-card relu-tool-card">
 <p><span class="toolbox-name">RELU</span></p>
@@ -1017,31 +1149,43 @@ p_i=\frac{e^{z_i}}{\sum_j e^{z_j}}
 <div class="fragment toolbox-footer">
 <p>Do not memorize six unrelated formulas. Identify the <strong>incoming message</strong> and multiply by the block’s <strong>local derivative</strong>.</p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>ReLU is a hard gate. Softmax is different from the elementwise activations because changing one logit changes every output probability. End with the fused loss shortcuts: these are the expressions students will use most often in classifiers.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="automatic-differentiation" class="title-slide slide level1 section-slide autodiff-section center" data-section-progress="5 / 6" style="--section-progress:83.333%">
+<h1>05 · Automatic differentiation</h1>
+
 </section>
-</section>
-<section id="automatic-differentiation" class="level1 section-slide autodiff-section" data-section-progress="5 / 6" style="--section-progress:83.333%">
-<h1 class="section-slide autodiff-section" data-section-progress="5 / 6" style="--section-progress:83.333%">05 · Automatic differentiation</h1>
-<section id="the-same-graphnow-automatic" class="level2">
-<h2 class="anchored" data-anchor-id="the-same-graphnow-automatic">The same graph—now automatic</h2>
+<section id="the-same-graphnow-automatic" class="slide level2">
+<h2>The same graph—now automatic</h2>
 <div class="micrograd-demo-layout">
 <div class="micrograd-code-panel">
 <p><span class="demo-kicker">MICROGRAD · FORWARD</span></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> micrograd.engine <span class="im">import</span> Value</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> Value(<span class="fl">1.0</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> ((x<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> <span class="dv">1</span>)<span class="op">**</span><span class="dv">3</span> <span class="op">-</span> <span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-hidden="true" tabindex="-1"></a><span class="im">from</span> micrograd.engine <span class="im">import</span> Value</span>
+<span id="cb1-2"><a aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> Value(<span class="fl">1.0</span>)</span>
+<span id="cb1-4"><a aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> ((x<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> <span class="dv">1</span>)<span class="op">**</span><span class="dv">3</span> <span class="op">-</span> <span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="fragment">
 <p><span class="demo-kicker backward-kicker">ONE BACKWARD CALL</span></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>L.backward()</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(x.grad)  <span class="co"># 288.0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-hidden="true" tabindex="-1"></a>L.backward()</span>
+<span id="cb2-2"><a aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(x.grad)  <span class="co"># 288.0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 <div class="micrograd-demo-graph">
-<p><img src="assets/scalar-backprop-step-5.svg" class="img-fluid" alt="The familiar scalar graph after its complete backward pass, ending with derivative 288 at x."></p>
+<p><img data-src="assets/scalar-backprop-step-5.svg" alt="The familiar scalar graph after its complete backward pass, ending with derivative 288 at x."></p>
 </div>
 </div>
 <div class="fragment micrograd-question">
@@ -1050,19 +1194,29 @@ p_i=\frac{e^{z_i}}{\sum_j e^{z_j}}
 <div class="micrograd-source">
 <p>Demonstration API: <a href="https://github.com/karpathy/micrograd">Karpathy’s micrograd</a></p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Run the forward lines first and ask what x and L contain. Reveal the backward call only after students predict its result. Micrograd is intentionally a black box in this lecture; students will build the box during the coding session.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="inspect-the-value-objects-created-by-code" class="level2">
-<h2 class="anchored" data-anchor-id="inspect-the-value-objects-created-by-code">Inspect the <code>Value</code> objects created by code</h2>
+<section id="inspect-the-value-objects-created-by-code" class="slide level2">
+<h2>Inspect the <code>Value</code> objects created by code</h2>
 <div class="value-inspector-code">
 <div class="value-composed-code">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>x, y, z <span class="op">=</span> Value(<span class="fl">2.0</span>), Value(<span class="fl">3.0</span>), Value(<span class="fl">1.0</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> x <span class="op">*</span> y       <span class="co"># 6</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> a <span class="op">+</span> z       <span class="co"># 7</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> b <span class="op">**</span> <span class="dv">2</span>      <span class="co"># 49</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-hidden="true" tabindex="-1"></a>x, y, z <span class="op">=</span> Value(<span class="fl">2.0</span>), Value(<span class="fl">3.0</span>), Value(<span class="fl">1.0</span>)</span>
+<span id="cb3-2"><a aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> x <span class="op">*</span> y       <span class="co"># 6</span></span>
+<span id="cb3-4"><a aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> a <span class="op">+</span> z       <span class="co"># 7</span></span>
+<span id="cb3-5"><a aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> b <span class="op">**</span> <span class="dv">2</span>      <span class="co"># 49</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="value-composed-formula">
 <p><strong class="composed-expression">𝓛 = (xy + z)²</strong> <span>Every operator returns a new <code>Value</code>.</span></p>
@@ -1088,12 +1242,22 @@ p_i=\frac{e^{z_i}}{\sum_j e^{z_j}}
 <div class="fragment value-after-backward">
 <p><span>AFTER <code>L.backward()</code></span> <code>L.grad = 1</code><code>b.grad = 14</code><code>a.grad = 14</code><code>x.grad = 42</code><code>y.grad = 28</code><code>z.grad = 14</code></p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Execute the expression one line at a time. Each overloaded Python operator constructs and returns a new Value. Read each inspector row across: the forward result, initial gradient, operation label, parent references, and the operation-specific backward closure. Only after all rows are understood should L.backward be revealed.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="what-does-backward-actually-do" class="level2">
-<h2 class="anchored" data-anchor-id="what-does-backward-actually-do">What does <code>backward()</code> actually do?</h2>
+<section id="what-does-backward-actually-do" class="slide level2">
+<h2>What does <code>backward()</code> actually do?</h2>
 <div class="backward-algorithm-layout">
 <div class="backward-order-panel">
 <span class="algorithm-label">REVERSE TOPOLOGICAL ORDER</span>
@@ -1105,23 +1269,33 @@ p_i=\frac{e^{z_i}}{\sum_j e^{z_j}}
 </div>
 </div>
 <div class="backward-pseudocode">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>L.grad <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> node <span class="kw">in</span> <span class="bu">reversed</span>(topological_order):</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    node._backward()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-hidden="true" tabindex="-1"></a>L.grad <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb4-2"><a aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> node <span class="kw">in</span> <span class="bu">reversed</span>(topological_order):</span>
+<span id="cb4-4"><a aria-hidden="true" tabindex="-1"></a>    node._backward()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 <div class="fragment accumulation-rule">
 <p><span>THE LINE THAT MAKES BRANCHING WORK</span></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>parent.grad <span class="op">+=</span> node.grad <span class="op">*</span> local_derivative</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a aria-hidden="true" tabindex="-1"></a>parent.grad <span class="op">+=</span> node.grad <span class="op">*</span> local_derivative</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><strong><code>+=</code> adds contributions from every path.</strong></p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Topological order guarantees that every child has sent its message before a node runs its local backward rule. Pause on plus-equals: assignment would erase a contribution whenever a value is reused in more than one place.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="coding-session-build-the-black-box" class="level2">
-<h2 class="anchored" data-anchor-id="coding-session-build-the-black-box">Coding session · Build the black box</h2>
+<section id="coding-session-build-the-black-box" class="slide level2">
+<h2>Coding session · Build the black box</h2>
 <div class="coding-handoff-goal">
 <span>THE TARGET</span>
 <pre class="handoff-code"><code>x = Value(1.0)
@@ -1154,19 +1328,31 @@ assert x.grad == 288.0</code></pre>
 <div class="fragment coding-handoff-close">
 <p>In the lecture, <code>Value</code> was the tool. In the coding session, <strong><code>Value</code> is the assignment.</strong></p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>This slide is the contract for the coding session. The students are not asked to use unexplained future machinery: they will implement the exact mechanism motivated by the lecture and verify it against a derivative they already trust.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="what-gradients-reveal" class="title-slide slide level1 section-slide diagnostics-section center" data-section-progress="6 / 6" style="--section-progress:100%">
+<h1>06 · What gradients reveal</h1>
+
 </section>
-</section>
-<section id="what-gradients-reveal" class="level1 section-slide diagnostics-section" data-section-progress="6 / 6" style="--section-progress:100%">
-<h1 class="section-slide diagnostics-section" data-section-progress="6 / 6" style="--section-progress:100%">06 · What gradients reveal</h1>
-<section id="read-a-gradient-before-using-it" class="level2">
-<h2 class="anchored" data-anchor-id="read-a-gradient-before-using-it">Read a gradient before using it</h2>
+<section id="read-a-gradient-before-using-it" class="slide level2">
+<h2>Read a gradient before using it</h2>
 <div class="gradient-reading-grid">
 <div class="fragment gradient-reading-card sign-card">
 <span class="reading-icon">− / +</span>
-<h3 class="anchored">
+<h3>
 Sign
 </h3>
 <strong>Which local direction raises the loss?</strong>
@@ -1176,7 +1362,7 @@ Sign
 </div>
 <div class="fragment gradient-reading-card magnitude-card">
 <span class="reading-icon">|g|</span>
-<h3 class="anchored">
+<h3>
 Magnitude
 </h3>
 <strong>How sensitive is the loss?</strong>
@@ -1186,7 +1372,7 @@ Large <span class="math inline">\(|g_w|\)</span>: a small change in <span class=
 </div>
 <div class="fragment gradient-reading-card zero-card">
 <span class="reading-icon">0</span>
-<h3 class="anchored">
+<h3>
 Near zero
 </h3>
 <strong>A clue—not a diagnosis.</strong>
@@ -1203,12 +1389,22 @@ The parameter may be locally irrelevant, a unit may be saturated, or several pat
 <span class="math inline">\(w_1\)</span> has the strongest local influence; <span class="math inline">\(w_2\)</span> is weakly sensitive; <span class="math inline">\(w_3\)</span> requires investigation before we call it “unimportant.”
 </p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Ask students to interpret signs before magnitudes. Avoid converting the gradient into an update; that belongs to optimization. Emphasize that a zero gradient has several possible causes and must be interpreted using the graph and forward activations.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="read-gradient-flow-across-layers" class="level2">
-<h2 class="anchored" data-anchor-id="read-gradient-flow-across-layers">Read gradient flow across layers</h2>
+<section id="read-gradient-flow-across-layers" class="slide level2">
+<h2>Read gradient flow across layers</h2>
 <div class="gradient-flow-gallery">
 <div class="fragment gradient-flow-card healthy-flow">
 <span>HEALTHY FLOW</span>
@@ -1251,12 +1447,22 @@ backward direction&nbsp; ←
 <div class="fragment diagnostic-boundary">
 <p>Gradients expose the symptom. Initialization, architecture, normalization, and optimization determine what we do about it later.</p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Read each set of bars from the loss side toward the input side. The diagrams are qualitative signatures rather than fixed numerical thresholds. This slide establishes diagnostic vocabulary; defer remedies to the relevant architecture and optimization lectures.</p>
-</div>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="backpropagation-in-five-moves" class="level2">
-<h2 class="anchored" data-anchor-id="backpropagation-in-five-moves">Backpropagation in five moves</h2>
+<section id="backpropagation-in-five-moves" class="slide level2">
+<h2>Backpropagation in five moves</h2>
 <div class="final-rule-strip">
 <div class="fragment">
 <span>01</span><strong>Compute forward</strong><small>Store the values local rules will need.</small>
@@ -1286,437 +1492,405 @@ backward direction&nbsp; ←
 <div class="fragment exit-ticket">
 <p><span>EXIT TICKET</span> Why must a backward engine use <code>parent.grad += ...</code> rather than <code>parent.grad = ...</code>?</p>
 </div>
-<div class="notes">
+<aside class="notes">
 <p>Reveal the five moves briskly and have the class speak the final memory sentence together. End with the exit ticket. The expected answer is that a parent can influence the loss through several children, so overwriting would discard all but one path contribution.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+<p>Deep Learning · Chapter 3</p>
 </div>
+</div></div>
 
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="../../site_libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="../../site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="../../site_libs/revealjs/plugin/quarto-support/support.js"></script>
+  
 
-</section>
-</section>
+  <script src="../../site_libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="../../site_libs/revealjs/plugin/search/search.js"></script>
+  <script src="../../site_libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="../../site_libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
-</main> <!-- /main -->
-<script id="quarto-html-after-body" type="application/javascript">
-  window.document.addEventListener("DOMContentLoaded", function (event) {
-    const icon = "";
-    const anchorJS = new window.AnchorJS();
-    anchorJS.options = {
-      placement: 'right',
-      icon: icon
-    };
-    anchorJS.add('.anchored');
-    const isCodeAnnotation = (el) => {
-      for (const clz of el.classList) {
-        if (clz.startsWith('code-annotation-')) {                     
-          return true;
-        }
-      }
-      return false;
-    }
-    const onCopySuccess = function(e) {
-      // button target
-      const button = e.trigger;
-      // don't keep focus
-      button.blur();
-      // flash "checked"
-      button.classList.add('code-copy-button-checked');
-      var currentTitle = button.getAttribute("title");
-      button.setAttribute("title", "Copied!");
-      let tooltip;
-      if (window.bootstrap) {
-        button.setAttribute("data-bs-toggle", "tooltip");
-        button.setAttribute("data-bs-placement", "left");
-        button.setAttribute("data-bs-title", "Copied!");
-        tooltip = new bootstrap.Tooltip(button, 
-          { trigger: "manual", 
-            customClass: "code-copy-button-tooltip",
-            offset: [0, -8]});
-        tooltip.show();    
-      }
-      setTimeout(function() {
-        if (tooltip) {
-          tooltip.hide();
-          button.removeAttribute("data-bs-title");
-          button.removeAttribute("data-bs-toggle");
-          button.removeAttribute("data-bs-placement");
-        }
-        button.setAttribute("title", currentTitle);
-        button.classList.remove('code-copy-button-checked');
-      }, 1000);
-      // clear code selection
-      e.clearSelection();
-    }
-    const getTextToCopy = function(trigger) {
-      const outerScaffold = trigger.parentElement.cloneNode(true);
-      const codeEl = outerScaffold.querySelector('code');
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-      text: getTextToCopy
-    });
-    clipboard.on('success', onCopySuccess);
-    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-        text: getTextToCopy,
-        container: window.document.getElementById('quarto-embedded-source-code-modal')
-      });
-      clipboardModal.on('success', onCopySuccess);
-    }
-      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
-      var isInternal = (href) => {
-          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-      }
-      // Inspect non-navigation links and adorn them if external
-     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-      for (var i=0; i<links.length; i++) {
-        const link = links[i];
-        if (!isInternal(link.href)) {
-          // undo the damage that might have been done by quarto-nav.js in the case of
-          // links that we want to consider external
-          if (link.dataset.originalHref !== undefined) {
-            link.href = link.dataset.originalHref;
-          }
-            // target, if specified
-            link.setAttribute("target", "_blank");
-            if (link.getAttribute("rel") === null) {
-              link.setAttribute("rel", "noopener");
-            }
-        }
-      }
-    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-      const config = {
-        allowHTML: true,
-        maxWidth: 500,
-        delay: 100,
-        arrow: false,
-        appendTo: function(el) {
-            return el.parentElement;
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': false,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1440,
+
+        height: 900,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 5.5e-2,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
         },
-        interactive: true,
-        interactiveBorder: 10,
-        theme: 'quarto',
-        placement: 'bottom-start',
-      };
-      if (contentFn) {
-        config.content = contentFn;
-      }
-      if (onTriggerFn) {
-        config.onTrigger = onTriggerFn;
-      }
-      if (onUntriggerFn) {
-        config.onUntrigger = onUntriggerFn;
-      }
-      window.tippy(el, config); 
-    }
-    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-    for (var i=0; i<noterefs.length; i++) {
-      const ref = noterefs[i];
-      tippyHover(ref, function() {
-        // use id or data attribute instead here
-        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-        try { href = new URL(href).hash; } catch {}
-        const id = href.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note) {
-          return note.innerHTML;
-        } else {
-          return "";
-        }
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
       });
-    }
-    const xrefs = window.document.querySelectorAll('a.quarto-xref');
-    const processXRef = (id, note) => {
-      // Strip column container classes
-      const stripColumnClz = (el) => {
-        el.classList.remove("page-full", "page-columns");
-        if (el.children) {
-          for (const child of el.children) {
-            stripColumnClz(child);
-          }
-        }
-      }
-      stripColumnClz(note)
-      if (id === null || id.startsWith('sec-')) {
-        // Special case sections, only their first couple elements
-        const container = document.createElement("div");
-        if (note.children && note.children.length > 2) {
-          container.appendChild(note.children[0].cloneNode(true));
-          for (let i = 1; i < note.children.length; i++) {
-            const child = note.children[i];
-            if (child.tagName === "P" && child.innerText === "") {
-              continue;
-            } else {
-              container.appendChild(child.cloneNode(true));
-              break;
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
             }
           }
-          if (window.Quarto?.typesetMath) {
-            window.Quarto.typesetMath(container);
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
           }
-          return container.innerHTML
-        } else {
-          if (window.Quarto?.typesetMath) {
-            window.Quarto.typesetMath(note);
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
           }
-          return note.innerHTML;
+          return codeEl.innerText;
         }
-      } else {
-        // Remove any anchor links if they are present
-        const anchorLink = note.querySelector('a.anchorjs-link');
-        if (anchorLink) {
-          anchorLink.remove();
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
         }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(note);
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
         }
-        if (note.classList.contains("callout")) {
-          return note.outerHTML;
-        } else {
-          return note.innerHTML;
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
         }
-      }
-    }
-    for (var i=0; i<xrefs.length; i++) {
-      const xref = xrefs[i];
-      tippyHover(xref, undefined, function(instance) {
-        instance.disable();
-        let url = xref.getAttribute('href');
-        let hash = undefined; 
-        if (url.startsWith('#')) {
-          hash = url;
-        } else {
-          try { hash = new URL(url).hash; } catch {}
-        }
-        if (hash) {
-          const id = hash.replace(/^#\/?/, "");
-          const note = window.document.getElementById(id);
-          if (note !== null) {
-            try {
-              const html = processXRef(id, note.cloneNode(true));
-              instance.setContent(html);
-            } finally {
-              instance.enable();
-              instance.show();
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
             }
           } else {
-            // See if we can fetch this
-            fetch(url.split('#')[0])
-            .then(res => res.text())
-            .then(html => {
-              const parser = new DOMParser();
-              const htmlDoc = parser.parseFromString(html, "text/html");
-              const note = htmlDoc.getElementById(id);
-              if (note !== null) {
-                const html = processXRef(id, note);
-                instance.setContent(html);
-              } 
-            }).finally(() => {
-              instance.enable();
-              instance.show();
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
             });
           }
-        } else {
-          // See if we can fetch a full url (with no hash to target)
-          // This is a special case and we should probably do some content thinning / targeting
-          fetch(url)
-          .then(res => res.text())
-          .then(html => {
-            const parser = new DOMParser();
-            const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.querySelector('main.content');
-            if (note !== null) {
-              // This should only happen for chapter cross references
-              // (since there is no id in the URL)
-              // remove the first header
-              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-                note.children[0].remove();
-              }
-              const html = processXRef(null, note);
-              instance.setContent(html);
-            } 
-          }).finally(() => {
-            instance.enable();
-            instance.show();
-          });
         }
-      }, function(instance) {
       });
-    }
-        let selectedAnnoteEl;
-        const selectorForAnnotation = ( cell, annotation) => {
-          let cellAttr = 'data-code-cell="' + cell + '"';
-          let lineAttr = 'data-code-annotation="' +  annotation + '"';
-          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
-          return selector;
-        }
-        const selectCodeLines = (annoteEl) => {
-          const doc = window.document;
-          const targetCell = annoteEl.getAttribute("data-target-cell");
-          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
-          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
-          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
-          const lineIds = lines.map((line) => {
-            return targetCell + "-" + line;
-          })
-          let top = null;
-          let height = null;
-          let parent = null;
-          if (lineIds.length > 0) {
-              //compute the position of the single el (top and bottom and make a div)
-              const el = window.document.getElementById(lineIds[0]);
-              top = el.offsetTop;
-              height = el.offsetHeight;
-              parent = el.parentElement.parentElement;
-            if (lineIds.length > 1) {
-              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-              height = bottom - top;
-            }
-            if (top !== null && height !== null && parent !== null) {
-              // cook up a div (if necessary) and position it 
-              let div = window.document.getElementById("code-annotation-line-highlight");
-              if (div === null) {
-                div = window.document.createElement("div");
-                div.setAttribute("id", "code-annotation-line-highlight");
-                div.style.position = 'absolute';
-                parent.appendChild(div);
-              }
-              div.style.top = top - 2 + "px";
-              div.style.height = height + 4 + "px";
-              div.style.left = 0;
-              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-              if (gutterDiv === null) {
-                gutterDiv = window.document.createElement("div");
-                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-                gutterDiv.style.position = 'absolute';
-                const codeCell = window.document.getElementById(targetCell);
-                const gutter = codeCell.querySelector('.code-annotation-gutter');
-                gutter.appendChild(gutterDiv);
-              }
-              gutterDiv.style.top = top - 2 + "px";
-              gutterDiv.style.height = height + 4 + "px";
-            }
-            selectedAnnoteEl = annoteEl;
-          }
-        };
-        const unselectCodeLines = () => {
-          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
-          elementsIds.forEach((elId) => {
-            const div = window.document.getElementById(elId);
-            if (div) {
-              div.remove();
-            }
-          });
-          selectedAnnoteEl = undefined;
-        };
-          // Handle positioning of the toggle
-      window.addEventListener(
-        "resize",
-        throttle(() => {
-          elRect = undefined;
-          if (selectedAnnoteEl) {
-            selectCodeLines(selectedAnnoteEl);
-          }
-        }, 10)
-      );
-      function throttle(fn, ms) {
-      let throttle = false;
-      let timer;
-        return (...args) => {
-          if(!throttle) { // first call gets through
-              fn.apply(this, args);
-              throttle = true;
-          } else { // all the others get throttled
-              if(timer) clearTimeout(timer); // cancel #2
-              timer = setTimeout(() => {
-                fn.apply(this, args);
-                timer = throttle = false;
-              }, ms);
-          }
-        };
-      }
-        // Attach click handler to the DT
-        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
-        for (const annoteDlNode of annoteDls) {
-          annoteDlNode.addEventListener('click', (event) => {
-            const clickedEl = event.target;
-            if (clickedEl !== selectedAnnoteEl) {
-              unselectCodeLines();
-              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
-              if (activeEl) {
-                activeEl.classList.remove('code-annotation-active');
-              }
-              selectCodeLines(clickedEl);
-              clickedEl.classList.add('code-annotation-active');
-            } else {
-              // Unselect the line
-              unselectCodeLines();
-              clickedEl.classList.remove('code-annotation-active');
-            }
-          });
-        }
-    const findCites = (el) => {
-      const parentEl = el.parentElement;
-      if (parentEl) {
-        const cites = parentEl.dataset.cites;
-        if (cites) {
-          return {
-            el,
-            cites: cites.split(' ')
-          };
-        } else {
-          return findCites(el.parentElement)
-        }
-      } else {
-        return undefined;
-      }
-    };
-    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-    for (var i=0; i<bibliorefs.length; i++) {
-      const ref = bibliorefs[i];
-      const citeInfo = findCites(ref);
-      if (citeInfo) {
-        tippyHover(citeInfo.el, function() {
-          var popup = window.document.createElement('div');
-          citeInfo.cites.forEach(function(cite) {
-            var citeDiv = window.document.createElement('div');
-            citeDiv.classList.add('hanging-indent');
-            citeDiv.classList.add('csl-entry');
-            var biblioDiv = window.document.getElementById('ref-' + cite);
-            if (biblioDiv) {
-              citeDiv.innerHTML = biblioDiv.innerHTML;
-            }
-            popup.appendChild(citeDiv);
-          });
-          return popup.innerHTML;
-        });
-      }
-    }
-  });
-  </script>
-</div> <!-- /content -->
-<footer class="footer">
-  <div class="nav-footer">
-    <div class="nav-footer-left">
-<p>Deep Learning · ENSA Tétouan</p>
-</div>   
-    <div class="nav-footer-center">
-      &nbsp;
-    </div>
-    <div class="nav-footer-right">
-<p>Built with Quarto</p>
-</div>
-  </div>
-</footer>
+      </script>
+    
 
-
-
-
-<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>
