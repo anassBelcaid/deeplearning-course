@@ -1,0 +1,103 @@
+{
+  "seed": 41,
+  "epochs": 6,
+  "denoising": {
+    "sigma": 0.45,
+    "classes": [
+      "T-shirt/top",
+      "Trouser",
+      "Coat",
+      "Sandal",
+      "Bag",
+      "Ankle boot"
+    ],
+    "noisy_mse": [
+      0.10772,
+      0.09382,
+      0.09432,
+      0.08923,
+      0.1059,
+      0.11389
+    ],
+    "restored_mse": [
+      0.01055,
+      0.02156,
+      0.02,
+      0.01812,
+      0.03529,
+      0.02107
+    ]
+  },
+  "anomaly": {
+    "normal_classes": [
+      "Sandal",
+      "Sneaker",
+      "Ankle boot"
+    ],
+    "threshold_95pct": 0.03971,
+    "normal_score_median": 0.01682,
+    "other_score_median": 0.08381,
+    "gallery": [
+      {
+        "class": "Sneaker",
+        "score": 0.00396,
+        "anomaly": false
+      },
+      {
+        "class": "Sandal",
+        "score": 0.00935,
+        "anomaly": false
+      },
+      {
+        "class": "Sneaker",
+        "score": 0.01267,
+        "anomaly": false
+      },
+      {
+        "class": "Ankle boot",
+        "score": 0.01707,
+        "anomaly": false
+      },
+      {
+        "class": "Sneaker",
+        "score": 0.02101,
+        "anomaly": false
+      },
+      {
+        "class": "Sneaker",
+        "score": 0.02679,
+        "anomaly": false
+      },
+      {
+        "class": "T-shirt/top",
+        "score": 0.18744,
+        "anomaly": true
+      },
+      {
+        "class": "Pullover",
+        "score": 0.17652,
+        "anomaly": true
+      },
+      {
+        "class": "T-shirt/top",
+        "score": 0.17369,
+        "anomaly": true
+      },
+      {
+        "class": "T-shirt/top",
+        "score": 0.167,
+        "anomaly": true
+      },
+      {
+        "class": "Coat",
+        "score": 0.16609,
+        "anomaly": true
+      },
+      {
+        "class": "Pullover",
+        "score": 0.16534,
+        "anomaly": true
+      }
+    ]
+  }
+}

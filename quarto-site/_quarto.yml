@@ -5,6 +5,10 @@ project:
     - "projects/**/*.ipynb"
     - "labs/**/*.ipynb"
     - "lectures/**/*.py"
+    - "lectures/**/assets/latent-sweep/**"
+    - "lectures/**/assets/latent-geometry/**"
+    - "lectures/**/assets/useful-reconstruction/**"
+    - "lectures/**/assets/sampling-failure/**"
 
 website:
   title: "Deep Learning"

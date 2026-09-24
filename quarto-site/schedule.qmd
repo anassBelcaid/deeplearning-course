@@ -288,7 +288,7 @@ Learn useful latent spaces, generate images, and compare generative mechanisms.
 Encoding, bottlenecks, reconstruction, denoising, and latent interpolation.
 :::
 :::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span>[Slides](lectures/10-autoencoders-latent-representations/index.html){.material-pill .available}[Notebook](https://colab.research.google.com/github/anassBelcaid/deeplearning-course/blob/main/quarto-site/lectures/10-autoencoders-latent-representations/assets/latent_sweep_colab.ipynb){.material-pill .available}
 :::
 :::{.links-cell}
 <span class="coming-soon">Autoencoder readings · Latent-space explorer</span>
