@@ -288,13 +288,17 @@ Learn useful latent spaces, generate images, and compare generative mechanisms.
 Encoding, bottlenecks, reconstruction, denoising, and latent interpolation.
 :::
 :::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span>[Slides](lectures/10-autoencoders-latent-representations/index.html){.material-pill .available}[Notebook](https://colab.research.google.com/github/anassBelcaid/deeplearning-course/blob/main/quarto-site/lectures/10-autoencoders-latent-representations/assets/latent_sweep_colab.ipynb){.material-pill .available}
+[Notes](notes/10-autoencoders-latent-representations/index.qmd){.material-pill .available}[PDF](notes/10-autoencoders-latent-representations/index.pdf){.material-pill .available}[Slides](lectures/10-autoencoders-latent-representations/index.html){.material-pill .available}[Notebook](https://colab.research.google.com/github/anassBelcaid/deeplearning-course/blob/main/quarto-site/lectures/10-autoencoders-latent-representations/assets/latent_sweep_colab.ipynb){.material-pill .available}[Project 3](projects/06-latent-laboratory/index.qmd){.material-pill .available}
 :::
 :::{.links-cell}
-<span class="coming-soon">Autoencoder readings · Latent-space explorer</span>
+[Reading guide](notes/10-autoencoders-latent-representations/index.qmd#reading-path)<br>
+[Book · Ch. 14](https://www.deeplearningbook.org/contents/autoencoders.html) · [Hinton & Salakhutdinov](https://doi.org/10.1126/science.1127647)<br>
+[Denoising · 2008](https://www.cs.toronto.edu/~larocheh/publications/icml-2008-denoising-autoencoders.pdf) · [Stacked denoising · 2010](https://www.jmlr.org/papers/v11/vincent10a.html)<br>
+[Fashion-MNIST](https://arxiv.org/abs/1708.07747) · [Deep SVDD](https://proceedings.mlr.press/v80/ruff18a.html)<br>
+[VAE preview](https://arxiv.org/abs/1312.6114) · [Latent explorer](lectures/10-autoencoders-latent-representations/index.html#/explore-the-map-before-seeing-the-labels)
 :::
 :::{.project-cell .track-start}
-<span class="project-label">Project 3 · Generative models</span><br>Reconstruct images and inspect a learned latent space.
+<a class="project-track-link" href="projects/06-latent-laboratory/index.html"><span class="project-label">Project 3 · The Latent Laboratory</span><br>Compress Fashion-MNIST while varying latent dimension.</a>
 :::
 :::
 
@@ -313,7 +317,7 @@ Latent distributions, reparameterization, KL divergence, sampling, and interpola
 <span class="coming-soon">VAE paper · Reparameterization visualizations</span>
 :::
 :::{.project-cell .track-middle}
-<span class="project-label">Project 3</span><br>Compare reconstruction, sampling, and interpolation.
+<a class="project-track-link" href="projects/06-latent-laboratory/index.html"><span class="project-label">Project 3 · Representations</span><br>Inspect actual codes, PCA views, and nearest neighbors.</a>
 :::
 :::
 
@@ -332,7 +336,7 @@ Generator–discriminator competition, adversarial objectives, DCGAN, mode colla
 <span class="coming-soon">GAN paper · Pretrained generator explorer</span>
 :::
 :::{.project-cell .track-middle}
-<span class="project-label">Project 3</span><br>Inspect generations and diagnose common failures.
+<a class="project-track-link" href="projects/06-latent-laboratory/index.html"><span class="project-label">Project 3 · Interpolation</span><br>Compare latent paths with pixel blending.</a>
 :::
 :::
 
@@ -351,7 +355,7 @@ Choose among autoencoders, VAEs, and GANs through samples, latent structure, eva
 <span class="coming-soon">Model-comparison gallery · Evaluation readings</span>
 :::
 :::{.project-cell .track-end}
-<span class="project-label">Project 3 · Due</span><br>Visual comparison and evidence-based model choice.
+<a class="project-track-link" href="projects/06-latent-laboratory/index.html"><span class="project-label">Project 3 · Due</span><br>Executed notebook, visual report, and justified choice of d.</a>
 :::
 :::
 

@@ -138,6 +138,22 @@ These notes are written as a connected textbook rather than lecture transcripts.
 :::
 :::
 
+## Part VI · Generative Representation Learning
+
+:::{.chapter-list}
+:::{.chapter-entry .available .generative}
+<span class="chapter-number">10</span>
+
+:::{.chapter-copy}
+### [Autoencoders and Latent Representations](notes/10-autoencoders-latent-representations/index.qmd)
+
+[![](notes/10-autoencoders-latent-representations/assets/chapter-cover.png){fig-alt="Real garments contract into a compact latent code and expand into reconstructed images."}](notes/10-autoencoders-latent-representations/index.qmd)
+:::
+
+<span class="chapter-state">Read chapter →</span>
+:::
+:::
+
 :::{.notes-coming}
 More chapters will appear here as the course develops.
 :::

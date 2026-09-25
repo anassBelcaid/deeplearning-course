@@ -10,6 +10,7 @@ These instructions apply to the whole repository. Use them whenever creating or 
 - When introducing a correction or scaling factor, first derive it from the quantity that should be preserved, then replace the derivation with a concrete numerical application that verifies the rule.
 - Keep the five-part frame visible where useful: data, hypothesis, loss, optimization, and evaluation.
 - Notes are the durable technical reference; slides are the visual, conversational teaching path. They should agree, but the notes should not merely transcribe the slides.
+- Develop approved lecture content fully in notes: preserve the visual evidence, expand mechanisms with derivations and worked examples, explain experimental limitations, and supply an annotated reading path with papers linked in the schedule resource column.
 - Keep notes section headings visually subordinate to the chapter title. Top-level chapter sections should organize the reading path without appearing like a new document title on every section.
 - When synchronizing approved slides into notes, preserve every pedagogically meaningful visual example or reconstruct it in a notes-appropriate form. Do not replace the lecture's visual evidence with prose merely because the notes add deeper derivations.
 - Give every notes chapter an original, purpose-made visual cover that previews its central idea without embedded text. Use that cover as the opening visual and as the dominant entry on the Notes index; keep only the title and navigation label as supporting index text.
@@ -59,6 +60,8 @@ Every in-class exercise should follow this sequence:
 In HTML notes, use a prompt followed by a `<details>` solution so readers choose when to reveal it. In PDF notes, keep the prompt before the worked solution and preserve enough visual separation to allow an honest pause.
 
 ## Project scope
+
+- Publish a readable Quarto companion to each new student notebook, including expected checks, measured example outputs, and interpretation guidance. Keep shared task content synchronized from one source when practical; clearly distinguish reference results from student submissions and keep site rendering independent of training.
 
 - Assess only concepts that students have already encountered in the course sequence. A project may use machinery from a future chapter, but that machinery must be provided as clearly labeled infrastructure, treated as a temporary black box, and revisited when it is formally taught. Do not turn an upcoming topic such as backpropagation or optimization into a student TODO merely because the project needs it to run.
 - When a project introduces a nontrivial class, object hierarchy, or hidden data structure, precede the implementation task with a diagram that makes object ownership, stored state, graph relationships, and information flow concrete. In particular, distinguish references to other objects from copied numerical values.

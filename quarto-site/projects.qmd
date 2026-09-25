@@ -99,6 +99,24 @@ Grow a scalar `Value` class into reverse-mode autodiff, compose an MLP, and lear
 ## PyTorch vision systems
 
 :::{.chapter-list}
+:::{.chapter-entry .available .generative}
+<span class="chapter-number">P3</span>
+
+:::{.chapter-copy}
+### [The Latent Laboratory](projects/06-latent-laboratory/index.qmd)
+
+Compress Fashion-MNIST at four latent dimensions, investigate neighborhoods, and compare latent interpolation with pixel blending.
+
+`Project`{.topic-tag} `Autoencoders`{.topic-tag} `Latent geometry`{.topic-tag} `Interactive interpolation`{.topic-tag}
+:::
+
+:::{.chapter-state}
+[View project](projects/06-latent-laboratory/index.qmd) · [Read notebook + expected results](projects/06-latent-laboratory/reading.qmd) · <a href="projects/06-latent-laboratory/starter/latent_laboratory.ipynb?download=1" download="latent_laboratory.ipynb">Download notebook</a>
+:::
+:::
+:::
+
+:::{.chapter-list}
 :::{.chapter-entry .available .pytorch}
 <span class="chapter-number">P2</span>
 

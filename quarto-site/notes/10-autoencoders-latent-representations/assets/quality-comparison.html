@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>Reconstruction quality illustration</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#fff;color:#17212b;font:22px sans-serif;padding:24px;display:flex;gap:24px}figure{margin:0;width:368px}h2{font-size:23px;margin:0 0 16px}figure div{width:368px;height:290px;overflow:hidden}img{width:100%;height:100%;object-fit:cover}.soft img{filter:blur(2.2px) saturate(.88);transform:scale(1.02)}.strong img{filter:blur(11px) saturate(.72);transform:scale(1.06)}figcaption{font-size:19px;margin-top:14px;line-height:1.3}
+</style>
+<figure><h2>Reference</h2><div><img src="../../../labs/09-semantic-segmentation/starter/data/segmentation-scenes/cats.jpg" alt="Original cat photograph"></div><figcaption>Objects, pose, layout, color</figcaption></figure>
+<figure class="soft"><h2>Illustration A</h2><div><img src="../../../labs/09-semantic-segmentation/starter/data/segmentation-scenes/cats.jpg" alt="Mildly softened photograph"></div><figcaption>Scene retained; texture softened</figcaption></figure>
+<figure class="strong"><h2>Illustration B</h2><div><img src="../../../labs/09-semantic-segmentation/starter/data/segmentation-scenes/cats.jpg" alt="Strongly softened photograph"></div><figcaption>Broad colors retained; structure lost</figcaption></figure>
+</html>
