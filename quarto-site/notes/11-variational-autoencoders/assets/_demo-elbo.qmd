@@ -1,0 +1,1 @@
+<div class="vae-demo"><iframe src="assets/demos/elbo.html" title="Interactive experiment: Exact evidence bound" loading="lazy"></iframe><a href="assets/demos/elbo.html" target="_blank">Open exact evidence bound in a full window →</a></div>

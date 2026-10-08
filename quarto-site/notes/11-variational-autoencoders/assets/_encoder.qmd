@@ -1,0 +1,18 @@
+```python
+import torch
+from torch import nn
+from torch.nn import functional as F
+
+class GaussianEncoder(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.features = nn.Sequential(
+            nn.Flatten(), nn.Linear(784, 256), nn.ReLU(),
+            nn.Linear(256, 128), nn.ReLU())
+        self.mu = nn.Linear(128, 2)
+        self.logvar = nn.Linear(128, 2)
+
+    def forward(self, x):
+        h = self.features(x)
+        return self.mu(h), self.logvar(h)
+```

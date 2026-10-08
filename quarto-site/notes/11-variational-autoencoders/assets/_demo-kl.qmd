@@ -1,0 +1,1 @@
+<div class="vae-demo"><iframe src="assets/demos/kl.html" title="Interactive experiment: Gaussian KL" loading="lazy"></iframe><a href="assets/demos/kl.html" target="_blank">Open gaussian kl in a full window →</a></div>

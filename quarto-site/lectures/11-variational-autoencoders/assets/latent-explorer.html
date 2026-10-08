@@ -1,0 +1,44 @@
+<script>
+(async () => {
+ const ready = () => new Promise(resolve => document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', resolve, {once:true}) : resolve());
+ await ready();
+ const path=document.getElementById('latent-path'), slider=document.getElementById('latent-t');
+ if(!path || !slider) return;
+ const status=document.getElementById('latent-z');
+ try {
+  const response=await fetch('assets/evidence/latent/manifest.json');
+  if(!response.ok) throw Error('Missing latent manifest');
+  const data=await response.json(), svg=document.getElementById('latent-path-map');
+  const ns='http://www.w3.org/2000/svg';
+  function node(tag,attrs,text){const e=document.createElementNS(ns,tag);for(const [k,v] of Object.entries(attrs))e.setAttribute(k,v);if(text)e.textContent=text;svg.appendChild(e);return e;}
+  const px=z=>75+(z+4)*51, py=z=>395-(z+4)*43;
+  node('rect',{x:75,y:51,width:408,height:344,fill:'#fffdf7',stroke:'#bdcbd4'});
+  for(const t of [-4,-2,0,2,4]){
+   node('line',{x1:px(t),x2:px(t),y1:51,y2:395,stroke:'#dbe1e4'});
+   node('line',{x1:75,x2:483,y1:py(t),y2:py(t),stroke:'#dbe1e4'});
+   node('text',{x:px(t),y:419,'text-anchor':'middle','font-size':19,fill:'#435769'},String(t));
+   node('text',{x:60,y:py(t)+6,'text-anchor':'end','font-size':19,fill:'#435769'},String(t));
+  }
+  node('text',{x:510,y:419,'font-size':23,fill:'#17212b'},'z₁');
+  node('text',{x:38,y:40,'font-size':23,fill:'#17212b'},'z₂');
+  let outside=0;
+  for(const p of data.points){if(p.mu.some(v=>Math.abs(v)>4)){outside++;continue;}node('circle',{cx:px(p.mu[0]),cy:py(p.mu[1]),r:2.5,fill:({0:'#2878c8',1:'#38865a',9:'#c94f78'})[p.label]||'#94a3ad',opacity:.5});}
+  node('text',{x:280,y:28,'text-anchor':'middle','font-size':18,fill:'#435769'},`1,024 validation means · ${outside} outside view`);
+  const line=node('line',{stroke:'#17212b','stroke-width':3,'stroke-dasharray':'7 5'});
+  const a=node('text',{'font-size':23,'font-weight':700,fill:'#17212b'},'A'),b=node('text',{'font-size':23,'font-weight':700,fill:'#17212b'},'B');
+  const dot=node('circle',{r:8,fill:'#ef5b45',stroke:'white','stroke-width':3});
+  function update(){
+   const p=data.paths[+path.value], i=+slider.value, z=p.codes[i], start=p.codes[0],end=p.codes[20];
+   for(const [k,v] of Object.entries({x1:px(start[0]),y1:py(start[1]),x2:px(end[0]),y2:py(end[1])}))line.setAttribute(k,v);
+   for(const [e,z0] of [[a,start],[b,end]]){e.setAttribute('x',px(z0[0])+12);e.setAttribute('y',py(z0[1])-10);}
+   dot.setAttribute('cx',px(z[0]));dot.setAttribute('cy',py(z[1]));
+   const image=document.getElementById('latent-path-output');image.src=`assets/evidence/latent/${p.key}-${i}.png`;image.alt=`Recorded decoder mean: ${p.label}, t=${(i/20).toFixed(2)}`;
+   const input=document.getElementById('latent-input-b');input.src=`assets/evidence/latent/input-${p.b}.png`;input.alt=p.b===1?'Original validation trouser at endpoint B':'Original validation ankle boot at endpoint B';
+   document.getElementById('latent-t-value').textContent=(i/20).toFixed(2);
+   status.textContent=`z = (${z[0].toFixed(2)}, ${z[1].toFixed(2)})`;
+  }
+  path.addEventListener('change',update);slider.addEventListener('input',update);
+  update();path.disabled=false;slider.disabled=false;
+ } catch(error){status.textContent='Recorded path unavailable; reload the course preview.';console.error(error);}
+})();
+</script>

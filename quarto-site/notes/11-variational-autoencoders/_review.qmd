@@ -1,0 +1,145 @@
+A compact reference for deriving, implementing, and assessing the course VAE. Full experiments and worked exercises are in the HTML chapter.
+
+## 1. Model and inference contracts
+
+For image $x\in[0,1]^{1\times28\times28}$ and latent code $z\in\mathbb R^d$,
+
+$$p_\theta(x,z)=p(z)p_\theta(x\mid z),\qquad p(z)=\mathcal N(0,I_d),\qquad
+p_\theta(x)=\int p_\theta(x\mid z)p(z)\,dz.$$
+
+The **decoder** specifies the conditional observation distribution. The **encoder** supplies a tractable approximation to the model posterior:
+
+$$q_\phi(z\mid x)=\mathcal N(\mu_\phi(x),\operatorname{diag}(\sigma_\phi^2(x))),\qquad
+p_\theta(z\mid x)=\frac{p_\theta(x\mid z)p(z)}{p_\theta(x)}.$$
+
+The true posterior is usually intractable because of the evidence integral. A shared encoder amortizes inference across images. Its approximation need not equal the true posterior [@kingma2014vae].
+
+| Operation | Code source | Required networks |
+|---|---|---|
+| Mean-code reconstruction | $z=\mu_\phi(x)$ | Encoder and decoder |
+| Stochastic reconstruction | $z\sim q_\phi(z\mid x)$ | Encoder and decoder |
+| Unconditional generation | $z\sim p(z)$ | Decoder only |
+
+**Parameterization.** Predict $v=\log\sigma^2\in\mathbb R^d$ and recover $\sigma=\exp(v/2)$. A two-dimensional Gaussian has four predicted parameters, but each latent draw still has two coordinates. `Normal(mu, sigma)` takes standard deviation, not variance. Diagonal covariance gives conditional coordinate independence for fixed $x$, not independence after mixing over images.
+
+**Display convention.** A gallery of $g_\theta(z)=\mathbb E[x\mid z]$ displays decoder means. Sampling observations from $p_\theta(x\mid z)$ is a separate step. Generally $g_\theta(\mathbb E[z])\ne\mathbb E[g_\theta(z)]$.
+
+**Likelihood convention.** Independent Bernoulli pixels give summed BCE for binary targets. The course applies BCE to grayscale targets as a labeled surrogate; this does not by itself define a normalized continuous-image likelihood. The exact ELBO identity on the next page assumes a valid likelihood.
+
+\newpage
+
+## 2. Objective and evidence-bound identity
+
+Define expected reconstruction cost and the computable prior penalty:
+
+$$R(x)=\mathbb E_{q_\phi(z\mid x)}[-\log p_\theta(x\mid z)],\qquad
+K(x)=D_{\mathrm{KL}}(q_\phi(z\mid x)\|p(z)),\qquad J=R+K.$$
+
+For a diagonal Gaussian and standard-normal prior,
+
+$$\boxed{K=\frac12\sum_{j=1}^d(\mu_j^2+\sigma_j^2-1-\log\sigma_j^2)
+=\frac12\sum_j(\mu_j^2+e^{v_j}-1-v_j).}$$
+
+**Derivation.** In one coordinate, $\log(q/p)=-\log\sigma-(z-\mu)^2/(2\sigma^2)+z^2/2$. Taking the expectation uses $\mathbb E_q[(z-\mu)^2]=\sigma^2$ and $\mathbb E_q[z^2]=\mu^2+\sigma^2$. Independent coordinates add. Both mean displacement and spread mismatch cost KL; the minimum is at $\mu=0,\sigma=1$. Shrinking the variance to zero is not prior matching.
+
+**Derive the bound, keeping the two KLs distinct.** Substitute Bayes' rule into $\mathbb E_q[\log q-\log p_\theta(z\mid x)]$:
+
+$$\boxed{J(x)=-\log p_\theta(x)+D_{\mathrm{KL}}(q_\phi(z\mid x)\|p_\theta(z\mid x)).}$$
+
+Thus $\mathcal L=-J\le\log p_\theta(x)$ is the evidence **lower** bound, while positive cost $J$ is an **upper** bound on negative log evidence. The prior KL is evaluated in training; the posterior KL describes the generally intractable gap. Equality requires $q=p_\theta(z\mid x)$ [@kingma2014vae, §2.2 and Appendix B].
+
+**Exact numerical check.** Two states have prior $(0.5,0.5)$ and likelihoods $(0.8,0.2)$ for the observed value. Evidence is $0.5$, posterior is $(0.8,0.2)$, and negative log evidence is $0.693147$.
+
+| Proposal $q$ | $R$ | Prior KL | $J$ | Gap |
+|---|---:|---:|---:|---:|
+| $(0.5,0.5)$ | 0.916 | 0 | 0.916 | 0.223 |
+| $(0.8,0.2)$ | 0.500 | 0.193 | 0.693 | 0 |
+
+The correct posterior can have nonzero KL to the prior. Maximizing the bound is not equivalent to minimizing KL alone.
+
+**Monte Carlo.** Estimate $R$ by averaging costs of separate posterior draws, not by scoring their averaged image. The bound concerns the expectation; one noisy realization need not bound the exact evidence. A better ELBO does not certify perceptual quality.
+
+\newpage
+
+## 3. Pathwise gradients and their checks
+
+Use a base draw independent of encoder parameters:
+
+$$\boxed{\epsilon\sim\mathcal N(0,I),\qquad z=\mu+\sigma\odot\epsilon.}$$
+
+An affine Gaussian transformation preserves the intended distribution: $\mathbb E[z]=\mu$ and $\operatorname{Cov}(z)=\operatorname{diag}(\sigma^2)$. With realized noise held fixed,
+
+$$\frac{\partial z_j}{\partial\mu_j}=1,\quad
+\frac{\partial z_j}{\partial\sigma_j}=\epsilon_j,\quad
+\frac{\partial z_j}{\partial v_j}=\frac12\sigma_j\epsilon_j.$$
+
+For upstream reconstruction gradient $a_j=\partial\ell/\partial z_j$,
+
+$$\frac{\partial\ell}{\partial\mu_j}=a_j,\qquad
+\frac{\partial\ell}{\partial v_j}=\frac12a_j\sigma_j\epsilon_j.$$
+
+KL adds $\partial K/\partial\mu_j=\mu_j$ and $\partial K/\partial v_j=(e^{v_j}-1)/2$. Under conditions permitting derivative/expectation interchange, averaging these pathwise gradients estimates the expected reconstruction gradient. One draw is noisy. Resample on each training forward pass; do not optimize the RNG or freeze the noise throughout training.
+
+**Worked derivative.** For $\mu=1,\sigma=0.5,\epsilon=-1$, decoder $\hat x=2z$, target 2, and $\ell=\tfrac12(\hat x-2)^2$:
+
+$$z=0.5,\quad\hat x=1,\quad\ell=0.5,\quad
+\ell_z=-2,\quad\ell_\mu=-2,\quad\ell_\sigma=2,\quad\ell_v=0.5.$$
+
+A small descent step raises $\mu$ and lowers $\sigma$, increasing $z$ for this negative draw. This is the sampled direction, not necessarily the expected-loss direction.
+
+**API distinction.** `Normal.sample()` supplies a forward draw without this pathwise encoder connection. Manual reparameterization or `Normal.rsample()` provides it. In the lecture's separate seed-7 scalar probe, all methods gave $z=0.853205$ and loss $0.043098$. Only the latter two gave $\mu$ gradient $-0.587180$ and $v$ gradient $0.043098$; `sample()` left both `None`. The decoder gradient was $-0.250493$ in all three.
+
+**Diagnostic rules.** Test reconstruction gradients alone: KL gradients can conceal a detached sampling path. `None` is not a measured zero. Use fresh graphs for independent comparisons. Keep noise fixed in finite differences. Do not detach $z$, convert the loss to a Python scalar before backward, or run training under `no_grad`. Not every distribution supports `rsample`.
+
+\newpage
+
+## 4. Implementation and reduction contract
+
+The course architecture uses encoder $784\to256\to128$, separate two-coordinate mean/log-variance heads, and decoder $2\to128\to256\to784$. Hidden activations are ReLU; output is sigmoid reshaped to $[B,1,28,28]$.
+
+```python
+# mu, logvar, eps, z: [B, 2]; x and x_hat: [B, 1, 28, 28]
+mu, logvar = model.encoder(x)
+z = mu + (0.5 * logvar).exp() * torch.randn_like(mu)
+x_hat = model.decoder(z)
+
+pixel_cost = F.binary_cross_entropy(x_hat, x, reduction='none')
+rec = pixel_cost.flatten(1).sum(1)                  # [B]
+kl = 0.5 * (mu.square() + logvar.exp() - 1 - logvar).sum(1)
+loss = (rec + kl).mean()                           # scalar
+```
+
+**Why these axes?** Sum reconstruction over pixels and KL over latent coordinates to form one pair of costs per image. Add the paired costs, then average over images. Default mean BCE divides by 784 as well as batch size; combining that with an unchanged per-image KL alters their relative weighting by 784.
+
+**Reduction check.** Costs $(R,K)=(2,0.5),(4,1.5)$ give $J=4$. Duplicating the same forward outputs leaves $J=4$. Hold reconstructions and Gaussian parameters fixed: a fresh stochastic pass changes sampling noise and does not isolate reductions. Weight batch means by batch size for epoch reporting.
+
+**Optimization order.** Instantiate Adam once; for each batch set training mode, clear accumulated gradients, run forward, compute the scalar loss, call `loss.backward()`, and update parameters with `optimizer.step()`. Convert returned values with `.item()` only for logging. Log reconstruction and KL separately. Verify finite nonzero reconstruction gradients to both encoder heads, not merely a decreasing total.
+
+**Inference choices.** Use `model.eval()` and `torch.no_grad()` for inspection, but recognize their different jobs. Evaluation mode changes modules such as Dropout/BatchNorm; it does not disable explicit random draws. `no_grad` disables graph recording, not randomness or training mode. To make this MLP reconstruction deterministic, decode $\mu$ explicitly. To generate 32 outputs, decode prior codes of shape $[32,2]$; no encoder or input image is needed.
+
+**Numerical caution.** Exponentiating log variance enforces positivity but can overflow. Match activation, target range, and likelihood. A logits decoder with a compatible stable BCE implementation is an implementation alternative, not a reason to feed logits into probability-based BCE.
+
+\newpage
+
+## 5. Evaluation: claims must match evidence
+
+| Question | Useful check | What it does not prove |
+|---|---|---|
+| Does the model reconstruct held-out inputs? | Per-image reconstruction cost and paired gallery | Prior-sample quality |
+| Does $z$ carry useful image information? | Code reassignment with fixed weights and outputs | Semantic disentanglement |
+| Are prior draws plausible and varied? | Unfiltered, fixed-seed galleries across runs | Full coverage or novelty |
+| Do outputs resemble training images? | Explicit nearest-neighbor search | Non-memorization |
+| Is a latent path interpretable? | Decode $(1-t)\mu_A+t\mu_B$ | Meaningful objects at every point |
+
+**Measured latent-use check.** For 1,024 held-out images and eight posterior draws each, cyclic reassignment raises the same decoder's reconstruction cost from 255.4250 to 836.5840; mean KL is 6.2336. This shows that pairing codes to their source images matters in this checkpoint. It is not a second trained model or a general quality benchmark. The costs are grayscale BCE surrogate values, summed over pixels and averaged over draws/images.
+
+**Posterior collapse.** If $q(z\mid x)\approx p(z)$ for every image, draws carry little information about image identity. Near-zero KL with little reassignment effect is a warning sign; neither alone is a complete diagnosis. A decoder ignoring its only image-specific input gives the same predicted mean for all codes. Blurry images alone do not diagnose collapse [@bowman2016generating, §3.1].
+
+**Interpretation limits.** A continuous decoder gives continuous pixels along a latent path, not guaranteed semantic continuity. Mean predictions can average unresolved alternatives, but the small course experiment does not isolate blur from limited capacity, latent dimension, or training. Fixed draws support comparisons; multiple seeds and broader evaluation are needed for general conclusions.
+
+**Final recall.** Explain why generation needs only the decoder, distinguish the two KLs in the bound identity, derive the log-variance gradient, and identify the batch/pixel reduction bug. If these four contracts are clear, the central mechanism is connected: reconstruction retains image information, KL encourages prior compatibility, and reparameterization makes joint training possible.
+
+## Core references
+
+::: {#refs}
+:::

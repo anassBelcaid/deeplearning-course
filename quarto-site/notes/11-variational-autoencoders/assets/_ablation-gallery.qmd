@@ -1,0 +1,3 @@
+![Reconstruction-only condition: first four inputs, posterior reconstructions, and prior outputs. All examples are retained; course experiment on Fashion-MNIST.](../../lectures/11-variational-autoencoders/assets/evidence/loss/recon-gallery.png)
+
+![Reconstruction-plus-KL condition with the same inputs and noise. These galleries expose different output paths, not a general quality ranking.](../../lectures/11-variational-autoencoders/assets/evidence/loss/vae-gallery.png)

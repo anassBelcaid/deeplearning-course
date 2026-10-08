@@ -1,0 +1,1 @@
+<div class="vae-demo"><iframe src="assets/demos/generation.html" title="Interactive experiment: Prior sampling" loading="lazy"></iframe><a href="assets/demos/generation.html" target="_blank">Open prior sampling in a full window →</a></div>

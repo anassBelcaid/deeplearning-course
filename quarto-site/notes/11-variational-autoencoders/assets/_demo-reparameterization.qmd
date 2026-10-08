@@ -1,0 +1,1 @@
+<div class="vae-demo"><iframe src="assets/demos/reparameterization.html" title="Interactive experiment: Fixed-noise gradient path" loading="lazy"></iframe><a href="assets/demos/reparameterization.html" target="_blank">Open fixed-noise gradient path in a full window →</a></div>

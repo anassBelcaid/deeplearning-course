@@ -1,0 +1,73 @@
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const byId = id => document.getElementById(id);
+  const svgText = (x,y,label,extra='') => `<text x="${x}" y="${y}" font-family="sans-serif" font-size="20" fill="#17212b" ${extra}>${label}</text>`;
+  async function loadEvidence() {
+    if (!byId('loss-ablation-lab')) return;
+    try {
+      const response = await fetch('assets/evidence/loss/manifest.json');
+      if (!response.ok) throw new Error('Missing loss evidence');
+      const data = await response.json();
+      const select = byId('loss-model');
+      function show() {
+        const name=select.value;
+        byId('loss-gallery').src=`assets/evidence/loss/${name}-gallery.png`;
+        byId('loss-gallery').alt=`Actual ${name==='vae'?'VAE with prior penalty':'reconstruction-only probabilistic autoencoder'} outputs: four fixed validation inputs, posterior reconstructions, and four fixed prior draws.`;
+        byId('loss-rec-score').textContent=data.models[name].reconstruction.toFixed(2);
+      }
+      select.addEventListener('change',show);show();
+      const costs=data.models.vae.first_image_draw_costs.slice(0,3);
+      costs.forEach((v,i)=>byId(`rec-cost-${i}`).textContent=v.toFixed(2));
+      byId('rec-average').textContent=`(${costs.map(v=>v.toFixed(2)).join(' + ')}) / 3 ≈ ${(costs.reduce((a,b)=>a+b,0)/3).toFixed(2)}`;
+    } catch(error) {
+      byId('loss-model').disabled=true;
+      byId('loss-rec-score').textContent='Unavailable';
+      byId('rec-average').textContent='Serve the complete deck over HTTP to load recorded scores.';
+    }
+  }
+  loadEvidence();
+  if (byId('kl-explorer')) {
+    const mu=byId('kl-mu'),sigma=byId('kl-sigma');
+    function plotKL() {
+      const m=Number(mu.value),s=Number(sigma.value);
+      byId('kl-mu-value').value=m.toFixed(2);byId('kl-sigma-value').value=s.toFixed(2);
+      const meanCost=.5*m*m,spreadCost=.5*(s*s-1-Math.log(s*s));
+      byId('kl-mean-cost').textContent=meanCost.toFixed(3);
+      byId('kl-spread-cost').textContent=spreadCost.toFixed(3);
+      byId('kl-total').textContent=(meanCost+spreadCost).toFixed(3);
+      const px=x=>75+(x+4)*90,py=y=>300-y*120;
+      const curve=(m,s)=>Array.from({length:401},(_,i)=>{const x=-4+i*.02,y=Math.exp(-.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));return `${i?'L':'M'}${px(x).toFixed(2)},${py(y).toFixed(2)}`;}).join(' ');
+      let svg=svgText(80,27,'Purple: prior p = N(0,1)')+svgText(465,27,'Orange: q = N(μ,σ²)');
+      svg+='<path d="M75 45 V300 H795" fill="none" stroke="#657079" stroke-width="2"/>';
+      for(const x of [-4,-2,0,2,4])svg+=svgText(px(x),330,String(x),'text-anchor="middle"');
+      for(const y of [0,1,2])svg+=svgText(60,py(y)+6,String(y),'text-anchor="end"');
+      svg+=svgText(78,53,'Density')+svgText(817,305,'z');
+      svg+=`<path d="${curve(0,1)}" fill="none" stroke="#7655ad" stroke-width="5"/><path d="${curve(m,s)}" fill="none" stroke="#ef5b45" stroke-width="4"/>`;
+      byId('kl-curves').innerHTML=svg;
+      byId('kl-curves').setAttribute('aria-label',`Prior standard normal and posterior normal mean ${m}, standard deviation ${s}. KL is ${(meanCost+spreadCost).toFixed(3)} nats.`);
+    }
+    mu.addEventListener('input',plotKL);sigma.addEventListener('input',plotKL);
+    byId('kl-match').addEventListener('click',()=>{mu.value=0;sigma.value=1;plotKL();});plotKL();
+  }
+  if (byId('elbo-q')) {
+    const input=byId('elbo-q');
+    function plotBound() {
+      const w=Number(input.value),r=-w*Math.log(.8)-(1-w)*Math.log(.2),k=w*Math.log(2*w)+(1-w)*Math.log(2*(1-w)),total=r+k,nll=-Math.log(.5),gap=total-nll;
+      const px=v=>110+v*230;
+      byId('elbo-q-value').value=w.toFixed(2);
+      byId('elbo-numbers').textContent=`R ${r.toFixed(3)} + K ${k.toFixed(3)} = ${total.toFixed(3)}`;
+      let svg=svgText(110,28,'Blue: reconstruction R · Orange: prior KL K');
+      svg+=svgText(12,85,'R + K')+`<rect x="110" y="55" width="${r*230}" height="48" fill="#2878c8"/><rect x="${px(r)}" y="55" width="${k*230}" height="48" fill="#ef5b45"/>`;
+      svg+=svgText(12,174,'−log p(x)')+`<rect x="110" y="143" width="${nll*230}" height="48" fill="#38865a"/>`;
+      svg+=svgText(px(nll)+12,175,'0.693 · exact');
+      svg+=`<path d="M${px(nll)} 48 V120 H${px(total)} V108" stroke="#17212b" stroke-width="2" fill="none" stroke-dasharray="5 4"/>`;
+      svg+=svgText(110,230,`Gap = ${Math.max(0,gap).toFixed(3)} nats`);
+      svg+=svgText(110,266,`q(B | x) = ${(1-w).toFixed(2)} · decoder fixed`);
+      byId('elbo-bars').innerHTML=svg;
+      byId('elbo-bars').setAttribute('aria-label',`Exact toy model: reconstruction ${r.toFixed(3)}, prior KL ${k.toFixed(3)}, total ${total.toFixed(3)}. Negative log evidence ${nll.toFixed(3)}. Nonnegative gap ${Math.max(0,gap).toFixed(3)}.`);
+    }
+    input.addEventListener('input',plotBound);
+    byId('elbo-exact').addEventListener('click',()=>{input.value=.8;plotBound();});plotBound();
+  }
+});
+</script>

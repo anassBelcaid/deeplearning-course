@@ -1,0 +1,29 @@
+---
+title: "Variational Autoencoders"
+subtitle: "Chapter 11 · Learning a latent space we can sample"
+author: "Dr. A. Belcaid"
+description: "A complete visual chapter with reproducible experiments, plus a concise PDF technical review."
+bibliography: ../../references.bib
+link-citations: true
+format:
+  html:
+    toc-depth: 2
+    css: assets/notes.css
+    include-after-body: assets/notes.html
+  pdf:
+    toc: false
+    number-sections: false
+    subtitle: "Chapter 11 · Technical review"
+    fontsize: 10pt
+    linestretch: 1.02
+execute:
+  enabled: false
+---
+
+::: {.content-visible when-format="html"}
+{{< include _chapter.qmd >}}
+:::
+
+::: {.content-visible when-format="pdf"}
+{{< include _review.qmd >}}
+:::

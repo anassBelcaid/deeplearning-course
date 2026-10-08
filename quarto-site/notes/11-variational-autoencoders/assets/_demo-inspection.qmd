@@ -1,0 +1,1 @@
+<div class="vae-demo"><iframe src="assets/demos/inspection.html" title="Interactive experiment: Three decoder input paths" loading="lazy"></iframe><a href="assets/demos/inspection.html" target="_blank">Open three decoder input paths in a full window →</a></div>

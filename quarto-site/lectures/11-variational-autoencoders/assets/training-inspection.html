@@ -1,0 +1,19 @@
+<script>
+(() => {
+ function setup() {
+  const select=document.getElementById('inspection-mode');
+  if(!select) return;
+  const modes={mean:['mean-0.png','Deterministic mean-code reconstruction','Observed x: used by the encoder'],posterior:['sample-0-0.png','One recorded posterior reconstruction','Observed x: used by the encoder'],prior:['prior-0.png','One recorded prior-generated image','Reference only: x is unused']};
+  function update(){
+   const [file,label,input]=modes[select.value];
+   const image=document.getElementById('inspection-output');
+   image.src='assets/evidence/posterior/'+file; image.alt=label+' from the fixed trained decoder.';
+   document.getElementById('inspection-output-label').textContent=label;
+   document.getElementById('inspection-input-label').textContent=input;
+   for(const key of Object.keys(modes)) document.getElementById('inspection-code-'+key).classList.toggle('inspection-active',key===select.value);
+  }
+  select.addEventListener('change',update); update();
+ }
+ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setup); else setup();
+})();
+</script>

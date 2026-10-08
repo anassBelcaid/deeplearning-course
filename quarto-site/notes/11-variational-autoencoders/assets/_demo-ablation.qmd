@@ -1,0 +1,1 @@
+<div class="vae-demo"><iframe src="assets/demos/ablation.html" title="Interactive experiment: Controlled objective comparison" loading="lazy"></iframe><a href="assets/demos/ablation.html" target="_blank">Open controlled objective comparison in a full window →</a></div>

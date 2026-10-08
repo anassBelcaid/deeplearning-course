@@ -154,6 +154,20 @@ These notes are written as a connected textbook rather than lecture transcripts.
 :::
 :::
 
+:::{.chapter-list}
+:::{.chapter-entry .available .generative}
+<span class="chapter-number">11</span>
+
+:::{.chapter-copy}
+### [Variational Autoencoders](notes/11-variational-autoencoders/index.qmd)
+
+[![](notes/11-variational-autoencoders/assets/chapter-cover.svg){fig-alt="Garments become latent probability clouds; sampled codes pass through a shared decoder to generated garments."}](notes/11-variational-autoencoders/index.qmd)
+:::
+
+<span class="chapter-state">Read chapter →</span>
+:::
+:::
+
 :::{.notes-coming}
 More chapters will appear here as the course develops.
 :::

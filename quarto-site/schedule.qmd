@@ -311,10 +311,13 @@ Encoding, bottlenecks, reconstruction, denoising, and latent interpolation.
 Latent distributions, reparameterization, KL divergence, sampling, and interpolation.
 :::
 :::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+[Notes](notes/11-variational-autoencoders/index.html){.material-pill .available}[PDF · technical review](notes/11-variational-autoencoders/index.pdf){.material-pill .available}[Slides](lectures/11-variational-autoencoders/index.html){.material-pill .available}<span class="material-pill muted">Notebook</span>
 :::
 :::{.links-cell}
-<span class="coming-soon">VAE paper · Reparameterization visualizations</span>
+[VAE · Kingma & Welling](https://arxiv.org/abs/1312.6114)<br>
+[Generation experiment](lectures/11-variational-autoencoders/assets/build_generation_evidence.py)<br>
+[Runnable VAE](lectures/11-variational-autoencoders/assets/vae_training.py)<br>
+[Latent-use failure · Bowman et al.](https://aclanthology.org/K16-1002/)
 :::
 :::{.project-cell .track-middle}
 <a class="project-track-link" href="projects/06-latent-laboratory/index.html"><span class="project-label">Project 3 · Representations</span><br>Inspect actual codes, PCA views, and nearest neighbors.</a>

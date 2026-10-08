@@ -1,0 +1,17 @@
+```python
+class VAE(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.encoder = GaussianEncoder()
+        self.decoder = nn.Sequential(
+            nn.Linear(2, 128), nn.ReLU(),
+            nn.Linear(128, 256), nn.ReLU(),
+            nn.Linear(256, 784), nn.Sigmoid(),
+            nn.Unflatten(1, (1, 28, 28)))
+
+    def forward(self, x):
+        mu, logvar = self.encoder(x)
+        sigma = (0.5 * logvar).exp()
+        z = mu + sigma * torch.randn_like(mu)
+        return self.decoder(z), mu, logvar
+```

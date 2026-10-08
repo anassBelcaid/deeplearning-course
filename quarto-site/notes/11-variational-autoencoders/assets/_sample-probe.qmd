@@ -1,0 +1,17 @@
+```python
+torch.manual_seed(7)
+mu = torch.tensor([1.], requires_grad=True)
+logvar = torch.tensor([0.], requires_grad=True)
+a = torch.tensor([2.], requires_grad=True)
+
+sigma = (0.5 * logvar).exp()
+q = torch.distributions.Normal(mu, sigma)
+z = q.sample()
+
+x_hat = a * z
+rec = 0.5 * (x_hat - 2).square().mean()
+rec.backward()
+
+print(a.grad, mu.grad, logvar.grad)
+# tensor([-0.2505]) None None
+```

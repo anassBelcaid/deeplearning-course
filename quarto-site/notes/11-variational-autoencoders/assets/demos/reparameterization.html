@@ -1,0 +1,102 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><base href="../../../../lectures/11-variational-autoencoders/"><title>VAE reparameterization experiment</title><link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-f3e585dc122d45960ea2c31f625881dd.css"><link rel="stylesheet" href="../01-what-is-learning/slides.css"><link rel="stylesheet" href="week11.css"><style>
+html,body { margin:0; height:auto; overflow:visible; background:#f5f1e8; }
+.reveal { font-size:28px; height:auto; width:100%; }
+.reveal section { display:block; position:relative; box-sizing:border-box; padding:20px; width:100%; height:auto; text-align:left; }
+.reveal .fragment { opacity:1; visibility:visible; }
+.reveal .vae-live { grid-template-columns:1fr 1fr; gap:25px; margin:0; }
+.reveal .vae-live img { width:100%; height:auto; max-height:none; }
+.reveal .vae-live-controls h3 { font-size:29px; }
+.reveal .posterior-stage { grid-template-columns:1fr 1.2fr 1fr; gap:15px; }
+.reveal .posterior-stage figure img { width:100%; height:auto; }
+.reveal .posterior-toolbar { margin-top:0; }
+.reveal .training-inspection-layout { display:block; margin:0 auto; max-width:500px; }
+.reveal .loss-ablation-layout { grid-template-columns:1fr; margin:0; }
+.reveal .loss-ablation-controls p { font-size:22px; }
+.reveal .loss-ablation-figure>figure { width:100%; height:auto; }
+.reveal .loss-ablation-figure img { height:auto; width:100%; }
+.reveal .elbo-example { grid-template-columns:1fr; gap:20px; margin:0; }
+.reveal .reparam-controls { flex-wrap:wrap; margin:10px 0; gap:18px; }
+.reveal .reparam-controls label { width:40%; }
+.reveal .reparam-graph { height:auto; }
+.reveal .reparam-rule p { font-size:23px; }
+.reveal .latent-path-layout { gap:15px; }
+.reveal .latent-endpoints p { font-size:20px; }
+.reveal .latent-endpoints img { width:45px; height:45px; }
+.reveal .latent-map-key { font-size:17px; }
+.reveal #latent-path-map { height:auto; }
+.reveal #latent-path-output { width:220px; height:220px; }
+.reveal .kl-explorer { grid-template-columns:1fr; }
+.reveal #kl-curves { height:auto; }
+.reveal .kl-costs { gap:12px; }
+.reveal .kl-costs strong { font-size:29px; }
+.reveal .kl-costs span { font-size:13px; }
+@media(max-width:700px) {
+ .reveal .posterior-stage,.reveal .latent-path-layout,.reveal .vae-live { grid-template-columns:1fr; }
+ .reveal .posterior-stage figure img { width:200px; margin:auto; }
+ .reveal .vae-live img { width:260px; margin:auto; }
+ .reveal .posterior-stage figure { max-width:100%; }
+ .reveal .posterior-stage figcaption { font-size:21px; }
+ .reveal .kl-costs { display:flex; flex-wrap:wrap; justify-content:center; }
+}
+</style></head><body><div class="reveal"><section class="slide level2 vae-s4" id="demo-reparameterization">
+
+<div class="reparam-controls" id="reparam-lab">
+<label for="rp-mu">μ
+<output id="rp-mu-value">
+1.00
+</output>
+<input id="rp-mu" max="2" min="-1" step="0.05" type="range" value="1"/></label><label for="rp-sigma">σ
+<output id="rp-sigma-value">
+0.50
+</output>
+<input id="rp-sigma" max="1.5" min="0.25" step="0.05" type="range" value="0.5"/></label><button id="rp-next" type="button">Next recorded ε →</button><button id="rp-example" type="button">Worked value ε = −1</button>
+</div>
+<p class="reparam-noise" id="rp-noise-status">
+ε ∼ N(0, I), independent of the encoder; held fixed while moving μ or σ.
+</p>
+<svg aria-label="Reparameterized computation graph. Independent noise epsilon multiplies sigma, then mu is added to produce z. Both learned parameters connect to the result through ordinary arithmetic." class="reparam-graph" role="img" viewbox="0 0 1200 320">
+<defs><marker id="rp-arrow" markerheight="8" markerwidth="8" orient="auto" refx="7" refy="4"><path d="M0 0 L8 4 L0 8 Z" fill="#657079"></path></marker></defs> <g fill="none" marker-end="url(#rp-arrow)" stroke="#657079" stroke-width="2.5"><path d="M240 145 H334"></path><path d="M375 70 V105"></path><path d="M416 145 H709"></path><path d="M600 224 V203 H750 V186"></path><path d="M791 145 H919"></path></g> <g fill="#dceeff" stroke="#2878c8" stroke-width="2"><rect height="70" rx="8" width="150" x="80" y="110"></rect><rect height="70" rx="8" width="150" x="525" y="234"></rect><rect height="70" rx="8" width="180" x="930" y="110"></rect></g> <rect fill="#edf0f3" height="60" rx="8" stroke="#657079" stroke-width="2" width="150" x="300" y="0"></rect> <g fill="#e9e2f3" stroke="#7655ad" stroke-width="3"><circle cx="375" cy="145" r="30"></circle><circle cx="750" cy="145" r="30"></circle></g> <g dominant-baseline="middle" fill="#17212b" font-family="sans-serif" font-size="26" text-anchor="middle"><text id="rp-sigma-node" x="155" y="146">σ = 0.500</text><text id="rp-eps-node" x="375" y="30">ε = …</text><text id="rp-mu-node" x="600" y="270">μ = 1.000</text><text id="rp-z-node" x="1020" y="146">z = …</text><text font-size="38" x="375" y="145">×</text><text font-size="38" x="750" y="145">+</text></g> <g fill="#657079" font-family="sans-serif" font-size="21"><text x="475" y="50">Draw independently; no gradient through the RNG.</text><text x="850" y="260">○ × multiply   ○ + add</text></g>
+</svg>
+<div class="reparam-rule">
+<p>
+<span class="math inline">\(z=\mu+\sigma\odot\epsilon,\quad\epsilon\sim\mathcal N(0,I)\)</span>
+</p>
+<p>
+<span class="math inline">\(\mathbb E[z]=\mu,\quad\operatorname{Var}(z_j)=\sigma_j^2\)</span>   ·   same diagonal Gaussian.
+</p>
+</div>
+
+
+
+</section></div><script>
+document.addEventListener('DOMContentLoaded',async()=>{
+ const el=id=>document.getElementById(id);
+ if(!el('reparam-lab'))return;
+ const mu=el('rp-mu'),sigma=el('rp-sigma'),next=el('rp-next'),example=el('rp-example');
+ let draws=[],index=0,eps=-1,worked=true;
+ function show(){
+  const m=Number(mu.value),s=Number(sigma.value),z=m+s*eps;
+  el('rp-mu-value').value=m.toFixed(2);el('rp-sigma-value').value=s.toFixed(2);
+  el('rp-mu-node').textContent='μ = '+m.toFixed(3);el('rp-sigma-node').textContent='σ = '+s.toFixed(3);
+  el('rp-eps-node').textContent='ε = '+eps.toFixed(3);el('rp-z-node').textContent='z = '+z.toFixed(3);
+  el('rp-noise-status').textContent=(worked?'Worked value ε = −1':`Recorded N(0,1) draw ${index+1} / ${draws.length}`)+' · held fixed while moving μ or σ.';
+  example.setAttribute('aria-pressed',String(worked));
+  document.querySelector('.reparam-graph').setAttribute('aria-label',`Fixed noise ${eps.toFixed(3)} times sigma ${s}, then plus mu ${m}, gives z ${z.toFixed(3)}. Local derivatives: dz/dmu=1 and dz/dsigma=${eps.toFixed(3)}.`);
+ }
+ mu.addEventListener('input',show);sigma.addEventListener('input',show);
+ example.addEventListener('click',()=>{worked=true;eps=-1;show();});
+ next.disabled=true;show();
+ try{
+  const response=await fetch('assets/evidence/reparameterization/manifest.json');
+  if(!response.ok)throw Error('Missing noise manifest');
+  const data=await response.json();draws=data.noise;eps=draws[0];worked=false;next.disabled=false;show();
+  next.addEventListener('click',()=>{if(!worked)index=(index+1)%draws.length;worked=false;eps=draws[index];show();});
+ }catch(error){el('rp-noise-status').textContent='Worked value ε = −1 · recorded draws unavailable; sliders remain usable.';}
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS_HTML-full"></script>
+<script>
+function height(){parent.postMessage({type:'vae-notes-height',height:Math.ceil(document.querySelector('.reveal').getBoundingClientRect().height)+8},location.origin);}
+new ResizeObserver(height).observe(document.querySelector('.reveal'));
+window.addEventListener('load',height);
+</script></body></html>

@@ -1,0 +1,26 @@
+<script>
+document.addEventListener('DOMContentLoaded',async()=>{
+ const el=id=>document.getElementById(id);
+ if(!el('reparam-lab'))return;
+ const mu=el('rp-mu'),sigma=el('rp-sigma'),next=el('rp-next'),example=el('rp-example');
+ let draws=[],index=0,eps=-1,worked=true;
+ function show(){
+  const m=Number(mu.value),s=Number(sigma.value),z=m+s*eps;
+  el('rp-mu-value').value=m.toFixed(2);el('rp-sigma-value').value=s.toFixed(2);
+  el('rp-mu-node').textContent='μ = '+m.toFixed(3);el('rp-sigma-node').textContent='σ = '+s.toFixed(3);
+  el('rp-eps-node').textContent='ε = '+eps.toFixed(3);el('rp-z-node').textContent='z = '+z.toFixed(3);
+  el('rp-noise-status').textContent=(worked?'Worked value ε = −1':`Recorded N(0,1) draw ${index+1} / ${draws.length}`)+' · held fixed while moving μ or σ.';
+  example.setAttribute('aria-pressed',String(worked));
+  document.querySelector('.reparam-graph').setAttribute('aria-label',`Fixed noise ${eps.toFixed(3)} times sigma ${s}, then plus mu ${m}, gives z ${z.toFixed(3)}. Local derivatives: dz/dmu=1 and dz/dsigma=${eps.toFixed(3)}.`);
+ }
+ mu.addEventListener('input',show);sigma.addEventListener('input',show);
+ example.addEventListener('click',()=>{worked=true;eps=-1;show();});
+ next.disabled=true;show();
+ try{
+  const response=await fetch('assets/evidence/reparameterization/manifest.json');
+  if(!response.ok)throw Error('Missing noise manifest');
+  const data=await response.json();draws=data.noise;eps=draws[0];worked=false;next.disabled=false;show();
+  next.addEventListener('click',()=>{if(!worked)index=(index+1)%draws.length;worked=false;eps=draws[index];show();});
+ }catch(error){el('rp-noise-status').textContent='Worked value ε = −1 · recorded draws unavailable; sliders remain usable.';}
+});
+</script>

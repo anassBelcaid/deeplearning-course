@@ -1,0 +1,11 @@
+```python
+def vae_loss(x_hat, x, mu, logvar):
+    pixel_cost = F.binary_cross_entropy(
+        x_hat, x, reduction='none')
+    rec = pixel_cost.flatten(1).sum(1)
+    kl = 0.5 * (
+        mu.square() + logvar.exp() - 1 - logvar
+    ).sum(1)
+    loss = (rec + kl).mean()
+    return loss, rec.mean(), kl.mean()
+```

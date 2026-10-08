@@ -1,0 +1,1 @@
+<div class="vae-demo"><iframe src="assets/demos/interpolation.html" title="Interactive experiment: Latent interpolation" loading="lazy"></iframe><a href="assets/demos/interpolation.html" target="_blank">Open latent interpolation in a full window →</a></div>

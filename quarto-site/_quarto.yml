@@ -9,6 +9,8 @@ project:
     - "lectures/**/assets/latent-geometry/**"
     - "lectures/**/assets/useful-reconstruction/**"
     - "lectures/**/assets/sampling-failure/**"
+    - "lectures/11-variational-autoencoders/assets/evidence/**"
+    - "notes/11-variational-autoencoders/assets/demos/**"
 
 website:
   title: "Deep Learning"

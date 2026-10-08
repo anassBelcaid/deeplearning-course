@@ -1,0 +1,8 @@
+<script>
+window.addEventListener('message', event => {
+ if(event.origin!==location.origin || event.data?.type!=='vae-notes-height')return;
+ for(const frame of document.querySelectorAll('.vae-demo iframe')) {
+  if(frame.contentWindow===event.source && Number.isFinite(event.data.height)) frame.style.height=Math.max(200,Math.min(5000,event.data.height))+'px';
+ }
+});
+</script>

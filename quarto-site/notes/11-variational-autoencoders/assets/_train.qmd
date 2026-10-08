@@ -1,0 +1,13 @@
+```python
+model = VAE()
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+
+def train_step(model, optimizer, x):
+    model.train()
+    optimizer.zero_grad(set_to_none=True)
+    x_hat, mu, logvar = model(x)
+    loss, rec, kl = vae_loss(x_hat, x, mu, logvar)
+    loss.backward()
+    optimizer.step()
+    return loss.item(), rec.item(), kl.item()
+```

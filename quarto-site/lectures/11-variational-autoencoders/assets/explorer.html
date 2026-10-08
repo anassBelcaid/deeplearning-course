@@ -1,0 +1,83 @@
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const panel = document.getElementById('vae-sampler');
+  if (!panel) return;
+  const code = document.getElementById('draw-code');
+  const button = document.getElementById('next-draw');
+  try {
+    const response = await fetch('assets/evidence/manifest.json');
+    if (!response.ok) throw new Error('Missing sample manifest');
+    const data = await response.json();
+    let index = 0;
+    function show() {
+      code.textContent = 'z = (' + data.prior_codes[index].map(v => v.toFixed(2)).join(', ') + ')';
+      document.getElementById('draw-count').textContent = index + 1;
+      const image = document.getElementById('draw-image');
+      image.src = 'assets/evidence/draw-' + String(index).padStart(2, '0') + '.png';
+      image.alt = 'Actual VAE decoder mean for recorded latent draw ' + (index + 1);
+    }
+    button.addEventListener('click', () => { index = (index + 1) % data.prior_codes.length; show(); });
+    show();
+  } catch (error) {
+    code.textContent = 'Recorded draw 1; serve this deck over HTTP to enable cycling.';
+    button.disabled = true;
+  }
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const panel = document.getElementById('posterior-lab');
+  if (!panel) return;
+  const base = 'assets/evidence/posterior/';
+  const select = document.getElementById('posterior-input');
+  const next = document.getElementById('posterior-next');
+  const meanButton = document.getElementById('posterior-mean');
+  const status = document.getElementById('posterior-count');
+  const parameters = document.getElementById('posterior-parameters');
+  const map = document.getElementById('posterior-map');
+  const fmt = values => '(' + values.map(v => v.toFixed(3)).join(', ') + ')';
+  try {
+    const response = await fetch(base + 'manifest.json');
+    if (!response.ok) throw new Error('Missing posterior manifest');
+    const data = await response.json();
+    let input = 0, draw = 0, atMean = false;
+    function show() {
+      const r = data.records[input];
+      const code = atMean ? r.mu : r.codes[draw];
+      document.getElementById('posterior-original').src = base + `input-${input}.png`;
+      document.getElementById('posterior-original').alt = `Observed ${r.label}, validation dataset index ${r.dataset_index}.`;
+      const output = document.getElementById('posterior-output');
+      output.src = base + (atMean ? `mean-${input}.png` : `sample-${input}-${draw}.png`);
+      output.alt = `Actual decoder mean for ${r.label}, ${atMean ? 'posterior mean code' : 'posterior draw ' + (draw + 1)}.`;
+      document.getElementById('posterior-code').textContent = (atMean ? 'μ = ' : 'z = ') + fmt(code);
+      parameters.textContent = 'μ = ' + fmt(r.mu) + '\nσ = ' + fmt(r.sigma);
+      status.textContent = atMean ? 'At μ · no draw' : `Draw ${draw + 1} / ${r.codes.length}`;
+      meanButton.setAttribute('aria-pressed', String(atMean));
+      // Same units and scale for each input; explicitly centered local window.
+      const scale = 250 / .6;
+      const sx = v => 205 + (v - r.mu[0]) * scale;
+      const sy = v => 155 - (v - r.mu[1]) * scale;
+      let svg = '<text x="205" y="17" text-anchor="middle" font-size="15" fill="#657079">LOCAL ZOOM · μ ± 0.30 on each axis</text>';
+      svg += '<rect x="80" y="30" width="250" height="250" fill="#fffdf7" stroke="#c8d6df"/>';
+      for (const radius of [2, 1]) svg += `<ellipse cx="205" cy="155" rx="${radius*r.sigma[0]*scale}" ry="${radius*r.sigma[1]*scale}" fill="#2878c8" fill-opacity=".10" stroke="#2878c8" stroke-opacity=".55"/>`;
+      for (const delta of [-.3, 0, .3]) {
+        svg += `<text x="${205+delta*scale}" y="300" text-anchor="middle" font-size="15">${(r.mu[0]+delta).toFixed(2)}</text>`;
+        svg += `<text x="70" y="${160-delta*scale}" text-anchor="end" font-size="15">${(r.mu[1]+delta).toFixed(2)}</text>`;
+      }
+      svg += '<path d="M197 155 H213 M205 147 V163" stroke="#17212b" stroke-width="2.5"/>';
+      svg += `<circle cx="${sx(code[0])}" cy="${sy(code[1])}" r="6" fill="#ef5b45" stroke="white" stroke-width="2"/>`;
+      svg += '<text x="345" y="284" font-size="17">z₁</text><text x="55" y="25" font-size="17">z₂</text><text x="205" y="327" text-anchor="middle" font-size="15">+ mean μ · orange point: decoder input</text>';
+      map.innerHTML = svg;
+      map.setAttribute('aria-label', `Local Gaussian view for ${r.label}. Mean ${fmt(r.mu)}, standard deviation ${fmt(r.sigma)}. Current code ${fmt(code)}. Each axis spans mean minus 0.30 to mean plus 0.30.`);
+    }
+    next.addEventListener('click', () => { if (!atMean) draw = (draw + 1) % data.records[input].codes.length; atMean = false; show(); });
+    meanButton.addEventListener('click', () => { atMean = true; show(); });
+    select.addEventListener('change', () => { input = Number(select.value); draw = 0; atMean = false; show(); });
+    show();
+  } catch (error) {
+    parameters.textContent = 'Recorded sample 1 shown. Serve the complete deck over HTTP to enable controls.';
+    next.disabled = true; meanButton.disabled = true; select.disabled = true;
+    status.textContent = 'Static preview';
+  }
+});
+</script>

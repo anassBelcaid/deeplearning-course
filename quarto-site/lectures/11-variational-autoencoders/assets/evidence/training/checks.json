@@ -1,0 +1,33 @@
+{
+  "batch_size": 32,
+  "input_shape": [
+    32,
+    1,
+    28,
+    28
+  ],
+  "mean_shape": [
+    32,
+    2
+  ],
+  "output_shape": [
+    32,
+    1,
+    28,
+    28
+  ],
+  "pre_update_loss": 545.7996826171875,
+  "pre_update_rec": 545.7926635742188,
+  "pre_update_kl": 0.006959557067602873,
+  "rec_head_gradient_norms": [
+    0.5337912440299988,
+    0.9730461239814758
+  ],
+  "all_parameters_updated": true,
+  "duplicated_batch_same_loss": true,
+  "eval_forward_remains_stochastic": true,
+  "torch": "2.13.0+cu130",
+  "seed": 113,
+  "noise_seed": 811,
+  "selection": "first 32 training-split images; one update, no quality claim"
+}

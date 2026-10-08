@@ -1,0 +1,1 @@
+<div class="vae-demo"><iframe src="assets/demos/posterior.html" title="Interactive experiment: Image-conditioned sampling" loading="lazy"></iframe><a href="assets/demos/posterior.html" target="_blank">Open image-conditioned sampling in a full window →</a></div>
