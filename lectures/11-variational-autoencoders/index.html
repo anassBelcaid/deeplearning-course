@@ -1,0 +1,2828 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-html/tabby.min.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.10.18">
+
+  <meta name="author" content="Dr.&nbsp;A. Belcaid">
+  <title>Deep Learning – Variational Autoencoders</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-f3e585dc122d45960ea2c31f625881dd.css">
+  <link rel="stylesheet" href="../01-what-is-learning/slides.css">
+  <link rel="stylesheet" href="week11.css">
+  <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <script src="../../site_libs/quarto-diagram/mermaid.min.js"></script>
+  <script src="../../site_libs/quarto-diagram/mermaid-init.js"></script>
+  <link href="../../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" data-visibility="hidden" class="quarto-title-block center">
+  <h1 class="title">Variational Autoencoders</h1>
+  <p class="subtitle">Learning a latent space we can sample</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Dr.&nbsp;A. Belcaid
+</div>
+</div>
+</div>
+
+</section>
+<section id="variational-autoencoders" class="slide level2 deck-title">
+<h2>Variational Autoencoders</h2>
+<div class="deck-title-grid">
+<div class="deck-title-copy">
+<p><span class="eyebrow">CHAPTER 11 · GENERATIVE MODELS</span></p>
+<h3 id="learning-a-latent-space-we-can-sample">Learning a latent space we can sample</h3>
+<p>We learned to reconstruct an image. How do we generate one without an input?</p>
+<p><span class="deck-author">Dr.&nbsp;A. Belcaid</span></p>
+</div>
+<div class="deck-title-art">
+<p><img data-src="assets/vae-hero.svg" alt="Conceptual diagram: a point is sampled from a smooth latent distribution, passed through a decoder, and turned into a clothing image. Faint nearby clothing outlines suggest variation."></p>
+</div>
+</div>
+<aside class="notes">
+<p>Open at the unresolved question from Chapter 10, not with a list of VAE definitions. Students have reconstructed Fashion-MNIST images, explored codes, and interpolated between examples. They also saw that an ordinary autoencoder leaves arbitrary latent samples unsupported by its training objective. Ask: if we remove the input image, where should the decoder’s code come from?</p>
+<p>The thumbnail is a course-made conceptual illustration, not measured VAE output. It previews the generation path: draw a latent code from a prior, then use the learned decoder. It deliberately omits the encoder because no input image is required on this path. During training, the encoder will approximate an image-dependent posterior; distinguish that distribution from the prior when the mechanism is introduced. A VAE encourages compatibility with a chosen prior, but does not guarantee that every sampled code produces a good image.</p>
+<p>The opening and roadmap are approved. Sections 1–5 develop generation, the probabilistic encoder, the variational objective, and reparameterization through model outputs, exact examples, and executable gradient probes; the model assembly and training code are now included. Section 6 closes with recorded latent paths, unfiltered samples, a latent-use diagnostic, and a generation task.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-first-level-map-of-the-lecture" class="slide level2">
+<h2>A first-level map of the lecture</h2>
+<div class="lecture-toc">
+<div class="lecture-toc-item" style="--toc-color:#2878c8">
+<p><span>01</span></p>
+<h3 id="from-reconstruction-to-generation">From reconstruction to generation</h3>
+</div>
+<div class="lecture-toc-item" style="--toc-color:#008e9b">
+<p><span>02</span></p>
+<h3 id="from-one-code-to-a-distribution">From one code to a distribution</h3>
+</div>
+<div class="lecture-toc-item" style="--toc-color:#ef5b45">
+<p><span>03</span></p>
+<h3 id="learning-to-reconstructand-to-sample">Learning to reconstruct—and to sample</h3>
+</div>
+<div class="lecture-toc-item" style="--toc-color:#7655ad">
+<p><span>04</span></p>
+<h3 id="backpropagating-through-a-random-draw">Backpropagating through a random draw</h3>
+</div>
+<div class="lecture-toc-item" style="--toc-color:#38865a">
+<p><span>05</span></p>
+<h3 id="building-and-training-a-vae">Building and training a VAE</h3>
+</div>
+<div class="lecture-toc-item" style="--toc-color:#c94f78">
+<p><span>06</span></p>
+<h3 id="sampling-interpolation-and-limitations">Sampling, interpolation, and limitations</h3>
+</div>
+</div>
+<aside class="notes">
+<p>Read these six sections as a single investigation with Fashion-MNIST as the visual thread.</p>
+<ol type="1">
+<li>Retrieve the previous lecture’s failed random samples. Contrast reconstructing a known image with generating a new one, and introduce the prior-to-decoder generative story before equations.</li>
+<li>Compare the familiar autoencoder with the VAE module structure. Replace the encoder’s single code with the parameters of a diagonal Gaussian approximate posterior. Use repeated draws for one image to explain mean, spread, and the roles of posterior versus prior; do not describe uncertainty as an arbitrary blur effect.</li>
+<li>Raise the competing demands with visual evidence: preserve the input while shaping codes toward a distribution from which we know how to sample. Develop expected reconstruction and KL divergence, then connect them to the evidence lower bound. Explain the direction of the KL and that the bound is on log likelihood, not a promise of perceptually perfect samples. Keep derivations tied to what the model is being asked to preserve or change.</li>
+<li>Turn randomness into fixed sampled noise plus a differentiable transformation. Trace z = mu + sigma * epsilon with a concrete numerical draw and a computation graph before showing the implementation. Clarify that gradients flow to the distribution parameters, not into the random-number generator.</li>
+<li>Map the architecture to PyTorch: mean/log-variance heads, sampling, decoder, and the loss. Show tensor shapes and consistent loss reductions. Use training infrastructure students already know, compare reconstructions with prior samples, and distinguish posterior-mean reconstructions from stochastic ones.</li>
+<li>Inspect generated images, latent paths, and failures. Compare controlled settings before claiming improvement; explain the reconstruction/regularization tradeoff, blurry outputs, and posterior collapse through evidence. Interpolation is an experiment, not a guarantee of semantic continuity. Finish by composing the mechanisms already taught, without introducing another model family.</li>
+</ol>
+<p>Keep the roadmap at this first level on screen. Detailed derivations and experiments belong to the sections we will develop after approval, not to this TOC.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section>
+<section id="from-reconstruction-to-generation-1" class="title-slide slide level1 section-slide vae-section center" data-section-progress="1 / 6" data-background-color="#17212b">
+<h1>01 · From reconstruction to generation</h1>
+<aside class="notes">
+<p>This section should take approximately 15–20 minutes including discussion. Its goal is to separate reconstruction from generation, identify the missing sampling rule, and establish a concrete generative path. It does not derive the ELBO, KL term, or reparameterization yet. Use the live samples and the final prediction exercise to diagnose whether students understand that distinction before advancing.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="we-can-reconstruct-an-image-we-already-have" class="slide level2">
+<h2>We can reconstruct an image we already have</h2>
+<div class="course-centered-figure evidence-wide">
+<figure>
+<img src="assets/evidence/reconstruction.png" alt="Eight validation Fashion-MNIST images above their actual reconstructions from the Project 3 two-dimensional autoencoder.">
+<figcaption>
+<span>RETRIEVE THE PREVIOUS LECTURE</span><strong>The decoder receives a code supplied by a real image.</strong><small>What information must we supply before this pipeline can start?</small><small class="course-caption-source">Course experiment · <a href="https://github.com/zalandoresearch/fashion-mnist">Fashion-MNIST</a> · Project 3 AE, d = 2, six epochs · first eight validation examples.</small>
+</figcaption>
+</figure>
+</div>
+<div class="fragment vae-line">
+<p><span class="math inline">\(x \xrightarrow{\text{encoder}} z \xrightarrow{\text{decoder}} \hat{x}\)</span> — the input gives us a starting point.</p>
+</div>
+<aside class="notes">
+<p>Start with the images, not the formula. Have students name two details that survived and two that did not. These are actual outputs from the Project 3 checkpoint, not an idealized autoencoder diagram. A two-dimensional code is severe compression, so the purpose is not to claim excellent reconstruction. The point is that each output has a specific target: the image directly above it.</p>
+<p>Ask where the decoder’s input came from. After their answer, reveal the familiar path. The encoder supplies the code for an observed validation image. Validation images were not used for weight updates: reconstruction of a held-out image is already generalization, but it still requires an input image. Do not equate held-out reconstruction with unconditional generation.</p>
+<p>Protocol: Fashion-MNIST’s official training set is split reproducibly into 50,000 training and 10,000 validation images with seed 41. The AE uses 784–256–128–2 and a mirrored sigmoid decoder, trained for six epochs with pixel MSE. No new AE training was needed when the saved Project 3 checkpoint was available. The displayed examples are the first eight validation images, without selecting the prettiest reconstructions.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="remove-the-input.-where-does-an-image-come-from" class="slide level2">
+<h2>Remove the input. Where does an image come from?</h2>
+<div class="course-centered-figure evidence-wide">
+<figure>
+<img src="assets/evidence/pixels.png" alt="Real clothing images compared with eight independently sampled random-pixel images, which appear as noise.">
+<figcaption>
+<span>TRY THE MOST DIRECT RANDOM GENERATOR</span><strong>Draw each of the 784 pixel values independently.</strong><small>Both rows are valid 28 × 28 arrays. Why is only one row recognizable clothing?</small><small class="course-caption-source">Fashion-MNIST validation images; independent Uniform(0, 1) pixels · course experiment, seed 97.</small>
+</figcaption>
+</figure>
+</div>
+<div class="fragment vae-line">
+<p>An image distribution must capture <strong>relationships between pixels</strong>.</p>
+</div>
+<aside class="notes">
+<p>Give students time to inspect the two rows. Both have the same shape and numerical range. The difference is not that the second row violates the tensor contract. Independent pixel draws ignore relationships: a sleeve is connected to a torso, a shoe has a coherent outline, and background pixels tend to occur together. A valid array is not necessarily a plausible image.</p>
+<p>Avoid claiming that random pixels can never form a recognizable object; the point is that this independent uniform distribution puts negligible probability on the structured images we care about. Nor is the lesson that randomness itself is bad. We want structured variation, rather than 784 unrelated choices.</p>
+<p>Retrieve the decoder: we already have a learned transformation that couples output pixels through shared latent variables and weights. That suggests moving randomness into the small latent space, then allowing the decoder to turn it into structure. Ask students whether this alone is sufficient. The next two slides test that proposal on an actual AE rather than answering with a cartoon.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="let-the-decoder-provide-the-structure" class="slide level2">
+<h2>Let the decoder provide the structure</h2>
+<div class="vae-map-layout">
+<img src="assets/evidence/ae-map.png" alt="Actual two-dimensional autoencoder codes for 2,000 validation images in blue, with 16 uniform latent draws marked as orange crosses; several crosses lie in sparsely occupied regions.">
+<div class="vae-map-copy">
+<p>
+<strong>Blue points</strong><br>Encode real images.
+</p>
+<p>
+<strong>Orange crosses</strong><br>Draw new codes.
+</p>
+<p class="fragment">
+Same decoder.<br>No input image.<br><strong>Predict the outputs.</strong>
+</p>
+</div>
+</div>
+<p class="vae-source">
+Actual AE coordinates, not PCA · 2,000 validation images · uniform draws inside the 1st–99th percentile box · seed 211.
+</p>
+<aside class="notes">
+<p>Explain the axes: each blue point is an actual pair of encoder outputs. This is not a PCA or t-SNE projection; d equals two. Orange crosses are a reproducible first batch of sixteen uniform random points within the coordinate-wise 1st–99th percentile bounds. The first four are numbered so students can connect them to the next gallery in reading order.</p>
+<p>Ask students to distinguish numerical validity from training support. All crosses have a valid decoder input shape. Some are close to observed codes; others are far from the plotted sample. The decoder was optimized on encoded training images, not uniformly over this rectangle. These validation codes are a visual proxy for the occupied regions, not a proof of zero training density elsewhere. Avoid the literal claim that every point outside the scatter is impossible or guaranteed to fail.</p>
+<p>Reveal the prediction prompt. Keep the model fixed while changing only how its input code is obtained. Do not insert a Gaussian here: the uniform box is deliberately a simple proposal, not a theoretical prior fitted to the model. A better post-hoc density model could be learned for an AE; ordinary reconstruction training simply does not supply one automatically.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="valid-codes-do-not-guarantee-useful-samples" class="slide level2">
+<h2>Valid codes do not guarantee useful samples</h2>
+<div class="course-centered-figure evidence-wide">
+<figure>
+<img src="assets/evidence/ae-samples.png" alt="Sixteen actual decoder outputs from the orange uniform latent draws in the previous map, including recognizable silhouettes and distorted or ambiguous shapes.">
+<figcaption>
+<span>REVEAL THE PREDICTED OUTPUTS</span><strong>These are the same 16 orange crosses, in reading order.</strong><small>Which samples are recognizable? Which are ambiguous? Judge before explaining.</small><small class="course-caption-source">Unmodified Project 3 d = 2 decoder · first 16 fixed-seed uniform draws, no cherry-picking.</small>
+</figcaption>
+</figure>
+</div>
+<div class="fragment vae-line">
+<p>Reconstruction learned a decoder—not a reliable rule for drawing its inputs.</p>
+</div>
+<aside class="notes">
+<p>Let students disagree about ambiguous samples. Some outputs can be recognizable; do not teach that all random AE samples are necessarily garbage. This gallery is evidence from one small model and one sampling proposal, not a universal impossibility theorem. The uncertainty about which region to sample is precisely the unresolved contract.</p>
+<p>Connect an output to the corresponding cross on the previous slide if useful. The images are displayed in the original draw order, not ranked by visual quality or distance from data. We deliberately retain all sixteen, including reasonable results. Explain that reconstruction loss evaluates pairs x and decoder(encoder(x)); it does not directly tell us how to sample z without x.</p>
+<p>Reveal the conclusion after the discussion. An ordinary AE can be combined with a separately fitted latent density, but we would like a model trained with an explicit generative story. The next slide introduces that story, not the entire VAE training algorithm.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="choose-where-to-draw-learn-what-to-draw" class="slide level2">
+<h2>Choose where to draw; learn what to draw</h2>
+<div class="vae-generative-flow" role="img" aria-label="Generation path: sample z from a prior, use a learned decoder distribution, produce an image. No encoder or input image is required.">
+<div>
+<span>1 · DRAW A CODE</span>
+<div class="vae-circle">
+<span class="math inline">\(z\)</span>
+</div>
+<p>
+<span class="math inline">\(z \sim p(z)\)</span>
+</p>
+<small>A known sampling rule</small>
+</div>
+<b aria-hidden="true">→</b>
+<div>
+<span>2 · DECODE</span>
+<div class="vae-decoder-bars">
+<i></i><i></i><i></i><i></i>
+</div>
+<p>
+<span class="math inline">\(p_\theta(x\mid z)\)</span>
+</p>
+<small>Learned image distribution</small>
+</div>
+<b aria-hidden="true">→</b>
+<div>
+<span>3 · PRODUCE AN IMAGE</span><img src="assets/evidence/draw-00.png" alt="Actual decoder mean for the first fixed-seed VAE latent draw.">
+<p>
+<span class="math inline">\(x \sim p_\theta(x\mid z)\)</span>
+</p>
+<small>Here: display the decoder mean</small>
+</div>
+</div>
+<div class="fragment vae-line">
+<p>No input image is needed at generation time. The decoder still had to learn from images.</p>
+</div>
+<p class="vae-source">
+Course diagram based on <a href="https://arxiv.org/abs/1312.6114">Kingma &amp; Welling, Auto-Encoding Variational Bayes (2014), §2.1</a>. Image: actual course VAE preview.
+</p>
+<aside class="notes">
+<p>Read the path left to right. First draw a low-dimensional code from a specified prior. In this experiment the prior is a standard two-dimensional Gaussian. Then a learned decoder specifies an image distribution conditional on that code. Formally we may sample an image from that conditional distribution. The preview displays its mean pixel values, as is common in VAE visualizations, rather than an additional pixel-level sample. A fresh latent draw already changes the displayed mean image.</p>
+<p>Distinguish the random variable from the distribution: z is one draw, p(z) is the rule generating possible draws. Theta denotes learned decoder parameters. This is a general latent-variable generative story; the diagram alone does not define a VAE. Variational inference and the encoder’s role in training are the next sections’ work.</p>
+<p>The right-hand image is an actual output from the small VAE trained for this section. It is evidence supporting the schematic, not an artist’s ideal output. Do not claim the two coordinates correspond directly to named attributes such as sleeve length. The model is unsupervised, and such disentanglement is not guaranteed.</p>
+<p>Ask where the encoder is. It is absent because this is the generation path. That does not mean the encoder is unimportant: it will help us learn from observed images. Keep that question open for the section transition. The generative story follows Kingma and Welling, §2.1; the training explanation is intentionally deferred.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-fresh-draw-without-an-input-image" class="slide level2">
+<h2>A fresh draw, without an input image</h2>
+<div id="vae-sampler" class="vae-live">
+<div class="vae-live-controls">
+<span>FIXED-SEED VAE PREVIEW · d = 2</span>
+<h3>
+Draw <b id="draw-count">1</b> / 16
+</h3>
+<p id="draw-code">
+Loading the recorded code…
+</p>
+<button id="next-draw" type="button">
+Next latent draw →
+</button>
+<p>
+Same trained decoder.<br>Only the latent code changes.
+</p>
+<small>Cycles through 16 recorded samples.<br>No training or inference in the browser.</small>
+</div>
+<p><img id="draw-image" src="assets/evidence/draw-00.png" alt="Actual VAE decoder mean for latent draw 1."></p>
+</div>
+<div class="fragment vae-line">
+<p>Recognizable variation is possible. Sharpness, diversity, and coverage still need checking.</p>
+</div>
+<p class="vae-source">
+Course experiment · Fashion-MNIST, 50k train · VAE, 10 epochs · z ∼ N(0, I) · decoder means, not pixel draws.
+</p>
+<aside class="notes">
+<p>Press the button several times and ask students to describe what changed. It cycles through the first sixteen recorded latent draws from a fixed seed, not a hand-selected good-example collection. No training or model inference runs in the page, so the demonstration works reliably offline. Use the adjacent model gallery in the reproducibility assets if a static handout is needed.</p>
+<p>This is a preview of what we will learn to construct. Its model uses a 784–256–128 encoder with two mean and two log-variance outputs, a two-dimensional Gaussian latent variable, and a mirrored sigmoid decoder. It was trained for ten epochs on the same 50,000-image training split, with Adam at 0.001. Its objective is summed-pixel binary cross-entropy with grayscale targets plus KL, averaged over images. For grayscale images this BCE is the conventional soft-target surrogate, not an exact continuous-data likelihood. Those distinctions belong in the later loss section.</p>
+<p>Do not present this as a controlled AE-versus-VAE performance ranking: objectives and epoch budgets differ. The question here is whether this explicitly trained prior-to-decoder path can yield recognizable clothing without an input. The outputs may be blurry and some ambiguous; retain those examples. A small d = 2 demonstration trades quality for inspectable geometry. A few images do not establish full distribution coverage or rule out memorization.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-plausible-image-is-only-the-first-check" class="slide level2">
+<h2>A plausible image is only the first check</h2>
+<div class="course-centered-figure evidence-wide">
+<figure>
+<img src="assets/evidence/neighbors.png" alt="Eight VAE decoder means and their nearest training images, found by exact pixel MSE search over all 50,000 training images.">
+<figcaption>
+<span>LOOK FOR COPYING—WITHOUT OVERCLAIMING</span><strong>Top: generated means. Bottom: nearest training images by pixel MSE.</strong><small>What is shared? What differs? Does this prove the model never memorizes?</small><small class="course-caption-source">Exact search over all 50,000 training images · first eight recorded VAE draws · pixel MSE is not semantic similarity.</small>
+</figcaption>
+</figure>
+</div>
+<div class="fragment vae-line">
+<p>Check plausibility, variation, and resemblance to training data—not just one attractive sample.</p>
+</div>
+<aside class="notes">
+<p>Students may call any unfamiliar image novel. Slow that inference down. We compare each generated decoder mean with its nearest image in the complete training split under a specified metric, pixel MSE. Ask them to identify a shared outline and a differing detail. The search is exact over 50,000 images, not over a small conveniently selected gallery.</p>
+<p>This is a simple diagnostic, not a proof of non-memorization or a privacy guarantee. Pixel distance can miss perceptually similar copies, small transformations can change MSE, and inspecting eight samples says little about rare behavior. The experiment records the selected training dataset indices and distances in the manifest so the figure is auditable.</p>
+<p>Separate three questions students often collapse: is an individual image plausible, are different draws meaningfully varied, and how do generated results relate to the training data? Distribution-level coverage requires broader evaluation. No formal generative metric is introduced here; the purpose is to establish that reconstruction MSE and a pretty sample are both insufficient to judge an unconditional generator.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="which-machine-can-start-without-an-image" class="slide level2">
+<h2>Which machine can start without an image?</h2>
+<div class="vae-choice-paths">
+<p>
+<b>A</b> held-out image → encoder → code → decoder
+</p>
+<p>
+<b>B</b> draw a stored training code → decoder
+</p>
+<p>
+<b>C</b> draw from a prior → trained decoder
+</p>
+</div>
+<p class="vae-task">
+For each path: does it need a new input image, and what limits its outputs?
+</p>
+<div class="exercise-pause">
+<span>PAUSE</span><b>90 seconds</b><small>Separate “no new input” from “new latent codes.”</small>
+</div>
+<div class="fragment exercise-solution vae-solution">
+<span class="solution-label">WORKED SOLUTION</span>
+<p>
+<strong>A:</strong> Yes—reconstruction remains tied to the supplied image.
+</p>
+<p>
+<strong>B:</strong> No new image—but a deterministic decoder repeats a finite collection of reconstructions.
+</p>
+<p>
+<strong>C:</strong> No image—new codes are possible; useful outputs depend on learning compatibility with the prior.
+</p>
+</div>
+<p class="fragment exercise-extension">
+If generation needs no encoder, why train one? → Section 02
+</p>
+<aside class="notes">
+<p>State the givens precisely: these paths use fixed trained networks; B samples only from a finite bank of stored training codes and uses a deterministic decoder. Students should classify both the input requirement and the limitation, not merely choose the path that looks like the VAE diagram.</p>
+<p>A can reconstruct an unseen image but still needs it as input. B can start without a newly supplied image, so saying it cannot generate anything is too strong. However, it only selects among a finite bank of fixed decoded outputs; it introduces no new latent locations. C defines an unconditional latent sampling process, but an arbitrary decoder plus a prior is not sufficient for good results, as our AE experiment showed.</p>
+<p>Reveal the worked solution only after the pause. Invite a student to explain why “no input image” does not alone distinguish B from C. Then reveal the transfer question. We have specified a direction for generation, z to x; learning from data starts with x. The next section will ask what distribution over codes could account for a given image, introducing the probabilistic encoder. Stop here rather than pre-teaching that section’s equations.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="section-2" class="title-slide slide level1 section-slide vae-section vae-section-two center" data-section-progress="2 / 6" data-background-color="#17212b">
+<h1>02 · From one code to a distribution</h1>
+<aside class="notes">
+<p>Allow about 15–20 minutes. Carry the question from section 1: generation runs from a latent code to an image, but our training set contains images. What could tell us which codes account for one observed image? Compare module structure, inspect a real probabilistic encoder, interpret its Gaussian outputs, and map that contract to code. End by distinguishing the input-conditioned distribution from the prior. The training objective and differentiable sampling are deliberately left for sections 3 and 4.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="encoder-distribution" class="slide level2 vae-s2">
+<h2>What changes inside the encoder?</h2>
+<div class="vae-architecture">
+<div class="vae-path-label">
+FAMILIAR AUTOENCODER · one code per image
+</div>
+<div class="cell" data-reveal="true" data-fig-width="13" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"themeVariables": {"fontSize": "25px"}, "flowchart": {"rankSpacing": 45, "nodeSpacing": 35, "padding": 20, "curve": "linear"}}}%%
+flowchart LR
+  X["Image x"] --&gt; E["Encoder"] --&gt; Z(("z")) --&gt; D["Decoder"] --&gt; R["Reconstruction"]
+  classDef net fill:#dceeff,stroke:#2878c8,stroke-width:2px,color:#17212b;
+  classDef latent fill:#e9e2f3,stroke:#7655ad,stroke-width:2px,color:#17212b;
+  class E,D net;
+  class Z latent;
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<div class="fragment">
+<div class="vae-path-label">
+PROBABILISTIC ENCODER · describe possible codes, then draw one
+</div>
+<div class="cell" data-reveal="true" data-fig-width="13" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"themeVariables": {"fontSize": "25px"}, "flowchart": {"rankSpacing": 45, "nodeSpacing": 35, "padding": 20, "curve": "linear"}}}%%
+flowchart LR
+  X["Image x"] --&gt; E["Encoder&lt;br/&gt;features"]
+  E --&gt; M["μ(x)"]
+  E --&gt; S["σ(x)"]
+  M --&gt; Q["Gaussian&lt;br/&gt;qφ(z ∣ x)"]
+  S --&gt; Q
+  Q --&gt;|draw| Z(("z")) --&gt; D["Decoder"] --&gt; R["Mean&lt;br/&gt;image"]
+  classDef net fill:#dceeff,stroke:#2878c8,stroke-width:2px,color:#17212b;
+  classDef latent fill:#e9e2f3,stroke:#7655ad,stroke-width:2px,color:#17212b;
+  class E,M,S,D net;
+  class Q,Z latent;
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="fragment vae-line">
+<p><span class="math inline">\(q_\phi(z\mid x)\)</span> approximates the model’s posterior <span class="math inline">\(p_\theta(z\mid x)\)</span>:<br>which codes could account for <em>this image</em>?</p>
+</div>
+<p class="vae-source">
+Course diagrams based on <a href="https://arxiv.org/abs/1312.6114">Kingma &amp; Welling (2014), §§2.1, 3</a>. Displayed reconstruction = decoder mean.
+</p>
+<aside class="notes">
+<p>Begin with the top path. The deterministic encoder supplies one point for an image; repeated evaluation of this fixed network returns that same point. Ask students which module must change if we want a distribution over possible codes for that image. Reveal the lower path. The shared feature extractor branches into two parameter heads. The drawing uses standard deviation for interpretability; the implementation will predict log variance and convert it to a positive standard deviation.</p>
+<p>The decoder still receives ONE vector z on each pass, not a cloud, a variance tensor, or all possible images. Its input dimension has not doubled. A distribution with two latent coordinates needs two means and two spreads, but a sample still has only two coordinates. The lower diagram is a structural description, not a complete training algorithm: replacing one head with two does not alone produce a trained VAE.</p>
+<p>Only after students trace the path, name q as an approximate posterior. The generative model defines a joint distribution p(z)p_theta(x|z). Once x is observed, the model’s posterior asks which latent explanations are compatible with it. Computing the exact posterior generally requires an intractable normalization integral. The learned encoder provides a tractable approximation; it does not recover a uniquely correct hidden code. Phi denotes shared encoder weights, theta decoder weights. Mu(x) and sigma(x) are per-image outputs, not separately fitted network weights for each image. No claim of calibrated semantic uncertainty follows from this construction.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="posterior-experiment" class="slide level2 vae-s2">
+<h2>Same image. Same encoder. Another code?</h2>
+<div id="posterior-lab" class="posterior-lab">
+<div class="posterior-toolbar">
+<label for="posterior-input">Observed image</label><select id="posterior-input"><option value="0">T-shirt / top</option><option value="1">Trouser</option><option value="2">Ankle boot</option></select><button id="posterior-next" type="button">Next posterior draw →</button><button id="posterior-mean" type="button">Decode μ instead</button><span id="posterior-count" aria-live="polite">Draw 1 / 8</span>
+</div>
+<div class="posterior-stage">
+<figure>
+<img id="posterior-original" src="assets/evidence/posterior/input-0.png" alt="First T-shirt/top in the fixed validation split.">
+<figcaption>
+Observed image <b>x</b>
+</figcaption>
+</figure>
+<div class="posterior-density">
+<svg id="posterior-map" viewbox="0 0 400 330" role="img" aria-label="Encoder Gaussian in actual latent coordinates; cross marks the mean and dot marks the current code.">
+</svg>
+<p id="posterior-parameters">
+Loading recorded encoder outputs…
+</p>
+</div>
+<figure>
+<img id="posterior-output" src="assets/evidence/posterior/sample-0-0.png" alt="Actual decoder mean for the first posterior draw.">
+<figcaption id="posterior-code">
+Decoded sample
+</figcaption>
+</figure>
+</div>
+<p class="posterior-fixed">
+Fixed input → fixed μ and σ. The sampled z can change.
+</p>
+</div>
+<div class="fragment vae-line">
+<p>The encoder describes a distribution; the decoder receives one point from it.</p>
+</div>
+<p class="vae-source">
+Actual course experiment · Fashion-MNIST · d = 2 · separate 10-epoch VAE run · first validation item of each named class; 8 fixed-seed draws each. Recorded decoder means.
+</p>
+<aside class="notes">
+<p>Before clicking, ask students to predict which items can change: input, mean, spread, code, decoded image, network weights. Click Next posterior draw several times. The input, encoder outputs, and weights remain fixed. The moving point is a new recorded posterior draw, and the right-hand image is its actual decoded mean. Depending on the example, changes may be subtle or include distorted details; do not imply that every draw is equally faithful. The contours represent Mahalanobis radii 1 and 2 of a diagonal Gaussian, not hard boundaries or 68%/95% joint probability regions. The plotted axes are the actual two latent coordinates, with equal scale across inputs. This is an explicitly labeled local zoom: each axis runs from that image’s mean minus 0.30 to its mean plus 0.30. The full prior comparison later restores the global view.</p>
+<p>Switch the observed image. Now the same encoder weights produce different means and spreads. Class names only label the chosen inputs; class labels were not supplied to the unsupervised model. The selection rule was fixed before viewing results: the first validation item of classes T-shirt/top, Trouser, and Ankle boot. This is an illustrative mechanism demonstration, not a representative reconstruction benchmark. All eight seeded draws for every input are retained.</p>
+<p>Click Decode mu instead. This is a deterministic plug-in reconstruction. It is neither a fresh posterior draw nor generally the expected decoded image: for a nonlinear decoder, decoding the mean need not equal averaging decoded samples. Next posterior draw resumes the saved draw sequence. The page uses local prerecorded assets, with no inference or training in the browser. The new checkpoint follows section 1’s architecture and protocol but is a separate run; do not claim pixel-identical results to section 1. Loss details, software version, seeds, exact indices, and checkpoint hash are in the manifest and generation script.</p>
+<p>The posterior spread describes uncertainty over latent codes under this fitted approximation; it is not a class probability, a direct blur control, or Bayesian uncertainty about the network’s weights.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gaussian-exercise" class="slide level2 vae-s2">
+<h2>Read the distribution before drawing a code</h2>
+<p class="vae-gaussian-definition">
+<span class="math inline">\(q_\phi(z\mid x)=\mathcal N\!\left(\mu(x),\operatorname{diag}(\sigma^2(x))\right)\)</span>
+</p>
+<p class="vae-task">
+For one image: <span class="math inline">\(\mu=(1,-0.5)\)</span> and <span class="math inline">\(\sigma=(0.25,1)\)</span>.<br>Which coordinate varies more? Give each mean ± one standard deviation interval.
+</p>
+<div class="vae-gaussian-plot">
+<img src="assets/evidence/posterior/gaussian-exercise.svg" alt="Two Gaussian marginal density curves on identical axes. Coordinate one is narrow and centered at 1; coordinate two is broader and centered at minus 0.5. Shading marks one standard deviation either side of each mean.">
+</div>
+<div class="exercise-pause">
+<span>PAUSE</span><b>60 seconds</b><small>Read location and width separately; compare spread, not peak height.</small>
+</div>
+<div class="fragment exercise-solution posterior-solution">
+<span class="solution-label">WORKED SOLUTION</span>
+<p>
+<span class="math inline">\(z_1: [0.75,1.25]\)</span> &nbsp; · &nbsp; <span class="math inline">\(z_2: [-1.5,0.5]\)</span>
+</p>
+<p>
+<span class="math inline">\(z_2\)</span> has 4× the standard deviation and 16× the variance.
+</p>
+<p>
+Each interval contains about 68% of its marginal Gaussian; neither is a hard limit.
+</p>
+</div>
+<p class="vae-source">
+Course-made numerical illustration, not fitted values. “Diagonal” assumes conditional independence of coordinates for this fixed image.
+</p>
+<aside class="notes">
+<p>Tie the formula to the previous experiment: mu locates the cloud and sigma controls its spread along each coordinate. Define diag explicitly: the covariance matrix has sigma_1 squared and sigma_2 squared on its diagonal, with zero off-diagonal entries. For this Gaussian approximation that means the coordinates are independent conditional on a fixed x. It does not imply that the coordinates of all encoded images are independent after mixing over the dataset. Nor is a diagonal Gaussian the only possible variational family.</p>
+<p>The plots deliberately share horizontal and vertical limits, so students can compare widths honestly. Peak height is probability density, not probability; the area under either full curve is one. Retrieve this prerequisite briefly rather than reteaching Gaussian probability. The displayed example is chosen for transparent arithmetic, not claimed to come from the model.</p>
+<p>After the pause, reveal the interval endpoints, then discuss the spread ratio. The wider coordinate has standard deviation 1 versus 0.25, hence four times the standard deviation; squaring gives a variance ratio of sixteen. Each one-dimensional interval has about 68.27% probability. Both coordinates lying within their respective intervals has about 0.6827 squared, or 46.6%, under conditional independence. A two-dimensional radius-one ellipse is a different region again. Avoid reusing the marginal 68% statement as a description of the ellipse in the live plot.</p>
+<p>This is distribution interpretation, not reparameterization practice; numerical draws and the gradient path belong to section 4.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="encoder-code" class="slide level2 vae-s2">
+<h2>Two heads describe the Gaussian</h2>
+<div class="posterior-code-layout">
+<div class="posterior-shapes">
+<h3>
+For a batch of 32 images
+</h3>
+<p>
+Shared features<br><b>h: [32, 128]</b>
+</p>
+<p>
+Two parameter heads<br><b>μ: [32, 2]</b><br><b>log σ²: [32, 2]</b>
+</p>
+<p class="fragment" data-fragment-index="1">
+One draw per image<br><b>z: [32, 2]</b>
+</p>
+</div>
+<div class="light-code-editor">
+<div class="editor-bar">
+<span>PYTORCH · ENCODER CONTRACT</span><strong>d = 2</strong>
+</div>
+<pre><code><span class="py-kw">class</span> GaussianEncoder(nn.Module):
+    <span class="py-kw">def</span> __init__(self):
+        super().__init__()
+        self.features = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(784, 256), nn.ReLU(),
+            nn.Linear(256, 128), nn.ReLU())
+        self.mu = nn.Linear(128, 2)
+        self.logvar = nn.Linear(128, 2)
+
+    <span class="py-kw">def</span> forward(self, x):
+        h = self.features(x)
+        <span class="py-kw">return</span> self.mu(h), self.logvar(h)
+<span class="fragment" data-fragment-index="1">
+mu, logvar = encoder(x)
+sigma = (0.5 * logvar).exp()
+q = torch.distributions.Normal(mu, sigma)
+z = q.sample()  <span class="py-comment-inline"># forward draw only</span></span></code></pre>
+</div>
+</div>
+<p class="fragment vae-line" data-fragment-index="2">
+<span class="math inline">\(\ell=\log\sigma^2 \;\Rightarrow\; \sigma=\exp(\ell/2)&gt;0\)</span><br>The decoder still takes two coordinates. Gradients through sampling: section 04.
+</p>
+<p class="vae-source">
+Architecture matches the recorded experiment. <a href="https://docs.pytorch.org/docs/stable/distributions.html#normal">PyTorch Normal</a> takes standard deviation as <code>scale</code>, not variance.
+</p>
+<aside class="notes">
+<p>Trace the two branches from the first slide into self.mu and self.logvar. The two Linear modules each have their own learned weights and biases, while the preceding features are shared. Instantiate encoder = GaussianEncoder() after importing torch and nn; x is a batch with shape [32, 1, 28, 28]. The two returned arrays contain four numbers per image, but they describe a distribution over two-dimensional z. Batch size and latent dimension have different meanings.</p>
+<p>Why log variance? Each linear head can output any real number. Representing log variance lets us recover a strictly positive variance by exponentiation. Since sigma squared = exp(logvar), the standard deviation is exp(logvar/2). As a quick check, logvar = 0 means sigma = 1, not zero; logvar = log(0.0625) gives sigma = 0.25 as in the exercise. This representation supports positivity; it is not an automatic numerical-stability guarantee for arbitrarily large outputs.</p>
+<p>Normal(mu, sigma) constructs scalar Normal distributions with batch shape [32, 2]. Sampling yields [32, 2], and the independent coordinate draws implement the diagonal Gaussian. When evaluating joint log density later, sum over the latent axis or wrap Normal in Independent(…, 1). Do not yet introduce a likelihood loss from this code.</p>
+<p>The visible q.sample() is intentionally a forward-only demonstration. It does not provide the pathwise gradient required for encoder training. It is not a training recipe; section 4 will derive the differentiable transformation and connect it to rsample(). The current experiment’s training script already implements that infrastructure. Section 5 will assemble the full trainable VAE. Keep these distinctions explicit so students do not copy sample() into a loss and silently cut encoder gradients.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="prior-versus-posterior" class="slide level2 vae-s2">
+<h2>Which distribution supplies the code?</h2>
+<div class="posterior-roles">
+<div>
+<span>AN IMAGE IS OBSERVED</span>
+<p>
+<span class="math inline">\(z\sim q_\phi(z\mid x)\)</span>
+</p>
+<small>Its encoder predicts μ(x), σ(x).</small>
+</div>
+<div>
+<span>NO IMAGE IS SUPPLIED</span>
+<p>
+<span class="math inline">\(z\sim p(z)=\mathcal N(0,I)\)</span>
+</p>
+<small>A fixed prior supplies a new code.</small>
+</div>
+</div>
+<div class="course-centered-figure posterior-comparison">
+<figure>
+<img src="assets/evidence/posterior/prior-posterior.svg" alt="Three measured encoder means with diagonal Gaussian radius-one ellipses in the same two-dimensional latent space. Pale purple circles show radius one and two of the fixed standard normal prior at the origin.">
+<figcaption>
+<span>SAME LATENT SPACE · SAME TRAINED DECODER</span><strong>Colored: three image-conditioned distributions. Purple: the shared prior.</strong><small>Why might good reconstructions alone leave prior samples unreliable?</small><small class="course-caption-source">Actual encoder parameters from the three demonstration inputs · contours are Mahalanobis radii, not probability cutoffs. Prior chosen by the modeler.</small>
+</figcaption>
+</figure>
+</div>
+<p class="fragment vae-line">
+We need informative codes for each image <em>and</em> a usable prior-to-decoder path. → Section 03
+</p>
+<aside class="notes">
+<p>Use the same three images students just explored. Each colored point is an actual predicted mean and its ellipse has semi-axes given by that image’s two predicted standard deviations. The shared prior remains centered at zero with unit scale. The posterior parameters vary with the image; the prior does not receive that image. In this example the prior is a modeling choice, not the arithmetic average of the three colored distributions.</p>
+<p>This is one latent space with one trained decoder. During reconstruction, an observed image provides an input-conditioned approximate posterior from which we can draw. During unconditional generation, no observed image is required, so we draw from the prior. The exact model posterior p_theta(z|x), approximated by q_phi, is a third object; do not confuse it with the prior p(z). The small set of ellipses is not a map of all training codes, a coverage measurement, or evidence that the aggregated posterior exactly equals the prior.</p>
+<p>Ask the final question before advancing. Students have already seen an AE reconstruct and then fail at some arbitrary codes. A probabilistic encoder alone does not enforce useful decoding wherever the prior places mass. Conversely, if every image had an identical q, the latent draw would convey no information about which input was observed. Section 3 will turn those competing demands into an objective. Keep KL divergence, the ELBO, and posterior collapse derivations for their planned sections.</p>
+<p>Do not claim the displayed run learned without regularization: it was trained with the full VAE objective as documented. We use its measured parameters to make the roles concrete, then ask what training must encourage. These are illustrative examples, not a controlled ablation.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="section-3" class="title-slide slide level1 section-slide vae-section vae-section-three center" data-section-progress="3 / 6" data-background-color="#17212b">
+<h1>03 · Learning to reconstruct—and to sample</h1>
+<aside class="notes">
+<p>This section is the loss part of our data–hypothesis–loss–optimization–evaluation frame. Allow roughly 20 minutes with the demonstrations and pause. We already have data, a probabilistic encoder, and a generative decoder. Now we must decide what training should reward. Follow a controlled ablation, score several reconstructions of one image, inspect the prior penalty, combine the costs, and finally explain why this particular combination bounds the evidence. Section 4 will solve the remaining optimization problem: how to differentiate through the draw.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="loss-ablation" class="slide level2 vae-s3">
+<h2>Good reconstruction. Useful prior samples?</h2>
+<div id="loss-ablation-lab" class="loss-ablation-layout">
+<div class="loss-ablation-controls">
+<label for="loss-model">Training objective</label><select id="loss-model"><option value="recon">Reconstruction only</option><option value="vae">Reconstruction + prior penalty</option></select>
+<p>
+Same architecture, initialization,<br>data order, and 10 epochs.
+</p>
+<p>
+Same inputs and latent noise<br>when comparing outputs.
+</p>
+<div class="fragment" data-fragment-index="1">
+<p>
+Validation reconstruction cost<br><strong id="loss-rec-score">…</strong>
+</p>
+<small>Pixel-summed soft-target BCE.<br>Mean over 1,024 images × 8 draws.<br>Lower is better for this score.</small>
+</div>
+</div>
+<div class="course-centered-figure loss-ablation-figure">
+<figure>
+<img id="loss-gallery" src="assets/evidence/loss/recon-gallery.png" alt="Actual outputs of the reconstruction-only probabilistic autoencoder: four validation inputs, posterior reconstructions, and four prior samples.">
+<figcaption>
+<span>INSPECT BOTH OUTPUT PATHS</span><strong>Switch the objective. Which row changes most?</strong><small>First four validation images and first four seeded prior draws; illustrative, not a quality ranking.</small><small class="course-caption-source">Course ablation · Fashion-MNIST · same d = 2 MLP · decoder means · one training seed per condition.</small>
+</figcaption>
+</figure>
+</div>
+</div>
+<p class="fragment vae-line" data-fragment-index="2">
+Reconstructing from <span class="math inline">\(q_\phi(z\mid x)\)</span> does not by itself train useful decoding from <span class="math inline">\(p(z)\)</span>.
+</p>
+<aside class="notes">
+<p>Start with the reconstruction-only condition. This is the probabilistic encoder architecture from section 2, trained without its KL term, not the deterministic MSE autoencoder from section 1. Ask students to inspect the middle row and then the bottom row before switching the selector. The top row is fixed. The middle row uses the same standard-normal noise per input but transforms it with the parameters produced by each model; the bottom row uses exactly the same prior codes for both decoders. After switching, the trained weights differ. Do not say that only the code changes in this experiment.</p>
+<p>We control the architecture, initialization seed 113, seed-41 train/validation split, minibatch order, Adam at 0.001, batch size 256, ten epochs, reconstruction surrogate, and sampling noise. The sole deliberate objective change is adding KL(q(z|x)||N(0,I)) with coefficient one. The regularized run is the section-2 checkpoint, verified by its saved hash; the unregularized run follows its exact training loop with a zero coefficient. Finite numerical differences and a single training seed limit generalization. Images are selected by index, not by visual success.</p>
+<p>Reveal the held-out reconstruction score after students inspect the images. It is the mean summed-pixel BCE with grayscale targets, estimated using eight posterior draws per image over the first 1,024 validation examples. It is not a prior-sample quality metric. A model can score better at reconstruction and still produce less useful prior samples. The few displayed samples establish a concrete failure mode, not distribution coverage, memorization behavior, or a universal ranking. Do not overstate any one unattractive sample.</p>
+<p>For grayscale targets, this conventional BCE is a soft-target surrogate. A Bernoulli model gives an exact likelihood for binary pixels; a continuous-image likelihood would need a suitable normalized distribution. We retain the existing experiment and label this distinction instead of quietly interpreting its scores as exact grayscale negative log likelihoods.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="expected-reconstruction" class="slide level2 vae-s3">
+<h2>Score the image across possible codes</h2>
+<p class="vae-task">
+One observed image. Three posterior draws. Which score should training trust?
+</p>
+<div id="reconstruction-draws" class="reconstruction-draws">
+<figure>
+<img src="assets/evidence/loss/target.png" alt="The first validation image, used as the fixed reconstruction target.">
+<figcaption>
+Fixed target <span class="math inline">\(x\)</span>
+</figcaption>
+</figure>
+<figure>
+<img src="assets/evidence/loss/reconstruction-0.png" alt="Actual decoder mean for posterior draw one of the fixed target.">
+<figcaption>
+Draw 1<br><b id="rec-cost-0">…</b>
+</figcaption>
+</figure>
+<figure>
+<img src="assets/evidence/loss/reconstruction-1.png" alt="Actual decoder mean for posterior draw two of the same target.">
+<figcaption>
+Draw 2<br><b id="rec-cost-1">…</b>
+</figcaption>
+</figure>
+<figure>
+<img src="assets/evidence/loss/reconstruction-2.png" alt="Actual decoder mean for posterior draw three of the same target.">
+<figcaption>
+Draw 3<br><b id="rec-cost-2">…</b>
+</figcaption>
+</figure>
+</div>
+<div class="fragment reconstruction-expectation">
+<p>
+<span class="math inline">\(R(x)=\mathbb E_{z\sim q_\phi(z\mid x)}[-\log p_\theta(x\mid z)]\)</span>
+</p>
+<p>
+Average the cost over draws—not the images before scoring.
+</p>
+<p id="rec-average">
+Three-draw estimate: loading…
+</p>
+</div>
+<p class="fragment vae-line">
+Give the observed image high likelihood under codes its encoder proposes.
+</p>
+<p class="vae-source">
+Actual section-2 VAE · first validation image · first 3 fixed-seed draws. Shown costs use summed-pixel soft-target BCE; the equation states the probabilistic objective.
+</p>
+<aside class="notes">
+<p>Ask whether we should take the best reconstruction, use only the mean code, or average costs over draws. The expectation answers the actual training demand: codes drawn from this image’s q should explain the observed image. Taking the minimum would ignore poor outcomes; decoding the mean would not evaluate spread. For a nonlinear decoder, scoring the decoded mean, averaging decoded images and then scoring, and averaging per-draw scores are generally different operations.</p>
+<p>Define negative log likelihood through a concrete binary-pixel example if students need retrieval: when the observed pixel is one, a Bernoulli probability of 0.9 costs -log(0.9) ≈ 0.105 nats, while 0.1 costs ≈ 2.303. High probability on the observation means low cost. For independent Bernoulli pixels, sum the pixel costs; with a fixed-variance Gaussian observation model, negative log likelihood becomes a scaled squared error plus a constant. Thus the decoder’s observation model determines the reconstruction loss. Neither BCE nor MSE is a universal VAE requirement.</p>
+<p>In this grayscale experiment, the measured scores use the usual soft-target BCE surrogate. They illustrate the average-over-latents mechanism, not an exact likelihood for continuous grayscale observations. The displayed arithmetic averages three measured scalar costs. In general, R-hat = (1/L) sum_l [-log p_theta(x|z_l)] with independent z_l drawn from q_phi(z|x). A single draw per image is a common stochastic training estimate; it does not turn q into a deterministic point. More draws reduce Monte Carlo noise for a fixed model and image, but do not guarantee better trained models.</p>
+<p>All three reconstructions use the fixed regularized checkpoint. Changes can be subtle because its inferred distributions are narrow; the different measured costs show that the outcomes need not coincide. The uncertainty here concerns z under q, not resampling decoder weights. How to differentiate this expectation is the next section’s question.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="kl-explorer" class="slide level2 vae-s3">
+<h2>What does the prior penalty actually penalize?</h2>
+<div id="kl-explorer" class="kl-explorer">
+<div class="kl-controls">
+<p>
+One latent coordinate
+</p>
+<label for="kl-mu">Mean μ
+<output id="kl-mu-value">
+1.00
+</output>
+</label><input id="kl-mu" type="range" min="-2" max="2" step="0.05" value="1"><label for="kl-sigma">Spread σ
+<output id="kl-sigma-value">
+0.50
+</output>
+</label><input id="kl-sigma" type="range" min="0.2" max="2" step="0.05" value="0.5"><button id="kl-match" type="button">Match the prior</button>
+<p>
+Can moving the mean fix<br>a spread mismatch?
+</p>
+</div>
+<svg id="kl-curves" viewbox="0 0 850 360" role="img" aria-label="Gaussian density curves for the adjustable approximate posterior and fixed standard normal prior, on common axes.">
+</svg>
+</div>
+<div class="fragment kl-definition">
+<p>
+<span class="math inline">\(K(x)=D_{\mathrm{KL}}\!\left(q_\phi(z\mid x)\,\|\,p(z)\right)=\mathbb E_q\!\left[\log\frac{q(z\mid x)}{p(z)}\right]\)</span>
+</p>
+<div class="kl-costs">
+<div>
+<span>MEAN COST · ½ μ²</span><strong id="kl-mean-cost">…</strong>
+</div>
+<b>+</b>
+<div>
+<span>SPREAD COST · ½ (σ² − 1 − log σ²)</span><strong id="kl-spread-cost">…</strong>
+</div>
+<b>=</b>
+<div>
+<span>KL · NATS</span><strong id="kl-total">…</strong>
+</div>
+</div>
+</div>
+<p class="fragment vae-line">
+Zero at μ = 0, σ = 1. Narrower is not always better. For diagonal <span class="math inline">\(q\)</span>, add the coordinate costs.
+</p>
+<p class="vae-source">
+Exact Gaussian calculation, not model inference. <a href="https://arxiv.org/abs/1312.6114">Kingma &amp; Welling (2014), Appendix B</a>. KL averages a log density ratio under q; it is not symmetric.
+</p>
+<aside class="notes">
+<p>Before revealing the formula, let students move the mean and standard deviation. The orange Gaussian is q for one observed image; the purple reference is the chosen prior N(0,1). Both plots share fixed axes. Their peaks are densities, not point probabilities. Ask which controls are needed to make the curves coincide. Try mu = 0 with sigma = 0.2, then sigma = 2: centering alone does not match the prior, and making every posterior as narrow as possible does not minimize this penalty. The button sets mu = 0 and sigma = 1 without changing model weights because this is an analytic illustration, not a training simulation.</p>
+<p>Reveal the direction: KL(q||p) averages log(q/p) over q’s draws. It is nonnegative as an expectation, although the pointwise log ratio may be negative in some regions. It is neither a symmetric distance nor the area between the two plotted curves. Under this Gaussian assumption the penalty is 0.5[mu² + sigma² - 1 - log(sigma²)]. Derive its terms orally or on the board by taking E_q[log q - log p]: E_q[(z-mu)²]/sigma² = 1 and E_q[z²] = mu² + sigma². The normalization terms contribute -log sigma; regrouping gives the displayed mean and spread costs. For independent Gaussian coordinates, log densities add, so sum these expressions over j.</p>
+<p>Use two checks: (mu,sigma)=(2,1) gives 2 nats; (0,0.5) gives (0.25 - 1 - log 0.25)/2 ≈ 0.318 nats. The default (1,0.5) combines 0.5 and 0.318 to give 0.818. Negative mean and positive mean of equal magnitude have the same cost. Sigma approaching zero or becoming very large is expensive. Numeric log variances are an implementation choice; they do not change which distributions are compared.</p>
+<p>Minimizing this term alone would set every image’s q to the same prior, removing information about the particular image from z. Reconstruction supplies the competing demand. The per-image KL does not merely align a histogram of encoder means, nor does it guarantee that the dataset’s aggregated posterior equals the prior. Keep the full posterior-collapse discussion for the evaluation section.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="vae-loss-exercise" class="slide level2 vae-s3">
+<h2>Which proposal earns the lower total cost?</h2>
+<p class="loss-objective">
+Minimize <span class="math inline">\(J(x)=\underbrace{R(x)}_{\text{reconstruct}}+\underbrace{K(x)}_{\text{prior penalty}}\)</span>
+</p>
+<p class="vae-task">
+Two proposals for one image; <span class="math inline">\(p(z)=\mathcal N(0,I)\)</span>, <span class="math inline">\(d=2\)</span>.<br>Average the three reconstruction costs, calculate KL, then choose the lower total.
+</p>
+<table class="loss-exercise-table">
+<thead>
+<tr>
+<th>
+Proposal
+</th>
+<th>
+Three reconstruction costs
+</th>
+<th>
+μ
+</th>
+<th>
+σ
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+A
+</td>
+<td>
+4, 5, 6
+</td>
+<td>
+(1, 0)
+</td>
+<td>
+(0.5, 1)
+</td>
+</tr>
+<tr>
+<td>
+B
+</td>
+<td>
+5, 6, 7
+</td>
+<td>
+(0, 0)
+</td>
+<td>
+(1, 1)
+</td>
+</tr>
+</tbody>
+</table>
+<p class="loss-exercise-hint">
+<span class="math inline">\(K=\tfrac12\sum_j(\mu_j^2+\sigma_j^2-1-\log\sigma_j^2)\)</span> &nbsp; · &nbsp; <span class="math inline">\(\log(0.25)\approx-1.386\)</span>
+</p>
+<div class="exercise-pause">
+<span>PAUSE</span><b>90 seconds</b><small>Use pixel-summed costs per image; round the final totals to 0.01.</small>
+</div>
+<div class="fragment exercise-solution loss-worked">
+<span class="solution-label">WORKED SOLUTION</span>
+<p>
+<strong>A:</strong> <span class="math inline">\(R=5\)</span>, <span class="math inline">\(K=\tfrac12(1+0.25-1+1.386)=0.818\)</span> → <span class="math inline">\(J\approx5.82\)</span>.
+</p>
+<p>
+<strong>B:</strong> <span class="math inline">\(R=6\)</span>, <span class="math inline">\(K=0\)</span> → <span class="math inline">\(J=6.00\)</span>.
+</p>
+<p>
+A wins: its reconstruction gain of 1 exceeds its extra KL cost of 0.818.
+</p>
+</div>
+<p class="vae-source">
+Illustrative costs in nats per image, not Fashion-MNIST measurements. Coefficient 1 on KL gives the standard negative-ELBO objective when R is a valid expected negative log likelihood.
+</p>
+<aside class="notes">
+<p>This exercise puts a price on the tradeoff rather than simply asking whether regularization is good. Explicitly state that the three numbers are per-draw reconstruction costs after summing over the image, and that their mean estimates R. We compare two candidate per-image distribution/decoder outcomes; the numbers are hand chosen to isolate arithmetic. We are not estimating the true marginal likelihood of either candidate from this table.</p>
+<p>The second coordinate contributes zero KL for both proposals. In A the first coordinate contributes 0.5 times [1 + 0.25 - 1 - log(0.25)] = 0.818147. In B both coordinates match the standard normal, giving zero. Thus the estimated total for A is 5.818147 versus 6 for B. A proposal can be preferred even though its posterior does not exactly match the prior. Minimizing KL alone would choose B, ignoring its poorer reconstructions.</p>
+<p>The losses are sums over pixels and latent coordinates, then averaged over Monte Carlo draws and, during training, over images. Dividing only the reconstruction term by 784 would silently change the relative weighting, not merely the displayed units. A shared multiplication of the whole loss leaves its minimizer unchanged, whereas independent reductions can change the model being optimized. Implementation of consistent reductions belongs to section 5.</p>
+<p>We use coefficient one because the next slide will derive this combination from the evidence bound. A deliberately different coefficient defines a modified objective and deserves its own interpretation; do not introduce a beta-VAE detour here. This exercise uses a finite-draw estimate: the bound applies to the expectation, and a noisy Monte Carlo realization is not guaranteed to bound the exact log evidence on every draw.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="elbo-evidence" class="slide level2 vae-s3">
+<h2>Why this sum? It bounds the evidence</h2>
+<div class="elbo-example">
+<div>
+<span>EXACT TOY MODEL · observed x = 1</span>
+<p>
+Two possible latent states, A and B.
+</p>
+<table>
+<thead>
+<tr>
+<th>
+z
+</th>
+<th>
+p(z)
+</th>
+<th>
+p(x = 1 ∣ z)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+A
+</td>
+<td>
+0.5
+</td>
+<td>
+0.8
+</td>
+</tr>
+<tr>
+<td>
+B
+</td>
+<td>
+0.5
+</td>
+<td>
+0.2
+</td>
+</tr>
+</tbody>
+</table>
+<p>
+<span class="math inline">\(p(x)=0.5(0.8)+0.5(0.2)=0.5\)</span>
+</p>
+<small>Here the evidence is exactly computable.<br>For a neural decoder, the latent integral usually is not.</small>
+</div>
+<div class="elbo-budget">
+<label for="elbo-q">Encoder proposal q(A ∣ x):
+<output id="elbo-q-value">
+0.50
+</output>
+</label><input id="elbo-q" type="range" min="0.05" max="0.95" step="0.01" value="0.5"><svg id="elbo-bars" viewbox="0 0 650 285" role="img" aria-label="Exact toy costs: reconstruction plus prior KL is at least negative log evidence. The gap changes as the encoder proposal changes."></svg>
+<p id="elbo-numbers" aria-live="polite">
+Computing exact costs…
+</p>
+<button id="elbo-exact" type="button">
+Use the exact posterior
+</button>
+</div>
+</div>
+<div class="fragment elbo-identity">
+<p>
+<span class="math inline">\(\underbrace{\log p_\theta(x)}_{\text{log evidence}}=\underbrace{-R(x)-K(x)}_{\text{ELBO}}+\underbrace{D_{\mathrm{KL}}(q_\phi(z\mid x)\,\|\,p_\theta(z\mid x))}_{\text{nonnegative gap}}\)</span>
+</p>
+<p>
+Minimize <span class="math inline">\(R+K\)</span> ⇔ maximize the <strong>evidence lower bound</strong>.
+</p>
+</div>
+<p class="fragment vae-line">
+The training penalty compares q with the <em>prior</em>; the bound’s gap compares q with the <em>posterior</em>.
+</p>
+<p class="vae-source">
+Course-made discrete example; exact sums, not Monte Carlo. <a href="https://arxiv.org/abs/1312.6114">Kingma &amp; Welling (2014), §2.2, Eqs. 1–3</a>. The identity assumes a valid normalized observation likelihood.
+</p>
+<aside class="notes">
+<p>Switch briefly to a tiny exact generative model so students can see what is inaccessible in the neural-network case. This is not another Fashion-MNIST run, and its categorical q does not use the Gaussian KL formula from the previous slide. The observed binary value is x = 1. A and B have equal prior probability; they predict this observation with likelihoods 0.8 and 0.2. Summing the two joint probabilities gives evidence 0.5. Its negative log is 0.693147 nats.</p>
+<p>Move the encoder proposal q(A|x)=w while keeping the generative model fixed. Here R = -w log(0.8) -(1-w)log(0.2), K = w log(2w)+(1-w)log(2(1-w)). The upper bar stacks those costs; the lower reference is the exact negative log evidence. At w = 0.5, R = 0.916291, K = 0, and the gap is 0.223144. At w = 0.8, R = 0.500402 and K = 0.192745, so their sum equals 0.693147. Notice that the best q has a nonzero KL to the prior. At w = 0.95, reconstruction cost is even lower but total cost increases again. Students can test why chasing only reconstruction or only prior matching misses the best combined answer.</p>
+<p>Derive the exact posterior from the visible joint probabilities: p(A|x)=0.4/0.5=0.8 and p(B|x)=0.1/0.5=0.2. The button sets this distribution. Reveal the identity after students notice the bar cannot go below the reference. Start from Bayes: log p_theta(z|x) = log p_theta(x|z)+log p(z)-log p_theta(x). Substitute into E_q[log q-log p_theta(z|x)]. The result is R + K + log p_theta(x). Rearranging gives the displayed identity; nonnegativity of KL makes -R-K a lower bound on log evidence. This is the evidence LOWER bound, although the positive loss R+K is an UPPER bound on negative log evidence. The graph intentionally shows positive costs to maintain the minimization convention from the exercise.</p>
+<p>Name the two KLs separately. The computable prior penalty KL(q||p(z)) is part of the loss. The generally intractable posterior gap KL(q||p_theta(z|x)) explains why it is a bound. We do not train by evaluating the exact posterior gap. The bound is tight when q equals the true model posterior; a restricted diagonal Gaussian and a shared encoder may not achieve that. With theta fixed, maximizing the bound improves the variational approximation in this KL direction. Joint training also changes theta, so both evidence and posterior move. A better ELBO need not produce sharper images or guarantee distributional coverage.</p>
+<p>The identity requires a proper likelihood. The preceding grayscale experiment uses a clearly labeled BCE surrogate, so its measured score is not automatically an exact evidence bound for continuous grayscale images. For valid likelihoods the bound concerns the expectation over q; a one-sample estimate may cross the exact evidence through sampling noise. All values in this toy are exact finite sums, and logs are natural, giving nats.</p>
+<p>Close with the remaining computational question: we can calculate a per-draw reconstruction cost and an analytic Gaussian KL, but how can a random latent draw transmit a useful gradient to mu and sigma? That question motivates section 4 without deriving the reparameterization trick here.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="section-4" class="title-slide slide level1 section-slide vae-section vae-section-four center" data-section-progress="4 / 6" data-background-color="#17212b">
+<h1>04 · Backpropagating through a random draw</h1>
+<aside class="notes">
+<p>Allow about 15 minutes including the worked exercise. Students already know the chain rule and autograd; retrieve those ideas through an actual missing-gradient result rather than reteaching differentiation. Focus on the reconstruction path. The Gaussian KL already has an analytic differentiable expression. Four slides move from a failing program to a graph students can manipulate, a numerical backward pass, and the working implementation.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="sampling-break" class="slide level2 vae-s4">
+<h2>The decoder learns. Does the encoder?</h2>
+<div class="reparam-code-layout">
+<div class="reparam-probe">
+<p>
+A tiny decoder:<br><span class="math inline">\(\hat x=az\)</span>, target <span class="math inline">\(x=2\)</span>.
+</p>
+<p>
+Backpropagate the<br><strong>reconstruction cost only.</strong>
+</p>
+<div class="fragment" data-fragment-index="1">
+<span class="vae-path-label">ACTUAL AUTOGRAD RESULT</span>
+<dl>
+<dt>
+Decoder a.grad
+</dt>
+<dd>
+−0.2505
+</dd>
+<dt>
+Encoder μ.grad
+</dt>
+<dd>
+None
+</dd>
+<dt>
+Encoder logvar.grad
+</dt>
+<dd>
+None
+</dd>
+</dl>
+</div>
+</div>
+<div class="light-code-editor">
+<div class="editor-bar">
+<span>PYTORCH · TRACE THE MISSING PATH</span><strong>CPU · seed 7</strong>
+</div>
+<pre><code>torch.manual_seed(7)
+mu = torch.tensor([1.], requires_grad=True)
+logvar = torch.tensor([0.], requires_grad=True)
+a = torch.tensor([2.], requires_grad=True)
+
+sigma = (0.5 * logvar).exp()
+q = torch.distributions.Normal(mu, sigma)
+z = q.sample()
+
+x_hat = a * z
+rec = 0.5 * (x_hat - 2).square().mean()
+rec.backward()
+
+<span class="fragment" data-fragment-index="1">print(a.grad, mu.grad, logvar.grad)
+<span class="py-output"># tensor([-0.2505]) None None</span></span></code></pre>
+</div>
+</div>
+<p class="fragment vae-line" data-fragment-index="2">
+Here <code>sample()</code> returns z without a gradient path to μ or σ.
+</p>
+<p class="vae-source">
+Executed course probe · PyTorch 2.13, CPU. <a href="https://docs.pytorch.org/docs/stable/distributions.html#pathwise-derivative">PyTorch distributions: pathwise derivatives</a>. None means no accumulated gradient, not a measured zero derivative.
+</p>
+<aside class="notes">
+<p>Ask students to predict which of the three leaf tensors receives a reconstruction gradient before revealing the result. Mu and logvar stand in for the encoder’s outputs, so we make them leaves to inspect their gradients directly. In a full encoder they are typically non-leaf outputs; use retain_grad if inspecting those directly, or inspect the encoder parameters instead. The scalar a is a trainable decoder weight. We seed the draw only to reproduce the classroom result; resetting a fixed seed every training iteration is not the intended training procedure.</p>
+<p>The decoder can differentiate its loss with respect to a while treating z as a supplied constant. However, Normal.sample() creates no pathwise autograd connection from z to mu and sigma. Thus the reconstruction term cannot teach the encoder which distribution parameters would yield more useful codes. This is a property of this sampling API and this gradient estimator, not a theorem that expectations involving randomness cannot be differentiated. Score-function estimators exist; they are outside this section’s scope.</p>
+<p>We isolate the reconstruction loss intentionally. If we added the analytic KL term, the encoder could receive KL gradients even with sample(), obscuring the missing reconstruction path. Training might appear to run while the encoder mainly learns to match the prior. A loss decreasing or some nonzero encoder gradient is not sufficient to prove the reconstruction path is correct. None is different from zero: here no path accumulated a derivative at all.</p>
+<p>For the recorded draw, z = 0.853204906 and rec = 0.043097600. The decoder gradient is (a<em>z - 2)</em>z = -0.250492603. The complete executable check is stored with the lecture; no browser model execution is implied.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="reparameterization-graph" class="slide level2 vae-s4">
+<h2>Draw noise, then transform it</h2>
+<div id="reparam-lab" class="reparam-controls">
+<label for="rp-mu">μ
+<output id="rp-mu-value">
+1.00
+</output>
+<input id="rp-mu" type="range" min="-1" max="2" step="0.05" value="1"></label><label for="rp-sigma">σ
+<output id="rp-sigma-value">
+0.50
+</output>
+<input id="rp-sigma" type="range" min="0.25" max="1.5" step="0.05" value="0.5"></label><button id="rp-next" type="button">Next recorded ε →</button><button id="rp-example" type="button">Worked value ε = −1</button>
+</div>
+<p class="reparam-noise" id="rp-noise-status">
+ε ∼ N(0, I), independent of the encoder; held fixed while moving μ or σ.
+</p>
+<svg class="reparam-graph" viewbox="0 0 1200 320" role="img" aria-label="Reparameterized computation graph. Independent noise epsilon multiplies sigma, then mu is added to produce z. Both learned parameters connect to the result through ordinary arithmetic.">
+<defs><marker id="rp-arrow" markerwidth="8" markerheight="8" refx="7" refy="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#657079"></path></marker></defs> <g fill="none" stroke="#657079" stroke-width="2.5" marker-end="url(#rp-arrow)"><path d="M240 145 H334"></path><path d="M375 70 V105"></path><path d="M416 145 H709"></path><path d="M600 224 V203 H750 V186"></path><path d="M791 145 H919"></path></g> <g fill="#dceeff" stroke="#2878c8" stroke-width="2"><rect x="80" y="110" width="150" height="70" rx="8"></rect><rect x="525" y="234" width="150" height="70" rx="8"></rect><rect x="930" y="110" width="180" height="70" rx="8"></rect></g> <rect x="300" y="0" width="150" height="60" rx="8" fill="#edf0f3" stroke="#657079" stroke-width="2"></rect> <g fill="#e9e2f3" stroke="#7655ad" stroke-width="3"><circle cx="375" cy="145" r="30"></circle><circle cx="750" cy="145" r="30"></circle></g> <g text-anchor="middle" dominant-baseline="middle" fill="#17212b" font-family="sans-serif" font-size="26"><text id="rp-sigma-node" x="155" y="146">σ = 0.500</text><text id="rp-eps-node" x="375" y="30">ε = …</text><text id="rp-mu-node" x="600" y="270">μ = 1.000</text><text id="rp-z-node" x="1020" y="146">z = …</text><text x="375" y="145" font-size="38">×</text><text x="750" y="145" font-size="38">+</text></g> <g font-family="sans-serif" font-size="21" fill="#657079"><text x="475" y="50">Draw independently; no gradient through the RNG.</text><text x="850" y="260">○ × multiply &nbsp; ○ + add</text></g>
+</svg>
+<div class="fragment reparam-rule">
+<p>
+<span class="math inline">\(z=\mu+\sigma\odot\epsilon,\quad\epsilon\sim\mathcal N(0,I)\)</span>
+</p>
+<p>
+<span class="math inline">\(\mathbb E[z]=\mu,\quad\operatorname{Var}(z_j)=\sigma_j^2\)</span> &nbsp; · &nbsp; same diagonal Gaussian.
+</p>
+</div>
+<p class="fragment vae-line">
+For this draw: <span class="math inline">\(\partial z_j/\partial\mu_j=1\)</span>, &nbsp; <span class="math inline">\(\partial z_j/\partial\sigma_j=\epsilon_j\)</span>.
+</p>
+<p class="vae-source">
+Course-made scalar graph; × and + are elementwise in a vector VAE. Recorded standard-normal draws, seed 73; ε = −1 is a separate teaching value. <a href="https://arxiv.org/abs/1312.6114">Kingma &amp; Welling (2014), §2.4</a>.
+</p>
+<aside class="notes">
+<p>Begin with the diagram and move mu. With epsilon and sigma fixed, the output shifts by exactly the same amount. Next move sigma while holding mu and epsilon fixed. For a negative epsilon the point moves in the opposite direction; for a positive epsilon it moves with sigma. The first recorded noise value happens to be small, so use Next recorded epsilon to reach larger positive and negative draws, or the explicitly labeled worked value -1. Every switch preserves mu and sigma. Eight real standard-normal draws from a fixed seed are available; the -1 button chooses a pedagogical value rather than claiming it was that seeded draw.</p>
+<p>The diagram uses data rectangles and operation circles; the × and + icons are defined once in the legend. The random-number generator supplies epsilon before the differentiable arithmetic. The drawn value is treated as a constant for this backward pass. The trainable distribution parameters remain connected to z. The demo is arithmetic, not a model being retrained. All values update immediately and the recorded draw stays fixed when sliders move.</p>
+<p>After students inspect the movement, reveal the expression and check its distribution. An affine transformation of a Gaussian remains Gaussian. E[epsilon]=0 gives E[z]=mu; Var(epsilon_j)=1 gives Var(z_j)=sigma_j². Independent standard-normal coordinates yield diagonal covariance after elementwise scaling. Matching mean and variance alone would not characterize an arbitrary distribution, so explicitly use the Gaussian affine-transformation fact. Sigma remains positive through the log-variance parameterization from section 2.</p>
+<p>Reveal the local derivatives only after observing the movement. They are derivatives with the realized noise fixed. Noise itself does not receive a trainable gradient. For a differentiable reconstruction function f, R = E_epsilon[f(mu_phi(x)+sigma_phi(x)*epsilon)] has a base distribution independent of phi. Under the usual differentiation/interchange regularity assumptions, we may average gradients through this transformation to estimate the gradient of the expectation. A single draw is noisy; it does not give the exact expected gradient. Fresh independent noise is normally sampled on each training forward pass, not frozen throughout training.</p>
+<p>The general reparameterization idea extends beyond Gaussians when an appropriate differentiable transformation exists. Do not imply that this affine formula applies unchanged to arbitrary or discrete distributions. We only need the diagonal Gaussian VAE here.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="reparameterization-exercise" class="slide level2 vae-s4">
+<h2>Follow one draw backward</h2>
+<p class="vae-task">
+Given μ = 1, σ = 0.5, ε = −1. Decoder: <span class="math inline">\(\hat x=2z\)</span>. Target: <span class="math inline">\(x=2\)</span>.<br>Use <span class="math inline">\(\ell=\tfrac12(\hat x-2)^2\)</span>. Find <span class="math inline">\(z\)</span>, <span class="math inline">\(\ell\)</span>, <span class="math inline">\(\partial\ell/\partial\mu\)</span>, and <span class="math inline">\(\partial\ell/\partial\sigma\)</span>.
+</p>
+<div class="reparam-workflow">
+<div>
+<span>DRAW HELD FIXED</span><strong>ε = −1</strong>
+</div>
+<b>→</b>
+<div>
+<span>TRANSFORM</span><strong>z = 1 + 0.5 ε</strong>
+</div>
+<b>→</b>
+<div>
+<span>DECODE</span><strong>x̂ = 2z</strong>
+</div>
+<b>→</b>
+<div>
+<span>SCORE</span><strong>½ (x̂ − 2)²</strong>
+</div>
+</div>
+<p class="reparam-chain">
+<span class="math inline">\(\displaystyle\frac{\partial\ell}{\partial z}=(\hat x-2)\,2\)</span> &nbsp; · &nbsp; <span class="math inline">\(\displaystyle\frac{\partial z}{\partial\mu}=1\)</span> &nbsp; · &nbsp; <span class="math inline">\(\displaystyle\frac{\partial z}{\partial\sigma}=\epsilon\)</span>
+</p>
+<div class="exercise-pause">
+<span>PAUSE</span><b>90 seconds</b><small>Keep ε fixed. Use the sign to predict which way gradient descent moves μ and σ.</small>
+</div>
+<div class="fragment exercise-solution reparam-solution">
+<span class="solution-label">WORKED SOLUTION</span>
+<p>
+<span class="math inline">\(z=0.5\)</span>, <span class="math inline">\(\hat x=1\)</span>, <span class="math inline">\(\ell=0.5\)</span>; &nbsp; <span class="math inline">\(\partial\ell/\partial z=-2\)</span>.
+</p>
+<p>
+<span class="math inline">\(\partial\ell/\partial\mu=-2\)</span>; &nbsp; <span class="math inline">\(\partial\ell/\partial\sigma=(-2)(-1)=2\)</span>.
+</p>
+<p>
+A small descent step raises μ and lowers σ. For this negative ε, both raise z toward the target.
+</p>
+</div>
+<p class="fragment exercise-extension">
+The encoder predicts log variance <span class="math inline">\(v\)</span>. Since <span class="math inline">\(\sigma=e^{v/2}\)</span>, <span class="math inline">\(\partial\ell/\partial v=2(0.5\sigma)=0.5\)</span>.
+</p>
+<p class="vae-source">
+Illustrative scalar decoder; reconstruction path only. Verified with PyTorch autograd and fixed-noise finite differences. The sampled direction is not necessarily the expected-loss direction.
+</p>
+<aside class="notes">
+<p>The graph from the previous slide is now a particular sampled path. Retrieve the chain rule through the displayed derivatives rather than reteaching it. The forward path gives z=1+0.5<em>(-1)=0.5, x_hat=1, and half squared error 0.5. The upstream derivative into z is (1-2)</em>2=-2. Multiply by dz/dmu=1 for -2 and dz/dsigma=-1 for +2. Gradient descent subtracts each gradient, so a small step increases mu and decreases sigma. For this fixed negative epsilon, both changes increase z and x_hat, reducing the sampled error locally.</p>
+<p>If students think the sigma derivative must be positive because sigma is positive, vary epsilon’s sign in the preceding demo. The derivative depends on both the upstream reconstruction error and the sampled noise. Do not generalize this one draw into a claim that shrinking every posterior improves the expected reconstruction objective.</p>
+<p>The optional final reveal traces the parameter the actual encoder outputs: v=log sigma², so dsigma/dv=sigma/2. Thus dℓ/dv=(dℓ/dsigma)<em>(sigma/2)=2</em>0.25=0.5. We are not updating sigma directly in the implemented VAE. The exponential transformation keeps sigma positive while allowing unconstrained v.</p>
+<p>These are reconstruction gradients only. The KL term contributes additional analytic gradients. For reference in this scalar setting, dK/dmu=mu and dK/dv=(exp(v)-1)/2, but keep those additional calculations in narration unless asked; this exercise diagnoses whether students can follow the stochastic reconstruction path. A finite-difference check must reuse the same epsilon in both perturbed evaluations, otherwise it mixes a parameter perturbation with Monte Carlo noise.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="reparameterization-code" class="slide level2 vae-s4">
+<h2>Same draw. Now the gradient reaches the encoder</h2>
+<div class="reparam-code-layout">
+<div class="reparam-probe">
+<p>
+Same seed and inputs.<br>Same z = <strong>0.8532</strong>.<br>Same loss = <strong>0.0431</strong>.
+</p>
+<div class="fragment" data-fragment-index="1">
+<span class="vae-path-label">ACTUAL AUTOGRAD RESULT</span>
+<dl>
+<dt>
+μ.grad
+</dt>
+<dd>
+−0.5872
+</dd>
+<dt>
+logvar.grad
+</dt>
+<dd>
+0.0431
+</dd>
+<dt>
+a.grad
+</dt>
+<dd>
+−0.2505
+</dd>
+</dl>
+</div>
+</div>
+<div class="light-code-editor">
+<div class="editor-bar">
+<span>PYTORCH · REPLACE THE DRAW</span><strong>same setup as before</strong>
+</div>
+<pre><code>sigma = (0.5 * logvar).exp()
+eps = torch.randn_like(mu)
+z = mu + sigma * eps
+
+x_hat = a * z
+rec = 0.5 * (x_hat - 2).square().mean()
+rec.backward()
+<span class="fragment" data-fragment-index="1">
+print(mu.grad, logvar.grad, a.grad)
+<span class="py-output"># tensor([-0.5872]) tensor([0.0431])
+# tensor([-0.2505])</span></span>
+<span class="fragment" data-fragment-index="2">
+<span class="py-comment-inline"># Equivalent Gaussian sampling API:</span>
+z = torch.distributions.Normal(
+    mu, sigma).rsample()</span></code></pre>
+</div>
+</div>
+<p class="fragment vae-line" data-fragment-index="2">
+Fresh noise each forward pass; ordinary backpropagation through μ + σ ⊙ ε.
+</p>
+<p class="vae-source">
+Executed CPU probe, seed 7, fresh leaf tensors in each run. Manual transformation and <code>Normal.rsample()</code> give matching values and gradients. <a href="https://docs.pytorch.org/docs/stable/distributions.html#pathwise-derivative">PyTorch pathwise derivative API</a>.
+</p>
+<aside class="notes">
+<p>Restore the same setup from the first slide with fresh mu, logvar, and a leaves and reset the seed once for the comparison. Change only the sampling expression. The observed numerical z and loss match the detached-sampling run in this tested CPU setup, while reconstruction gradients now reach the distribution parameters. Decoder a’s gradient is unchanged. This separates changing the sampling distribution from changing how the sampled value is represented in the differentiation graph.</p>
+<p>The final API line is an alternative to the manual eps/z lines, not a second required sample after backward. When comparing outputs exactly, reset the seed and rebuild the graph for each independent run. The equivalence of the distributions and the pathwise mechanism matters generally; bitwise agreement of separately executed calls is not guaranteed across devices, versions, or generator consumption patterns. Do not detach mu, sigma, or z, convert them to Python scalars in the training path, or put the forward pass under no_grad.</p>
+<p>Normal.rsample() implements reparameterized sampling for this distribution. Not all distributions support rsample; check their support instead of assuming every random operation provides a pathwise gradient. In the real encoder, gradients continue from mu and logvar to shared feature-extractor weights by the chain rule. Epsilon ordinarily has requires_grad=False; we do not optimize the noise or the RNG seed.</p>
+<p>For a batch, mu, logvar, eps, and z all have shape [B,d]. randn_like supplies a standard-normal value at every element; this is elementwise multiplication, not a matrix product. The reconstruction loss is estimated from the draw, and the analytic Gaussian KL is added separately. Section 5 will combine this sampling step with the actual decoder, consistently reduced losses, and an optimizer update. We have solved the sampling gradient mechanism here without expanding into the entire training loop.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="section-5" class="title-slide slide level1 section-slide vae-section vae-section-five center" data-section-progress="5 / 6" data-background-color="#17212b">
+<h1>05 · Building and training a VAE</h1>
+<aside class="notes">
+<p>This section assembles the mechanisms already taught into a working program. Keep the explanation concrete after the conceptual work of sections 3–4. Use the GaussianEncoder from section 2, the reparameterization from section 4, and the two loss terms from section 3. Students should leave able to identify tensor shapes, reduce the losses correctly, perform an optimizer step, and distinguish three inference paths. Allow about 15 minutes including the reduction exercise and output inspection. Imports and the complete runnable program are available through the schedule; slides foreground the new contract rather than boilerplate.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="vae-assembly" class="slide level2 vae-s5">
+<h2>Assemble the pieces we already understand</h2>
+<div class="posterior-code-layout">
+<div class="posterior-shapes">
+<h3>
+Trace one batch
+</h3>
+<p>
+Images<br><b>x: [32, 1, 28, 28]</b>
+</p>
+<p>
+Section 02 encoder<br><b>μ, logvar: [32, 2]</b>
+</p>
+<p class="fragment" data-fragment-index="1">
+One draw per image<br><b>z: [32, 2]</b>
+</p>
+<p class="fragment" data-fragment-index="1">
+Decoder means<br><b>x̂: [32, 1, 28, 28]</b>
+</p>
+</div>
+<div class="light-code-editor">
+<div class="editor-bar">
+<span>PYTORCH · COMPLETE VAE MODULE</span><strong>d = 2</strong>
+</div>
+<pre><code><span class="py-kw">class</span> VAE(nn.Module):
+    <span class="py-kw">def</span> __init__(self):
+        super().__init__()
+        self.encoder = GaussianEncoder()
+        self.decoder = nn.Sequential(
+            nn.Linear(2, 128), nn.ReLU(),
+            nn.Linear(128, 256), nn.ReLU(),
+            nn.Linear(256, 784), nn.Sigmoid(),
+            nn.Unflatten(1, (1, 28, 28)))
+<span class="fragment" data-fragment-index="1">
+    <span class="py-kw">def</span> forward(self, x):
+        mu, logvar = self.encoder(x)
+        sigma = (0.5 * logvar).exp()
+        z = mu + sigma * torch.randn_like(mu)
+        <span class="py-kw">return</span> self.decoder(z), mu, logvar</span></code></pre>
+</div>
+</div>
+<p class="fragment vae-line" data-fragment-index="2">
+Return the reconstruction <em>and</em> the distribution parameters: the loss needs both.
+</p>
+<p class="vae-source">
+Course implementation · same layer architecture as the recorded Fashion-MNIST experiments. GaussianEncoder is defined in section 02 and in the <a href="assets/vae_training.py">runnable script</a>.
+</p>
+<aside class="notes">
+<p>Point back to the architecture comparison, then map the existing modules directly to this class. GaussianEncoder is exactly the two-head module from section 2: flatten, 784→256→128 with ReLUs, followed by separate two-dimensional mean and log-variance heads. The decoder mirrors the widths and emits 784 sigmoid values before restoring the image axes. Inputs are grayscale tensors in [0,1]. The output is a decoder mean image, not a sampled binary pixel array.</p>
+<p>Reveal forward only after tracing the constructor. The encoder produces two parameter tensors, then the sampling transform makes one code per image. The sampled code still has dimension two, not four. Return x_hat, mu, and logvar so the training loop can compute both reconstruction and analytic KL costs without running the encoder again. Calling forward again would draw new noise and create a different stochastic computation.</p>
+<p>The batch size 32 is an example, not hardcoded. The module supports a variable leading batch dimension, including the smaller final minibatch. The experiment training batch size was 256. Students already know nn.Module, Sequential, and forward; spend time on data flow, not Python class syntax.</p>
+<p>This implementation preserves the established sigmoid-plus-BCE teaching model. A logits-based decoder paired with BCEWithLogitsLoss is a common numerically stable alternative, but requires changing both output and loss consistently. Do not silently remove Sigmoid while continuing to call probability-form BCE. Because targets here are grayscale, BCE remains the explicitly labeled soft-target surrogate rather than an exact continuous-image likelihood.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="vae-reductions" class="slide level2 vae-s5">
+<h2>Sum within an image; average across images</h2>
+<div class="training-loss-layout">
+<div>
+<h3>
+Two illustrative images
+</h3>
+<table class="training-cost-table">
+<thead>
+<tr>
+<th>
+Image
+</th>
+<th>
+R
+</th>
+<th>
+K
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+1
+</td>
+<td>
+2
+</td>
+<td>
+0.5
+</td>
+</tr>
+<tr>
+<td>
+2
+</td>
+<td>
+4
+</td>
+<td>
+1.5
+</td>
+</tr>
+</tbody>
+</table>
+<p>
+R already sums the pixels.<br>K already sums latent coordinates.
+</p>
+<p>
+<strong>What scalar should<br>this batch return?</strong>
+</p>
+</div>
+<div class="light-code-editor">
+<div class="editor-bar">
+<span>PYTORCH · ONE COST PER IMAGE FIRST</span><strong>then one batch mean</strong>
+</div>
+<pre><code><span class="py-kw">def</span> vae_loss(x_hat, x, mu, logvar):
+    pixel_cost = F.binary_cross_entropy(
+        x_hat, x, reduction='none')
+    rec = pixel_cost.flatten(1).sum(1)
+
+    kl = 0.5 * (
+        mu.square() + logvar.exp() - 1 - logvar
+    ).sum(1)
+
+    loss = (rec + kl).mean()
+    <span class="py-kw">return</span> loss, rec.mean(), kl.mean()</code></pre>
+</div>
+</div>
+<div class="exercise-pause">
+<span>PAUSE</span><b>45 seconds</b><small>Compute the scalar. Would duplicating both images change it?</small>
+</div>
+<div class="fragment exercise-solution training-loss-solution">
+<span class="solution-label">WORKED SOLUTION</span>
+<p>
+<span class="math inline">\(J=\big[(2+0.5)+(4+1.5)\big]/2=4\)</span>.
+</p>
+<p>
+Duplicating the batch keeps the mean at 4. It must not double the loss.
+</p>
+</div>
+<p class="vae-source">
+Illustrative costs, not measured data. In the program: pixels [B,1,28,28] → R [B]; latent coordinates [B,2] → K [B] → scalar. F is torch.nn.functional.
+</p>
+<aside class="notes">
+<p>Make the axes concrete before arithmetic. reduction=‘none’ preserves every pixel’s BCE cost. flatten(1) merges only the non-batch axes to [B,784], and sum(1) produces one reconstruction cost per image. The elementwise Gaussian expression starts as [B,2]; sum(1) produces one KL cost per image. Adding the two [B] vectors pairs costs from the same image; mean then averages over images.</p>
+<p>The two-image exercise gives per-image totals 2.5 and 5.5, averaging to 4. Duplicating the same already computed forward outputs gives [2.5,5.5,2.5,5.5], also averaging to 4. We hold outputs fixed for this invariance check. A fresh stochastic forward pass can change the numerical Monte Carlo estimate even when the inputs are duplicated; that is a sampling change, not a reduction error. The executable checks duplicate x_hat, x, mu, and logvar together to isolate the reduction semantics.</p>
+<p>A common bug uses default mean BCE across batch AND pixels, but sums KL over latent coordinates and averages only over the batch. Relative to this objective, that divides reconstruction by 784 while leaving KL unchanged, effectively emphasizing KL by a factor of 784. Averaging both terms over the same batch is not enough; their internal reductions must also match the intended per-image objective. A global constant rescaling of the whole loss differs from changing the relative weights.</p>
+<p>Return the differentiable total plus the two scalar components so the loop can log them separately. Calling item() before backward on the total would discard the tensor graph. For epoch reporting, accumulate each batch mean times its batch size, then divide by the number of images, so a small final minibatch receives the appropriate weight.</p>
+<p>The code assumes matching reconstruction and target shapes and valid [0,1] values. The source script tests scalar shape, finiteness, reduction equivalence to summed BCE divided by batch size, and duplicate-batch invariance. It also separately checks that reconstruction gradients reach both encoder heads, rather than relying on KL gradients to mask a detached sampling path.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="vae-training-step" class="slide level2 vae-s5">
+<h2>One batch now updates the whole model</h2>
+<div class="posterior-code-layout">
+<div class="training-step-evidence">
+<span class="vae-path-label">ACTUAL 32-IMAGE CHECK</span>
+<p>
+Before the first update
+</p>
+<dl>
+<dt>
+Reconstruction
+</dt>
+<dd>
+545.7927
+</dd>
+<dt>
+KL
+</dt>
+<dd>
+0.0070
+</dd>
+<dt>
+Total
+</dt>
+<dd>
+545.7997
+</dd>
+</dl>
+<div class="fragment" data-fragment-index="1">
+<p>
+Reconstruction reaches<br><strong>both encoder heads.</strong>
+</p>
+<p>
+All parameter tensors<br><strong>changed after the step.</strong>
+</p>
+</div>
+</div>
+<div class="light-code-editor">
+<div class="editor-bar">
+<span>PYTORCH · FOR EACH MINIBATCH</span><strong>familiar optimizer contract</strong>
+</div>
+<pre><code>model = VAE()
+optimizer = torch.optim.Adam(
+    model.parameters(), lr=1e-3)
+
+<span class="py-kw">def</span> train_step(model, optimizer, x):
+    model.train()
+    optimizer.zero_grad(set_to_none=True)
+    x_hat, mu, logvar = model(x)
+    loss, rec, kl = vae_loss(
+        x_hat, x, mu, logvar)
+<span class="fragment" data-fragment-index="1">
+    loss.backward()
+    optimizer.step()
+    <span class="py-kw">return</span> loss.item(), rec.item(), kl.item()</span></code></pre>
+</div>
+</div>
+<p class="fragment vae-line" data-fragment-index="2">
+Log reconstruction and KL separately. A total alone can hide a missing learning path.
+</p>
+<p class="vae-source">
+Executed check · first 32 images in the seed-41 training split · initialization 113, noise 811 · one Adam step. These are initial batch costs, not trained-model quality scores.
+</p>
+<aside class="notes">
+<p>Trace the now-complete program in order. Construct the model and optimizer once, outside the minibatch function; recreating Adam each batch would discard its accumulated state. zero_grad clears accumulated parameter gradients, forward draws fresh noise, the loss combines per-image reconstruction and KL, backward differentiates the same graph, and step updates both encoder and decoder weights. The returned Python numbers are for logging only and are extracted after backward.</p>
+<p>The visible numbers come from an executed smoke check on the first 32 training-split images with a fresh model, not the ten-epoch checkpoint. The script’s simpler module construction consumes initialization RNG differently from the earlier evidence generator’s temporary Autoencoder construction, so the same initialization seed does not imply identical initial decoder weights across those implementations. Architecture and objective agree. We make no quality comparison between this one-step check and the trained evidence.</p>
+<p>Two checks matter beyond seeing a finite loss: the reconstruction term by itself produces finite nonzero gradients for both encoder heads, and the optimizer step changes every parameter tensor in this probe. The measured head-weight gradient norms are approximately 0.5338 for mu and 0.9730 for logvar. These are diagnostic outcomes of this particular batch, not required target magnitudes or guarantees for every future model. They catch the detached-sampling mistake from section 4 that an encoder KL gradient alone could conceal.</p>
+<p>In the full runnable script, iterate over the shuffled training loader for ten epochs, use the 50k/10k split already established, and weight logged batch means by batch size. Keep validation images outside optimizer updates. A training curve decreasing is useful but cannot establish prior-sample quality; the next slide opens the two output paths directly. Architecture design and optimizer theory are assumed prerequisites here.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="vae-inspection" class="slide level2 vae-s5">
+<h2>Choose the path you actually want to inspect</h2>
+<div id="training-inspection" class="training-inspection-layout">
+<div class="training-inspection-view">
+<label for="inspection-mode">Decoder input</label><select id="inspection-mode"><option value="mean">Encoder mean μ(x)</option><option value="posterior">Draw from q(z ∣ x)</option><option value="prior">Draw from p(z)</option></select>
+<div class="inspection-input">
+<img src="assets/evidence/posterior/input-0.png" alt="The observed validation T-shirt used for reconstruction; only a reference when generating from the prior.">
+<p id="inspection-input-label">
+Observed x<br>used by the encoder
+</p>
+</div>
+<img id="inspection-output" src="assets/evidence/posterior/mean-0.png" alt="Actual decoder output for the observed image's posterior mean code.">
+<p id="inspection-output-label">
+Deterministic mean-code reconstruction
+</p>
+</div>
+<div class="light-code-editor">
+<div class="editor-bar">
+<span>PYTORCH · FIXED TRAINED WEIGHTS</span><strong>three different questions</strong>
+</div>
+<pre><code>model.eval()
+<span class="py-kw">with</span> torch.no_grad():
+    mu, logvar = model.encoder(x)
+    sigma = (0.5 * logvar).exp()
+
+    <span id="inspection-code-mean">mean_image = model.decoder(mu)</span>
+
+    <span id="inspection-code-posterior">z = mu + sigma * torch.randn_like(mu)
+    posterior_image = model.decoder(z)</span>
+
+    <span id="inspection-code-prior">z_prior = torch.randn_like(mu)
+    generated_image = model.decoder(z_prior)</span></code></pre>
+<div class="fragment training-inspection-note">
+<p>
+<code>eval()</code> does not remove explicit random draws.<br><code>no_grad()</code> disables gradient recording.
+</p>
+</div>
+</div>
+</div>
+<p class="fragment vae-line">
+Decode μ to repeat one reconstruction; draw from the prior to generate without an image.
+</p>
+<p class="vae-source">
+Recorded outputs from the section-2 checkpoint · same decoder in all three paths · first selected validation T-shirt, first recorded posterior/prior draws. Browser switches local images; code shows the corresponding operations.
+</p>
+<aside class="notes">
+<p>Use the selector to compare three output paths through the same trained decoder. The image supplied to the encoder stays visible as a reference. In prior mode the label explicitly says it is unused: the generation path does not need an observed x. The code shows all three paths together for comparison; a standalone prior-generation program needs only a latent batch with the desired shape, for example torch.randn(1,2,device=device), and the decoder. randn_like(mu) here reuses an already available tensor only to specify shape, dtype, and device, not to condition the prior on mu’s numerical values.</p>
+<p>The first mode decodes mu for a deterministic plug-in reconstruction in this MLP. It is not generally the expectation of decoded images. The second mode draws from the input-conditioned posterior and may give different reconstructions on repeated calls. The third mode draws from the fixed standard-normal prior, irrespective of the observed image. All displayed outputs are decoder means, with no additional pixel sampling. The source images and indices are documented in the section-2 manifest; these controls display recorded outputs rather than running the network in JavaScript.</p>
+<p>The visible VAE.forward always draws noise, so model.eval() alone cannot make its reconstructions deterministic. eval() changes training/evaluation behavior for modules such as Dropout and BatchNorm; this particular MLP has neither. no_grad prevents graph recording and is appropriate for inspection, but does not change random-number generation or set module evaluation mode by itself. Both calls are commonly used together during inference for different reasons. Training must occur outside no_grad.</p>
+<p>The code path is executed against the existing trained checkpoint by mapping its original encoder/head parameter names to this composed module, with decoder weights unchanged. That mapping is a teaching refactor, not a newly trained model. The sampled images need not match arbitrary unseeded reruns pixel for pixel. The inspector intentionally reuses the exact recorded draws from section 2.</p>
+<p>We can now build, train, and inspect a VAE. Section 6 will evaluate the latent space and output limitations more carefully; a valid program and a few recognizable images are not yet a complete evaluation.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="section-6" class="title-slide slide level1 section-slide vae-section vae-section-six center" data-section-progress="6 / 6" data-background-color="#17212b">
+<h1>06 · Sampling, interpolation, and limitations</h1>
+
+</section>
+<section id="vae-latent-path" class="slide level2 vae-s6">
+<h2>What happens between two encoded images?</h2>
+<div class="posterior-toolbar">
+<label for="latent-path">Endpoints</label><select id="latent-path" disabled=""><option value="0">T-shirt → trouser</option><option value="1">T-shirt → ankle boot</option></select><span>Same decoder · no new noise</span>
+</div>
+<div class="latent-path-layout">
+<div>
+<svg id="latent-path-map" viewbox="0 0 580 445" role="img" aria-label="Actual two-dimensional posterior means for 1,024 validation images, with a straight interpolation path and moving code marker.">
+</svg>
+<p class="latent-map-key">
+Blue: T-shirt · green: trouser · pink: boot<br>Gray: other classes · labels used only for display
+</p>
+</div>
+<div class="latent-path-view">
+<div class="latent-endpoints">
+<figure>
+<img id="latent-input-a" src="assets/evidence/latent/input-0.png" alt="Original validation T-shirt at endpoint A">
+<figcaption>
+Input A
+</figcaption>
+</figure>
+<p>
+z(t) = (1 − t) μ<sub>A</sub> + t μ<sub>B</sub>
+</p>
+<figure>
+<img id="latent-input-b" src="assets/evidence/latent/input-1.png" alt="Original validation trouser at endpoint B">
+<figcaption>
+Input B
+</figcaption>
+</figure>
+</div>
+<img id="latent-path-output" src="assets/evidence/latent/shirt-trouser-0.png" alt="Decoder mean at the T-shirt endpoint"><label for="latent-t">Position t =
+<output id="latent-t-value">
+0.00
+</output>
+</label><input id="latent-t" type="range" min="0" max="20" step="1" value="0" disabled="">
+<p id="latent-z">
+Loading recorded latent path…
+</p>
+</div>
+</div>
+<p class="fragment vae-line">
+Continuous pixels do not guarantee meaningful objects all along the path.
+</p>
+<p class="vae-source">
+Course experiment · unchanged section-2 checkpoint · first validation T-shirt, trouser, and ankle boot · 21 recorded positions per path. Map: actual μ coordinates, no projection. Fashion-MNIST <a href="https://github.com/zalandoresearch/fashion-mnist">Xiao et al.&nbsp;(2017)</a>; latent exploration <a href="https://arxiv.org/abs/1312.6114">Kingma &amp; Welling (2014)</a>.
+</p>
+<aside class="notes">
+<p>Ask students to predict the middle before moving the slider. Trace the point on the map and the changing decoded image together. Begin with T-shirt to trouser, then compare the path to a boot. Endpoints are the first validation examples of these three classes, selected by the same rule as section 2; no visual-quality filtering is applied. All intermediate outputs are retained. At t=0 and t=1 we decode the endpoint means, so even these outputs need not equal the original thumbnails.</p>
+<p>The map contains the first 1,024 validation posterior means. It is a map of mu, not posterior draws or a density plot of the prior. Labels color the display only; the VAE never trained on them. Overlap is allowed, and the axes are coordinates, not named semantic factors. The SVG view clips coordinates outside the labeled -4 to 4 window and reports their count. The displayed path stays in this window.</p>
+<p>The browser loads 21 saved outputs and their exact latent coordinates; it performs no network inference. Decoder weights stay fixed and no new epsilon is drawn during interpolation. This isolates the effect of changing z. The straight interpolation of two posterior means is not itself a random draw from the prior; it must not be counted as an unconditional generation-quality evaluation.</p>
+<p>The decoder uses continuous operations, so its pixel outputs change continuously with z. Recognition of an object is a different property: a smooth path can pass through ambiguous shapes. No semantic disentanglement or class-consistent transition is guaranteed by the VAE loss. Do not call the interpolated images actual examples from the data manifold solely because the endpoints are encoded observations.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="vae-sample-audit" class="slide level2 vae-s6">
+<h2>Inspect the draws you did not get to choose</h2>
+<div class="latent-prior-grid">
+<figure>
+<img src="assets/evidence/latent/prior-0.png" alt="Unfiltered prior draw 1, decoded mean from the fixed VAE">
+<figcaption>
+01
+</figcaption>
+</figure>
+<figure>
+<img src="assets/evidence/latent/prior-1.png" alt="Unfiltered prior draw 2, decoded mean from the fixed VAE">
+<figcaption>
+02
+</figcaption>
+</figure>
+<figure>
+<img src="assets/evidence/latent/prior-2.png" alt="Unfiltered prior draw 3, decoded mean from the fixed VAE">
+<figcaption>
+03
+</figcaption>
+</figure>
+<figure>
+<img src="assets/evidence/latent/prior-3.png" alt="Unfiltered prior draw 4, decoded mean from the fixed VAE">
+<figcaption>
+04
+</figcaption>
+</figure>
+<figure>
+<img src="assets/evidence/latent/prior-4.png" alt="Unfiltered prior draw 5, decoded mean from the fixed VAE">
+<figcaption>
+05
+</figcaption>
+</figure>
+<figure>
+<img src="assets/evidence/latent/prior-5.png" alt="Unfiltered prior draw 6, decoded mean from the fixed VAE">
+<figcaption>
+06
+</figcaption>
+</figure>
+<figure>
+<img src="assets/evidence/latent/prior-6.png" alt="Unfiltered prior draw 7, decoded mean from the fixed VAE">
+<figcaption>
+07
+</figcaption>
+</figure>
+<figure>
+<img src="assets/evidence/latent/prior-7.png" alt="Unfiltered prior draw 8, decoded mean from the fixed VAE">
+<figcaption>
+08
+</figcaption>
+</figure>
+<figure>
+<img src="assets/evidence/latent/prior-8.png" alt="Unfiltered prior draw 9, decoded mean from the fixed VAE">
+<figcaption>
+09
+</figcaption>
+</figure>
+<figure>
+<img src="assets/evidence/latent/prior-9.png" alt="Unfiltered prior draw 10, decoded mean from the fixed VAE">
+<figcaption>
+10
+</figcaption>
+</figure>
+<figure>
+<img src="assets/evidence/latent/prior-10.png" alt="Unfiltered prior draw 11, decoded mean from the fixed VAE">
+<figcaption>
+11
+</figcaption>
+</figure>
+<figure>
+<img src="assets/evidence/latent/prior-11.png" alt="Unfiltered prior draw 12, decoded mean from the fixed VAE">
+<figcaption>
+12
+</figcaption>
+</figure>
+<figure>
+<img src="assets/evidence/latent/prior-12.png" alt="Unfiltered prior draw 13, decoded mean from the fixed VAE">
+<figcaption>
+13
+</figcaption>
+</figure>
+<figure>
+<img src="assets/evidence/latent/prior-13.png" alt="Unfiltered prior draw 14, decoded mean from the fixed VAE">
+<figcaption>
+14
+</figcaption>
+</figure>
+<figure>
+<img src="assets/evidence/latent/prior-14.png" alt="Unfiltered prior draw 15, decoded mean from the fixed VAE">
+<figcaption>
+15
+</figcaption>
+</figure>
+<figure>
+<img src="assets/evidence/latent/prior-15.png" alt="Unfiltered prior draw 16, decoded mean from the fixed VAE">
+<figcaption>
+16
+</figcaption>
+</figure>
+</div>
+<p class="vae-line">
+Sixteen consecutive prior draws. Which shapes are convincing—and which are ambiguous?
+</p>
+<div class="latent-gallery-reading fragment">
+<div>
+<strong>Soft edges</strong>
+<p>
+These are decoder mean pixels. Inspect detail, not just the outline.
+</p>
+</div>
+<div>
+<strong>Uneven appearances</strong>
+<p>
+A few recognizable shapes do not establish coverage.
+</p>
+</div>
+<div>
+<strong>Keep the failures</strong>
+<p>
+Use fixed, unfiltered draws when comparing checkpoints.
+</p>
+</div>
+</div>
+<p class="vae-source">
+Actual outputs · same two-dimensional MLP, ten epochs · first 16 N(0,I) draws, seed 619 · no selection by appearance · decoder means, not sampled pixels. Course experiment on Fashion-MNIST <a href="https://github.com/zalandoresearch/fashion-mnist">Xiao et al.&nbsp;(2017)</a>.
+</p>
+<aside class="notes">
+<p>Give students time to scan every tile before revealing the reading guide. The numbered positions make it possible to refer to an ambiguous sample without silently replacing it. These sixteen draws are a reproducible small gallery, not a representative quality estimate or a class-balance measurement. They all come from the same section-2 checkpoint used for interpolation and the next diagnostic. This avoids confusing changes in weights with different viewing operations.</p>
+<p>Many mean images have soft contours and little fine detail. The visible model combines a two-dimensional bottleneck, a modest MLP, ten epochs of training, and a pixelwise BCE surrogate. Do not attribute every defect to a universal property of VAEs, or claim this small experiment establishes state-of-the-art limits. A pixelwise predicted mean can average unresolved alternatives; the current experiment does not isolate that explanation from capacity, latent dimension, or optimization. Sampling Bernoulli pixels instead would add binary pixel noise; it is not evidence of recovered object detail, and grayscale BCE was already identified as a surrogate.</p>
+<p>For a controlled comparison, hold the validation set and prior codes fixed, inspect the reconstruction and KL components separately, and repeat the experiment across seeds before making a general ranking. Section 3 already compared the reconstruction/regularization tradeoff under controlled training conditions; this slide adds an audit of outputs, not another uncontrolled beta comparison. A lower training objective alone does not establish perceptual quality, diversity, or novelty.</p>
+<p>Generation without an input does not prove non-memorization. The nearest-neighbor comparison from section 1 is one limited check; pixel distance alone cannot establish originality. More samples and class-wise inspection can reveal omissions, but these labels are evaluation aids rather than training targets. Preserve the distinction between qualitative evidence and a population-level claim.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="vae-latent-use" class="slide level2 vae-s6">
+<h2>Does the decoder use the image’s code?</h2>
+<div class="latent-diagnostic-layout">
+<div class="latent-probe-grid">
+<p><span>Observed x</span><img src="assets/evidence/latent/probe-input-0.png" alt="Validation case 1: Observed x"><img src="assets/evidence/latent/probe-input-1.png" alt="Validation case 2: Observed x"><img src="assets/evidence/latent/probe-input-2.png" alt="Validation case 3: Observed x"><img src="assets/evidence/latent/probe-input-3.png" alt="Validation case 4: Observed x"><span>Paired code</span><img src="assets/evidence/latent/probe-right-0.png" alt="Validation case 1: Paired code"><img src="assets/evidence/latent/probe-right-1.png" alt="Validation case 2: Paired code"><img src="assets/evidence/latent/probe-right-2.png" alt="Validation case 3: Paired code"><img src="assets/evidence/latent/probe-right-3.png" alt="Validation case 4: Paired code"><span>Reassigned</span><img src="assets/evidence/latent/probe-wrong-0.png" alt="Validation case 1: Reassigned"><img src="assets/evidence/latent/probe-wrong-1.png" alt="Validation case 2: Reassigned"><img src="assets/evidence/latent/probe-wrong-2.png" alt="Validation case 3: Reassigned"><img src="assets/evidence/latent/probe-wrong-3.png" alt="Validation case 4: Reassigned"></p>
+</div>
+<div class="latent-probe-reading">
+<p>
+Keep the weights and the decoded samples.<br><strong>Reassign each code to another image.</strong>
+</p>
+<p class="latent-probe-question">
+What should happen to reconstruction cost?
+</p>
+<div class="fragment">
+<h3>
+1,024 held-out images · 8 draws each
+</h3>
+<div class="latent-score">
+<span>Paired</span><i style="width:28.38%"></i><b>255.4</b>
+</div>
+<div class="latent-score">
+<span>Reassigned</span><i style="width:92.95%"></i><b>836.6</b>
+</div>
+<p class="latent-probe-unit">
+Pixel-summed BCE / image · lower is better<br>Same scale, zero origin · mean KL = 6.23
+</p>
+<p>
+<strong>The pairing matters in this model.</strong>
+</p>
+</div>
+</div>
+</div>
+<div class="fragment latent-collapse-line">
+<strong>Posterior collapse:</strong> q(z ∣ x) ≈ p(z), with little image information in z.<br>Near-zero KL + little effect from reassignment is a warning sign.
+</div>
+<p class="vae-source">
+Measured intervention, not a second trained model · first four validation cases shown, first posterior draw · cyclic code reassignment over 1,024 images · seed 620. Collapse reference: <a href="https://aclanthology.org/K16-1002/">Bowman et al.&nbsp;(2016), §3.1</a>.
+</p>
+<aside class="notes">
+<p>First compare each observed input with its paired reconstruction. Then compare the same target with a reconstruction decoded from a different image’s code. The weights and set of decoded outputs are identical; only the matching changes. This rules out changes in model capacity or training quality as the reason for the difference. The shown rows are the first four validation images and the first posterior draw. Reassignment is a cyclic roll by one across the full 1,024-image probe, not a permutation restricted to these four thumbnails.</p>
+<p>The measured reconstruction cost averages eight seeded posterior draws per image, summing BCE over pixels and averaging over draws and images. It rises from 255.4250 to 836.5840 when pairing is broken. The unmodified model’s mean analytic Gaussian KL is 6.2336 nats per image. The soft-target grayscale BCE is the same surrogate used throughout; these are not likelihood estimates for a continuous-image distribution. The bars have a common zero-based scale ending at 900.</p>
+<p>The intervention establishes that image-specific codes help reconstruct their own images in this tested checkpoint. It does not establish perceptual quality, semantic disentanglement, or perfect use of every latent coordinate. It is evidence against complete loss of image-specific latent information here, not proof against every partial-collapse phenomenon.</p>
+<p>Now name the failure that the diagnostic could reveal. If q(z|x) equals p(z) for every x, drawing z conveys no information about which input was encoded. In familiar posterior-collapse failures the decoder learns to ignore z and the KL approaches zero. Bowman et al.&nbsp;describe this behavior for sequence VAEs with powerful decoders; we cite that failure mechanism without treating their language-model experiment as this Fashion-MNIST result. In an unconditional independent-pixel decoder such as ours, ignoring z would remove the only image-specific input and give the same predicted mean for every code.</p>
+<p>Neither a small KL value alone nor a reassignment test alone is a complete diagnosis. Compare components and sensitivity together, over adequate data and seeds. Positive KL may partly reflect an aggregate mismatch rather than useful image information. This checkpoint has a large reassignment penalty, so do not label its blurry samples as posterior collapse. No new remedies or model families are needed to close this lecture.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="vae-closing" class="slide level2 vae-s6">
+<h2>Close the loop: generate without an input</h2>
+<p class="vae-task">
+You have a trained VAE. Produce <strong>32 new 28 × 28 images</strong>, with no observed x.
+</p>
+<div class="latent-closing-questions">
+<div>
+<span>01 · CODE SOURCE</span>
+<p>
+Where do the<br>32 codes come from?
+</p>
+</div>
+<div>
+<span>02 · EXECUTION PATH</span>
+<p>
+Which trained modules<br>must run?
+</p>
+</div>
+<div>
+<span>03 · EVIDENCE</span>
+<p>
+What would you inspect<br>before claiming success?
+</p>
+</div>
+</div>
+<div class="exercise-pause">
+<span>PAUSE</span><b>60 seconds</b><small>Trace the path and give one limitation of your proposed quality check.</small>
+</div>
+<div class="fragment exercise-solution latent-closing-solution">
+<span class="solution-label">WORKED SOLUTION</span>
+<div class="latent-closing-flow">
+<div>
+<strong>z ∼ N(0, I)</strong>
+<p>
+[32, 2]
+</p>
+</div>
+<b>→</b>
+<div>
+<strong>Fixed decoder</strong>
+<p>
+Encoder is not needed
+</p>
+</div>
+<b>→</b>
+<div>
+<strong>32 mean images</strong>
+<p>
+[32, 1, 28, 28]
+</p>
+</div>
+</div>
+<p>
+Inspect unfiltered prior draws and failures; a small gallery cannot establish coverage or novelty.
+</p>
+</div>
+<div class="fragment latent-closing-takeaway">
+<strong>Training made this path possible:</strong><br>reconstruction + KL, optimized through z = μ + σ ⊙ ε.
+</div>
+<p class="vae-source">
+Synthesis of the trained course model · these outputs are decoder means; observation sampling is a separate step. Variational training and generation: <a href="https://arxiv.org/abs/1312.6114">Kingma &amp; Welling (2014)</a>.
+</p>
+<aside class="notes">
+<p>This is a transfer task using the mechanisms already taught, not a new architecture. The trained model has two latent coordinates, so create a standard-normal tensor [32,2] on the model’s device and pass it through the fixed decoder under evaluation/no_grad. No image or encoder is needed to execute this generation path. The result is 32 decoder mean images with shape [32,1,28,28]. Draw again to get different codes while keeping learned weights fixed.</p>
+<p>A defensible evaluation answer names an actual check and its limit. A fixed-seed, unfiltered prior gallery exposes obvious failures but cannot prove coverage or novelty. Held-out reconstruction costs check another important behavior but are not a direct generation-quality score. A latent-reassignment diagnostic tests image-specific information use but cannot certify realism. Pixel nearest neighbors flag obvious resemblance without proving non-memorization. Accept any accurately scoped answer instead of demanding one metric.</p>
+<p>After the worked solution, connect the result to training. The encoder supplied image-conditioned distributions, the decoder learned from their samples, reconstruction preserved useful information, KL encouraged compatibility with the prior, and reparameterization enabled gradients through the sampled code. Adam updated both networks. At generation time we retain the learned decoder and replace the image-conditioned code source by the prior.</p>
+<p>Return verbally to the five-part frame: Fashion-MNIST data; a latent-variable encoder/decoder hypothesis; reconstruction plus KL loss; reparameterized gradient optimization; and separate evidence for reconstruction, latent use, and generation. Close with the sampling path on screen. Do not add diffusion, adversarial training, or collapse remedies to this conclusion.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+<p>Deep Learning · Chapter 11</p>
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="../../site_libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="../../site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="../../site_libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="../../site_libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="../../site_libs/revealjs/plugin/search/search.js"></script>
+  <script src="../../site_libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="../../site_libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': false,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1440,
+
+        height: 900,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 5.5e-2,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const panel = document.getElementById('vae-sampler');
+      if (!panel) return;
+      const code = document.getElementById('draw-code');
+      const button = document.getElementById('next-draw');
+      try {
+        const response = await fetch('assets/evidence/manifest.json');
+        if (!response.ok) throw new Error('Missing sample manifest');
+        const data = await response.json();
+        let index = 0;
+        function show() {
+          code.textContent = 'z = (' + data.prior_codes[index].map(v => v.toFixed(2)).join(', ') + ')';
+          document.getElementById('draw-count').textContent = index + 1;
+          const image = document.getElementById('draw-image');
+          image.src = 'assets/evidence/draw-' + String(index).padStart(2, '0') + '.png';
+          image.alt = 'Actual VAE decoder mean for recorded latent draw ' + (index + 1);
+        }
+        button.addEventListener('click', () => { index = (index + 1) % data.prior_codes.length; show(); });
+        show();
+      } catch (error) {
+        code.textContent = 'Recorded draw 1; serve this deck over HTTP to enable cycling.';
+        button.disabled = true;
+      }
+    });
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const panel = document.getElementById('posterior-lab');
+      if (!panel) return;
+      const base = 'assets/evidence/posterior/';
+      const select = document.getElementById('posterior-input');
+      const next = document.getElementById('posterior-next');
+      const meanButton = document.getElementById('posterior-mean');
+      const status = document.getElementById('posterior-count');
+      const parameters = document.getElementById('posterior-parameters');
+      const map = document.getElementById('posterior-map');
+      const fmt = values => '(' + values.map(v => v.toFixed(3)).join(', ') + ')';
+      try {
+        const response = await fetch(base + 'manifest.json');
+        if (!response.ok) throw new Error('Missing posterior manifest');
+        const data = await response.json();
+        let input = 0, draw = 0, atMean = false;
+        function show() {
+          const r = data.records[input];
+          const code = atMean ? r.mu : r.codes[draw];
+          document.getElementById('posterior-original').src = base + `input-${input}.png`;
+          document.getElementById('posterior-original').alt = `Observed ${r.label}, validation dataset index ${r.dataset_index}.`;
+          const output = document.getElementById('posterior-output');
+          output.src = base + (atMean ? `mean-${input}.png` : `sample-${input}-${draw}.png`);
+          output.alt = `Actual decoder mean for ${r.label}, ${atMean ? 'posterior mean code' : 'posterior draw ' + (draw + 1)}.`;
+          document.getElementById('posterior-code').textContent = (atMean ? 'μ = ' : 'z = ') + fmt(code);
+          parameters.textContent = 'μ = ' + fmt(r.mu) + '\nσ = ' + fmt(r.sigma);
+          status.textContent = atMean ? 'At μ · no draw' : `Draw ${draw + 1} / ${r.codes.length}`;
+          meanButton.setAttribute('aria-pressed', String(atMean));
+          // Same units and scale for each input; explicitly centered local window.
+          const scale = 250 / .6;
+          const sx = v => 205 + (v - r.mu[0]) * scale;
+          const sy = v => 155 - (v - r.mu[1]) * scale;
+          let svg = '<text x="205" y="17" text-anchor="middle" font-size="15" fill="#657079">LOCAL ZOOM · μ ± 0.30 on each axis</text>';
+          svg += '<rect x="80" y="30" width="250" height="250" fill="#fffdf7" stroke="#c8d6df"/>';
+          for (const radius of [2, 1]) svg += `<ellipse cx="205" cy="155" rx="${radius*r.sigma[0]*scale}" ry="${radius*r.sigma[1]*scale}" fill="#2878c8" fill-opacity=".10" stroke="#2878c8" stroke-opacity=".55"/>`;
+          for (const delta of [-.3, 0, .3]) {
+            svg += `<text x="${205+delta*scale}" y="300" text-anchor="middle" font-size="15">${(r.mu[0]+delta).toFixed(2)}</text>`;
+            svg += `<text x="70" y="${160-delta*scale}" text-anchor="end" font-size="15">${(r.mu[1]+delta).toFixed(2)}</text>`;
+          }
+          svg += '<path d="M197 155 H213 M205 147 V163" stroke="#17212b" stroke-width="2.5"/>';
+          svg += `<circle cx="${sx(code[0])}" cy="${sy(code[1])}" r="6" fill="#ef5b45" stroke="white" stroke-width="2"/>`;
+          svg += '<text x="345" y="284" font-size="17">z₁</text><text x="55" y="25" font-size="17">z₂</text><text x="205" y="327" text-anchor="middle" font-size="15">+ mean μ · orange point: decoder input</text>';
+          map.innerHTML = svg;
+          map.setAttribute('aria-label', `Local Gaussian view for ${r.label}. Mean ${fmt(r.mu)}, standard deviation ${fmt(r.sigma)}. Current code ${fmt(code)}. Each axis spans mean minus 0.30 to mean plus 0.30.`);
+        }
+        next.addEventListener('click', () => { if (!atMean) draw = (draw + 1) % data.records[input].codes.length; atMean = false; show(); });
+        meanButton.addEventListener('click', () => { atMean = true; show(); });
+        select.addEventListener('change', () => { input = Number(select.value); draw = 0; atMean = false; show(); });
+        show();
+      } catch (error) {
+        parameters.textContent = 'Recorded sample 1 shown. Serve the complete deck over HTTP to enable controls.';
+        next.disabled = true; meanButton.disabled = true; select.disabled = true;
+        status.textContent = 'Static preview';
+      }
+    });
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const byId = id => document.getElementById(id);
+      const svgText = (x,y,label,extra='') => `<text x="${x}" y="${y}" font-family="sans-serif" font-size="20" fill="#17212b" ${extra}>${label}</text>`;
+      async function loadEvidence() {
+        if (!byId('loss-ablation-lab')) return;
+        try {
+          const response = await fetch('assets/evidence/loss/manifest.json');
+          if (!response.ok) throw new Error('Missing loss evidence');
+          const data = await response.json();
+          const select = byId('loss-model');
+          function show() {
+            const name=select.value;
+            byId('loss-gallery').src=`assets/evidence/loss/${name}-gallery.png`;
+            byId('loss-gallery').alt=`Actual ${name==='vae'?'VAE with prior penalty':'reconstruction-only probabilistic autoencoder'} outputs: four fixed validation inputs, posterior reconstructions, and four fixed prior draws.`;
+            byId('loss-rec-score').textContent=data.models[name].reconstruction.toFixed(2);
+          }
+          select.addEventListener('change',show);show();
+          const costs=data.models.vae.first_image_draw_costs.slice(0,3);
+          costs.forEach((v,i)=>byId(`rec-cost-${i}`).textContent=v.toFixed(2));
+          byId('rec-average').textContent=`(${costs.map(v=>v.toFixed(2)).join(' + ')}) / 3 ≈ ${(costs.reduce((a,b)=>a+b,0)/3).toFixed(2)}`;
+        } catch(error) {
+          byId('loss-model').disabled=true;
+          byId('loss-rec-score').textContent='Unavailable';
+          byId('rec-average').textContent='Serve the complete deck over HTTP to load recorded scores.';
+        }
+      }
+      loadEvidence();
+      if (byId('kl-explorer')) {
+        const mu=byId('kl-mu'),sigma=byId('kl-sigma');
+        function plotKL() {
+          const m=Number(mu.value),s=Number(sigma.value);
+          byId('kl-mu-value').value=m.toFixed(2);byId('kl-sigma-value').value=s.toFixed(2);
+          const meanCost=.5*m*m,spreadCost=.5*(s*s-1-Math.log(s*s));
+          byId('kl-mean-cost').textContent=meanCost.toFixed(3);
+          byId('kl-spread-cost').textContent=spreadCost.toFixed(3);
+          byId('kl-total').textContent=(meanCost+spreadCost).toFixed(3);
+          const px=x=>75+(x+4)*90,py=y=>300-y*120;
+          const curve=(m,s)=>Array.from({length:401},(_,i)=>{const x=-4+i*.02,y=Math.exp(-.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));return `${i?'L':'M'}${px(x).toFixed(2)},${py(y).toFixed(2)}`;}).join(' ');
+          let svg=svgText(80,27,'Purple: prior p = N(0,1)')+svgText(465,27,'Orange: q = N(μ,σ²)');
+          svg+='<path d="M75 45 V300 H795" fill="none" stroke="#657079" stroke-width="2"/>';
+          for(const x of [-4,-2,0,2,4])svg+=svgText(px(x),330,String(x),'text-anchor="middle"');
+          for(const y of [0,1,2])svg+=svgText(60,py(y)+6,String(y),'text-anchor="end"');
+          svg+=svgText(78,53,'Density')+svgText(817,305,'z');
+          svg+=`<path d="${curve(0,1)}" fill="none" stroke="#7655ad" stroke-width="5"/><path d="${curve(m,s)}" fill="none" stroke="#ef5b45" stroke-width="4"/>`;
+          byId('kl-curves').innerHTML=svg;
+          byId('kl-curves').setAttribute('aria-label',`Prior standard normal and posterior normal mean ${m}, standard deviation ${s}. KL is ${(meanCost+spreadCost).toFixed(3)} nats.`);
+        }
+        mu.addEventListener('input',plotKL);sigma.addEventListener('input',plotKL);
+        byId('kl-match').addEventListener('click',()=>{mu.value=0;sigma.value=1;plotKL();});plotKL();
+      }
+      if (byId('elbo-q')) {
+        const input=byId('elbo-q');
+        function plotBound() {
+          const w=Number(input.value),r=-w*Math.log(.8)-(1-w)*Math.log(.2),k=w*Math.log(2*w)+(1-w)*Math.log(2*(1-w)),total=r+k,nll=-Math.log(.5),gap=total-nll;
+          const px=v=>110+v*230;
+          byId('elbo-q-value').value=w.toFixed(2);
+          byId('elbo-numbers').textContent=`R ${r.toFixed(3)} + K ${k.toFixed(3)} = ${total.toFixed(3)}`;
+          let svg=svgText(110,28,'Blue: reconstruction R · Orange: prior KL K');
+          svg+=svgText(12,85,'R + K')+`<rect x="110" y="55" width="${r*230}" height="48" fill="#2878c8"/><rect x="${px(r)}" y="55" width="${k*230}" height="48" fill="#ef5b45"/>`;
+          svg+=svgText(12,174,'−log p(x)')+`<rect x="110" y="143" width="${nll*230}" height="48" fill="#38865a"/>`;
+          svg+=svgText(px(nll)+12,175,'0.693 · exact');
+          svg+=`<path d="M${px(nll)} 48 V120 H${px(total)} V108" stroke="#17212b" stroke-width="2" fill="none" stroke-dasharray="5 4"/>`;
+          svg+=svgText(110,230,`Gap = ${Math.max(0,gap).toFixed(3)} nats`);
+          svg+=svgText(110,266,`q(B | x) = ${(1-w).toFixed(2)} · decoder fixed`);
+          byId('elbo-bars').innerHTML=svg;
+          byId('elbo-bars').setAttribute('aria-label',`Exact toy model: reconstruction ${r.toFixed(3)}, prior KL ${k.toFixed(3)}, total ${total.toFixed(3)}. Negative log evidence ${nll.toFixed(3)}. Nonnegative gap ${Math.max(0,gap).toFixed(3)}.`);
+        }
+        input.addEventListener('input',plotBound);
+        byId('elbo-exact').addEventListener('click',()=>{input.value=.8;plotBound();});plotBound();
+      }
+    });
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded',async()=>{
+     const el=id=>document.getElementById(id);
+     if(!el('reparam-lab'))return;
+     const mu=el('rp-mu'),sigma=el('rp-sigma'),next=el('rp-next'),example=el('rp-example');
+     let draws=[],index=0,eps=-1,worked=true;
+     function show(){
+      const m=Number(mu.value),s=Number(sigma.value),z=m+s*eps;
+      el('rp-mu-value').value=m.toFixed(2);el('rp-sigma-value').value=s.toFixed(2);
+      el('rp-mu-node').textContent='μ = '+m.toFixed(3);el('rp-sigma-node').textContent='σ = '+s.toFixed(3);
+      el('rp-eps-node').textContent='ε = '+eps.toFixed(3);el('rp-z-node').textContent='z = '+z.toFixed(3);
+      el('rp-noise-status').textContent=(worked?'Worked value ε = −1':`Recorded N(0,1) draw ${index+1} / ${draws.length}`)+' · held fixed while moving μ or σ.';
+      example.setAttribute('aria-pressed',String(worked));
+      document.querySelector('.reparam-graph').setAttribute('aria-label',`Fixed noise ${eps.toFixed(3)} times sigma ${s}, then plus mu ${m}, gives z ${z.toFixed(3)}. Local derivatives: dz/dmu=1 and dz/dsigma=${eps.toFixed(3)}.`);
+     }
+     mu.addEventListener('input',show);sigma.addEventListener('input',show);
+     example.addEventListener('click',()=>{worked=true;eps=-1;show();});
+     next.disabled=true;show();
+     try{
+      const response=await fetch('assets/evidence/reparameterization/manifest.json');
+      if(!response.ok)throw Error('Missing noise manifest');
+      const data=await response.json();draws=data.noise;eps=draws[0];worked=false;next.disabled=false;show();
+      next.addEventListener('click',()=>{if(!worked)index=(index+1)%draws.length;worked=false;eps=draws[index];show();});
+     }catch(error){el('rp-noise-status').textContent='Worked value ε = −1 · recorded draws unavailable; sliders remain usable.';}
+    });
+    </script>
+    <script>
+    (() => {
+     function setup() {
+      const select=document.getElementById('inspection-mode');
+      if(!select) return;
+      const modes={mean:['mean-0.png','Deterministic mean-code reconstruction','Observed x: used by the encoder'],posterior:['sample-0-0.png','One recorded posterior reconstruction','Observed x: used by the encoder'],prior:['prior-0.png','One recorded prior-generated image','Reference only: x is unused']};
+      function update(){
+       const [file,label,input]=modes[select.value];
+       const image=document.getElementById('inspection-output');
+       image.src='assets/evidence/posterior/'+file; image.alt=label+' from the fixed trained decoder.';
+       document.getElementById('inspection-output-label').textContent=label;
+       document.getElementById('inspection-input-label').textContent=input;
+       for(const key of Object.keys(modes)) document.getElementById('inspection-code-'+key).classList.toggle('inspection-active',key===select.value);
+      }
+      select.addEventListener('change',update); update();
+     }
+     if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setup); else setup();
+    })();
+    </script>
+    <script>
+    (async () => {
+     const ready = () => new Promise(resolve => document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', resolve, {once:true}) : resolve());
+     await ready();
+     const path=document.getElementById('latent-path'), slider=document.getElementById('latent-t');
+     if(!path || !slider) return;
+     const status=document.getElementById('latent-z');
+     try {
+      const response=await fetch('assets/evidence/latent/manifest.json');
+      if(!response.ok) throw Error('Missing latent manifest');
+      const data=await response.json(), svg=document.getElementById('latent-path-map');
+      const ns='http://www.w3.org/2000/svg';
+      function node(tag,attrs,text){const e=document.createElementNS(ns,tag);for(const [k,v] of Object.entries(attrs))e.setAttribute(k,v);if(text)e.textContent=text;svg.appendChild(e);return e;}
+      const px=z=>75+(z+4)*51, py=z=>395-(z+4)*43;
+      node('rect',{x:75,y:51,width:408,height:344,fill:'#fffdf7',stroke:'#bdcbd4'});
+      for(const t of [-4,-2,0,2,4]){
+       node('line',{x1:px(t),x2:px(t),y1:51,y2:395,stroke:'#dbe1e4'});
+       node('line',{x1:75,x2:483,y1:py(t),y2:py(t),stroke:'#dbe1e4'});
+       node('text',{x:px(t),y:419,'text-anchor':'middle','font-size':19,fill:'#435769'},String(t));
+       node('text',{x:60,y:py(t)+6,'text-anchor':'end','font-size':19,fill:'#435769'},String(t));
+      }
+      node('text',{x:510,y:419,'font-size':23,fill:'#17212b'},'z₁');
+      node('text',{x:38,y:40,'font-size':23,fill:'#17212b'},'z₂');
+      let outside=0;
+      for(const p of data.points){if(p.mu.some(v=>Math.abs(v)>4)){outside++;continue;}node('circle',{cx:px(p.mu[0]),cy:py(p.mu[1]),r:2.5,fill:({0:'#2878c8',1:'#38865a',9:'#c94f78'})[p.label]||'#94a3ad',opacity:.5});}
+      node('text',{x:280,y:28,'text-anchor':'middle','font-size':18,fill:'#435769'},`1,024 validation means · ${outside} outside view`);
+      const line=node('line',{stroke:'#17212b','stroke-width':3,'stroke-dasharray':'7 5'});
+      const a=node('text',{'font-size':23,'font-weight':700,fill:'#17212b'},'A'),b=node('text',{'font-size':23,'font-weight':700,fill:'#17212b'},'B');
+      const dot=node('circle',{r:8,fill:'#ef5b45',stroke:'white','stroke-width':3});
+      function update(){
+       const p=data.paths[+path.value], i=+slider.value, z=p.codes[i], start=p.codes[0],end=p.codes[20];
+       for(const [k,v] of Object.entries({x1:px(start[0]),y1:py(start[1]),x2:px(end[0]),y2:py(end[1])}))line.setAttribute(k,v);
+       for(const [e,z0] of [[a,start],[b,end]]){e.setAttribute('x',px(z0[0])+12);e.setAttribute('y',py(z0[1])-10);}
+       dot.setAttribute('cx',px(z[0]));dot.setAttribute('cy',py(z[1]));
+       const image=document.getElementById('latent-path-output');image.src=`assets/evidence/latent/${p.key}-${i}.png`;image.alt=`Recorded decoder mean: ${p.label}, t=${(i/20).toFixed(2)}`;
+       const input=document.getElementById('latent-input-b');input.src=`assets/evidence/latent/input-${p.b}.png`;input.alt=p.b===1?'Original validation trouser at endpoint B':'Original validation ankle boot at endpoint B';
+       document.getElementById('latent-t-value').textContent=(i/20).toFixed(2);
+       status.textContent=`z = (${z[0].toFixed(2)}, ${z[1].toFixed(2)})`;
+      }
+      path.addEventListener('change',update);slider.addEventListener('input',update);
+      update();path.disabled=false;slider.disabled=false;
+     } catch(error){status.textContent='Recorded path unavailable; reload the course preview.';console.error(error);}
+    })();
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

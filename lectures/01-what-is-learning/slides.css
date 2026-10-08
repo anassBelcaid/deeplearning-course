@@ -36,6 +36,12 @@
 .deck-title-art { overflow:hidden; border:1px solid var(--line); border-radius:22px; background:white; box-shadow:0 20px 52px rgba(15,42,55,.13); transform:rotate(.7deg); }
 .deck-title-art img { display:block; width:100%; max-height:510px; margin:0!important; object-fit:contain; }
 
+/* Shared vertical roadmap, promoted from the approved Chapter 10 opening. */
+.reveal .lecture-toc { display:grid; grid-template-rows:repeat(6,1fr); gap:11px; margin-top:12px; }
+.reveal .lecture-toc-item { --toc-color:#c94f78; display:grid; grid-template-columns:96px 1fr; min-width:0; min-height:0; padding:0 30px; border-left:9px solid var(--toc-color); border-radius:11px; background:var(--raised); box-shadow:0 4px 14px rgba(23,33,43,.06); align-items:center; }
+.reveal .lecture-toc-item > span { color:var(--toc-color); font:800 18px/1 "DM Mono",monospace; text-align:center; }
+.reveal .lecture-toc-item h3 { margin:0!important; font-size:31px!important; line-height:1.08; }
+
 .section-slide { background:var(--ink); color:white; }
 .section-slide h1 { display:inline-block; margin-top:2.2em; border-bottom:10px solid var(--part-color,var(--coral)); color:white; font-size:3.3em; }
 .data-section { --part-color:var(--blue); }.hypothesis-section { --part-color:var(--amber); }.loss-section { --part-color:var(--coral); }.optimization-section { --part-color:var(--violet); }.evaluation-section { --part-color:var(--green); }

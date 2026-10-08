@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="A guided Fashion-MNIST autoencoder project with latent-width experiments, representation inspection, and interactive interpolation.">
+
+<title>Project 3 · The Latent Laboratory – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2e7c9b518fe54fcaa4a8b379123416fc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+<script src="../../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+<style>#title-block-header.quarto-title-block { display: block; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../schedule.html"> 
+<span class="menu-text">Schedule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../logistics.html"> 
+<span class="menu-text">Logistics</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://edstem.org/us/courses/102787/"> 
+<span class="menu-text">ED</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#your-investigation" id="toc-your-investigation" class="nav-link active" data-scroll-target="#your-investigation">Your investigation</a></li>
+  <li><a href="#the-model-and-experimental-contract" id="toc-the-model-and-experimental-contract" class="nav-link" data-scroll-target="#the-model-and-experimental-contract">The model and experimental contract</a></li>
+  <li><a href="#investigation-1-what-survives-compression" id="toc-investigation-1-what-survives-compression" class="nav-link" data-scroll-target="#investigation-1-what-survives-compression">Investigation 1 · What survives compression?</a></li>
+  <li><a href="#investigation-2-what-becomes-a-neighbor" id="toc-investigation-2-what-becomes-a-neighbor" class="nav-link" data-scroll-target="#investigation-2-what-becomes-a-neighbor">Investigation 2 · What becomes a neighbor?</a></li>
+  <li><a href="#investigation-3-what-lies-between-two-objects" id="toc-investigation-3-what-lies-between-two-objects" class="nav-link" data-scroll-target="#investigation-3-what-lies-between-two-objects">Investigation 3 · What lies between two objects?</a></li>
+  <li><a href="#student-work-and-provided-infrastructure" id="toc-student-work-and-provided-infrastructure" class="nav-link" data-scroll-target="#student-work-and-provided-infrastructure">Student work and provided infrastructure</a></li>
+  <li><a href="#submission-and-assessment" id="toc-submission-and-assessment" class="nav-link" data-scroll-target="#submission-and-assessment">Submission and assessment</a></li>
+  <li><a href="#reading-and-reference-evidence" id="toc-reading-and-reference-evidence" class="nav-link" data-scroll-target="#reading-and-reference-evidence">Reading and reference evidence</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Project 3 · The Latent Laboratory</h1>
+<p class="subtitle lead">Compress images, inspect their neighborhoods, and travel between objects</p>
+</div>
+
+<div>
+  <div class="description">
+    A guided Fashion-MNIST autoencoder project with latent-width experiments, representation inspection, and interactive interpolation.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="project-brief">
+<p><span><strong>Dataset:</strong> Fashion-MNIST</span> <span><strong>Framework:</strong> PyTorch, CPU or GPU</span> <span><strong>Prerequisite:</strong> Chapter 10</span> <span><strong>Deliverable:</strong> Executed notebook and visual report</span></p>
+</div>
+<section id="your-investigation" class="level2">
+<h2 class="anchored" data-anchor-id="your-investigation">Your investigation</h2>
+<p>A shoe can survive compression while losing its laces. A pullover and a coat can become neighbors even though their labels differ. Two encoded garments can produce a smooth transition that passes through an implausible object. Your project is to make these effects visible, measure them, and explain them.</p>
+<p>Train one autoencoder family on Fashion-MNIST <span class="citation" data-cites="xiao2017fashion">(<a href="#ref-xiao2017fashion" role="doc-biblioref">Xiao et al. 2017</a>)</span>, varying only the prescribed latent width and keeping the remaining architecture and training budget fixed. Investigate three questions: <strong>what survives compression, which examples become neighbors, and what happens between two objects?</strong></p>
+<p><a href="../../projects/06-latent-laboratory/reading.html" class="btn btn-primary">Read the notebook and expected results</a></p>
+<p><a class="btn btn-secondary" href="starter/latent_laboratory.ipynb?download=1" download="latent_laboratory.ipynb">Download student notebook</a></p>
+<p><a href="https://colab.research.google.com/github/anassBelcaid/deeplearning-course/blob/main/quarto-site/projects/06-latent-laboratory/starter/latent_laboratory.ipynb" class="btn btn-secondary">Open in Google Colab</a></p>
+<p>The reading version includes the same task sequence, code skeletons, public checks, and measured example outputs. The downloadable notebook embeds the expected figures so they remain available when opened locally or in Colab. Run your own experiments and submit your own outputs; matching the reference images pixel-for-pixel is not required.</p>
+</section>
+<section id="the-model-and-experimental-contract" class="level2">
+<h2 class="anchored" data-anchor-id="the-model-and-experimental-contract">The model and experimental contract</h2>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+    X["Image batch&lt;br&gt;N × 1 × 28 × 28"] --&gt; E["Encoder&lt;br&gt;784 → 256 → 128 → d"]
+    E --&gt; Z["Code&lt;br&gt;N × d"]
+    Z --&gt; D["Decoder&lt;br&gt;d → 128 → 256 → 784"]
+    D --&gt; R["Reconstruction&lt;br&gt;N × 1 × 28 × 28"]
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>This graph shows the information path. The <code>Autoencoder</code> object owns two <code>nn.Sequential</code> modules, <code>encoder</code> and <code>decoder</code>; each owns its parameters. <code>models[d]</code> holds a reference to a different trained autoencoder for each width. The notebook diagrams dataset references and batch flow before you implement the model.</p>
+<p>Use ReLU in hidden layers, a linear latent layer, and Sigmoid at the output. Minimize mean squared error over every image and pixel. Class labels are used for inspection, never for reconstruction training.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Setting</th>
+<th>Required comparison</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Latent widths</td>
+<td>(d{2,8,32,128})</td>
+</tr>
+<tr class="even">
+<td>Split</td>
+<td>50,000 training / 10,000 validation from the official training split</td>
+</tr>
+<tr class="odd">
+<td>Final test</td>
+<td>Official 10,000-image test split; evaluate your selected model once</td>
+</tr>
+<tr class="even">
+<td>Training</td>
+<td>Six epochs for every width, Adam, learning rate (10^{-3}), batch size 256</td>
+</tr>
+<tr class="odd">
+<td>Reproducibility</td>
+<td>Seed 41; fresh model, optimizer, and shuffled-loader generator per width</td>
+</tr>
+<tr class="even">
+<td>Inspection set</td>
+<td>Fixed 1,000 validation examples, 100 per class</td>
+</tr>
+</tbody>
+</table>
+<p>Use one epoch while debugging, then run the full comparison at six. CPU is supported; a GPU is helpful. Training time varies by device. No marks depend on speed. Changing width also changes parameter count, which you must report rather than claim is held constant.</p>
+</section>
+<section id="investigation-1-what-survives-compression" class="level2">
+<h2 class="anchored" data-anchor-id="investigation-1-what-survives-compression">Investigation 1 · What survives compression?</h2>
+<p>Implement the autoencoder, reconstruction loss, and dimension sweep. Compare the <strong>same images</strong> in every gallery row, plot validation learning curves and final error against (d), and discuss a visible failure as well as an improvement.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="assets/expected/reconstructions.png" class="img-fluid figure-img" alt="Original Fashion-MNIST validation garments followed by reconstructions from four independent autoencoders."></p>
+<figcaption>Reference outputs for the same validation examples at each dimension. The row labels identify the trained width.</figcaption>
+</figure>
+</div>
+<p>The expected trend is a large initial benefit followed by smaller gains, but strict monotonicity is not guaranteed. Finite training and different random parameter arrays can alter the ordering. Your explanation should connect the measurements to lost or recovered details.</p>
+<p>Compare (d/784) as a coordinate fraction, then distinguish it from storage: 32 float32 coordinates occupy 128 bytes before metadata and decoder cost, whereas a raw uint8 image occupies 784 bytes. The project studies a representation bottleneck; it does not implement an image codec.</p>
+</section>
+<section id="investigation-2-what-becomes-a-neighbor" class="level2">
+<h2 class="anchored" data-anchor-id="investigation-2-what-becomes-a-neighbor">Investigation 2 · What becomes a neighbor?</h2>
+<p>Plot actual coordinates for (d=2), then use provided PCA displays for higher-dimensional codes. Report how much variance each PCA display retains. Color by labels only after encoding.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="assets/expected/maps.png" class="img-fluid figure-img" alt="Four latent plots colored by garment class, distinguishing the actual two-dimensional code from PCA views."></p>
+<figcaption>Reference maps: actual coordinates for d=2 and explicitly labeled PCA projections for d=8, 32, and 128.</figcaption>
+</figure>
+</div>
+<p>Implement nearest-neighbor retrieval using <strong>all (d) coordinates</strong>, not the two displayed coordinates. Choose two anchors from different classes, inspect their seven closest neighbors at (d=2) and (d=32), and compare visual similarity with label agreement. The notebook’s anchor selector highlights those neighbors on the display and shows originals beside reconstructions.</p>
+<p>PCA can hide differences. Independently trained codes can rotate and change scale. Avoid interpreting absolute axis directions or comparing raw distance magnitudes across models as if the coordinate systems were shared.</p>
+</section>
+<section id="investigation-3-what-lies-between-two-objects" class="level2">
+<h2 class="anchored" data-anchor-id="investigation-3-what-lies-between-two-objects">Investigation 3 · What lies between two objects?</h2>
+<p>Implement</p>
+<p><span class="math display">\[
+z_\alpha=(1-\alpha)f_\theta(x)+\alpha f_\theta(y),\qquad
+\hat x_\alpha=g_\phi(z_\alpha).
+\]</span></p>
+<p>Select one same-class pair and one different-class pair. Move the provided alpha slider, then export nine-step paths for (d=2) and your selected larger dimension. Place direct pixel blending, ((1-)x+y), beside the latent result.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="assets/expected/cross-class.png" class="img-fluid figure-img" alt="Nine alpha values comparing decoded latent interpolation with pixel blending between a sneaker and an ankle boot."></p>
+<figcaption>Reference sneaker-to-boot comparison: decode interpolated codes above and blend input pixels below.</figcaption>
+</figure>
+</div>
+<p>Show the original endpoints separately. At alpha 0 and 1, the latent path gives <strong>reconstructions</strong> of the endpoints; the pixel path gives the original images. Identify two intermediate alpha values and describe what changes in silhouette or detail. A failed or ambiguous transition is useful evidence, not a reason to hide the result.</p>
+</section>
+<section id="student-work-and-provided-infrastructure" class="level2">
+<h2 class="anchored" data-anchor-id="student-work-and-provided-infrastructure">Student work and provided infrastructure</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>You implement</th>
+<th>Provided and explained</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Parameterized encoder, decoder, and forward pass</td>
+<td>Dataset download, split, batch loaders</td>
+</tr>
+<tr class="even">
+<td>MSE loss with a shape check</td>
+<td>Optimizer loop, held-out evaluation, checkpoint export</td>
+</tr>
+<tr class="odd">
+<td>Independent dimension sweep</td>
+<td>Plotting and comparison tables</td>
+</tr>
+<tr class="even">
+<td>Nearest neighbors in the full latent space</td>
+<td>Encoding, PCA projection, anchor controls</td>
+</tr>
+<tr class="odd">
+<td>Latent interpolation with tested endpoints</td>
+<td>Alpha slider, pixel-blend baseline, figure export</td>
+</tr>
+</tbody>
+</table>
+<p>Each task has a public behavioral check. Passing shape tests is necessary but does not establish that a representation is useful. Your figures and written explanations supply that evidence.</p>
+</section>
+<section id="submission-and-assessment" class="level2">
+<h2 class="anchored" data-anchor-id="submission-and-assessment">Submission and assessment</h2>
+<p>Submit the notebook after a fresh <strong>Restart &amp; Run All</strong>, together with an approximately 2–4 page report. Include configuration and validation results, the two neighbor investigations, same-class and cross-class paths at two dimensions, a justified choice of (d), and its final test error. Cite any reused code or external material. Expected-result figures are reference evidence and do not replace your own outputs.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 42%">
+<col style="width: 57%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Criterion</th>
+<th style="text-align: right;">Weight</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Model, loss, shapes, and gradient checks</td>
+<td style="text-align: right;">20%</td>
+</tr>
+<tr class="even">
+<td>Independent sweep, fixed-image comparison, and validation reasoning</td>
+<td style="text-align: right;">25%</td>
+</tr>
+<tr class="odd">
+<td>Actual/projection distinction and full-space neighbor investigation</td>
+<td style="text-align: right;">20%</td>
+</tr>
+<tr class="even">
+<td>Interpolation correctness, pixel baseline, and visual explanation</td>
+<td style="text-align: right;">25%</td>
+</tr>
+<tr class="odd">
+<td>Reproducibility, final held-out evaluation, and stated limitations</td>
+<td style="text-align: right;">10%</td>
+</tr>
+</tbody>
+</table>
+<p>This assignment requires the mechanisms already taught in Chapter 10. It does not require VAEs, GANs, distribution matching, or implementation of PCA. Future lecture topics can be explored voluntarily but do not replace the three required investigations.</p>
+</section>
+<section id="reading-and-reference-evidence" class="level2">
+<h2 class="anchored" data-anchor-id="reading-and-reference-evidence">Reading and reference evidence</h2>
+<ul>
+<li><a href="../../notes/10-autoencoders-latent-representations/index.html">Chapter 10 notes</a>: loss, bottlenecks, latent geometry, and sampling caveats.</li>
+<li><a href="../../projects/06-latent-laboratory/reading.html">Full reading notebook with expected results</a>: inspect the workflow before implementing it.</li>
+<li><a href="assets/expected/metrics.json">Recorded reference metrics</a>: split, seed, software/device, per-epoch losses, and parameter counts.</li>
+<li><a href="https://arxiv.org/abs/1708.07747">Fashion-MNIST paper</a>: dataset provenance <span class="citation" data-cites="xiao2017fashion">(<a href="#ref-xiao2017fashion" role="doc-biblioref">Xiao et al. 2017</a>)</span>.</li>
+<li><a href="https://www.deeplearningbook.org/contents/autoencoders.html">Deep Learning, Chapter 14</a>: broader context <span class="citation" data-cites="goodfellow2016deep">(<a href="#ref-goodfellow2016deep" role="doc-biblioref">Goodfellow et al. 2016</a>)</span>.</li>
+</ul>
+<p>Reference figures are generated from the completed project implementation with the prescribed split, rather than copied from the lecture’s different experiment. Small numerical differences across environments are expected. The reading notebook is rendered from stored results; building the site never downloads a dataset or trains a model.</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-goodfellow2016deep" class="csl-entry" role="listitem">
+Goodfellow, Ian, Yoshua Bengio, and Aaron Courville. 2016. <em>Deep Learning</em>. MIT Press. <a href="https://www.deeplearningbook.org/">https://www.deeplearningbook.org/</a>.
+</div>
+<div id="ref-xiao2017fashion" class="csl-entry" role="listitem">
+Xiao, Han, Kashif Rasul, and Roland Vollgraf. 2017. <span>“Fashion-MNIST: A Novel Image Dataset for Benchmarking Machine Learning Algorithms.”</span> <em>arXiv Preprint arXiv:1708.07747</em>. <a href="https://arxiv.org/abs/1708.07747">https://arxiv.org/abs/1708.07747</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Deep Learning · ENSA Tétouan</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

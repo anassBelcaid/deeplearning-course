@@ -1,0 +1,148 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><base href="../../../../lectures/11-variational-autoencoders/"><title>VAE ablation experiment</title><link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-f3e585dc122d45960ea2c31f625881dd.css"><link rel="stylesheet" href="../01-what-is-learning/slides.css"><link rel="stylesheet" href="week11.css"><style>
+html,body { margin:0; height:auto; overflow:visible; background:#f5f1e8; }
+.reveal { font-size:28px; height:auto; width:100%; }
+.reveal section { display:block; position:relative; box-sizing:border-box; padding:20px; width:100%; height:auto; text-align:left; }
+.reveal .fragment { opacity:1; visibility:visible; }
+.reveal .vae-live { grid-template-columns:1fr 1fr; gap:25px; margin:0; }
+.reveal .vae-live img { width:100%; height:auto; max-height:none; }
+.reveal .vae-live-controls h3 { font-size:29px; }
+.reveal .posterior-stage { grid-template-columns:1fr 1.2fr 1fr; gap:15px; }
+.reveal .posterior-stage figure img { width:100%; height:auto; }
+.reveal .posterior-toolbar { margin-top:0; }
+.reveal .training-inspection-layout { display:block; margin:0 auto; max-width:500px; }
+.reveal .loss-ablation-layout { grid-template-columns:1fr; margin:0; }
+.reveal .loss-ablation-controls p { font-size:22px; }
+.reveal .loss-ablation-figure>figure { width:100%; height:auto; }
+.reveal .loss-ablation-figure img { height:auto; width:100%; }
+.reveal .elbo-example { grid-template-columns:1fr; gap:20px; margin:0; }
+.reveal .reparam-controls { flex-wrap:wrap; margin:10px 0; gap:18px; }
+.reveal .reparam-controls label { width:40%; }
+.reveal .reparam-graph { height:auto; }
+.reveal .reparam-rule p { font-size:23px; }
+.reveal .latent-path-layout { gap:15px; }
+.reveal .latent-endpoints p { font-size:20px; }
+.reveal .latent-endpoints img { width:45px; height:45px; }
+.reveal .latent-map-key { font-size:17px; }
+.reveal #latent-path-map { height:auto; }
+.reveal #latent-path-output { width:220px; height:220px; }
+.reveal .kl-explorer { grid-template-columns:1fr; }
+.reveal #kl-curves { height:auto; }
+.reveal .kl-costs { gap:12px; }
+.reveal .kl-costs strong { font-size:29px; }
+.reveal .kl-costs span { font-size:13px; }
+@media(max-width:700px) {
+ .reveal .posterior-stage,.reveal .latent-path-layout,.reveal .vae-live { grid-template-columns:1fr; }
+ .reveal .posterior-stage figure img { width:200px; margin:auto; }
+ .reveal .vae-live img { width:260px; margin:auto; }
+ .reveal .posterior-stage figure { max-width:100%; }
+ .reveal .posterior-stage figcaption { font-size:21px; }
+ .reveal .kl-costs { display:flex; flex-wrap:wrap; justify-content:center; }
+}
+</style></head><body><div class="reveal"><section class="slide level2 vae-s3" id="demo-ablation">
+
+<div class="loss-ablation-layout" id="loss-ablation-lab">
+<div class="loss-ablation-controls">
+<label for="loss-model">Training objective</label><select id="loss-model"><option value="recon">Reconstruction only</option><option value="vae">Reconstruction + prior penalty</option></select>
+<p>
+Same architecture, initialization,<br/>data order, and 10 epochs.
+</p>
+<p>
+Same inputs and latent noise<br/>when comparing outputs.
+</p>
+<div class="" data-fragment-index="1">
+<p>
+Validation reconstruction cost<br/><strong id="loss-rec-score">…</strong>
+</p>
+<small>Pixel-summed soft-target BCE.<br/>Mean over 1,024 images × 8 draws.<br/>Lower is better for this score.</small>
+</div>
+</div>
+<div class="course-centered-figure loss-ablation-figure">
+<figure>
+<img alt="Actual outputs of the reconstruction-only probabilistic autoencoder: four validation inputs, posterior reconstructions, and four prior samples." id="loss-gallery" src="assets/evidence/loss/recon-gallery.png"/>
+<figcaption>
+<span>INSPECT BOTH OUTPUT PATHS</span><strong>Switch the objective. Which row changes most?</strong><small>First four validation images and first four seeded prior draws; illustrative, not a quality ranking.</small><small class="course-caption-source">Course ablation · Fashion-MNIST · same d = 2 MLP · decoder means · one training seed per condition.</small>
+</figcaption>
+</figure>
+</div>
+</div>
+
+
+</section><div hidden><span id="rec-cost-0"></span><span id="rec-cost-1"></span><span id="rec-cost-2"></span><span id="rec-average"></span></div></div><script>
+document.addEventListener('DOMContentLoaded', () => {
+  const byId = id => document.getElementById(id);
+  const svgText = (x,y,label,extra='') => `<text x="${x}" y="${y}" font-family="sans-serif" font-size="20" fill="#17212b" ${extra}>${label}</text>`;
+  async function loadEvidence() {
+    if (!byId('loss-ablation-lab')) return;
+    try {
+      const response = await fetch('assets/evidence/loss/manifest.json');
+      if (!response.ok) throw new Error('Missing loss evidence');
+      const data = await response.json();
+      const select = byId('loss-model');
+      function show() {
+        const name=select.value;
+        byId('loss-gallery').src=`assets/evidence/loss/${name}-gallery.png`;
+        byId('loss-gallery').alt=`Actual ${name==='vae'?'VAE with prior penalty':'reconstruction-only probabilistic autoencoder'} outputs: four fixed validation inputs, posterior reconstructions, and four fixed prior draws.`;
+        byId('loss-rec-score').textContent=data.models[name].reconstruction.toFixed(2);
+      }
+      select.addEventListener('change',show);show();
+      const costs=data.models.vae.first_image_draw_costs.slice(0,3);
+      costs.forEach((v,i)=>byId(`rec-cost-${i}`).textContent=v.toFixed(2));
+      byId('rec-average').textContent=`(${costs.map(v=>v.toFixed(2)).join(' + ')}) / 3 ≈ ${(costs.reduce((a,b)=>a+b,0)/3).toFixed(2)}`;
+    } catch(error) {
+      byId('loss-model').disabled=true;
+      byId('loss-rec-score').textContent='Unavailable';
+      byId('rec-average').textContent='Serve the complete deck over HTTP to load recorded scores.';
+    }
+  }
+  loadEvidence();
+  if (byId('kl-explorer')) {
+    const mu=byId('kl-mu'),sigma=byId('kl-sigma');
+    function plotKL() {
+      const m=Number(mu.value),s=Number(sigma.value);
+      byId('kl-mu-value').value=m.toFixed(2);byId('kl-sigma-value').value=s.toFixed(2);
+      const meanCost=.5*m*m,spreadCost=.5*(s*s-1-Math.log(s*s));
+      byId('kl-mean-cost').textContent=meanCost.toFixed(3);
+      byId('kl-spread-cost').textContent=spreadCost.toFixed(3);
+      byId('kl-total').textContent=(meanCost+spreadCost).toFixed(3);
+      const px=x=>75+(x+4)*90,py=y=>300-y*120;
+      const curve=(m,s)=>Array.from({length:401},(_,i)=>{const x=-4+i*.02,y=Math.exp(-.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));return `${i?'L':'M'}${px(x).toFixed(2)},${py(y).toFixed(2)}`;}).join(' ');
+      let svg=svgText(80,27,'Purple: prior p = N(0,1)')+svgText(465,27,'Orange: q = N(μ,σ²)');
+      svg+='<path d="M75 45 V300 H795" fill="none" stroke="#657079" stroke-width="2"/>';
+      for(const x of [-4,-2,0,2,4])svg+=svgText(px(x),330,String(x),'text-anchor="middle"');
+      for(const y of [0,1,2])svg+=svgText(60,py(y)+6,String(y),'text-anchor="end"');
+      svg+=svgText(78,53,'Density')+svgText(817,305,'z');
+      svg+=`<path d="${curve(0,1)}" fill="none" stroke="#7655ad" stroke-width="5"/><path d="${curve(m,s)}" fill="none" stroke="#ef5b45" stroke-width="4"/>`;
+      byId('kl-curves').innerHTML=svg;
+      byId('kl-curves').setAttribute('aria-label',`Prior standard normal and posterior normal mean ${m}, standard deviation ${s}. KL is ${(meanCost+spreadCost).toFixed(3)} nats.`);
+    }
+    mu.addEventListener('input',plotKL);sigma.addEventListener('input',plotKL);
+    byId('kl-match').addEventListener('click',()=>{mu.value=0;sigma.value=1;plotKL();});plotKL();
+  }
+  if (byId('elbo-q')) {
+    const input=byId('elbo-q');
+    function plotBound() {
+      const w=Number(input.value),r=-w*Math.log(.8)-(1-w)*Math.log(.2),k=w*Math.log(2*w)+(1-w)*Math.log(2*(1-w)),total=r+k,nll=-Math.log(.5),gap=total-nll;
+      const px=v=>110+v*230;
+      byId('elbo-q-value').value=w.toFixed(2);
+      byId('elbo-numbers').textContent=`R ${r.toFixed(3)} + K ${k.toFixed(3)} = ${total.toFixed(3)}`;
+      let svg=svgText(110,28,'Blue: reconstruction R · Orange: prior KL K');
+      svg+=svgText(12,85,'R + K')+`<rect x="110" y="55" width="${r*230}" height="48" fill="#2878c8"/><rect x="${px(r)}" y="55" width="${k*230}" height="48" fill="#ef5b45"/>`;
+      svg+=svgText(12,174,'−log p(x)')+`<rect x="110" y="143" width="${nll*230}" height="48" fill="#38865a"/>`;
+      svg+=svgText(px(nll)+12,175,'0.693 · exact');
+      svg+=`<path d="M${px(nll)} 48 V120 H${px(total)} V108" stroke="#17212b" stroke-width="2" fill="none" stroke-dasharray="5 4"/>`;
+      svg+=svgText(110,230,`Gap = ${Math.max(0,gap).toFixed(3)} nats`);
+      svg+=svgText(110,266,`q(B | x) = ${(1-w).toFixed(2)} · decoder fixed`);
+      byId('elbo-bars').innerHTML=svg;
+      byId('elbo-bars').setAttribute('aria-label',`Exact toy model: reconstruction ${r.toFixed(3)}, prior KL ${k.toFixed(3)}, total ${total.toFixed(3)}. Negative log evidence ${nll.toFixed(3)}. Nonnegative gap ${Math.max(0,gap).toFixed(3)}.`);
+    }
+    input.addEventListener('input',plotBound);
+    byId('elbo-exact').addEventListener('click',()=>{input.value=.8;plotBound();});plotBound();
+  }
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS_HTML-full"></script>
+<script>
+function height(){parent.postMessage({type:'vae-notes-height',height:Math.ceil(document.querySelector('.reveal').getBoundingClientRect().height)+8},location.origin);}
+new ResizeObserver(height).observe(document.querySelector('.reveal'));
+window.addEventListener('load',height);
+</script></body></html>

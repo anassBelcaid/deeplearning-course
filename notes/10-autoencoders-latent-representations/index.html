@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dr.&nbsp;A. Belcaid">
+<meta name="description" content="Reconstruction, bottlenecks, latent geometry, denoising, anomaly scores, and the limits of sampling, developed through real experiments.">
+
+<title>Autoencoders and Latent Representations – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e90830a6c3a870e8aa2cd7457ccbff49.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+<style>
+#title-block-header.quarto-title-block { display: block; }
+main details { margin: 1.3rem 0 2rem; padding: 1rem 1.25rem; border-left: 3px solid #38865a; background: rgba(56,134,90,.05); }
+main details summary { cursor: pointer; font-weight: 700; color: #28603f; }
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../schedule.html"> 
+<span class="menu-text">Schedule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../logistics.html"> 
+<span class="menu-text">Logistics</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://edstem.org/us/courses/102787/"> 
+<span class="menu-text">ED</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#learning-goals" id="toc-learning-goals" class="nav-link active" data-scroll-target="#learning-goals">Learning goals</a></li>
+  <li><a href="#reconstructing-before-generating" id="toc-reconstructing-before-generating" class="nav-link" data-scroll-target="#reconstructing-before-generating"><span class="header-section-number">1</span> Reconstructing before generating</a>
+  <ul class="collapse">
+  <li><a href="#begin-with-an-image-we-already-have" id="toc-begin-with-an-image-we-already-have" class="nav-link" data-scroll-target="#begin-with-an-image-we-already-have"><span class="header-section-number">1.1</span> Begin with an image we already have</a></li>
+  <li><a href="#turn-visual-discrepancy-into-a-learning-signal" id="toc-turn-visual-discrepancy-into-a-learning-signal" class="nav-link" data-scroll-target="#turn-visual-discrepancy-into-a-learning-signal"><span class="header-section-number">1.2</span> Turn visual discrepancy into a learning signal</a>
+  <ul class="collapse">
+  <li><a href="#pixel-agreement-is-not-semantic-agreement" id="toc-pixel-agreement-is-not-semantic-agreement" class="nav-link" data-scroll-target="#pixel-agreement-is-not-semantic-agreement"><span class="header-section-number">1.2.1</span> Pixel agreement is not semantic agreement</a></li>
+  <li><a href="#exercise-what-will-survive" id="toc-exercise-what-will-survive" class="nav-link" data-scroll-target="#exercise-what-will-survive">Exercise: what will survive?</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#the-autoencoder-contract" id="toc-the-autoencoder-contract" class="nav-link" data-scroll-target="#the-autoencoder-contract"><span class="header-section-number">2</span> The autoencoder contract</a>
+  <ul class="collapse">
+  <li><a href="#two-learned-functions-with-different-roles" id="toc-two-learned-functions-with-different-roles" class="nav-link" data-scroll-target="#two-learned-functions-with-different-roles"><span class="header-section-number">2.1</span> Two learned functions with different roles</a></li>
+  <li><a href="#map-the-architecture-into-executable-code" id="toc-map-the-architecture-into-executable-code" class="nav-link" data-scroll-target="#map-the-architecture-into-executable-code"><span class="header-section-number">2.2</span> Map the architecture into executable code</a>
+  <ul class="collapse">
+  <li><a href="#exercise-trace-shapes-and-count-parameters" id="toc-exercise-trace-shapes-and-count-parameters" class="nav-link" data-scroll-target="#exercise-trace-shapes-and-count-parameters">Exercise: trace shapes and count parameters</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#learning-through-a-bottleneck" id="toc-learning-through-a-bottleneck" class="nav-link" data-scroll-target="#learning-through-a-bottleneck"><span class="header-section-number">3</span> Learning through a bottleneck</a>
+  <ul class="collapse">
+  <li><a href="#a-restriction-creates-pressure-not-a-semantic-guarantee" id="toc-a-restriction-creates-pressure-not-a-semantic-guarantee" class="nav-link" data-scroll-target="#a-restriction-creates-pressure-not-a-semantic-guarantee"><span class="header-section-number">3.1</span> A restriction creates pressure, not a semantic guarantee</a></li>
+  <li><a href="#the-controlled-latent-width-experiment" id="toc-the-controlled-latent-width-experiment" class="nav-link" data-scroll-target="#the-controlled-latent-width-experiment"><span class="header-section-number">3.2</span> The controlled latent-width experiment</a>
+  <ul class="collapse">
+  <li><a href="#exercise-choose-from-evidence" id="toc-exercise-choose-from-evidence" class="nav-link" data-scroll-target="#exercise-choose-from-evidence">Exercise: choose from evidence</a></li>
+  </ul></li>
+  <li><a href="#why-the-linear-case-connects-to-pca" id="toc-why-the-linear-case-connects-to-pca" class="nav-link" data-scroll-target="#why-the-linear-case-connects-to-pca"><span class="header-section-number">3.3</span> Why the linear case connects to PCA</a></li>
+  </ul></li>
+  <li><a href="#reading-the-latent-space" id="toc-reading-the-latent-space" class="nav-link" data-scroll-target="#reading-the-latent-space"><span class="header-section-number">4</span> Reading the latent space</a>
+  <ul class="collapse">
+  <li><a href="#inspect-geometry-before-interpreting-labels" id="toc-inspect-geometry-before-interpreting-labels" class="nav-link" data-scroll-target="#inspect-geometry-before-interpreting-labels"><span class="header-section-number">4.1</span> Inspect geometry before interpreting labels</a></li>
+  <li><a href="#make-similarity-operational-with-nearest-neighbors" id="toc-make-similarity-operational-with-nearest-neighbors" class="nav-link" data-scroll-target="#make-similarity-operational-with-nearest-neighbors"><span class="header-section-number">4.2</span> Make similarity operational with nearest neighbors</a></li>
+  <li><a href="#decode-paths-between-observed-points" id="toc-decode-paths-between-observed-points" class="nav-link" data-scroll-target="#decode-paths-between-observed-points"><span class="header-section-number">4.3</span> Decode paths between observed points</a></li>
+  </ul></li>
+  <li><a href="#when-reconstruction-becomes-useful" id="toc-when-reconstruction-becomes-useful" class="nav-link" data-scroll-target="#when-reconstruction-becomes-useful"><span class="header-section-number">5</span> When reconstruction becomes useful</a>
+  <ul class="collapse">
+  <li><a href="#denoising-changes-the-inputtarget-pair" id="toc-denoising-changes-the-inputtarget-pair" class="nav-link" data-scroll-target="#denoising-changes-the-inputtarget-pair"><span class="header-section-number">5.1</span> Denoising changes the input–target pair</a></li>
+  <li><a href="#why-denoising-can-produce-an-average" id="toc-why-denoising-can-produce-an-average" class="nav-link" data-scroll-target="#why-denoising-can-produce-an-average"><span class="header-section-number">5.2</span> Why denoising can produce an average</a></li>
+  <li><a href="#reconstruction-error-as-an-anomaly-signal" id="toc-reconstruction-error-as-an-anomaly-signal" class="nav-link" data-scroll-target="#reconstruction-error-as-an-anomaly-signal"><span class="header-section-number">5.3</span> Reconstruction error as an anomaly signal</a>
+  <ul class="collapse">
+  <li><a href="#calibrating-an-alarm-honestly" id="toc-calibrating-an-alarm-honestly" class="nav-link" data-scroll-target="#calibrating-an-alarm-honestly"><span class="header-section-number">5.3.1</span> Calibrating an alarm honestly</a></li>
+  <li><a href="#exercise-set-the-alarm" id="toc-exercise-set-the-alarm" class="nav-link" data-scroll-target="#exercise-set-the-alarm">Exercise: set the alarm</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#why-sampling-still-fails" id="toc-why-sampling-still-fails" class="nav-link" data-scroll-target="#why-sampling-still-fails"><span class="header-section-number">6</span> Why sampling still fails</a>
+  <ul class="collapse">
+  <li><a href="#the-decoder-accepts-more-codes-than-training-constrains" id="toc-the-decoder-accepts-more-codes-than-training-constrains" class="nav-link" data-scroll-target="#the-decoder-accepts-more-codes-than-training-constrains"><span class="header-section-number">6.1</span> The decoder accepts more codes than training constrains</a></li>
+  <li><a href="#decode-a-whole-grid" id="toc-decode-a-whole-grid" class="nav-link" data-scroll-target="#decode-a-whole-grid"><span class="header-section-number">6.2</span> Decode a whole grid</a></li>
+  <li><a href="#why-declaring-a-gaussian-after-training-is-insufficient" id="toc-why-declaring-a-gaussian-after-training-is-insufficient" class="nav-link" data-scroll-target="#why-declaring-a-gaussian-after-training-is-insufficient"><span class="header-section-number">6.3</span> Why declaring a Gaussian after training is insufficient</a>
+  <ul class="collapse">
+  <li><a href="#exercise-identify-the-missing-contract" id="toc-exercise-identify-the-missing-contract" class="nav-link" data-scroll-target="#exercise-identify-the-missing-contract">Exercise: identify the missing contract</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#compose-the-mechanisms-for-a-task" id="toc-compose-the-mechanisms-for-a-task" class="nav-link" data-scroll-target="#compose-the-mechanisms-for-a-task"><span class="header-section-number">7</span> Compose the mechanisms for a task</a></li>
+  <li><a href="#reproduce-and-extend-the-evidence" id="toc-reproduce-and-extend-the-evidence" class="nav-link" data-scroll-target="#reproduce-and-extend-the-evidence"><span class="header-section-number">8</span> Reproduce and extend the evidence</a></li>
+  <li><a href="#reading-path" id="toc-reading-path" class="nav-link" data-scroll-target="#reading-path"><span class="header-section-number">9</span> An annotated reading path</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Autoencoders and Latent Representations</h1>
+<p class="subtitle lead">Chapter 10 · Learning what an image must preserve</p>
+</div>
+
+<div>
+  <div class="description">
+    Reconstruction, bottlenecks, latent geometry, denoising, anomaly scores, and the limits of sampling, developed through real experiments.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dr.&nbsp;A. Belcaid </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="chapter-opening">
+<div class="chapter-kicker">
+<p>PART VI · GENERATIVE REPRESENTATION LEARNING</p>
+</div>
+<div class="chapter-cover">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="assets/chapter-cover.png" class="img-fluid figure-img" alt="Three garment images connected through narrowing blue state bars, a small orange code, and expanding purple states to three reconstructions."></p>
+<figcaption>An original course illustration: real garment images pass through contracting states and a compact code, then expanding states reconstruct their silhouettes.</figcaption>
+</figure>
+</div>
+</div>
+<p>Suppose we already have an image. Instead of asking a network for its label, ask it to reproduce the image after passing through a small intermediate representation. At first this sounds pointless: a copy operation would be perfect. The useful question appears only when copying is restricted. <strong>What must the model preserve to make a good reconstruction, and what can it afford to lose?</strong></p>
+<p>This chapter follows the lecture’s six sections. We begin with the same cat photograph, build the encoder–decoder contract, examine the measured Fashion-MNIST bottleneck experiment, inspect latent neighborhoods and interpolations, and use reconstruction for denoising and anomaly scoring. Finally we decode locations between observed codes to understand why a reconstruction model is not automatically a reliable generator.</p>
+<p><a href="../../lectures/10-autoencoders-latent-representations/index.html">Lecture</a> · <a href="https://colab.research.google.com/github/anassBelcaid/deeplearning-course/blob/main/quarto-site/lectures/10-autoencoders-latent-representations/assets/latent_sweep_colab.ipynb">Run the bottleneck experiment in Colab</a> · <a href="#reading-path">Annotated readings</a></p>
+</div>
+<section id="learning-goals" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="learning-goals">Learning goals</h2>
+<p>By the end, you should be able to trace the architecture and tensor shapes of an autoencoder; derive and interpret its reconstruction objective; distinguish a coordinate bottleneck from a storage guarantee; evaluate a latent representation through examples and measurements; specify the denoising input–target pair; calibrate a reconstruction-based anomaly score; and explain what ordinary reconstruction leaves unspecified about generation.</p>
+</section>
+<section id="reconstructing-before-generating" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Reconstructing before generating</h1>
+<section id="begin-with-an-image-we-already-have" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="begin-with-an-image-we-already-have"><span class="header-section-number">1.1</span> Begin with an image we already have</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../labs/09-semantic-segmentation/starter/data/segmentation-scenes/cats.jpg" class="img-fluid figure-img" style="width:70.0%" alt="Two cats on a couch, used to ask which visual details a small representation should preserve."></p>
+<figcaption>The lecture’s starting image: two cats resting on a couch. Source: COCO validation photograph, reused from the course segmentation lab.</figcaption>
+</figure>
+</div>
+<p>Imagine resizing this image to <span class="math inline">\(64\times64\)</span> RGB pixels. It contains <span class="math inline">\(D=64\cdot64\cdot3=12{,}288\)</span> scalar values. A reconstruction network must return another array of those dimensions. The target is the image itself; no human needs to annotate a category for this training pair.</p>
+<p>If the network can simply route every input coordinate to its corresponding output, zero error is achievable without learning reusable structure. The identity map <span class="math inline">\(r(x)=x\)</span> solves the copying task. To make the intermediate representation interesting, we restrict the route. One choice is to require all information to pass through a vector <span class="math inline">\(z\in\mathbb R^d\)</span> with <span class="math inline">\(d\ll D\)</span>.</p>
+<p>For the cats, broad couch colors and the positions of two bodies may be reconstructable from relatively few coordinates. Fine fur texture, whiskers, and irregular background details compete for the remaining capacity. This is a prediction to test, not a promise that the model understands “cat.” The loss rewards pixel prediction; it may prioritize a large background region over a small feature essential to a human observer.</p>
+<p>The target is derived from the input, so this is commonly described as self-supervised learning, historically also grouped under unsupervised representation learning. Absence of class labels does not mean absence of supervision: every target pixel supplies an error signal.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Part of the learning problem</th>
+<th>Our reconstruction example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Data</td>
+<td>Images scaled consistently; each image supplies its own target</td>
+</tr>
+<tr class="even">
+<td>Hypothesis</td>
+<td>An encoder followed by a decoder</td>
+</tr>
+<tr class="odd">
+<td>Loss</td>
+<td>Discrepancy between image and predicted reconstruction</td>
+</tr>
+<tr class="even">
+<td>Optimization</td>
+<td>Joint training of both networks through backpropagation</td>
+</tr>
+<tr class="odd">
+<td>Evaluation</td>
+<td>Held-out error, image inspection, and usefulness of the code for a specified task</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="turn-visual-discrepancy-into-a-learning-signal" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="turn-visual-discrepancy-into-a-learning-signal"><span class="header-section-number">1.2</span> Turn visual discrepancy into a learning signal</h2>
+<p>Write <span class="math inline">\(\hat x\)</span> for the prediction and flatten image coordinates only for notation. Our experiments use mean squared error per pixel:</p>
+<p><span class="math display">\[
+\ell(x,\hat x)=\frac1D\sum_{j=1}^D(x_j-\hat x_j)^2.
+\]</span></p>
+<p>For a tiny grayscale example, let <span class="math inline">\(x=(0,1,1,0)\)</span> and <span class="math inline">\(\hat x=(0.1,0.8,0.6,0.2)\)</span>. The squared errors are <span class="math inline">\((0.01,0.04,0.16,0.04)\)</span>, so <span class="math inline">\(\ell=0.25/4=0.0625\)</span>. The third pixel contributes most to the error. The derivative with respect to a prediction is</p>
+<p><span class="math display">\[
+\frac{\partial\ell}{\partial\hat x_j}=\frac2D(\hat x_j-x_j).
+\]</span></p>
+<p>At the third pixel it equals <span class="math inline">\(-0.2\)</span>, encouraging gradient descent to increase the prediction toward <span class="math inline">\(1\)</span>. Backpropagation carries that correction through the decoder and encoder. Both are trained toward one objective.</p>
+<p>A useful connection to probability comes from assuming independent Gaussian observation noise with fixed variance: <span class="math inline">\(p(x\mid z)=\mathcal N(g_\phi(z),\sigma^2I)\)</span>. Its negative log likelihood is a constant plus <span class="math inline">\(\|x-g_\phi(z)\|^2/(2\sigma^2)\)</span>. Thus squared-error fitting corresponds to fitting a Gaussian mean under this assumption. This interpretation does not turn the whole autoencoder into a generative model; we have not specified how to sample <span class="math inline">\(z\)</span>.</p>
+<section id="pixel-agreement-is-not-semantic-agreement" class="level3" data-number="1.2.1">
+<h3 data-number="1.2.1" class="anchored" data-anchor-id="pixel-agreement-is-not-semantic-agreement"><span class="header-section-number">1.2.1</span> Pixel agreement is not semantic agreement</h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="assets/quality-comparison.png" class="img-fluid figure-img" alt="The same cat photograph displayed unfiltered, mildly blurred, and strongly blurred."></p>
+<figcaption>The lecture’s qualitative comparison preserved with the same display filters. A softens texture; B damages object structure. These are illustrative filtered versions of the COCO photograph, not trained autoencoder outputs.</figcaption>
+</figure>
+</div>
+<p>A one-pixel shift may preserve a cat’s identity while changing many pixel comparisons. Conversely, a blurred prediction can score reasonably under MSE while losing important details. If two target appearances are both plausible given the code, predicting their average can reduce squared error. We derive this averaging effect later when discussing denoising.</p>
+<p>Output activation and target convention must agree. Sigmoid predictions lie in <span class="math inline">\([0,1]\)</span> and are compatible with the scaled pixels here. Standardized targets can be negative and usually need an unrestricted output. Binary cross entropy is appropriate to a Bernoulli observation model; a floating-point image in <span class="math inline">\([0,1]\)</span> is not automatically binary data. The choice must follow the interpretation of the target, rather than the presence of a sigmoid alone.</p>
+</section>
+<section id="exercise-what-will-survive" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="exercise-what-will-survive">Exercise: what will survive?</h3>
+<p>For the cat photograph compressed to <span class="math inline">\(32\)</span> coordinates, predict which features will be easier to preserve: broad couch color, the two bodies’ positions, individual whiskers, or exact fur texture. Explain your reasoning in terms of repeated structure and loss contributions.</p>
+<details>
+<summary>
+Worked interpretation
+</summary>
+<p>Broad color and approximate layout are plausible priorities because they influence many pixels and can often be described with a small number of factors. Exact texture and whisker placement need finer information. However, the answer depends on training data, architecture, and loss: an image-specific detail can dominate error, and a low-dimensional code can still memorize a finite training set. Inspect held-out reconstructions before claiming a semantic hierarchy.</p>
+</details>
+</section>
+</section>
+</section>
+<section id="the-autoencoder-contract" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> The autoencoder contract</h1>
+<section id="two-learned-functions-with-different-roles" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="two-learned-functions-with-different-roles"><span class="header-section-number">2.1</span> Two learned functions with different roles</h2>
+<p>The encoder and decoder implement</p>
+<p><span class="math display">\[
+z=f_\theta(x),\qquad \hat x=g_\phi(z),\qquad
+f_\theta:\mathbb R^D\to\mathbb R^d,\quad
+g_\phi:\mathbb R^d\to\mathbb R^D.
+\]</span></p>
+<div id="fig-hourglass" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Input x passes through progressively shorter encoder states to z, then taller decoder states produce x hat.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-hourglass-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="assets/hourglass.png" class="img-fluid figure-img" alt="Input x passes through progressively shorter encoder states to z, then taller decoder states produce x hat.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-hourglass-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: The lecture’s hourglass reconstructed for reading: each rounded vertical bar is a complete state, and height indicates relative coordinate count. Arrows denote deterministic transformations. Course diagram.
+</figcaption>
+</figure>
+</div>
+<p>This is a computation diagram, not yet a probabilistic graphical model. An arrow means a function transforms a state. No probability distribution or conditional-independence statement follows merely from drawing <span class="math inline">\(x\to z\to\hat x\)</span>. Those additional modeling commitments will matter in the VAE chapter.</p>
+<p>The decoder reverses the progression of shapes, but need not invert the encoder algebraically. If two images produce the same code, a deterministic decoder cannot recover both exactly. Its reconstruction is the output favored by the learned task and data. Symmetric widths are convenient rather than compulsory; convolutional states can also preserve spatial axes inside the bottleneck.</p>
+<p>Compare this with the CNN classifier you already know:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Shared beginning</th>
+<th>Final module</th>
+<th>Required answer</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Image <span class="math inline">\(\to\)</span> CNN features <span class="math inline">\(\to\)</span> representation</td>
+<td>Classification head</td>
+<td><span class="math inline">\(K\)</span> class scores</td>
+</tr>
+<tr class="even">
+<td>Image <span class="math inline">\(\to\)</span> CNN features <span class="math inline">\(\to\)</span> representation</td>
+<td>Reconstruction decoder</td>
+<td>An image-shaped prediction</td>
+</tr>
+</tbody>
+</table>
+<p>The architecture changes because the target changes. An image classifier can discard detail irrelevant to a label; a pixel reconstruction objective continues to penalize discarded detail even if it does not help classification.</p>
+</section>
+<section id="map-the-architecture-into-executable-code" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="map-the-architecture-into-executable-code"><span class="header-section-number">2.2</span> Map the architecture into executable code</h2>
+<p>The lecture’s smallest example is <span class="math inline">\(784\to128\to32\to128\to784\)</span>. For a PyTorch batch, the complete route is <span class="math inline">\((N,1,28,28)\to(N,784)\to(N,32)\to(N,784)\to(N,1,28,28)\)</span>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch <span class="im">import</span> nn</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Autoencoder(nn.Module):</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, d<span class="op">=</span><span class="dv">32</span>):</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.encoder <span class="op">=</span> nn.Sequential(</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>            nn.Flatten(start_dim<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>            nn.Linear(<span class="dv">784</span>, <span class="dv">128</span>), nn.ReLU(),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>            nn.Linear(<span class="dv">128</span>, d),</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.decoder <span class="op">=</span> nn.Sequential(</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>            nn.Linear(d, <span class="dv">128</span>), nn.ReLU(),</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>            nn.Linear(<span class="dv">128</span>, <span class="dv">784</span>), nn.Sigmoid(),</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>            nn.Unflatten(<span class="dv">1</span>, (<span class="dv">1</span>, <span class="dv">28</span>, <span class="dv">28</span>)),</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.decoder(<span class="va">self</span>.encoder(x))</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> Autoencoder(d<span class="op">=</span><span class="dv">32</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> torch.optim.Adam(model.parameters(), lr<span class="op">=</span><span class="fl">1e-3</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> train_batch(images):</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    model.train()</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    optimizer.zero_grad(set_to_none<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    reconstructed <span class="op">=</span> model(images)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> reconstructed.shape <span class="op">==</span> images.shape</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    loss <span class="op">=</span> (reconstructed <span class="op">-</span> images).square().mean()</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    loss.backward()</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    optimizer.step()</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> loss.item()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Flattening starts after the batch axis. A linear latent layer allows signed coordinates; the sigmoid is applied to reconstructed pixels. The shape assertion catches an omitted <code>Unflatten</code> before an accidental broadcast creates an unintended loss. The optimizer sees parameters from both modules. Detaching <span class="math inline">\(z\)</span> before the decoder would prevent reconstruction gradients from training the encoder.</p>
+<section id="exercise-trace-shapes-and-count-parameters" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="exercise-trace-shapes-and-count-parameters">Exercise: trace shapes and count parameters</h3>
+<p>For a batch of <span class="math inline">\(16\)</span> images and <span class="math inline">\(d=32\)</span>, write every tensor shape. Then count the trainable parameters, including biases, in the four linear layers.</p>
+<details>
+<summary>
+Worked solution
+</summary>
+<p>The shapes are <span class="math inline">\((16,1,28,28)\)</span>, <span class="math inline">\((16,784)\)</span>, <span class="math inline">\((16,128)\)</span>, <span class="math inline">\((16,32)\)</span>, <span class="math inline">\((16,128)\)</span>, <span class="math inline">\((16,784)\)</span>, and finally <span class="math inline">\((16,1,28,28)\)</span>. ReLU and sigmoid do not change shape. A linear layer from <span class="math inline">\(a\)</span> to <span class="math inline">\(b\)</span> has <span class="math inline">\(ab+b\)</span> parameters. The four counts are <span class="math inline">\(100{,}480\)</span>, <span class="math inline">\(4{,}128\)</span>, <span class="math inline">\(4{,}224\)</span>, and <span class="math inline">\(101{,}136\)</span>, totaling <span class="math inline">\(209{,}968\)</span>. Flatten and Unflatten have no learned parameters. A small code does not imply a small model.</p>
+</details>
+</section>
+</section>
+</section>
+<section id="learning-through-a-bottleneck" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Learning through a bottleneck</h1>
+<section id="a-restriction-creates-pressure-not-a-semantic-guarantee" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="a-restriction-creates-pressure-not-a-semantic-guarantee"><span class="header-section-number">3.1</span> A restriction creates pressure, not a semantic guarantee</h2>
+<p>An undercomplete autoencoder has <span class="math inline">\(d&lt;D\)</span>. This limits the number of continuous coordinates transmitted along the prescribed path. It does not by itself enforce a useful representation. A sufficiently expressive model can assign distinct codes to finitely many training images and learn to decode them, while generalizing poorly. Shortcut paths around <span class="math inline">\(z\)</span> can also weaken the intended bottleneck.</p>
+<p>The coordinate ratio for Fashion-MNIST at <span class="math inline">\(d=32\)</span> is <span class="math inline">\(32/784\approx0.0408\)</span>: about <span class="math inline">\(4.08\%\)</span> as many coordinates, or <span class="math inline">\(24.5\)</span> input coordinates per code coordinate. This is <strong>not a measured file-compression ratio</strong>. A 784-byte uint8 image compared with 32 float32 values gives <span class="math inline">\(784/128\approx6.13\)</span> before metadata, quantization, decoder storage, or entropy coding. Infinite-precision real numbers would make a literal bit-budget interpretation still less appropriate. A useful compressor requires specifying precision, code format, model cost, and reconstruction quality.</p>
+</section>
+<section id="the-controlled-latent-width-experiment" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="the-controlled-latent-width-experiment"><span class="header-section-number">3.2</span> The controlled latent-width experiment</h2>
+<p>The lecture trains seven MLPs on Fashion-MNIST <span class="citation" data-cites="xiao2017fashion">(<a href="#ref-xiao2017fashion" role="doc-biblioref">Xiao et al. 2017</a>)</span>. The experimental architecture is slightly deeper than the minimal teaching code:</p>
+<p><span class="math display">\[784\to256\to128\to d\to128\to256\to784.\]</span></p>
+<p>Hidden layers use ReLU, the output uses sigmoid, and each model trains for six epochs on 60,000 images with Adam at <span class="math inline">\(10^{-3}\)</span> and batch size 256. The seed is 17. Evaluation uses the 10,000-image test split. Width varies over <span class="math inline">\(d\in\{2,4,8,16,32,64,128\}\)</span>; the other architectural widths and training settings stay fixed.</p>
+<p>This is a controlled classroom comparison, not a multi-seed benchmark. Changing <span class="math inline">\(d\)</span> also changes the number of parameters connected to the code, and random initialization arrays differ in shape. The script reuses a shuffled loader whose generator state advances, so batch order is not identical across models. The experiment isolates the main architectural intervention while leaving stochastic variation that repeated runs would need to quantify.</p>
+<div id="fig-width-gallery" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Rows of pullover, sandal, and bag reconstructions at dimensions 2 through 128 beside the originals.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-width-gallery-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="assets/width-gallery.png" class="img-fluid figure-img" alt="Rows of pullover, sandal, and bag reconstructions at dimensions 2 through 128 beside the originals.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-width-gallery-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: The same three held-out inputs across every latent width. The pullover reproduces the lecture’s filmstrip; sandal and bag expose different reconstruction difficulties. Course-trained outputs, not drawn predictions.
+</figcaption>
+</figure>
+</div>
+<p>Look first at a single row. The gross outline often emerges before fine detail, but improvements need not occur at every step. Then compare rows: a setting that preserves one garment’s silhouette may still lose a bag handle or a thin sandal strap. A few attractive examples are insufficient to choose the code width.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="assets/residual.png" class="img-fluid figure-img" alt="Original pullover, its reconstruction, and a colored residual map emphasizing lost detail."></p>
+<figcaption>The pullover input, its eight-dimensional reconstruction, and the absolute-error map used in the lecture explorer. Dark purple means little error; warm yellow means large absolute pixel discrepancy on a fixed 0–1 scale.</figcaption>
+</figure>
+</div>
+<p>Residual maps reveal where the score comes from. The colored map displays absolute error <span class="math inline">\(|x_j-\hat x_j|\)</span>, whereas the scalar MSE squares those errors and averages them. Use the same color scale across comparisons: rescaling every map separately would make different error magnitudes look deceptively alike. The <a href="../../lectures/10-autoencoders-latent-representations/index.html#/hold-everything-fixedchange-only-d">interactive width explorer</a> retains all ten class examples and seven dimensions.</p>
+<div id="fig-width-curve" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Error falls sharply from dimension 2 to 8 then flattens near 0.016, with a small increase at 32.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-width-curve-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="assets/width-curve.png" class="img-fluid figure-img" alt="Error falls sharply from dimension 2 to 8 then flattens near 0.016, with a small increase at 32.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-width-curve-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Measured test MSE averaged across pixels and images. The early gains are large, followed by a broad plateau.
+</figcaption>
+</figure>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: right;">Code dimension</th>
+<th style="text-align: right;">Test MSE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.0291551</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.0205394</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">0.0168457</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.0162394</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">0.0163097</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">0.0159695</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">0.0158035</td>
+</tr>
+</tbody>
+</table>
+<p>From <span class="math inline">\(d=2\)</span> to <span class="math inline">\(8\)</span>, error drops by about <span class="math inline">\(42.2\%\)</span>. From <span class="math inline">\(8\)</span> to <span class="math inline">\(128\)</span>, sixteen times as many coordinates reduce error by only about <span class="math inline">\(6.2\%\)</span>. Dimension 32 is slightly worse than 16 in this run. A larger function class can offer a lower achievable optimum without guaranteeing a better result after finite stochastic training.</p>
+<section id="exercise-choose-from-evidence" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="exercise-choose-from-evidence">Exercise: choose from evidence</h3>
+<p>Suppose you want a compact code for inspecting garment shape. Choose a provisional <span class="math inline">\(d\)</span> from this evidence and state what additional check you would require before deployment.</p>
+<details>
+<summary>
+Worked interpretation
+</summary>
+<p>Dimension 8 is a defensible starting point near the bend in the curve; 16 is also reasonable if its visual improvements matter. Neither is universally optimal. Compare representative and difficult validation examples, repeat training across seeds, and evaluate the downstream task. Reserve the test set for the final evaluation. The published lecture sweep is exploratory test-set evidence, so repeatedly selecting settings from it would compromise an untouched final test.</p>
+</details>
+</section>
+</section>
+<section id="why-the-linear-case-connects-to-pca" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="why-the-linear-case-connects-to-pca"><span class="header-section-number">3.3</span> Why the linear case connects to PCA</h2>
+<p>The classical dimensionality-reduction perspective motivates autoencoders <span class="citation" data-cites="hinton2006reducing">(<a href="#ref-hinton2006reducing" role="doc-biblioref">Hinton and Salakhutdinov 2006</a>)</span>. To see a tractable special case, center the data and use a linear encoder and decoder with squared error. If <span class="math inline">\(U\in\mathbb R^{D\times d}\)</span> has orthonormal columns, set <span class="math inline">\(z=U^\top x\)</span> and <span class="math inline">\(\hat x=UU^\top x\)</span>. With covariance <span class="math inline">\(\Sigma=\mathbb E[xx^\top]\)</span>,</p>
+<p><span class="math display">\[
+\mathbb E\|x-UU^\top x\|^2
+=\operatorname{tr}(\Sigma)-\operatorname{tr}(U^\top\Sigma U).
+\]</span></p>
+<p>Minimizing reconstruction error therefore maximizes retained variance. The optimal subspace is spanned by leading covariance eigenvectors. An unconstrained linear encoder–decoder factorization can represent that projection without giving uniquely identified PCA coordinates: invertible changes of basis inside <span class="math inline">\(z\)</span> leave the reconstruction unchanged.</p>
+<p>For a numerical example, suppose <span class="math inline">\(\Sigma=\operatorname{diag}(9,1)\)</span> and <span class="math inline">\(d=1\)</span>. Keeping the first coordinate leaves expected squared error <span class="math inline">\(1\)</span>; keeping the second leaves error <span class="math inline">\(9\)</span>. A nonlinear autoencoder can represent curved structures beyond a single linear subspace, but then optimization, capacity, and validation become more complicated. “Nonlinear” is additional expressive freedom, not an automatic improvement.</p>
+</section>
+</section>
+<section id="reading-the-latent-space" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Reading the latent space</h1>
+<section id="inspect-geometry-before-interpreting-labels" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="inspect-geometry-before-interpreting-labels"><span class="header-section-number">4.1</span> Inspect geometry before interpreting labels</h2>
+<p>For this section, the lecture separately trains a <span class="math inline">\(d=2\)</span> model for 12 epochs with seed 29. It is not the two-dimensional checkpoint from the six-epoch sweep. The displayed sample contains the first 100 test examples of each class, totaling 1,000 images. These labels are used to construct and color the inspection sample, never as training targets for the autoencoder.</p>
+<div id="fig-latent-map" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two scatterplots show latent coordinates before and after coloring by garment class.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-latent-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="assets/latent-map.png" class="img-fluid figure-img" alt="Two scatterplots show latent coordinates before and after coloring by garment class.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-latent-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: The same actual encoder coordinates, first without class colors and then with them. These notes plot raw coordinates; the lecture rescales axes and clips the outer 1% for display.
+</figcaption>
+</figure>
+</div>
+<p>This is the actual two-dimensional code, not a PCA or t-SNE projection of a larger representation. Each point represents a held-out image. In the <a href="../../lectures/10-autoencoders-latent-representations/index.html#/explore-the-map-before-seeing-the-labels">interactive lecture map</a>, selecting a point retrieves its original and reconstruction. Inspect dense areas, isolated examples, and transitions before attaching semantic explanations.</p>
+<p>Class coloring reveals partial organization: distinct silhouettes often separate, while tops such as shirts, coats, and pullovers overlap. The encoder was rewarded for helping the decoder reproduce pixels. Shape information useful for that purpose can correlate with category, but class separation was not the objective. Do not read each coordinate as a named property such as “sleeve length”; rotated or rescaled codes can support equivalent reconstructions.</p>
+</section>
+<section id="make-similarity-operational-with-nearest-neighbors" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="make-similarity-operational-with-nearest-neighbors"><span class="header-section-number">4.2</span> Make similarity operational with nearest neighbors</h2>
+<p>For an anchor image <span class="math inline">\(x_a\)</span>, retrieve examples minimizing <span class="math inline">\(\|f_\theta(x_i)-f_\theta(x_a)\|_2\)</span>, excluding the anchor. This is a precise operation rather than an assertion that all close images mean the same thing.</p>
+<div id="fig-neighbors" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A shirt anchor followed by seven nearby encoded garments, with reconstructions below each input.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-neighbors-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="assets/neighbors.png" class="img-fluid figure-img" alt="A shirt anchor followed by seven nearby encoded garments, with reconstructions below each input.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-neighbors-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: A shirt anchor and its seven nearest neighbors among the 1,000 displayed test images. Originals appear above reconstructions; headings show class and latent distance.
+</figcaption>
+</figure>
+</div>
+<p>Compare silhouette and brightness distribution before comparing class labels. Then compare each input with its reconstruction. Reconstructions can look more alike than the originals because the code has discarded distinguishing detail. A retrieval system should be judged against the application’s meaning of similarity: finding a matching shape and finding the same product category are different goals.</p>
+<p>There is also a coordinate caveat. For any invertible matrix <span class="math inline">\(A\)</span>, replacing <span class="math inline">\(f\)</span> by <span class="math inline">\(Af\)</span> and <span class="math inline">\(g\)</span> by <span class="math inline">\(g\circ A^{-1}\)</span> preserves reconstruction. Yet a non-orthogonal <span class="math inline">\(A\)</span> changes Euclidean distances. Reconstruction alone does not uniquely determine a canonical latent metric. Normalization, a learned metric, or a task-specific objective may be needed before deploying retrieval.</p>
+</section>
+<section id="decode-paths-between-observed-points" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="decode-paths-between-observed-points"><span class="header-section-number">4.3</span> Decode paths between observed points</h2>
+<p>Choose two images and encode their endpoints <span class="math inline">\(z_a\)</span> and <span class="math inline">\(z_b\)</span>. A straight path is</p>
+<p><span class="math display">\[z(t)=(1-t)z_a+t z_b,\qquad \hat x(t)=g_\phi(z(t)),\quad 0\le t\le1.\]</span></p>
+<p>At <span class="math inline">\(t=0\)</span> and <span class="math inline">\(1\)</span> we obtain reconstructions of the endpoints, not the original images. At <span class="math inline">\(t=0.5\)</span> the decoder receives their coordinate midpoint. This is not generally equal to averaging the images: <span class="math inline">\(g((z_a+z_b)/2)\)</span> need not equal <span class="math inline">\((g(z_a)+g(z_b))/2\)</span> for a nonlinear decoder.</p>
+<div id="fig-interpolation" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two rows of nine decoded images show footwear and top-clothing interpolations.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-interpolation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="assets/interpolation.png" class="img-fluid figure-img" alt="Two rows of nine decoded images show footwear and top-clothing interpolations.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-interpolation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: The lecture’s nine-step sneaker-to-boot and shirt-to-coat paths. Every frame is decoded from an interpolated code.
+</figcaption>
+</figure>
+</div>
+<p>The footwear path changes ankle height and silhouette. The top-clothing path changes more subtly and contains ambiguity. Read these as observations, not proof that class overlap causes every blur. Blur can also arise from limited capacity, training, the output distribution, or the loss. A continuous decoder produces continuous pixel changes even through regions sparsely represented by data. Continuity alone does not prove realism.</p>
+</section>
+</section>
+<section id="when-reconstruction-becomes-useful" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> When reconstruction becomes useful</h1>
+<section id="denoising-changes-the-inputtarget-pair" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="denoising-changes-the-inputtarget-pair"><span class="header-section-number">5.1</span> Denoising changes the input–target pair</h2>
+<p>The clean-copy objective asks for <span class="math inline">\(x\mapsto x\)</span>. A denoising objective instead supplies a corrupted input <span class="math inline">\(\tilde x\sim q(\tilde x\mid x)\)</span> and asks for the clean target <span class="math inline">\(x\)</span>. The model must exploit predictable structure to recover information damaged by corruption. This is the key idea in denoising autoencoders <span class="citation" data-cites="vincent2008denoising vincent2010stacked">(<a href="#ref-vincent2008denoising" role="doc-biblioref">Vincent et al. 2008</a>, <a href="#ref-vincent2010stacked" role="doc-biblioref">2010</a>)</span>.</p>
+<p>In the course experiment, <span class="math inline">\(\epsilon\sim\mathcal N(0,0.45^2I)\)</span> and <span class="math inline">\(\tilde x=\operatorname{clip}(x+\epsilon,0,1)\)</span>. Clipping is part of the actual procedure: near the boundaries, effective corruption is not an unbounded zero-mean Gaussian. A 16-dimensional model trains for six epochs, drawing fresh noise during training.</p>
+<div id="fig-denoising" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Three rows show noisy garments, restored predictions, and clean originals.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-denoising-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="assets/denoising.png" class="img-fluid figure-img" alt="Three rows show noisy garments, restored predictions, and clean originals.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-denoising-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: The exact six noisy inputs, model predictions, and clean targets shown in the lecture, aligned for comparison.
+</figcaption>
+</figure>
+</div>
+<p>Across these six selected test examples, mean input MSE against the clean targets is about <span class="math inline">\(0.1008\)</span>, and prediction MSE is about <span class="math inline">\(0.0211\)</span>. These are gallery averages, not a reported estimate over the full test distribution. The bag is a useful counterexample to unqualified success: the network removes noise but also loses a distinctive handle and structural details.</p>
+<p>The general objective is</p>
+<p><span class="math display">\[
+\min_{\theta,\phi}\ \mathbb E_{x,\tilde x\sim q(\cdot\mid x)}
+\left[\frac1D\|x-g_\phi(f_\theta(\tilde x))\|^2\right].
+\]</span></p>
+<p>Only the corrupted image enters the network. The clean image enters the loss. Training against <span class="math inline">\(\tilde x\)</span> instead would reward reproducing the very noise we want removed.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace the clean reconstruction step inside the training loop:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>noisy <span class="op">=</span> (images <span class="op">+</span> <span class="fl">0.45</span> <span class="op">*</span> torch.randn_like(images)).clamp(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>prediction <span class="op">=</span> model(noisy)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> (prediction <span class="op">-</span> images).square().mean()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="why-denoising-can-produce-an-average" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="why-denoising-can-produce-an-average"><span class="header-section-number">5.2</span> Why denoising can produce an average</h2>
+<p>Fix a corrupted observation <span class="math inline">\(\tilde x=u\)</span> and consider a possible prediction <span class="math inline">\(a\)</span>. Let <span class="math inline">\(m=\mathbb E[x\mid\tilde x=u]\)</span>. Expanding around <span class="math inline">\(m\)</span> gives</p>
+<p><span class="math display">\[
+\mathbb E[\|x-a\|^2\mid u]
+=\mathbb E[\|x-m\|^2\mid u]+\|m-a\|^2.
+\]</span></p>
+<p>The cross term vanishes because <span class="math inline">\(\mathbb E[x-m\mid u]=0\)</span>. The optimal unconstrained squared-error prediction is therefore the conditional mean <span class="math inline">\(a=m\)</span>. If two different edge locations remain plausible, their mean can contain a soft double edge. A learned network approximates this solution subject to its capacity and training. This explains why reducing MSE and restoring visually sharp details are not identical tasks.</p>
+<p>Denoising also should not be overinterpreted as guaranteed latent invariance. The composition <span class="math inline">\(g\circ f\)</span> can remove noise while <span class="math inline">\(f\)</span> still encodes some of it. If stable codes themselves matter, measure their response to corruption and use a suitable objective. A bottleneck constrains the route; corruption changes what must be inferred; neither alone certifies the desired downstream behavior.</p>
+</section>
+<section id="reconstruction-error-as-an-anomaly-signal" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="reconstruction-error-as-an-anomaly-signal"><span class="header-section-number">5.3</span> Reconstruction error as an anomaly signal</h2>
+<p>Now change the training distribution. The lecture’s second model sees only sandals, sneakers, and ankle boots. After six epochs, it is evaluated on held-out footwear and garments from the other classes. A per-image score is</p>
+<p><span class="math display">\[s(x)=\frac1{784}\|x-g_\phi(f_\theta(x))\|^2.\]</span></p>
+<div id="fig-anomalies" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Footwear inputs reconstruct as footwear; six selected unfamiliar tops reconstruct into shoe-like shapes.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-anomalies-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="assets/anomalies.png" class="img-fluid figure-img" alt="Footwear inputs reconstruct as footwear; six selected unfamiliar tops reconstruct into shoe-like shapes.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-anomalies-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: Six familiar footwear examples followed by six unfamiliar garments. Each prediction is vertically aligned with its input. The unfamiliar side intentionally shows high-error examples.
+</figcaption>
+</figure>
+</div>
+<p>The candidate pool consists of the first 40 test images per class: 120 footwear and 280 other images. Median scores are <span class="math inline">\(0.01682\)</span> and <span class="math inline">\(0.08381\)</span>, respectively. The displayed unfamiliar examples are the six largest-error cases from this pool. They make the mechanism visible but cannot establish a detection rate or show the hardest anomalies. Familiar examples were selected at spaced score ranks. Report this selection when interpreting the gallery.</p>
+<p>A large score says that this model reconstructs an input poorly. It does not identify why. A novel valid shoe, a change in camera conditions, or a defect can all raise it. Conversely, an unfamiliar but easily reconstructed input can receive a low score. Reconstruction-based detection is one possible approach; Deep SVDD provides a useful contrasting reading because it directly learns a compact normal-data representation <span class="citation" data-cites="ruff2018deep">(<a href="#ref-ruff2018deep" role="doc-biblioref">Ruff et al. 2018</a>)</span>.</p>
+<section id="calibrating-an-alarm-honestly" class="level3" data-number="5.3.1">
+<h3 data-number="5.3.1" class="anchored" data-anchor-id="calibrating-an-alarm-honestly"><span class="header-section-number">5.3.1</span> Calibrating an alarm honestly</h3>
+<p>For deployment, separate normal training data, normal validation data for calibration, and an independent evaluation set. Given acceptable validation false-alarm rate <span class="math inline">\(\alpha\)</span>, set</p>
+<p><span class="math display">\[\tau=Q_{1-\alpha}(\{s(x):x\in\mathcal V_{\mathrm{normal}}\}),\qquad
+\operatorname{alarm}(x)=\mathbf1[s(x)&gt;\tau].\]</span></p>
+<p>For <span class="math inline">\(\alpha=0.05\)</span>, choose the empirical 95th percentile. This controls the observed calibration behavior approximately, subject to finite samples and quantile convention. It does not guarantee a 5% future false-alarm rate under distribution shift. Report false-positive and true-positive rates on independent evaluation examples, and examine precision at the expected prevalence of anomalies.</p>
+<p><strong>Audit of the lecture’s number:</strong> the displayed threshold <span class="math inline">\(0.03971\)</span> was calculated from the 120 footwear candidates in the test-derived demonstration pool. It illustrates a percentile calculation; it is not an independently calibrated production threshold. The same pool supplied the gallery and summary statistics. Reproduce it to understand the lesson, then split calibration from evaluation for a valid performance study.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="assets/anomaly-scores.png" class="img-fluid figure-img" alt="Footwear gallery scores below 0.03 and selected garment scores above 0.16 with a dashed threshold at 0.03971."></p>
+<figcaption>The lecture’s selected gallery scores and its illustrative percentile threshold. The large visible gap is amplified by selecting the highest-error unfamiliar garments; this is not the full score distribution.</figcaption>
+</figure>
+</div>
+<p>The slides sometimes use <span class="math inline">\(\|x-\hat x\|^2\)</span> as shorthand. All numerical scores here and in the generation script are <strong>means over 784 pixels</strong>. If you use summed squared error, multiply the threshold by 784: <span class="math inline">\(0.03971\times784\approx31.13\)</span>. Changing resolution or intensity scaling also changes the score convention.</p>
+</section>
+<section id="exercise-set-the-alarm" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="exercise-set-the-alarm">Exercise: set the alarm</h3>
+<p>A footwear system uses the demonstration threshold <span class="math inline">\(0.03971\)</span>. A shoe receives MSE <span class="math inline">\(0.045\)</span> and an unfamiliar garment receives <span class="math inline">\(0.030\)</span>. Which triggers an alarm, and what does the outcome teach us?</p>
+<details>
+<summary>
+Worked solution
+</summary>
+<p>The shoe triggers an alarm because <span class="math inline">\(0.045&gt;0.03971\)</span>; if it is legitimate normal footwear, this is a false positive. The garment passes because <span class="math inline">\(0.030&lt;0.03971\)</span>; relative to the specified normal family, this is a false negative. The score is a reconstruction discrepancy, not a semantic class detector. Raising the threshold tends to reduce false alarms while missing more anomalies. Application costs determine the tradeoff, and independent evaluation estimates it.</p>
+</details>
+</section>
+</section>
+</section>
+<section id="why-sampling-still-fails" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Why sampling still fails</h1>
+<section id="the-decoder-accepts-more-codes-than-training-constrains" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="the-decoder-accepts-more-codes-than-training-constrains"><span class="header-section-number">6.1</span> The decoder accepts more codes than training constrains</h2>
+<p>Every vector in <span class="math inline">\(\mathbb R^d\)</span> has the correct shape for the decoder. Training, however, evaluates it mainly at codes <span class="math inline">\(f_\theta(x)\)</span> generated from the training examples. The objective does not request plausible outputs throughout a convenient rectangle or a standard Gaussian cloud.</p>
+<div id="fig-sampling-support" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Uniformly sampled latent points cover sparse areas around and between the encoded image cloud.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-sampling-support-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="assets/sampling-support.png" class="img-fluid figure-img" alt="Uniformly sampled latent points cover sparse areas around and between the encoded image cloud.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sampling-support-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9: The lecture’s 250 uniform probes over a rectangle spanning the central coordinate ranges. Gray points are encoded test examples; color measures raw-coordinate distance to the nearest of those 1,000 examples.
+</figcaption>
+</figure>
+</div>
+<p>The rectangle uses the 1st and 99th percentiles separately on each coordinate. Choosing it from encoded data is more informed than sampling an arbitrary scale, but it still fills gaps and gives equal area equal probability. The real encoded distribution is neither uniform nor necessarily rectangular.</p>
+<p>Here “support” is a visual diagnostic based on finitely many held-out codes. A point far from this sample is not proven to be outside the training distribution’s mathematical support; a point near one example is not proven to decode realistically. Coordinate distance also depends on parametrization. The figure raises a coverage question that reconstruction training leaves unanswered.</p>
+</section>
+<section id="decode-a-whole-grid" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="decode-a-whole-grid"><span class="header-section-number">6.2</span> Decode a whole grid</h2>
+<div id="fig-atlas" class="quarto-float quarto-figure quarto-figure-center anchored" alt="One hundred decoded grid positions show tops, trousers, footwear, and blurred transitions.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-atlas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../lectures/10-autoencoders-latent-representations/assets/sampling-failure/decoder-atlas.png" class="img-fluid figure-img" style="width:78.0%" alt="One hundred decoded grid positions show tops, trousers, footwear, and blurred transitions.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-atlas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10: The lecture’s 10×10 decoder atlas. Left to right increases the first latent coordinate; top to bottom decreases the second. All cells are outputs from the same trained two-dimensional decoder.
+</figcaption>
+</figure>
+</div>
+<p>Trace a row and then a column. There are recognizable garments, intermediate silhouettes, and faint or ambiguous shapes. Some distant regions still decode recognizable boots. That observation matters: the lesson is absence of a sampling guarantee, not that every unvisited coordinate must fail. Repetition, uneven class coverage, and implausible mixtures can all limit generation even when several isolated samples look acceptable.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../lectures/10-autoencoders-latent-representations/assets/sampling-failure/random-probes.png" class="img-fluid figure-img" style="width:100.0%" alt="Eight decoded probes show varied nearby garments and four similar faraway boot-shaped outputs."></p>
+<figcaption>Four uniform probes closest to the displayed encoded sample, followed by four farthest probes. Distances range from about 0.02 to 8.64 in the learned coordinates. These are selected extremes among 250 draws, not an unbiased sample-quality comparison.</figcaption>
+</figure>
+</div>
+</section>
+<section id="why-declaring-a-gaussian-after-training-is-insufficient" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="why-declaring-a-gaussian-after-training-is-insufficient"><span class="header-section-number">6.3</span> Why declaring a Gaussian after training is insufficient</h2>
+<p>Suppose we now draw <span class="math inline">\(z\sim\mathcal N(0,I)\)</span> and return <span class="math inline">\(g_\phi(z)\)</span>. This is an executable sampling procedure, but no term in ordinary reconstruction training aligns encoded data with that Gaussian. Some samples may be plausible by chance; reliable quality and coverage do not follow.</p>
+<p>An explicit counterexample makes this precise. Take a trained pair <span class="math inline">\((f,g)\)</span> and define <span class="math inline">\(f'(x)=10f(x)+100\mathbf1\)</span> and <span class="math inline">\(g'(z')=g((z'-100\mathbf1)/10)\)</span>. For every input, <span class="math inline">\(g'(f'(x))=g(f(x))\)</span>. Reconstruction is identical, yet codes near the old origin have moved near 100. Standard-normal samples near zero now address entirely different decoder locations. Reconstruction alone cannot prefer the coordinate system that suits our arbitrary prior.</p>
+<p>One can fit an additional density model to codes, and resampling observed codes can return reconstructions of known examples. These are additional modeling choices with their own generalization and diversity questions. The next chapter studies a training formulation that explicitly couples reconstruction with a latent distribution <span class="citation" data-cites="kingma2014vae">(<a href="#ref-kingma2014vae" role="doc-biblioref">Kingma and Welling 2014</a>)</span>. Its machinery is not needed to understand the missing specification here.</p>
+<section id="exercise-identify-the-missing-contract" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="exercise-identify-the-missing-contract">Exercise: identify the missing contract</h3>
+<p>A colleague reports excellent held-out reconstruction MSE and concludes that standard-normal sampling will produce realistic new images. Name the unsupported step, and propose an evaluation that would actually test the claim.</p>
+<details>
+<summary>
+Worked solution
+</summary>
+<p>Held-out reconstruction feeds the decoder codes produced by the encoder. Standard-normal generation feeds a different code distribution, which the objective did not require the encoder to match. Evaluate independent prior draws for realism, diversity, and coverage, using a protocol suitable to the dataset and task; compare their latent distribution with encoded data as a diagnostic. A handful of hand-selected attractive outputs cannot establish the claim.</p>
+</details>
+</section>
+</section>
+</section>
+<section id="compose-the-mechanisms-for-a-task" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Compose the mechanisms for a task</h1>
+<p>The lecture’s conclusion can now be read as a design procedure. First specify the target and nuisance variables. Then choose the representation route and loss. Finally evaluate the behavior you want from the trained components.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Task specification</th>
+<th>Use of the learned components</th>
+<th>Necessary evaluation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Reproduce garments from a compact code</td>
+<td><span class="math inline">\(x\to f(x)\to g(f(x))\)</span></td>
+<td>Held-out fidelity, difficult details, storage convention</td>
+</tr>
+<tr class="even">
+<td>Remove a specified corruption</td>
+<td>Train <span class="math inline">\(\tilde x\to x\)</span></td>
+<td>Independent corruptions, retained detail, changed noise conditions</td>
+</tr>
+<tr class="odd">
+<td>Retrieve similar garments</td>
+<td>Distances between encoder outputs</td>
+<td>Relevance under the application’s definition of similarity</td>
+</tr>
+<tr class="even">
+<td>Flag inputs outside normal operation</td>
+<td>Calibrated reconstruction score</td>
+<td>False alarms, missed anomalies, prevalence, distribution shift</td>
+</tr>
+<tr class="odd">
+<td>Generate new garments</td>
+<td>A sampling distribution plus a decoder</td>
+<td>Realism, diversity, coverage, and the distribution mismatch</td>
+</tr>
+</tbody>
+</table>
+<p>The code is useful only relative to these decisions. Good reconstruction can support several applications, but each requires its own evidence. The unresolved generative question is how to preserve reconstruction while arranging latent codes so that a specified sampling procedure reliably reaches meaningful outputs.</p>
+</section>
+<section id="reproduce-and-extend-the-evidence" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Reproduce and extend the evidence</h1>
+<p>The lecture assets preserve measured values and generation scripts:</p>
+<ul>
+<li><a href="../../lectures/10-autoencoders-latent-representations/assets/build_latent_sweep.py">Latent-width training script</a> and <a href="../../lectures/10-autoencoders-latent-representations/assets/latent-sweep/manifest.json">measured manifest</a>: seven dimensions, seed 17, six epochs.</li>
+<li><a href="../../lectures/10-autoencoders-latent-representations/assets/build_latent_geometry.py">Latent-geometry script</a> and <a href="../../lectures/10-autoencoders-latent-representations/assets/latent-geometry/manifest.json">manifest</a>: separate 12-epoch, two-dimensional model, seed 29, balanced inspection subset.</li>
+<li><a href="../../lectures/10-autoencoders-latent-representations/assets/build_useful_reconstruction.py">Denoising and anomaly script</a> and <a href="../../lectures/10-autoencoders-latent-representations/assets/useful-reconstruction/manifest.json">manifest</a>: two distinct models, six epochs each, explicit noise and gallery selection.</li>
+<li><a href="../../lectures/10-autoencoders-latent-representations/assets/build_sampling_failure.py">Sampling script</a> and <a href="../../lectures/10-autoencoders-latent-representations/assets/sampling-failure/manifest.json">manifest</a>: 250 uniform probes and a 10×10 atlas from the saved geometry checkpoint.</li>
+</ul>
+<p>For an extension, reserve a validation split, reset the batch-order generator for each width, repeat several seeds, and report mean and variability. Measure errors separately for garment classes and inspect the worst cases. Compare code-space neighbors with pixel-space neighbors using a fixed relevance criterion. For anomaly detection, construct independent calibration and evaluation splits before changing the threshold. These extensions test claims that a classroom gallery cannot settle.</p>
+</section>
+<section id="reading-path" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> An annotated reading path</h1>
+<p>Start with the conceptual overview, then read the original studies for their specific questions. Optional next-chapter material is marked explicitly.</p>
+<ol type="1">
+<li><strong>Conceptual companion:</strong> Goodfellow, Bengio, and Courville, <a href="https://www.deeplearningbook.org/contents/autoencoders.html">Deep Learning, Chapter 14: Autoencoders</a> <span class="citation" data-cites="goodfellow2016deep">(<a href="#ref-goodfellow2016deep" role="doc-biblioref">Goodfellow et al. 2016</a>)</span>. Read Sections 14.1–14.2 alongside bottleneck design. Use the distinction between undercomplete and regularized models to explain why dimensionality alone cannot guarantee useful features.</li>
+<li><strong>Historical dimensionality reduction:</strong> Hinton and Salakhutdinov (2006), <a href="https://doi.org/10.1126/science.1127647">Reducing the Dimensionality of Data with Neural Networks</a> <span class="citation" data-cites="hinton2006reducing">(<a href="#ref-hinton2006reducing" role="doc-biblioref">Hinton and Salakhutdinov 2006</a>)</span>. Ask what reconstruction-based low-dimensional codes offer beyond linear projections. Distinguish the historical training procedure from our modern Adam experiment.</li>
+<li><strong>Original denoising idea:</strong> Vincent et al.&nbsp;(2008), <a href="https://www.cs.toronto.edu/~larocheh/publications/icml-2008-denoising-autoencoders.pdf">Extracting and Composing Robust Features with Denoising Autoencoders</a> <span class="citation" data-cites="vincent2008denoising">(<a href="#ref-vincent2008denoising" role="doc-biblioref">Vincent et al. 2008</a>)</span>. Track exactly which object is corrupted and which remains the target. Explain how a corruption process changes the task.</li>
+<li><strong>Deeper denoising study:</strong> Vincent et al.&nbsp;(2010), <a href="https://www.jmlr.org/papers/v11/vincent10a.html">Stacked Denoising Autoencoders</a> <span class="citation" data-cites="vincent2010stacked">(<a href="#ref-vincent2010stacked" role="doc-biblioref">Vincent et al. 2010</a>)</span>. Read the experimental comparisons as evidence about representation quality, not merely image cleanup.</li>
+<li><strong>Dataset provenance:</strong> Xiao, Rasul, and Vollgraf (2017), <a href="https://arxiv.org/abs/1708.07747">Fashion-MNIST</a> <span class="citation" data-cites="xiao2017fashion">(<a href="#ref-xiao2017fashion" role="doc-biblioref">Xiao et al. 2017</a>)</span>. Check image dimensions, class definitions, and splits before interpreting our numbers.</li>
+<li><strong>Alternative anomaly objective:</strong> Ruff et al.&nbsp;(2018), <a href="https://proceedings.mlr.press/v80/ruff18a.html">Deep One-Class Classification</a> <span class="citation" data-cites="ruff2018deep">(<a href="#ref-ruff2018deep" role="doc-biblioref">Ruff et al. 2018</a>)</span>. This is an optional comparison, not the method used in our gallery. Contrast its normal-data representation objective with reconstruction scoring.</li>
+<li><strong>Bridge to the next chapter:</strong> Kingma and Welling, <a href="https://arxiv.org/abs/1312.6114">Auto-Encoding Variational Bayes</a> <span class="citation" data-cites="kingma2014vae">(<a href="#ref-kingma2014vae" role="doc-biblioref">Kingma and Welling 2014</a>)</span>. For now, read the abstract and motivation. Return to its objective and gradient estimator after the VAE lecture.</li>
+</ol>
+</section>
+<section id="references" class="level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-goodfellow2016deep" class="csl-entry" role="listitem">
+Goodfellow, Ian, Yoshua Bengio, and Aaron Courville. 2016. <em>Deep Learning</em>. MIT Press. <a href="https://www.deeplearningbook.org/">https://www.deeplearningbook.org/</a>.
+</div>
+<div id="ref-hinton2006reducing" class="csl-entry" role="listitem">
+Hinton, Geoffrey E., and Ruslan R. Salakhutdinov. 2006. <span>“Reducing the Dimensionality of Data with Neural Networks.”</span> <em>Science</em> 313 (5786): 504–7. <a href="https://doi.org/10.1126/science.1127647">https://doi.org/10.1126/science.1127647</a>.
+</div>
+<div id="ref-kingma2014vae" class="csl-entry" role="listitem">
+Kingma, Diederik P., and Max Welling. 2014. <span>“Auto-Encoding Variational Bayes.”</span> <em>International Conference on Learning Representations</em>. <a href="https://arxiv.org/abs/1312.6114">https://arxiv.org/abs/1312.6114</a>.
+</div>
+<div id="ref-ruff2018deep" class="csl-entry" role="listitem">
+Ruff, Lukas, Robert Vandermeulen, Nico Goernitz, et al. 2018. <span>“Deep One-Class Classification.”</span> <em>Proceedings of the 35th International Conference on Machine Learning</em> 80: 4393–402. <a href="https://proceedings.mlr.press/v80/ruff18a.html">https://proceedings.mlr.press/v80/ruff18a.html</a>.
+</div>
+<div id="ref-vincent2008denoising" class="csl-entry" role="listitem">
+Vincent, Pascal, Hugo Larochelle, Yoshua Bengio, and Pierre-Antoine Manzagol. 2008. <span>“Extracting and Composing Robust Features with Denoising Autoencoders.”</span> <em>Proceedings of the 25th International Conference on Machine Learning</em>, 1096–103. <a href="https://doi.org/10.1145/1390156.1390294">https://doi.org/10.1145/1390156.1390294</a>.
+</div>
+<div id="ref-vincent2010stacked" class="csl-entry" role="listitem">
+Vincent, Pascal, Hugo Larochelle, Isabelle Lajoie, Yoshua Bengio, and Pierre-Antoine Manzagol. 2010. <span>“Stacked Denoising Autoencoders: Learning Useful Representations in a Deep Network with a Local Denoising Criterion.”</span> <em>Journal of Machine Learning Research</em> 11: 3371–408. <a href="https://www.jmlr.org/papers/v11/vincent10a.html">https://www.jmlr.org/papers/v11/vincent10a.html</a>.
+</div>
+<div id="ref-xiao2017fashion" class="csl-entry" role="listitem">
+Xiao, Han, Kashif Rasul, and Roland Vollgraf. 2017. <span>“Fashion-MNIST: A Novel Image Dataset for Benchmarking Machine Learning Algorithms.”</span> <em>arXiv Preprint arXiv:1708.07747</em>. <a href="https://arxiv.org/abs/1708.07747">https://arxiv.org/abs/1708.07747</a>.
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Deep Learning · ENSA Tétouan</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

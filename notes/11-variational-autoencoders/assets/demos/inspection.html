@@ -1,0 +1,86 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><base href="../../../../lectures/11-variational-autoencoders/"><title>VAE inspection experiment</title><link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-f3e585dc122d45960ea2c31f625881dd.css"><link rel="stylesheet" href="../01-what-is-learning/slides.css"><link rel="stylesheet" href="week11.css"><style>
+html,body { margin:0; height:auto; overflow:visible; background:#f5f1e8; }
+.reveal { font-size:28px; height:auto; width:100%; }
+.reveal section { display:block; position:relative; box-sizing:border-box; padding:20px; width:100%; height:auto; text-align:left; }
+.reveal .fragment { opacity:1; visibility:visible; }
+.reveal .vae-live { grid-template-columns:1fr 1fr; gap:25px; margin:0; }
+.reveal .vae-live img { width:100%; height:auto; max-height:none; }
+.reveal .vae-live-controls h3 { font-size:29px; }
+.reveal .posterior-stage { grid-template-columns:1fr 1.2fr 1fr; gap:15px; }
+.reveal .posterior-stage figure img { width:100%; height:auto; }
+.reveal .posterior-toolbar { margin-top:0; }
+.reveal .training-inspection-layout { display:block; margin:0 auto; max-width:500px; }
+.reveal .loss-ablation-layout { grid-template-columns:1fr; margin:0; }
+.reveal .loss-ablation-controls p { font-size:22px; }
+.reveal .loss-ablation-figure>figure { width:100%; height:auto; }
+.reveal .loss-ablation-figure img { height:auto; width:100%; }
+.reveal .elbo-example { grid-template-columns:1fr; gap:20px; margin:0; }
+.reveal .reparam-controls { flex-wrap:wrap; margin:10px 0; gap:18px; }
+.reveal .reparam-controls label { width:40%; }
+.reveal .reparam-graph { height:auto; }
+.reveal .reparam-rule p { font-size:23px; }
+.reveal .latent-path-layout { gap:15px; }
+.reveal .latent-endpoints p { font-size:20px; }
+.reveal .latent-endpoints img { width:45px; height:45px; }
+.reveal .latent-map-key { font-size:17px; }
+.reveal #latent-path-map { height:auto; }
+.reveal #latent-path-output { width:220px; height:220px; }
+.reveal .kl-explorer { grid-template-columns:1fr; }
+.reveal #kl-curves { height:auto; }
+.reveal .kl-costs { gap:12px; }
+.reveal .kl-costs strong { font-size:29px; }
+.reveal .kl-costs span { font-size:13px; }
+@media(max-width:700px) {
+ .reveal .posterior-stage,.reveal .latent-path-layout,.reveal .vae-live { grid-template-columns:1fr; }
+ .reveal .posterior-stage figure img { width:200px; margin:auto; }
+ .reveal .vae-live img { width:260px; margin:auto; }
+ .reveal .posterior-stage figure { max-width:100%; }
+ .reveal .posterior-stage figcaption { font-size:21px; }
+ .reveal .kl-costs { display:flex; flex-wrap:wrap; justify-content:center; }
+}
+</style></head><body><div class="reveal"><section class="slide level2 vae-s5" id="demo-inspection">
+
+<div class="training-inspection-layout" id="training-inspection">
+<div class="training-inspection-view">
+<label for="inspection-mode">Decoder input</label><select id="inspection-mode"><option value="mean">Encoder mean μ(x)</option><option value="posterior">Draw from q(z ∣ x)</option><option value="prior">Draw from p(z)</option></select>
+<div class="inspection-input">
+<img alt="The observed validation T-shirt used for reconstruction; only a reference when generating from the prior." src="assets/evidence/posterior/input-0.png"/>
+<p id="inspection-input-label">
+Observed x<br/>used by the encoder
+</p>
+</div>
+<img alt="Actual decoder output for the observed image's posterior mean code." id="inspection-output" src="assets/evidence/posterior/mean-0.png"/>
+<p id="inspection-output-label">
+Deterministic mean-code reconstruction
+</p>
+</div>
+
+</div>
+
+
+
+</section><span hidden id="inspection-code-mean"></span><span hidden id="inspection-code-posterior"></span><span hidden id="inspection-code-prior"></span></div><script>
+(() => {
+ function setup() {
+  const select=document.getElementById('inspection-mode');
+  if(!select) return;
+  const modes={mean:['mean-0.png','Deterministic mean-code reconstruction','Observed x: used by the encoder'],posterior:['sample-0-0.png','One recorded posterior reconstruction','Observed x: used by the encoder'],prior:['prior-0.png','One recorded prior-generated image','Reference only: x is unused']};
+  function update(){
+   const [file,label,input]=modes[select.value];
+   const image=document.getElementById('inspection-output');
+   image.src='assets/evidence/posterior/'+file; image.alt=label+' from the fixed trained decoder.';
+   document.getElementById('inspection-output-label').textContent=label;
+   document.getElementById('inspection-input-label').textContent=input;
+   for(const key of Object.keys(modes)) document.getElementById('inspection-code-'+key).classList.toggle('inspection-active',key===select.value);
+  }
+  select.addEventListener('change',update); update();
+ }
+ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setup); else setup();
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS_HTML-full"></script>
+<script>
+function height(){parent.postMessage({type:'vae-notes-height',height:Math.ceil(document.querySelector('.reveal').getBoundingClientRect().height)+8},location.origin);}
+new ResizeObserver(height).observe(document.querySelector('.reveal'));
+window.addEventListener('load',height);
+</script></body></html>

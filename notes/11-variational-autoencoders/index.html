@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dr.&nbsp;A. Belcaid">
+<meta name="description" content="A complete visual chapter with reproducible experiments, plus a concise PDF technical review.">
+
+<title>Variational Autoencoders – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e90830a6c3a870e8aa2cd7457ccbff49.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+<script src="../../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="assets/notes.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../schedule.html"> 
+<span class="menu-text">Schedule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../logistics.html"> 
+<span class="menu-text">Logistics</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://edstem.org/us/courses/102787/"> 
+<span class="menu-text">ED</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#from-reconstruction-to-generation" id="toc-from-reconstruction-to-generation" class="nav-link active" data-scroll-target="#from-reconstruction-to-generation"><span class="header-section-number">1</span> From reconstruction to generation</a>
+  <ul class="collapse">
+  <li><a href="#an-input-supplies-a-code-but-not-a-sampling-rule" id="toc-an-input-supplies-a-code-but-not-a-sampling-rule" class="nav-link" data-scroll-target="#an-input-supplies-a-code-but-not-a-sampling-rule"><span class="header-section-number">1.1</span> An input supplies a code, but not a sampling rule</a></li>
+  <li><a href="#test-random-codes-in-the-ordinary-autoencoder" id="toc-test-random-codes-in-the-ordinary-autoencoder" class="nav-link" data-scroll-target="#test-random-codes-in-the-ordinary-autoencoder"><span class="header-section-number">1.2</span> Test random codes in the ordinary autoencoder</a></li>
+  <li><a href="#specify-the-generative-direction" id="toc-specify-the-generative-direction" class="nav-link" data-scroll-target="#specify-the-generative-direction"><span class="header-section-number">1.3</span> Specify the generative direction</a></li>
+  <li><a href="#plausibility-diversity-and-resemblance-are-different-questions" id="toc-plausibility-diversity-and-resemblance-are-different-questions" class="nav-link" data-scroll-target="#plausibility-diversity-and-resemblance-are-different-questions"><span class="header-section-number">1.4</span> Plausibility, diversity, and resemblance are different questions</a></li>
+  </ul></li>
+  <li><a href="#from-one-code-to-a-distribution" id="toc-from-one-code-to-a-distribution" class="nav-link" data-scroll-target="#from-one-code-to-a-distribution"><span class="header-section-number">2</span> From one code to a distribution</a>
+  <ul class="collapse">
+  <li><a href="#inference-runs-in-the-other-direction" id="toc-inference-runs-in-the-other-direction" class="nav-link" data-scroll-target="#inference-runs-in-the-other-direction"><span class="header-section-number">2.1</span> Inference runs in the other direction</a></li>
+  <li><a href="#interpret-location-and-spread-through-actual-outputs" id="toc-interpret-location-and-spread-through-actual-outputs" class="nav-link" data-scroll-target="#interpret-location-and-spread-through-actual-outputs"><span class="header-section-number">2.2</span> Interpret location and spread through actual outputs</a></li>
+  <li><a href="#map-the-distribution-to-a-programming-contract" id="toc-map-the-distribution-to-a-programming-contract" class="nav-link" data-scroll-target="#map-the-distribution-to-a-programming-contract"><span class="header-section-number">2.3</span> Map the distribution to a programming contract</a></li>
+  </ul></li>
+  <li><a href="#reconstruction-regularization-and-the-evidence-bound" id="toc-reconstruction-regularization-and-the-evidence-bound" class="nav-link" data-scroll-target="#reconstruction-regularization-and-the-evidence-bound"><span class="header-section-number">3</span> Reconstruction, regularization, and the evidence bound</a>
+  <ul class="collapse">
+  <li><a href="#first-inspect-the-competing-demands" id="toc-first-inspect-the-competing-demands" class="nav-link" data-scroll-target="#first-inspect-the-competing-demands"><span class="header-section-number">3.1</span> First inspect the competing demands</a></li>
+  <li><a href="#average-costs-across-possible-codes" id="toc-average-costs-across-possible-codes" class="nav-link" data-scroll-target="#average-costs-across-possible-codes"><span class="header-section-number">3.2</span> Average costs across possible codes</a></li>
+  <li><a href="#derive-the-gaussian-prior-penalty" id="toc-derive-the-gaussian-prior-penalty" class="nav-link" data-scroll-target="#derive-the-gaussian-prior-penalty"><span class="header-section-number">3.3</span> Derive the Gaussian prior penalty</a></li>
+  <li><a href="#why-this-particular-sum-derive-the-elbo" id="toc-why-this-particular-sum-derive-the-elbo" class="nav-link" data-scroll-target="#why-this-particular-sum-derive-the-elbo"><span class="header-section-number">3.4</span> Why this particular sum? Derive the ELBO</a></li>
+  </ul></li>
+  <li><a href="#backpropagating-through-a-random-draw" id="toc-backpropagating-through-a-random-draw" class="nav-link" data-scroll-target="#backpropagating-through-a-random-draw"><span class="header-section-number">4</span> Backpropagating through a random draw</a>
+  <ul class="collapse">
+  <li><a href="#separate-forward-sampling-from-the-gradient-estimator" id="toc-separate-forward-sampling-from-the-gradient-estimator" class="nav-link" data-scroll-target="#separate-forward-sampling-from-the-gradient-estimator"><span class="header-section-number">4.1</span> Separate forward sampling from the gradient estimator</a></li>
+  <li><a href="#move-randomness-outside-the-learned-transformation" id="toc-move-randomness-outside-the-learned-transformation" class="nav-link" data-scroll-target="#move-randomness-outside-the-learned-transformation"><span class="header-section-number">4.2</span> Move randomness outside the learned transformation</a></li>
+  <li><a href="#verify-the-repaired-path" id="toc-verify-the-repaired-path" class="nav-link" data-scroll-target="#verify-the-repaired-path"><span class="header-section-number">4.3</span> Verify the repaired path</a></li>
+  </ul></li>
+  <li><a href="#building-training-and-inspecting-the-vae" id="toc-building-training-and-inspecting-the-vae" class="nav-link" data-scroll-target="#building-training-and-inspecting-the-vae"><span class="header-section-number">5</span> Building, training, and inspecting the VAE</a>
+  <ul class="collapse">
+  <li><a href="#assemble-the-same-architecture" id="toc-assemble-the-same-architecture" class="nav-link" data-scroll-target="#assemble-the-same-architecture"><span class="header-section-number">5.1</span> Assemble the same architecture</a></li>
+  <li><a href="#reduce-within-an-image-then-across-images" id="toc-reduce-within-an-image-then-across-images" class="nav-link" data-scroll-target="#reduce-within-an-image-then-across-images"><span class="header-section-number">5.2</span> Reduce within an image, then across images</a></li>
+  <li><a href="#one-optimizer-step-updates-both-networks" id="toc-one-optimizer-step-updates-both-networks" class="nav-link" data-scroll-target="#one-optimizer-step-updates-both-networks"><span class="header-section-number">5.3</span> One optimizer step updates both networks</a></li>
+  <li><a href="#choose-the-output-path-intentionally" id="toc-choose-the-output-path-intentionally" class="nav-link" data-scroll-target="#choose-the-output-path-intentionally"><span class="header-section-number">5.4</span> Choose the output path intentionally</a></li>
+  </ul></li>
+  <li><a href="#sampling-interpolation-and-limitations" id="toc-sampling-interpolation-and-limitations" class="nav-link" data-scroll-target="#sampling-interpolation-and-limitations"><span class="header-section-number">6</span> Sampling, interpolation, and limitations</a>
+  <ul class="collapse">
+  <li><a href="#walk-between-encoded-examples" id="toc-walk-between-encoded-examples" class="nav-link" data-scroll-target="#walk-between-encoded-examples"><span class="header-section-number">6.1</span> Walk between encoded examples</a></li>
+  <li><a href="#keep-the-samples-you-did-not-select" id="toc-keep-the-samples-you-did-not-select" class="nav-link" data-scroll-target="#keep-the-samples-you-did-not-select"><span class="header-section-number">6.2</span> Keep the samples you did not select</a></li>
+  <li><a href="#test-whether-image-specific-codes-matter" id="toc-test-whether-image-specific-codes-matter" class="nav-link" data-scroll-target="#test-whether-image-specific-codes-matter"><span class="header-section-number">6.3</span> Test whether image-specific codes matter</a></li>
+  <li><a href="#close-the-loop-with-a-task-specification" id="toc-close-the-loop-with-a-task-specification" class="nav-link" data-scroll-target="#close-the-loop-with-a-task-specification"><span class="header-section-number">6.4</span> Close the loop with a task specification</a></li>
+  </ul></li>
+  <li><a href="#experiment-provenance" id="toc-experiment-provenance" class="nav-link" data-scroll-target="#experiment-provenance"><span class="header-section-number">7</span> Experiment provenance and reproducibility</a></li>
+  <li><a href="#reading-path" id="toc-reading-path" class="nav-link" data-scroll-target="#reading-path"><span class="header-section-number">8</span> An annotated reading path</a>
+  <ul class="collapse">
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Variational Autoencoders</h1>
+<p class="subtitle lead">Chapter 11 · Learning a latent space we can sample</p>
+</div>
+
+<div>
+  <div class="description">
+    A complete visual chapter with reproducible experiments, plus a concise PDF technical review.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dr.&nbsp;A. Belcaid </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="chapter-opening">
+<div class="chapter-kicker">
+<p>PART VI · GENERATIVE REPRESENTATION LEARNING</p>
+</div>
+<div class="chapter-cover">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="assets/chapter-cover.svg" class="img-fluid figure-img" alt="Observed garments connect to Gaussian clouds; an independent prior path joins the shared decoder and produces actual model outputs."></p>
+<figcaption>A course-made visual: three garment images lead to latent probability clouds; sampled points flow through a shared decoder to generated garments. No text is embedded in the illustration.</figcaption>
+</figure>
+</div>
+</div>
+<p>An autoencoder reconstructs an image by first encoding it. Remove the image and the decoder has no prescribed starting point. A variational autoencoder supplies that missing contract: <strong>draw a code from a known prior and decode it</strong>, while learning from images through an approximate posterior.</p>
+<p>These notes preserve all six sections of the approved lecture: its real model outputs, numerical exercises, gradient probes, implementation, and interactive experiments. They add the derivations and caveats that support the visual story. The <a href="index.pdf">PDF technical review</a> is deliberately shorter: use it to revise the mathematical and programming contracts after working through this chapter.</p>
+<p><a href="../../lectures/11-variational-autoencoders/index.html">Lecture</a> · <a href="../../lectures/11-variational-autoencoders/assets/vae_training.py">Runnable PyTorch model</a> · <a href="#experiment-provenance">Experiment provenance</a> · <a href="#reading-path">Reading path</a></p>
+</div>
+<section id="from-reconstruction-to-generation" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> From reconstruction to generation</h1>
+<section id="an-input-supplies-a-code-but-not-a-sampling-rule" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="an-input-supplies-a-code-but-not-a-sampling-rule"><span class="header-section-number">1.1</span> An input supplies a code, but not a sampling rule</h2>
+<p>The previous chapter’s two-dimensional autoencoder has encoder <span class="math inline">\(f\)</span> and decoder <span class="math inline">\(g\)</span>. For an observed image, <span class="math inline">\(\hat x=g(f(x))\)</span> is a complete computation. Its training objective scores those paired reconstructions; it does not specify a distribution from which to draw useful decoder inputs without an image.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../lectures/11-variational-autoencoders/assets/evidence/reconstruction.png" class="img-fluid figure-img" alt="Eight held-out clothing images paired with their two-dimensional autoencoder reconstructions."></p>
+<figcaption>The first eight validation Fashion-MNIST images above their actual reconstructions from the Project 3 autoencoder. The two-dimensional bottleneck retains broad silhouettes but loses detail. Course experiment; six epochs, pixel MSE.</figcaption>
+</figure>
+</div>
+<p>Reconstructing a held-out image is generalization, but it still requires an input. To generate unconditionally we must supply a different source of codes. First consider sampling pixels directly.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../lectures/11-variational-autoencoders/assets/evidence/pixels.png" class="img-fluid figure-img" alt="Real clothing above independently sampled pixel noise."></p>
+<figcaption>Real validation images versus independent Uniform(0,1) pixel arrays, seed 97. Both rows satisfy the same numerical shape and range; only the first has learned clothing structure.</figcaption>
+</figure>
+</div>
+<p>A <span class="math inline">\(28\times28\)</span> array is not necessarily a plausible garment. Sleeves connect to torsos, shoes have coherent outlines, and background pixels occur together. Independent uniform pixels ignore these relationships. The issue is not randomness itself: we want a distribution that concentrates probability on structured images. Fashion-MNIST provides the concrete image distribution studied here <span class="citation" data-cites="xiao2017fashion">(<a href="#ref-xiao2017fashion" role="doc-biblioref">Xiao et al. 2017</a>)</span>.</p>
+</section>
+<section id="test-random-codes-in-the-ordinary-autoencoder" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="test-random-codes-in-the-ordinary-autoencoder"><span class="header-section-number">1.2</span> Test random codes in the ordinary autoencoder</h2>
+<p>A decoder already couples output pixels through a shared latent representation. Perhaps it can turn random codes into structure. The lecture tests this directly, using the first sixteen uniform draws inside the coordinate-wise 1st–99th percentile rectangle of 2,000 validation codes.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../lectures/11-variational-autoencoders/assets/evidence/ae-map.png" class="img-fluid figure-img" alt="Two-dimensional autoencoder scatter with sampled points inside a percentile rectangle."></p>
+<figcaption>Blue points are actual two-dimensional autoencoder codes; orange crosses are the sixteen sampled decoder inputs, seed 211. This is not PCA or t-SNE.</figcaption>
+</figure>
+</div>
+<p>Predict which sampled locations are likely to produce useful images before inspecting the gallery.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../lectures/11-variational-autoencoders/assets/evidence/ae-samples.png" class="img-fluid figure-img" alt="Sixteen unfiltered random-code autoencoder outputs."></p>
+<figcaption>Actual outputs for the same sixteen orange crosses, in draw order. All outputs are retained, including recognizable silhouettes and ambiguous shapes.</figcaption>
+</figure>
+</div>
+<p>This is evidence about one model and one sampling proposal, not proof that every random AE code fails. The scatter is a finite validation sample, not a support boundary. An AE can be combined with a separately fitted latent density. Ordinary reconstruction training simply does not supply that density automatically.</p>
+</section>
+<section id="specify-the-generative-direction" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="specify-the-generative-direction"><span class="header-section-number">1.3</span> Specify the generative direction</h2>
+<p>A latent-variable model defines</p>
+<p><span class="math display">\[
+p_\theta(x,z)=p(z)p_\theta(x\mid z),\qquad
+p_\theta(x)=\int p_\theta(x\mid z)p(z)\,dz.
+\]</span></p>
+<p>The prior supplies a sampling rule; the decoder learns a conditional observation distribution. Here <span class="math inline">\(p(z)=\mathcal N(0,I_2)\)</span>. Generation follows <span class="math inline">\(z\sim p(z)\)</span>, then <span class="math inline">\(x\sim p_\theta(x\mid z)\)</span>. <strong>The image is not an input to this path.</strong> The decoder still had to learn from images <span class="citation" data-cites="kingma2014vae">(<a href="#ref-kingma2014vae" role="doc-biblioref">Kingma and Welling 2014, sec. 2.1</a>)</span>.</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+ P["Known prior p(z)"] --&gt; Z["Sample z"] --&gt; D["Learned decoder pθ(x|z)"] --&gt; X["Image"]
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>Our galleries display the decoder’s <strong>mean pixel values</strong>, not an additional observation-level sample. For a Bernoulli observation model those means are probabilities; drawing binary pixels is a separate operation. Fresh latent draws already change the displayed mean image.</p>
+<div class="vae-demo">
+<iframe src="assets/demos/generation.html" title="Interactive experiment: Prior sampling" loading="lazy">
+</iframe>
+<a href="assets/demos/generation.html" target="_blank">Open prior sampling in a full window →</a>
+</div>
+<p>The recorded preview has sixteen fixed-seed codes. Change the draw and observe what varies while the decoder remains fixed. This is not browser inference or training. It also is not a controlled AE–VAE quality comparison: the AE used six epochs and MSE; the preview VAE used ten epochs and the reconstruction-plus-KL surrogate developed below.</p>
+</section>
+<section id="plausibility-diversity-and-resemblance-are-different-questions" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="plausibility-diversity-and-resemblance-are-different-questions"><span class="header-section-number">1.4</span> Plausibility, diversity, and resemblance are different questions</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../lectures/11-variational-autoencoders/assets/evidence/neighbors.png" class="img-fluid figure-img" alt="Generated means paired with nearest training images by pixel MSE."></p>
+<figcaption>Eight VAE decoder means and their nearest training images under exact pixel-MSE search over all 50,000 training images. The generated samples are the first eight recorded draws, not a selected best set.</figcaption>
+</figure>
+</div>
+<p>An unfamiliar output is not automatically novel. Pixel distance can miss perceptually similar copies, transformations can change MSE, and eight draws say little about rare behavior. This nearest-neighbor experiment is an auditable diagnostic, not proof against memorization. The manifest records the matching dataset indices and distances.</p>
+<section id="exercise-which-path-starts-without-an-image" class="level3" data-number="1.4.1">
+<h3 data-number="1.4.1" class="anchored" data-anchor-id="exercise-which-path-starts-without-an-image"><span class="header-section-number">1.4.1</span> Exercise: which path starts without an image?</h3>
+<p>Assume fixed trained networks and a deterministic decoder. Classify each path by whether it requires a newly supplied image and what limits its outputs: <strong>A</strong> encode a held-out image then decode; <strong>B</strong> draw from a finite bank of stored training codes then decode; <strong>C</strong> draw from a prior then decode. Pause for 90 seconds and separate “no new input” from “new latent locations.”</p>
+<details>
+<summary>
+Worked solution
+</summary>
+<p>A needs an input and reconstructs that particular image. B needs no new image but only selects among a finite set of fixed decoded outputs. C also needs no image and can sample new latent locations, but useful outputs require compatibility between the prior and the learned decoder. A prior attached to an arbitrary decoder is not enough. The encoder’s training role is the next question.</p>
+</details>
+</section>
+</section>
+</section>
+<section id="from-one-code-to-a-distribution" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> From one code to a distribution</h1>
+<section id="inference-runs-in-the-other-direction" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="inference-runs-in-the-other-direction"><span class="header-section-number">2.1</span> Inference runs in the other direction</h2>
+<p>Generation starts with <span class="math inline">\(z\)</span>; training data give us <span class="math inline">\(x\)</span>. Which latent codes could explain a particular observed image? The model’s posterior is</p>
+<p><span class="math display">\[p_\theta(z\mid x)=\frac{p_\theta(x\mid z)p(z)}{p_\theta(x)}.\]</span></p>
+<p>The marginal likelihood in its denominator generally requires an intractable latent integral. We therefore learn a tractable approximation <span class="math inline">\(q_\phi(z\mid x)\)</span>, using shared encoder parameters <span class="math inline">\(\phi\)</span> across images. This is <em>amortized variational inference</em>: the encoder predicts the approximate posterior parameters in one forward pass rather than separately optimizing a variational distribution from scratch for every image.</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+ X["Image x"] --&gt; E["Shared encoder features"]
+ E --&gt; M["Mean μ(x)"]
+ E --&gt; V["Log variance v(x)"]
+ M --&gt; Q["qφ(z|x)"]
+ V --&gt; Q
+ Q --&gt; Z["Draw z"] --&gt; D["Decoder"] --&gt; R["Mean image"]
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>The ordinary AE maps <span class="math inline">\(x\)</span> to one point. The probabilistic encoder describes a distribution over possible codes, then a code is drawn. A two-dimensional Gaussian requires two means and two variances; those four parameters do <strong>not</strong> turn <span class="math inline">\(z\)</span> into a four-dimensional vector.</p>
+</section>
+<section id="interpret-location-and-spread-through-actual-outputs" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="interpret-location-and-spread-through-actual-outputs"><span class="header-section-number">2.2</span> Interpret location and spread through actual outputs</h2>
+<p>We use the diagonal Gaussian</p>
+<p><span class="math display">\[q_\phi(z\mid x)=\mathcal N\!\left(\mu_\phi(x),\operatorname{diag}(\sigma_\phi^2(x))\right).\]</span></p>
+<p>For a fixed image, diagonal covariance implies independent Gaussian coordinates. It does not imply that coordinates are independent after mixing the encoded distributions across many images. Nor does it claim the true model posterior is diagonal Gaussian.</p>
+<div class="vae-demo">
+<iframe src="assets/demos/posterior.html" title="Interactive experiment: Image-conditioned sampling" loading="lazy">
+</iframe>
+<a href="assets/demos/posterior.html" target="_blank">Open image-conditioned sampling in a full window →</a>
+</div>
+<p>Choose one of the first validation T-shirt, trouser, and boot examples. Repeated draws change <span class="math inline">\(z\)</span> and the decoded mean while the image, encoder, and decoder stay fixed. “Decode μ” uses the mean code; it does not average the displayed reconstructions. For a nonlinear decoder, <span class="math inline">\(g_\theta(\mathbb E[z])\)</span> is generally different from <span class="math inline">\(\mathbb E[g_\theta(z)]\)</span>.</p>
+<p>The T-shirt’s measured mean is approximately <span class="math inline">\((-0.911,-1.446)\)</span> and its standard deviations are <span class="math inline">\((0.0506,0.0573)\)</span>. The local map uses the same <span class="math inline">\(\mu\pm0.30\)</span> window for each example. Its radius-one and radius-two ellipses are Mahalanobis contours, not hard support boundaries or marginal 68%/95% probability intervals. A two-dimensional standard Gaussian has probability <span class="math inline">\(1-e^{-r^2/2}\)</span> inside radius <span class="math inline">\(r\)</span>: about 39.3% and 86.5% for these two contours.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../lectures/11-variational-autoencoders/assets/evidence/posterior/prior-posterior.svg" class="img-fluid figure-img" alt="Three image-conditioned Gaussians compared with radius-one and radius-two contours of a standard-normal prior."></p>
+<figcaption>The three measured encoder distributions and the standard-normal prior on common global coordinates. Narrow image-conditioned distributions need not individually match the prior exactly. Course figure from the unchanged section-2 checkpoint.</figcaption>
+</figure>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Distribution</th>
+<th>Depends on an observed image?</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(p(z)=\mathcal N(0,I)\)</span></td>
+<td>No</td>
+<td>Known source of codes for generation</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(q_\phi(z\mid x)\)</span></td>
+<td>Yes</td>
+<td>Approximate posterior used to learn from or reconstruct an image</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(p_\theta(z\mid x)\)</span></td>
+<td>Yes</td>
+<td>True model posterior; usually intractable</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(p_\theta(x\mid z)\)</span></td>
+<td>Depends on the code</td>
+<td>Decoder’s observation model</td>
+</tr>
+</tbody>
+</table>
+<section id="exercise-read-a-diagonal-gaussian" class="level3" data-number="2.2.1">
+<h3 data-number="2.2.1" class="anchored" data-anchor-id="exercise-read-a-diagonal-gaussian"><span class="header-section-number">2.2.1</span> Exercise: read a diagonal Gaussian</h3>
+<p>For one image, let <span class="math inline">\(\mu=(1,-0.5)\)</span> and <span class="math inline">\(\sigma=(0.25,1)\)</span>. Which coordinate varies more, and what are the two mean-plus/minus-one-standard-deviation intervals? Pause for 60 seconds; compare width rather than density height.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../lectures/11-variational-autoencoders/assets/evidence/posterior/gaussian-exercise.svg" class="img-fluid figure-img" alt="A narrow Gaussian centered at one and a broader Gaussian centered at minus one half."></p>
+<figcaption>The lecture’s numerical Gaussian example on matching axes. Shading marks one standard deviation around each mean; these are chosen values, not fitted model outputs.</figcaption>
+</figure>
+</div>
+<details>
+<summary>
+Worked solution
+</summary>
+<p>The intervals are <span class="math inline">\([0.75,1.25]\)</span> and <span class="math inline">\([-1.5,0.5]\)</span>. Coordinate two has four times the standard deviation and sixteen times the variance. Each marginal interval contains about 68.27% probability; both coordinates landing in their respective intervals has probability approximately <span class="math inline">\(0.6827^2=46.6\%\)</span>. Neither interval is a hard limit. Density height is not probability: area under each complete curve is one.</p>
+</details>
+</section>
+</section>
+<section id="map-the-distribution-to-a-programming-contract" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="map-the-distribution-to-a-programming-contract"><span class="header-section-number">2.3</span> Map the distribution to a programming contract</h2>
+<p>The encoder shares a 784–256–128 feature extractor and has separate linear mean and log-variance heads. Write <span class="math inline">\(v=\log\sigma^2\)</span>, so <span class="math inline">\(\sigma=e^{v/2}\)</span>. Thus <span class="math inline">\(v=0\)</span> means standard deviation one, and <span class="math inline">\(v=\log(0.0625)\)</span> means standard deviation <span class="math inline">\(0.25\)</span>. Exponentiation enforces positivity, but does not protect arbitrary large outputs from overflow.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch <span class="im">import</span> nn</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.nn <span class="im">import</span> functional <span class="im">as</span> F</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> GaussianEncoder(nn.Module):</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.features <span class="op">=</span> nn.Sequential(</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>            nn.Flatten(), nn.Linear(<span class="dv">784</span>, <span class="dv">256</span>), nn.ReLU(),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>            nn.Linear(<span class="dv">256</span>, <span class="dv">128</span>), nn.ReLU())</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.mu <span class="op">=</span> nn.Linear(<span class="dv">128</span>, <span class="dv">2</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.logvar <span class="op">=</span> nn.Linear(<span class="dv">128</span>, <span class="dv">2</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        h <span class="op">=</span> <span class="va">self</span>.features(x)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.mu(h), <span class="va">self</span>.logvar(h)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For a batch of 32 images, features have shape <code>[32,128]</code>; <code>mu</code>, <code>logvar</code>, <code>sigma</code>, and a single latent draw have shape <code>[32,2]</code>. <code>Normal(mu, sigma)</code> takes <strong>standard deviation</strong>, not variance, as its scale. It has scalar Normal batch shape <code>[32,2]</code>; computing joint log density requires summing the latent axis or using <code>Independent(...,1)</code>.</p>
+<p>The lecture first used <code>q.sample()</code> to inspect a forward draw. That is not the training recipe: it lacks the pathwise encoder gradient needed below. Distribution specification and differentiation behavior are separate contracts.</p>
+</section>
+</section>
+<section id="reconstruction-regularization-and-the-evidence-bound" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Reconstruction, regularization, and the evidence bound</h1>
+<section id="first-inspect-the-competing-demands" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="first-inspect-the-competing-demands"><span class="header-section-number">3.1</span> First inspect the competing demands</h2>
+<p>The controlled ablation changes only the KL coefficient from zero to one, retaining architecture, initialization, data order, optimizer, ten-epoch budget, and evaluation noise. These are both probabilistic autoencoders; the zero-KL condition is not the earlier six-epoch deterministic AE.</p>
+<div class="vae-demo">
+<iframe src="assets/demos/ablation.html" title="Interactive experiment: Controlled objective comparison" loading="lazy">
+</iframe>
+<a href="assets/demos/ablation.html" target="_blank">Open controlled objective comparison in a full window →</a>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../lectures/11-variational-autoencoders/assets/evidence/loss/recon-gallery.png" class="img-fluid figure-img"></p>
+<figcaption>Reconstruction-only condition: first four inputs, posterior reconstructions, and prior outputs. All examples are retained; course experiment on Fashion-MNIST.</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../lectures/11-variational-autoencoders/assets/evidence/loss/vae-gallery.png" class="img-fluid figure-img"></p>
+<figcaption>Reconstruction-plus-KL condition with the same inputs and noise. These galleries expose different output paths, not a general quality ranking.</figcaption>
+</figure>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Condition</th>
+<th style="text-align: right;">Held-out reconstruction cost</th>
+<th style="text-align: right;">Mean KL to prior</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Reconstruction only</td>
+<td style="text-align: right;">253.62</td>
+<td style="text-align: right;">75.19</td>
+</tr>
+<tr class="even">
+<td>Reconstruction + prior penalty</td>
+<td style="text-align: right;">255.48</td>
+<td style="text-align: right;">6.23</td>
+</tr>
+</tbody>
+</table>
+<p>Scores use the first 1,024 validation images and eight posterior draws each, summing reconstruction costs over pixels and averaging over draws and images. The reconstruction-only model scores slightly better on that component, but its code distribution is much less compatible with the chosen prior. The galleries ask us to inspect reconstruction and prior generation separately. One seed and a small gallery do not establish a general quality ranking.</p>
+</section>
+<section id="average-costs-across-possible-codes" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="average-costs-across-possible-codes"><span class="header-section-number">3.2</span> Average costs across possible codes</h2>
+<p>For a normalized observation likelihood define</p>
+<p><span class="math display">\[R(x)=\mathbb E_{q_\phi(z\mid x)}[-\log p_\theta(x\mid z)].\]</span></p>
+<p>With <span class="math inline">\(L\)</span> independent posterior draws, use the Monte Carlo estimate</p>
+<p><span class="math display">\[\widehat R(x)=\frac1L\sum_{l=1}^{L}-\log p_\theta(x\mid z^{(l)}).\]</span></p>
+<p>Score each decoded output against the same target <strong>before</strong> averaging. Scoring an averaged image answers a different question because the loss is nonlinear.</p>
+<div class="evidence-strip">
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/loss/target.png" alt="Fixed validation reconstruction target" class="figure-img">
+<figcaption>
+Fixed target
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/loss/reconstruction-0.png" alt="Posterior draw 1 reconstruction" class="figure-img">
+<figcaption>
+Draw 1 · 338.11
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/loss/reconstruction-1.png" alt="Posterior draw 2 reconstruction" class="figure-img">
+<figcaption>
+Draw 2 · 341.37
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/loss/reconstruction-2.png" alt="Posterior draw 3 reconstruction" class="figure-img">
+<figcaption>
+Draw 3 · 339.67
+</figcaption>
+</figure>
+</div>
+<p>The first three recorded costs are 338.11, 341.37, and 339.67, averaging to approximately 339.72. These draws and costs belong to one fixed validation target; variation is sampling variation, not a change in weights.</p>
+<p>For independent Bernoulli pixels with predicted means <span class="math inline">\(\hat x_j\)</span>,</p>
+<p><span class="math display">\[-\log p_\theta(x\mid z)=-\sum_{j=1}^{784}[x_j\log\hat x_j+(1-x_j)\log(1-\hat x_j)].\]</span></p>
+<p>This is a proper binary-data likelihood when <span class="math inline">\(x_j\in\{0,1\}\)</span>. Fashion-MNIST contains grayscale targets in <span class="math inline">\([0,1]\)</span>. The course uses this expression as a <strong>soft-target BCE surrogate</strong>; a floating-point target does not automatically define a normalized continuous observation likelihood. Consequently its measured reconstruction-plus-KL score must not be called an exact continuous-image evidence bound without an appropriate observation model.</p>
+</section>
+<section id="derive-the-gaussian-prior-penalty" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="derive-the-gaussian-prior-penalty"><span class="header-section-number">3.3</span> Derive the Gaussian prior penalty</h2>
+<p>For <span class="math inline">\(p(z)=\mathcal N(0,I)\)</span>, define <span class="math inline">\(K(x)=D_{\mathrm{KL}}(q_\phi(z\mid x)\|p(z))\)</span>. In one coordinate,</p>
+<p><span class="math display">\[\log\frac{q(z)}{p(z)}=-\log\sigma-\frac{(z-\mu)^2}{2\sigma^2}+\frac{z^2}{2}.\]</span></p>
+<p>Under <span class="math inline">\(q\)</span>, <span class="math inline">\(\mathbb E[(z-\mu)^2]=\sigma^2\)</span> and <span class="math inline">\(\mathbb E[z^2]=\mu^2+\sigma^2\)</span>. Taking the expectation and summing independent coordinates gives</p>
+<p><span class="math display">\[K(x)=\frac12\sum_{j=1}^{d}\left(\mu_j^2+\sigma_j^2-1-\log\sigma_j^2\right)
+=\frac12\sum_j(\mu_j^2+e^{v_j}-1-v_j).\]</span></p>
+<p>The location contribution is <span class="math inline">\(\mu_j^2/2\)</span>. The spread contribution is <span class="math inline">\(\tfrac12(\sigma_j^2-1-\log\sigma_j^2)\)</span>, minimized at <span class="math inline">\(\sigma_j=1\)</span>. Moving the mean cannot fix the spread term. Collapsing the variance to zero is penalized, not rewarded. This is the direction <span class="math inline">\(\mathrm{KL}(q\|p)\)</span> <span class="citation" data-cites="kingma2014vae">(<a href="#ref-kingma2014vae" role="doc-biblioref">Kingma and Welling 2014</a>, Appendix B)</span>.</p>
+<div class="vae-demo">
+<iframe src="assets/demos/kl.html" title="Interactive experiment: Gaussian KL" loading="lazy">
+</iframe>
+<a href="assets/demos/kl.html" target="_blank">Open gaussian kl in a full window →</a>
+</div>
+<p>At <span class="math inline">\(\mu=1\)</span>, <span class="math inline">\(\sigma=0.5\)</span>, the location cost is <span class="math inline">\(0.5\)</span> and spread cost is <span class="math inline">\(0.318147\)</span>, totaling <span class="math inline">\(0.818147\)</span> nats. Matching the prior gives zero. This penalty acts on each image’s distribution, not merely on a histogram of encoder means. It neither guarantees perfect aggregate prior matching nor requires every optimal posterior to equal the prior.</p>
+<section id="exercise-which-proposal-earns-the-lower-total" class="level3" data-number="3.3.1">
+<h3 data-number="3.3.1" class="anchored" data-anchor-id="exercise-which-proposal-earns-the-lower-total"><span class="header-section-number">3.3.1</span> Exercise: which proposal earns the lower total?</h3>
+<p>For <span class="math inline">\(d=2\)</span> and a standard-normal prior, compare A with reconstruction costs <span class="math inline">\((4,5,6)\)</span>, <span class="math inline">\(\mu=(1,0)\)</span>, <span class="math inline">\(\sigma=(0.5,1)\)</span> against B with costs <span class="math inline">\((5,6,7)\)</span>, <span class="math inline">\(\mu=(0,0)\)</span>, <span class="math inline">\(\sigma=(1,1)\)</span>. Average the three per-draw costs, calculate KL, and minimize <span class="math inline">\(J=R+K\)</span>. Pause for 90 seconds; use <span class="math inline">\(\log0.25\approx-1.386\)</span>.</p>
+<details>
+<summary>
+Worked solution
+</summary>
+<p>A has <span class="math inline">\(R=5\)</span> and <span class="math inline">\(K=\tfrac12(1+0.25-1+1.386)=0.818\)</span>, giving <span class="math inline">\(J\approx5.82\)</span>. B has <span class="math inline">\(R=6\)</span>, <span class="math inline">\(K=0\)</span>, and <span class="math inline">\(J=6\)</span>. A wins because its reconstruction gain of one exceeds the extra KL cost. Minimizing KL alone would miss that tradeoff. These are illustrative per-image costs, not measured Fashion-MNIST scores.</p>
+</details>
+</section>
+</section>
+<section id="why-this-particular-sum-derive-the-elbo" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="why-this-particular-sum-derive-the-elbo"><span class="header-section-number">3.4</span> Why this particular sum? Derive the ELBO</h2>
+<p>Assume a valid normalized likelihood and suitable support/integrability. Bayes’ rule gives</p>
+<p><span class="math display">\[\log p_\theta(z\mid x)=\log p_\theta(x\mid z)+\log p(z)-\log p_\theta(x).\]</span></p>
+<p>Substitute it into the posterior discrepancy:</p>
+<p><span class="math display">\[\begin{aligned}
+D_{\mathrm{KL}}(q_\phi(z\mid x)\|p_\theta(z\mid x))
+&amp;=\mathbb E_q[\log q_\phi(z\mid x)-\log p_\theta(z\mid x)]\\
+&amp;=K(x)+R(x)+\log p_\theta(x).
+\end{aligned}\]</span></p>
+<p>Therefore</p>
+<p><span class="math display">\[\underbrace{R(x)+K(x)}_{J(x)}
+=-\log p_\theta(x)+D_{\mathrm{KL}}(q_\phi(z\mid x)\|p_\theta(z\mid x)).\]</span></p>
+<p>The nonnegative gap makes <span class="math inline">\(J\)</span> an <strong>upper bound on negative log evidence</strong>. Its negative is the <strong>evidence lower bound</strong>, <span class="math inline">\(\mathcal L=-R-K\le\log p_\theta(x)\)</span>. We minimize <span class="math inline">\(J\)</span>, or equivalently maximize <span class="math inline">\(\mathcal L\)</span> <span class="citation" data-cites="kingma2014vae">(<a href="#ref-kingma2014vae" role="doc-biblioref">Kingma and Welling 2014, sec. 2.2</a>)</span>.</p>
+<p>The two KLs have distinct jobs. The computable <span class="math inline">\(\mathrm{KL}(q\|p(z))\)</span> belongs to the objective. The generally intractable <span class="math inline">\(\mathrm{KL}(q\|p_\theta(z\mid x))\)</span> explains its gap from the evidence; we do not evaluate that gap during ordinary VAE training. The bound is tight if <span class="math inline">\(q\)</span> equals the true model posterior. A diagonal family and a shared encoder may prevent equality. With decoder parameters fixed, optimizing the bound improves the variational approximation; joint training also moves the decoder and its posterior.</p>
+<section id="an-exact-model-makes-the-bound-visible" class="level3" data-number="3.4.1">
+<h3 data-number="3.4.1" class="anchored" data-anchor-id="an-exact-model-makes-the-bound-visible"><span class="header-section-number">3.4.1</span> An exact model makes the bound visible</h3>
+<p>Let <span class="math inline">\(z\in\{A,B\}\)</span> with prior <span class="math inline">\((0.5,0.5)\)</span>, and let the likelihoods of observed <span class="math inline">\(x=1\)</span> be <span class="math inline">\((0.8,0.2)\)</span>. Then <span class="math inline">\(p(x)=0.5\)</span>, <span class="math inline">\(-\log p(x)=0.693147\)</span>, and Bayes’ rule gives posterior <span class="math inline">\((0.8,0.2)\)</span>. For proposal <span class="math inline">\(q=(w,1-w)\)</span>,</p>
+<p><span class="math display">\[R=-w\log0.8-(1-w)\log0.2,\qquad
+K=w\log(2w)+(1-w)\log(2(1-w)).\]</span></p>
+<div class="vae-demo">
+<iframe src="assets/demos/elbo.html" title="Interactive experiment: Exact evidence bound" loading="lazy">
+</iframe>
+<a href="assets/demos/elbo.html" target="_blank">Open exact evidence bound in a full window →</a>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: right;"><span class="math inline">\(q(A\mid x)\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(R\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(K\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(J\)</span></th>
+<th style="text-align: right;">Posterior gap</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.5</td>
+<td style="text-align: right;">0.916291</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.916291</td>
+<td style="text-align: right;">0.223144</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.8</td>
+<td style="text-align: right;">0.500402</td>
+<td style="text-align: right;">0.192745</td>
+<td style="text-align: right;">0.693147</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p>The best proposal has nonzero KL <strong>to the prior</strong> but zero KL <strong>to the true posterior</strong>. Setting <span class="math inline">\(w=0.95\)</span> lowers reconstruction further while worsening the total. These are exact finite sums; a single Monte Carlo realization of a neural objective need not respect the bound numerically on every draw. A better ELBO also does not guarantee sharper images, novelty, or distributional coverage.</p>
+</section>
+</section>
+</section>
+<section id="backpropagating-through-a-random-draw" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Backpropagating through a random draw</h1>
+<section id="separate-forward-sampling-from-the-gradient-estimator" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="separate-forward-sampling-from-the-gradient-estimator"><span class="header-section-number">4.1</span> Separate forward sampling from the gradient estimator</h2>
+<p>Use a scalar decoder <span class="math inline">\(\hat x=az\)</span>, target <span class="math inline">\(x=2\)</span>, and reconstruction cost <span class="math inline">\(\ell=\tfrac12(az-2)^2\)</span>. With seed 7, <span class="math inline">\(\mu=1\)</span>, <span class="math inline">\(v=0\)</span>, and <span class="math inline">\(a=2\)</span>, <code>Normal(mu, sigma).sample()</code> produces <span class="math inline">\(z\approx0.853205\)</span>. The decoder weight receives a gradient, but <code>mu.grad</code> and <code>logvar.grad</code> are <code>None</code>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>torch.manual_seed(<span class="dv">7</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>mu <span class="op">=</span> torch.tensor([<span class="fl">1.</span>], requires_grad<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>logvar <span class="op">=</span> torch.tensor([<span class="fl">0.</span>], requires_grad<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> torch.tensor([<span class="fl">2.</span>], requires_grad<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>sigma <span class="op">=</span> (<span class="fl">0.5</span> <span class="op">*</span> logvar).exp()</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> torch.distributions.Normal(mu, sigma)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> q.sample()</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>x_hat <span class="op">=</span> a <span class="op">*</span> z</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>rec <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> (x_hat <span class="op">-</span> <span class="dv">2</span>).square().mean()</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>rec.backward()</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(a.grad, mu.grad, logvar.grad)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"># tensor([-0.2505]) None None</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>None</code> means no accumulated derivative, not a measured zero. This API returns a draw without the pathwise connection to the distribution parameters. The experiment intentionally excludes KL: an encoder receiving KL gradients could otherwise mask the missing reconstruction path. In a real encoder, inspect parameter gradients or call <code>retain_grad()</code> on non-leaf outputs.</p>
+</section>
+<section id="move-randomness-outside-the-learned-transformation" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="move-randomness-outside-the-learned-transformation"><span class="header-section-number">4.2</span> Move randomness outside the learned transformation</h2>
+<p>Draw <span class="math inline">\(\epsilon\sim\mathcal N(0,I)\)</span> independently of encoder parameters and set</p>
+<p><span class="math display">\[z=\mu_\phi(x)+\sigma_\phi(x)\odot\epsilon.\]</span></p>
+<p>An affine transformation of a Gaussian is Gaussian. Its mean is <span class="math inline">\(\mu\)</span>; the independent coordinates have variance <span class="math inline">\(\sigma_j^2\)</span>. Thus the distribution is unchanged, while <span class="math inline">\(z\)</span> is now differentiable with respect to learned distribution parameters for fixed realized noise <span class="citation" data-cites="kingma2014vae">(<a href="#ref-kingma2014vae" role="doc-biblioref">Kingma and Welling 2014, sec. 2.4</a>)</span>.</p>
+<div class="vae-demo">
+<iframe src="assets/demos/reparameterization.html" title="Interactive experiment: Fixed-noise gradient path" loading="lazy">
+</iframe>
+<a href="assets/demos/reparameterization.html" target="_blank">Open fixed-noise gradient path in a full window →</a>
+</div>
+<p>Move <span class="math inline">\(\mu\)</span> while holding noise fixed: <span class="math inline">\(z\)</span> shifts by the same amount. Move <span class="math inline">\(\sigma\)</span>: the response changes sign with <span class="math inline">\(\epsilon\)</span>. The demo’s “worked value” selects <span class="math inline">\(-1\)</span> explicitly; it is not one of the eight seeded draws. For this backward pass,</p>
+<p><span class="math display">\[\frac{\partial z_j}{\partial\mu_j}=1,\qquad
+\frac{\partial z_j}{\partial\sigma_j}=\epsilon_j,\qquad
+\frac{\partial z_j}{\partial v_j}=\frac12\sigma_j\epsilon_j.\]</span></p>
+<p>For a differentiable reconstruction function <span class="math inline">\(f_\theta\)</span>, the base distribution no longer depends on <span class="math inline">\(\phi\)</span>:</p>
+<p><span class="math display">\[\nabla_\phi\mathbb E_{\epsilon\sim\mathcal N(0,I)}[f_\theta(\mu_\phi+\sigma_\phi\odot\epsilon)]
+=\mathbb E_\epsilon[\nabla_\phi f_\theta(\mu_\phi+\sigma_\phi\odot\epsilon)],\]</span></p>
+<p>under the usual conditions permitting differentiation under the expectation. A draw gives a noisy gradient estimate, not the exact expected gradient. Fresh noise is normally used on each training forward pass; it is held fixed only when differentiating that realized computation or comparing finite differences. No trainable gradient is required through the random-number generator. This affine construction does not apply unchanged to arbitrary discrete distributions.</p>
+<section id="exercise-follow-one-draw-backward" class="level3" data-number="4.2.1">
+<h3 data-number="4.2.1" class="anchored" data-anchor-id="exercise-follow-one-draw-backward"><span class="header-section-number">4.2.1</span> Exercise: follow one draw backward</h3>
+<p>Given <span class="math inline">\(\mu=1\)</span>, <span class="math inline">\(\sigma=0.5\)</span>, <span class="math inline">\(\epsilon=-1\)</span>, decoder <span class="math inline">\(\hat x=2z\)</span>, target <span class="math inline">\(2\)</span>, and <span class="math inline">\(\ell=\tfrac12(\hat x-2)^2\)</span>, calculate <span class="math inline">\(z\)</span>, <span class="math inline">\(\ell\)</span>, and the gradients with respect to <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span>. Pause for 90 seconds, keeping noise fixed.</p>
+<details>
+<summary>
+Worked solution and log-variance extension
+</summary>
+<p>The forward values are <span class="math inline">\(z=0.5\)</span>, <span class="math inline">\(\hat x=1\)</span>, and <span class="math inline">\(\ell=0.5\)</span>. The upstream derivative is <span class="math inline">\(\partial\ell/\partial z=(1-2)2=-2\)</span>. Hence <span class="math inline">\(\partial\ell/\partial\mu=-2\)</span> and <span class="math inline">\(\partial\ell/\partial\sigma=(-2)(-1)=2\)</span>. A small descent step raises <span class="math inline">\(\mu\)</span> and lowers <span class="math inline">\(\sigma\)</span>; both raise <span class="math inline">\(z\)</span> for this negative draw.</p>
+<p>Since <span class="math inline">\(\sigma=e^{v/2}\)</span>, <span class="math inline">\(\partial\ell/\partial v=2(\sigma/2)=0.5\)</span>. The implemented encoder predicts <span class="math inline">\(v\)</span>, not <span class="math inline">\(\sigma\)</span> directly. KL contributes additional derivatives <span class="math inline">\(\partial K/\partial\mu=\mu\)</span> and <span class="math inline">\(\partial K/\partial v=(e^v-1)/2\)</span>. The sampled reconstruction direction need not be the exact expected-loss direction. A finite-difference test must use the same noise at both perturbed parameter values.</p>
+</details>
+</section>
+</section>
+<section id="verify-the-repaired-path" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="verify-the-repaired-path"><span class="header-section-number">4.3</span> Verify the repaired path</h2>
+<p>Replace <code>sample()</code> with <code>mu + sigma * torch.randn_like(mu)</code>, or use <code>Normal(mu,sigma).rsample()</code> as an alternative. With fresh leaf tensors and the seed reset once for each comparison, the executed CPU probe gives:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Draw mechanism</th>
+<th style="text-align: right;"><span class="math inline">\(z\)</span></th>
+<th style="text-align: right;">Loss</th>
+<th style="text-align: right;"><span class="math inline">\(\mu\)</span> gradient</th>
+<th style="text-align: right;"><span class="math inline">\(v\)</span> gradient</th>
+<th style="text-align: right;"><span class="math inline">\(a\)</span> gradient</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>sample()</code></td>
+<td style="text-align: right;">0.853205</td>
+<td style="text-align: right;">0.043098</td>
+<td style="text-align: right;">None</td>
+<td style="text-align: right;">None</td>
+<td style="text-align: right;">−0.250493</td>
+</tr>
+<tr class="even">
+<td>Manual reparameterization</td>
+<td style="text-align: right;">0.853205</td>
+<td style="text-align: right;">0.043098</td>
+<td style="text-align: right;">−0.587180</td>
+<td style="text-align: right;">0.043098</td>
+<td style="text-align: right;">−0.250493</td>
+</tr>
+<tr class="odd">
+<td><code>rsample()</code></td>
+<td style="text-align: right;">0.853205</td>
+<td style="text-align: right;">0.043098</td>
+<td style="text-align: right;">−0.587180</td>
+<td style="text-align: right;">0.043098</td>
+<td style="text-align: right;">−0.250493</td>
+</tr>
+</tbody>
+</table>
+<p>The forward distribution did not change; the gradient path did. Exact numerical agreement here is a recorded CPU check, not a promise across library versions, devices, or RNG consumption patterns. Avoid detaching the learned parameters or sampled code, converting the loss to a Python number before backward, or training under <code>no_grad</code>. The <a href="../../lectures/11-variational-autoencoders/assets/check_reparameterization.py">executable gradient probe</a> also verifies fixed-noise finite differences. See the <a href="https://docs.pytorch.org/docs/stable/distributions.html#pathwise-derivative">official PyTorch pathwise-derivative documentation</a>.</p>
+</section>
+</section>
+<section id="building-training-and-inspecting-the-vae" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Building, training, and inspecting the VAE</h1>
+<section id="assemble-the-same-architecture" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="assemble-the-same-architecture"><span class="header-section-number">5.1</span> Assemble the same architecture</h2>
+<p>The decoder maps <span class="math inline">\(2\to128\to256\to784\)</span>, with ReLU between hidden layers, sigmoid output, and reshape to <code>[B,1,28,28]</code>. The forward method returns the reconstruction and both encoder parameters because the objective needs all three.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> VAE(nn.Module):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.encoder <span class="op">=</span> GaussianEncoder()</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.decoder <span class="op">=</span> nn.Sequential(</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>            nn.Linear(<span class="dv">2</span>, <span class="dv">128</span>), nn.ReLU(),</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>            nn.Linear(<span class="dv">128</span>, <span class="dv">256</span>), nn.ReLU(),</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>            nn.Linear(<span class="dv">256</span>, <span class="dv">784</span>), nn.Sigmoid(),</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>            nn.Unflatten(<span class="dv">1</span>, (<span class="dv">1</span>, <span class="dv">28</span>, <span class="dv">28</span>)))</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        mu, logvar <span class="op">=</span> <span class="va">self</span>.encoder(x)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        sigma <span class="op">=</span> (<span class="fl">0.5</span> <span class="op">*</span> logvar).exp()</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        z <span class="op">=</span> mu <span class="op">+</span> sigma <span class="op">*</span> torch.randn_like(mu)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.decoder(z), mu, logvar</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Stage</th>
+<th>Tensor shape for <span class="math inline">\(B=32\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Image</td>
+<td><code>[32,1,28,28]</code></td>
+</tr>
+<tr class="even">
+<td>Shared encoder features</td>
+<td><code>[32,128]</code></td>
+</tr>
+<tr class="odd">
+<td>Mean, log variance, noise, and code</td>
+<td><code>[32,2]</code> each</td>
+</tr>
+<tr class="even">
+<td>Decoder mean</td>
+<td><code>[32,1,28,28]</code></td>
+</tr>
+<tr class="odd">
+<td>Per-image reconstruction and KL</td>
+<td><code>[32]</code> each</td>
+</tr>
+<tr class="even">
+<td>Batch objective</td>
+<td>Scalar</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="reduce-within-an-image-then-across-images" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="reduce-within-an-image-then-across-images"><span class="header-section-number">5.2</span> Reduce within an image, then across images</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> vae_loss(x_hat, x, mu, logvar):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pixel_cost <span class="op">=</span> F.binary_cross_entropy(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        x_hat, x, reduction<span class="op">=</span><span class="st">'none'</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    rec <span class="op">=</span> pixel_cost.flatten(<span class="dv">1</span>).<span class="bu">sum</span>(<span class="dv">1</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    kl <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> (</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        mu.square() <span class="op">+</span> logvar.exp() <span class="op">-</span> <span class="dv">1</span> <span class="op">-</span> logvar</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    ).<span class="bu">sum</span>(<span class="dv">1</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    loss <span class="op">=</span> (rec <span class="op">+</span> kl).mean()</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> loss, rec.mean(), kl.mean()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>reduction='none'</code> retains all pixel costs. <code>flatten(1).sum(1)</code> sums the non-batch axes; the KL sums only latent coordinates. Each term is now <code>[B]</code>, so their addition pairs costs for the same image. Only then take the batch mean.</p>
+<p>Default mean BCE would average over both images and 784 pixels. If KL were still summed over coordinates and averaged over images, reconstruction would be divided by 784 while KL stayed unchanged—an unintended 784-fold relative increase in KL weight. A constant scaling of the whole objective is different from independently changing term reductions. For epoch logging, weight each batch mean by its batch size before averaging, so a smaller final minibatch is not overrepresented.</p>
+<section id="exercise-duplication-and-batch-reduction" class="level3" data-number="5.2.1">
+<h3 data-number="5.2.1" class="anchored" data-anchor-id="exercise-duplication-and-batch-reduction"><span class="header-section-number">5.2.1</span> Exercise: duplication and batch reduction</h3>
+<p>Two images have <span class="math inline">\((R,K)=(2,0.5)\)</span> and <span class="math inline">\((4,1.5)\)</span>. Find the batch scalar and determine whether duplicating both already computed outputs changes it. Pause for 45 seconds.</p>
+<details>
+<summary>
+Worked solution
+</summary>
+<p><span class="math inline">\(J=[(2+0.5)+(4+1.5)]/2=4\)</span>. Duplicating the cost pairs gives four totals <span class="math inline">\((2.5,5.5,2.5,5.5)\)</span>, still averaging to four. Hold outputs fixed for this test: a fresh stochastic forward pass can change a Monte Carlo estimate even when inputs repeat. The executable check duplicates reconstructions and Gaussian parameters along with the targets to isolate reduction semantics.</p>
+</details>
+</section>
+</section>
+<section id="one-optimizer-step-updates-both-networks" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="one-optimizer-step-updates-both-networks"><span class="header-section-number">5.3</span> One optimizer step updates both networks</h2>
+<p>Create the model and Adam optimizer once, outside the minibatch loop. Recreating Adam each batch would discard its accumulated state.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> VAE()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> torch.optim.Adam(model.parameters(), lr<span class="op">=</span><span class="fl">1e-3</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> train_step(model, optimizer, x):</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    model.train()</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    optimizer.zero_grad(set_to_none<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    x_hat, mu, logvar <span class="op">=</span> model(x)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    loss, rec, kl <span class="op">=</span> vae_loss(x_hat, x, mu, logvar)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    loss.backward()</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    optimizer.step()</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> loss.item(), rec.item(), kl.item()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The executed 32-image smoke check, with initialization seed 113 and noise seed 811, records reconstruction 545.7927, KL 0.0070, and total 545.7997 <strong>before the first update</strong>. Reconstruction gradients alone reach both encoder heads (weight-gradient norms approximately 0.5338 and 0.9730); every parameter tensor changes after one step. These are diagnostic initial values, not trained quality targets.</p>
+<p>The <a href="../../lectures/11-variational-autoencoders/assets/vae_training.py">runnable script</a> includes the complete dataset split and training loop. It checks shapes, finiteness, reduction equivalence, duplication invariance, both reconstruction gradient paths, parameter updates, and stochastic evaluation forward passes. Rendering the site never trains a network. Example commands, after installing PyTorch/torchvision and placing Fashion-MNIST locally:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> vae_training.py <span class="at">--data</span> /path/to/data <span class="at">--check</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> vae_training.py <span class="at">--data</span> /path/to/data <span class="at">--epochs</span> 10 <span class="at">--output</span> /tmp/course-vae.pt</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The simpler composed constructor consumes initialization RNG differently from the original evidence generator, which constructed an extra temporary autoencoder. Equal seeds therefore do not mean identical initial weights across those implementations. The recorded visual evidence uses the original checkpoint, loaded by equivalent parameter-name mapping when needed.</p>
+</section>
+<section id="choose-the-output-path-intentionally" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="choose-the-output-path-intentionally"><span class="header-section-number">5.4</span> Choose the output path intentionally</h2>
+<div class="vae-demo">
+<iframe src="assets/demos/inspection.html" title="Interactive experiment: Three decoder input paths" loading="lazy">
+</iframe>
+<a href="assets/demos/inspection.html" target="_blank">Open three decoder input paths in a full window →</a>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>model.<span class="bu">eval</span>()</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    mu, logvar <span class="op">=</span> model.encoder(x)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    sigma <span class="op">=</span> (<span class="fl">0.5</span> <span class="op">*</span> logvar).exp()</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    mean_image <span class="op">=</span> model.decoder(mu)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    posterior_image <span class="op">=</span> model.decoder(mu <span class="op">+</span> sigma <span class="op">*</span> torch.randn_like(mu))</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    z_prior <span class="op">=</span> torch.randn(<span class="dv">32</span>, <span class="dv">2</span>, device<span class="op">=</span><span class="bu">next</span>(model.parameters()).device)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    generated_images <span class="op">=</span> model.decoder(z_prior)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Mean-code reconstruction is deterministic for this fixed MLP, but it is not generally the expected decoded image. Posterior draws depend on <span class="math inline">\(x\)</span>; prior draws do not. The lecture’s <code>randn_like(mu)</code> prior example reused only shape, dtype, and device, not numerical values from <span class="math inline">\(\mu\)</span>. The standalone prior line above makes the lack of an image requirement explicit.</p>
+<p><code>eval()</code> changes the behavior of modules such as Dropout and BatchNorm; this MLP has neither. It does not suppress explicit <code>randn_like</code> calls. <code>no_grad()</code> disables graph recording, but does not set evaluation mode or stop randomness. The model’s normal forward method still samples in evaluation mode. Distinguish these settings from deliberately choosing the mean-code path.</p>
+</section>
+</section>
+<section id="sampling-interpolation-and-limitations" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Sampling, interpolation, and limitations</h1>
+<section id="walk-between-encoded-examples" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="walk-between-encoded-examples"><span class="header-section-number">6.1</span> Walk between encoded examples</h2>
+<p>For endpoint means <span class="math inline">\(\mu_A,\mu_B\)</span>, interpolate</p>
+<p><span class="math display">\[z(t)=(1-t)\mu_A+t\mu_B,\quad 0\le t\le1,\]</span></p>
+<p>and decode each code with unchanged weights and no extra noise. The first validation T-shirt, trouser, and boot define two paths, each with all 21 recorded positions preserved.</p>
+<div class="vae-demo">
+<iframe src="assets/demos/interpolation.html" title="Interactive experiment: Latent interpolation" loading="lazy">
+</iframe>
+<a href="assets/demos/interpolation.html" target="_blank">Open latent interpolation in a full window →</a>
+</div>
+<p>The scatter shows actual means for the first 1,024 validation images, not posterior samples or a prior-density estimate. Labels color the display but did not train the VAE. Even endpoint decoded means need not equal the input thumbnails. A straight path between posterior means is not an unconditional prior sample and is not a representative generation evaluation.</p>
+<p>The network’s continuous operations produce continuous pixel values as the code moves. Recognition is a different property: the T-shirt-to-boot path passes through ambiguous shapes. Continuous pixels do not guarantee meaningful objects throughout the path. Axes are coordinates, not certified semantic attributes; the objective does not guarantee disentanglement.</p>
+</section>
+<section id="keep-the-samples-you-did-not-select" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="keep-the-samples-you-did-not-select"><span class="header-section-number">6.2</span> Keep the samples you did not select</h2>
+<div class="evidence-strip evidence-sixteen">
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/prior-0.png" alt="Unfiltered actual prior draw 1" class="figure-img">
+<figcaption>
+01
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/prior-1.png" alt="Unfiltered actual prior draw 2" class="figure-img">
+<figcaption>
+02
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/prior-2.png" alt="Unfiltered actual prior draw 3" class="figure-img">
+<figcaption>
+03
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/prior-3.png" alt="Unfiltered actual prior draw 4" class="figure-img">
+<figcaption>
+04
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/prior-4.png" alt="Unfiltered actual prior draw 5" class="figure-img">
+<figcaption>
+05
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/prior-5.png" alt="Unfiltered actual prior draw 6" class="figure-img">
+<figcaption>
+06
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/prior-6.png" alt="Unfiltered actual prior draw 7" class="figure-img">
+<figcaption>
+07
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/prior-7.png" alt="Unfiltered actual prior draw 8" class="figure-img">
+<figcaption>
+08
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/prior-8.png" alt="Unfiltered actual prior draw 9" class="figure-img">
+<figcaption>
+09
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/prior-9.png" alt="Unfiltered actual prior draw 10" class="figure-img">
+<figcaption>
+10
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/prior-10.png" alt="Unfiltered actual prior draw 11" class="figure-img">
+<figcaption>
+11
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/prior-11.png" alt="Unfiltered actual prior draw 12" class="figure-img">
+<figcaption>
+12
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/prior-12.png" alt="Unfiltered actual prior draw 13" class="figure-img">
+<figcaption>
+13
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/prior-13.png" alt="Unfiltered actual prior draw 14" class="figure-img">
+<figcaption>
+14
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/prior-14.png" alt="Unfiltered actual prior draw 15" class="figure-img">
+<figcaption>
+15
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/prior-15.png" alt="Unfiltered actual prior draw 16" class="figure-img">
+<figcaption>
+16
+</figcaption>
+</figure>
+</div>
+<p>Course experiment: actual mean outputs, first sixteen draws, seed 619.</p>
+<p>These are the first sixteen standard-normal draws at seed 619, decoded by the same section-2 checkpoint. All outputs are retained. Inspect soft edges, ambiguity, variation, and absent appearances before making a claim. Sixteen images cannot establish class coverage, novelty, or a distribution-level quality ranking.</p>
+<p>Pixelwise mean predictions can average unresolved alternatives, but this experiment does not isolate that cause from a two-dimensional bottleneck, modest MLP, or ten-epoch optimization budget. Do not present every defect as a universal VAE limitation. Sampling binary pixels would add pixel noise, not demonstrate recovered detail. For comparisons, hold evaluation inputs and prior codes fixed, report reconstruction and KL separately, and repeat across seeds before generalizing.</p>
+</section>
+<section id="test-whether-image-specific-codes-matter" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="test-whether-image-specific-codes-matter"><span class="header-section-number">6.3</span> Test whether image-specific codes matter</h2>
+<p>Keep the trained weights and decoded posterior samples fixed, but cyclically reassign each image’s code to another image. This breaks the pairing while retaining the set of outputs.</p>
+<p><strong>Observed images</strong></p>
+<div class="evidence-strip">
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/probe-input-0.png" alt="Observed images, validation case 1" class="figure-img">
+<figcaption>
+Case 1
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/probe-input-1.png" alt="Observed images, validation case 2" class="figure-img">
+<figcaption>
+Case 2
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/probe-input-2.png" alt="Observed images, validation case 3" class="figure-img">
+<figcaption>
+Case 3
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/probe-input-3.png" alt="Observed images, validation case 4" class="figure-img">
+<figcaption>
+Case 4
+</figcaption>
+</figure>
+</div>
+<p><strong>Correctly paired codes</strong></p>
+<div class="evidence-strip">
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/probe-right-0.png" alt="Correctly paired codes, validation case 1" class="figure-img">
+<figcaption>
+Case 1
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/probe-right-1.png" alt="Correctly paired codes, validation case 2" class="figure-img">
+<figcaption>
+Case 2
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/probe-right-2.png" alt="Correctly paired codes, validation case 3" class="figure-img">
+<figcaption>
+Case 3
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/probe-right-3.png" alt="Correctly paired codes, validation case 4" class="figure-img">
+<figcaption>
+Case 4
+</figcaption>
+</figure>
+</div>
+<p><strong>Reassigned codes</strong></p>
+<div class="evidence-strip">
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/probe-wrong-0.png" alt="Reassigned codes, validation case 1" class="figure-img">
+<figcaption>
+Case 1
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/probe-wrong-1.png" alt="Reassigned codes, validation case 2" class="figure-img">
+<figcaption>
+Case 2
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/probe-wrong-2.png" alt="Reassigned codes, validation case 3" class="figure-img">
+<figcaption>
+Case 3
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/11-variational-autoencoders/assets/evidence/latent/probe-wrong-3.png" alt="Reassigned codes, validation case 4" class="figure-img">
+<figcaption>
+Case 4
+</figcaption>
+</figure>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Probe on 1,024 held-out images, 8 draws each</th>
+<th style="text-align: right;">Reconstruction cost</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Correct image/code pairing</td>
+<td style="text-align: right;">255.4250</td>
+</tr>
+<tr class="even">
+<td>Cyclically reassigned pairing</td>
+<td style="text-align: right;">836.5840</td>
+</tr>
+</tbody>
+</table>
+<p>The mean analytic KL is 6.2336. Costs use pixel sums followed by draw/image averages, with noise seed 620. The gallery shows the first four targets and first draw; reassignment occurs across all 1,024 images, not just the four thumbnails. This experiment differs slightly from the earlier reconstruction estimate because it uses different evaluation noise.</p>
+<p>The large cost increase shows that image-specific codes help reconstruct their own images in this checkpoint. It does not certify semantic disentanglement, perceptual quality, or full use of every coordinate.</p>
+<section id="posterior-collapse-is-a-different-failure" class="level3" data-number="6.3.1">
+<h3 data-number="6.3.1" class="anchored" data-anchor-id="posterior-collapse-is-a-different-failure"><span class="header-section-number">6.3.1</span> Posterior collapse is a different failure</h3>
+<p>If <span class="math inline">\(q_\phi(z\mid x)\approx p(z)\)</span> for every image, a draw from <span class="math inline">\(q\)</span> carries little information about which image supplied it. A familiar failure has near-zero KL and a decoder that largely ignores <span class="math inline">\(z\)</span>. Bowman et al.&nbsp;document this behavior for sequence VAEs with powerful decoders <span class="citation" data-cites="bowman2016generating">(<a href="#ref-bowman2016generating" role="doc-biblioref">Bowman et al. 2016, sec. 3.1</a>)</span>; their language-model evidence is not a second trained Fashion-MNIST condition here.</p>
+<p>For this unconditional independent-pixel decoder, ignoring its only image-specific input would give the same predicted mean for all codes. Near-zero KL together with little reassignment effect is a warning sign. Neither observation alone is a complete diagnosis; positive KL can reflect aggregate mismatch rather than useful information, and this test cannot exclude every partial-collapse phenomenon. The measured pairing penalty is evidence against complete loss of image-specific information here. <strong>Blurry outputs do not by themselves diagnose posterior collapse.</strong></p>
+</section>
+</section>
+<section id="close-the-loop-with-a-task-specification" class="level2" data-number="6.4">
+<h2 data-number="6.4" class="anchored" data-anchor-id="close-the-loop-with-a-task-specification"><span class="header-section-number">6.4</span> Close the loop with a task specification</h2>
+<p>You have the trained VAE and no observed image. Produce 32 new <span class="math inline">\(28\times28\)</span> mean images. State the code source, the trained modules that must run, and an evaluation check together with its limitation. Pause for 60 seconds.</p>
+<details>
+<summary>
+Worked solution
+</summary>
+<p>Draw <span class="math inline">\(z\sim\mathcal N(0,I_2)\)</span> with tensor shape <code>[32,2]</code> on the model’s device. Run only the fixed decoder to obtain <code>[32,1,28,28]</code>. The encoder is not required for this generation path. Inspect fixed, unfiltered prior draws and failures; a small gallery cannot establish coverage or novelty. Held-out reconstruction checks a different behavior, latent reassignment tests information use, and pixel nearest neighbors only screen for certain forms of resemblance.</p>
+<p>Training made the path possible: image-conditioned posterior samples taught the decoder, reconstruction preserved useful information, KL encouraged compatibility with the prior, and reparameterization connected reconstruction gradients to the encoder. Adam updated both networks. At generation time, replace the image-conditioned code source with the prior.</p>
+</details>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Learning frame</th>
+<th>What the complete VAE specifies</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Data</td>
+<td>Fashion-MNIST images; class labels only for interpreting evaluation</td>
+</tr>
+<tr class="even">
+<td>Hypothesis</td>
+<td>A prior and decoder observation model, with a learned approximate posterior</td>
+</tr>
+<tr class="odd">
+<td>Loss</td>
+<td>Expected reconstruction plus prior KL; the likelihood caveat matters</td>
+</tr>
+<tr class="even">
+<td>Optimization</td>
+<td>Reparameterized stochastic gradients and joint encoder/decoder updates</td>
+</tr>
+<tr class="odd">
+<td>Evaluation</td>
+<td>Separate checks of reconstruction, latent information use, and prior-generated outputs</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="experiment-provenance" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Experiment provenance and reproducibility</h1>
+<p>The official Fashion-MNIST training set is split into 50,000 training and 10,000 validation images by a seed-41 permutation. Validation images never update weights. The demonstrations are intentionally small and two-dimensional so their geometry is inspectable. They are not competitive generative-model benchmarks.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Evidence</th>
+<th>Protocol and scope</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Section 1</td>
+<td>Project 3 AE: 6 epochs, MSE; separate VAE preview: 10 epochs, BCE surrogate + KL. This comparison is motivational, not controlled.</td>
+</tr>
+<tr class="even">
+<td>Sections 2, 5 viewer, 6</td>
+<td>One unchanged 10-epoch checkpoint: initialization 113, Adam 0.001, batch 256. SHA-256 begins <code>07171c50244c10a8</code>.</td>
+</tr>
+<tr class="odd">
+<td>Section 3</td>
+<td>Controlled zero-versus-one KL ablation; common training protocol and evaluation noise. First 1,024 held-out images × 8 draws.</td>
+</tr>
+<tr class="even">
+<td>Section 4</td>
+<td>Independent scalar CPU autograd probes, seed 7; eight graph noise values from seed 73; worked noise −1 is deliberately chosen.</td>
+</tr>
+<tr class="odd">
+<td>Section 5 training check</td>
+<td>Fresh composed model, initial seed 113/noise 811, first 32 training images. Not the trained checkpoint.</td>
+</tr>
+<tr class="even">
+<td>Section 6</td>
+<td>First examples by class; all 21 positions on each path; first 16 prior draws seed 619; reassignment probe seed 620.</td>
+</tr>
+</tbody>
+</table>
+<p>The section-1 manifest records PyTorch 2.14; the later checkpoint and probes record 2.13. Seeds alone cannot establish numerical identity across versions and construction orders. The <a href="../../lectures/11-variational-autoencoders/assets/README.md">source README</a>, saved manifests, and generation scripts retain exact seeds, indices, costs, software versions, selections, and checkpoint hashes. The site stores recorded outputs, not model checkpoints, and never invokes training during rendering.</p>
+<p><a href="../../lectures/11-variational-autoencoders/assets/build_generation_evidence.py">Generation evidence script</a> · <a href="../../lectures/11-variational-autoencoders/assets/build_posterior_evidence.py">Posterior evidence</a> · <a href="../../lectures/11-variational-autoencoders/assets/build_loss_evidence.py">Loss ablation</a> · <a href="../../lectures/11-variational-autoencoders/assets/check_reparameterization.py">Gradient checks</a> · <a href="../../lectures/11-variational-autoencoders/assets/vae_training.py">Runnable VAE</a> · <a href="../../lectures/11-variational-autoencoders/assets/build_latent_evidence.py">Latent evidence</a></p>
+</section>
+<section id="reading-path" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> An annotated reading path</h1>
+<ol type="1">
+<li><strong>Kingma and Welling, Auto-Encoding Variational Bayes</strong> <span class="citation" data-cites="kingma2014vae">(<a href="#ref-kingma2014vae" role="doc-biblioref">Kingma and Welling 2014</a>)</span>. Read §2.1 for the latent generative model, §2.2 for the evidence-bound identity, §2.4 for pathwise gradients, and Appendix B for diagonal-Gaussian KL. Match each derivation to the chapter’s numerical examples before following the general algorithm.</li>
+<li><strong>Fashion-MNIST</strong> <span class="citation" data-cites="xiao2017fashion">(<a href="#ref-xiao2017fashion" role="doc-biblioref">Xiao et al. 2017</a>)</span>. Use the dataset paper and repository to understand what the small grayscale experiment represents. Do not generalize its gallery quality to high-resolution generation.</li>
+<li><strong>Bowman et al., Generating Sentences from a Continuous Space</strong>, §3.1 <span class="citation" data-cites="bowman2016generating">(<a href="#ref-bowman2016generating" role="doc-biblioref">Bowman et al. 2016</a>)</span>. Read specifically for the posterior-collapse failure mechanism. The application and decoder differ from our experiment; we use it to interpret diagnostics, not to rank this image model.</li>
+<li><strong><a href="https://docs.pytorch.org/docs/stable/distributions.html#pathwise-derivative">PyTorch distributions</a></strong>. Check <code>sample</code>, <code>rsample</code>, Normal scale, and batch/event semantics against the executable gradient probe. <strong><a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module.eval">Module.eval</a></strong> and <strong><a href="https://docs.pytorch.org/docs/stable/generated/torch.no_grad.html">no_grad</a></strong> describe separate inference controls.</li>
+</ol>
+<section id="references" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-bowman2016generating" class="csl-entry" role="listitem">
+Bowman, Samuel R., Luke Vilnis, Oriol Vinyals, Andrew Dai, Rafal Jozefowicz, and Samy Bengio. 2016. <span>“Generating Sentences from a Continuous Space.”</span> <em>Proceedings of the 20th SIGNLL Conference on Computational Natural Language Learning</em>, 10–21. <a href="https://doi.org/10.18653/v1/K16-1002">https://doi.org/10.18653/v1/K16-1002</a>.
+</div>
+<div id="ref-kingma2014vae" class="csl-entry" role="listitem">
+Kingma, Diederik P., and Max Welling. 2014. <span>“Auto-Encoding Variational Bayes.”</span> <em>International Conference on Learning Representations</em>. <a href="https://arxiv.org/abs/1312.6114">https://arxiv.org/abs/1312.6114</a>.
+</div>
+<div id="ref-xiao2017fashion" class="csl-entry" role="listitem">
+Xiao, Han, Kashif Rasul, and Roland Vollgraf. 2017. <span>“Fashion-MNIST: A Novel Image Dataset for Benchmarking Machine Learning Algorithms.”</span> <em>arXiv Preprint arXiv:1708.07747</em>. <a href="https://arxiv.org/abs/1708.07747">https://arxiv.org/abs/1708.07747</a>.
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script>
+window.addEventListener('message', event => {
+ if(event.origin!==location.origin || event.data?.type!=='vae-notes-height')return;
+ for(const frame of document.querySelectorAll('.vae-demo iframe')) {
+  if(frame.contentWindow===event.source && Number.isFinite(event.data.height)) frame.style.height=Math.max(200,Math.min(5000,event.data.height))+'px';
+ }
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Deep Learning · ENSA Tétouan</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

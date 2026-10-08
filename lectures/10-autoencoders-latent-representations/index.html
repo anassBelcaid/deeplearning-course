@@ -1,0 +1,2081 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-html/tabby.min.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.10.18">
+
+  <meta name="author" content="Dr.&nbsp;A. Belcaid">
+  <title>Deep Learning – Autoencoders and Latent Representations</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-f3e585dc122d45960ea2c31f625881dd.css">
+  <link rel="stylesheet" href="../01-what-is-learning/slides.css">
+  <link rel="stylesheet" href="week10.css">
+  <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" data-visibility="hidden" class="quarto-title-block center">
+  <h1 class="title">Autoencoders and Latent Representations</h1>
+  <p class="subtitle">Learning what an image must preserve</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Dr.&nbsp;A. Belcaid
+</div>
+</div>
+</div>
+
+</section>
+<section id="autoencoders-and-latent-representations" class="slide level2 deck-title">
+<h2>Autoencoders and Latent Representations</h2>
+<div class="deck-title-grid">
+<div class="deck-title-copy">
+<p><span class="eyebrow">CHAPTER 10 · GENERATIVE REPRESENTATION LEARNING</span></p>
+<h3 id="learning-what-an-image-must-preserve">Learning what an image must preserve</h3>
+<p>Can a network compress an image, discard what is unnecessary, and still reconstruct what matters?</p>
+<p><span class="deck-author">Dr.&nbsp;A. Belcaid</span></p>
+</div>
+<div class="deck-title-art autoencoder-hero">
+<p><img data-src="assets/autoencoder-hero.svg" alt="A colorful image grid contracts through an encoder into one compact latent point, then expands through a decoder into a reconstructed grid."></p>
+</div>
+</div>
+<aside class="notes">
+<p>The thumbnail shows the complete contract before naming its parts: a structured input is compressed into a much smaller representation and reconstructed. Ask students what information could be removed while the output still looks like the same image. Keep the opening on preservation and compression; generation becomes relevant only after the latent representation has been understood.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-first-level-map-of-the-lecture" class="slide level2">
+<h2>A first-level map of the lecture</h2>
+<div class="autoencoder-toc">
+<div class="autoencoder-toc-item reconstruct-item">
+<p><span>01</span></p>
+<h3 id="reconstructing-before-generating">Reconstructing before generating</h3>
+</div>
+<div class="autoencoder-toc-item contract-item">
+<p><span>02</span></p>
+<h3 id="the-autoencoder-contract">The autoencoder contract</h3>
+</div>
+<div class="autoencoder-toc-item bottleneck-item">
+<p><span>03</span></p>
+<h3 id="learning-through-a-bottleneck">Learning through a bottleneck</h3>
+</div>
+<div class="autoencoder-toc-item latent-item">
+<p><span>04</span></p>
+<h3 id="reading-the-latent-space">Reading the latent space</h3>
+</div>
+<div class="autoencoder-toc-item useful-item">
+<p><span>05</span></p>
+<h3 id="when-reconstruction-becomes-useful">When reconstruction becomes useful</h3>
+</div>
+<div class="autoencoder-toc-item sampling-item">
+<p><span>06</span></p>
+<h3 id="why-sampling-still-fails">Why sampling still fails</h3>
+</div>
+</div>
+<aside class="notes">
+<p>Read the six sections as one argument. We first establish reconstruction as the concrete task. We then expose the encoder–latent–decoder contract and ask how a bottleneck changes what can be copied. Once the mechanism is clear, we inspect the geometry of the learned representation and use reconstruction for denoising, retrieval, and anomaly detection. The final section demonstrates a limitation rather than teaching a new model: an ordinary autoencoder does not guarantee that arbitrary latent samples decode into meaningful images. That unresolved problem motivates the VAE lecture.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section>
+<section id="reconstructing-before-generating-1" class="title-slide slide level1 section-slide autoencoder-section reconstruct-section center" data-section-progress="1 / 6" style="--section-progress:16.667%">
+<h1>01 · Reconstructing before generating</h1>
+
+</section>
+<section id="begin-with-an-image-we-already-have" class="slide level2">
+<h2>Begin with an image we already have</h2>
+<div class="reconstruction-question">
+<div class="reconstruction-photo">
+<p><img data-src="../../labs/09-semantic-segmentation/starter/data/segmentation-scenes/cats.jpg" alt="Two cats resting on a couch in a COCO validation photograph."></p>
+<p><span>INPUT · <span class="math inline">\(64 \times 64 \times 3 = 12{,}288\)</span> values</span></p>
+</div>
+<div class="reconstruction-challenge">
+<p><span class="eyebrow">THE TASK</span></p>
+<h3 id="send-the-image-through-a-small-message">Send the image through a small message</h3>
+<div class="message-slot" aria-label="A narrow message containing 32 values">
+<i></i><i></i><i></i><i></i><i></i><i></i><b>32 values</b>
+</div>
+<p class="fragment">
+Then rebuild <strong>the same image</strong> from that message.
+</p>
+</div>
+</div>
+<p class="source-line">
+Image: <a href="https://cocodataset.org/#download">COCO 2017 validation set</a>, image 000000039769.
+</p>
+<div class="question-prompt fragment">
+<p>What must those 32 values preserve—and what can they afford to forget?</p>
+</div>
+<aside class="notes">
+<p>Start from the photograph, not a model diagram. The input contains 12,288 scalar values after resizing to 64 by 64 RGB. The communication channel permits only 32 values. Ask students to name information worth preserving: the two cats, their pose, boundaries, dominant colors, and rough background. Then ask what might be discarded: sensor noise, tiny texture, and exact pixel values. Do not name the encoder or decoder yet; Section 2 formalizes those roles.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="reconstruction-alone-is-too-easy" class="slide level2">
+<h2>Reconstruction alone is too easy</h2>
+<div class="shortcut-stage">
+<div class="shortcut-image">
+<p><img src="../../labs/09-semantic-segmentation/starter/data/segmentation-scenes/cats.jpg" alt="Original photograph of two cats"> <span><span class="math inline">\(x\)</span></span></p>
+</div>
+<div class="shortcut-wire">
+<i></i><strong>COPY</strong><i></i>
+</div>
+<div class="shortcut-image">
+<p><img src="../../labs/09-semantic-segmentation/starter/data/segmentation-scenes/cats.jpg" alt="An exact copy of the original photograph"> <span><span class="math inline">\(\hat{x}=x\)</span></span></p>
+</div>
+</div>
+<div class="shortcut-score fragment">
+<p><span>reconstruction error</span> <strong><span class="math inline">\(0\)</span></strong> <b>perfect score</b></p>
+</div>
+<div class="takeaway danger fragment">
+<p>A perfect copy has learned nothing useful if every pixel can bypass the representation.</p>
+</div>
+<aside class="notes">
+<p>Let students celebrate the zero error for a moment, then ask what representation was learned. The direct wire satisfies the output request but avoids the learning problem. This is the identity shortcut. Reconstruction becomes meaningful only after we restrict the information path or otherwise corrupt the input. Today, the first restriction is a bottleneck.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="make-copying-impossible" class="slide level2">
+<h2>Make copying impossible</h2>
+<div class="capacity-comparison">
+<div class="capacity-case open-channel">
+<span>UNRESTRICTED PATH</span>
+<div class="capacity-flow">
+<b>12,288</b><i></i><b>12,288</b><i></i><b>12,288</b>
+</div>
+<p>
+Every pixel can pass through.
+</p>
+<p><strong class="fragment">Likely strategy: copy</strong></p>
+</div>
+<div class="capacity-case narrow-channel fragment">
+<span>BOTTLENECK</span>
+<div class="capacity-flow">
+<b>12,288</b><i></i><b>32</b><i></i><b>12,288</b>
+</div>
+<p>
+The middle cannot hold every pixel.
+</p>
+<p><strong class="fragment">Required strategy: compress</strong></p>
+</div>
+</div>
+<div class="compression-reading fragment">
+<p><b><span class="math inline">\(12{,}288 / 32 = 384\)</span></b> <span>The network gets one stored value for every 384 input values.</span></p>
+</div>
+<aside class="notes">
+<p>Contrast the visible widths before revealing the strategies. In the unrestricted path, an identity mapping is available. In the bottlenecked path, 12,288 input values must pass through 32 numbers, a nominal compression ratio of 384 to 1. Be precise: this count alone does not measure information in bits because the values are continuous. It does make the architectural constraint concrete.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="same-image-does-not-mean-identical-pixels" class="slide level2">
+<h2>“Same image” does not mean identical pixels</h2>
+<div class="quality-gallery">
+<div class="quality-card original-quality">
+<span>REFERENCE</span> <img src="../../labs/09-semantic-segmentation/starter/data/segmentation-scenes/cats.jpg" alt="Reference image of two cats">
+<p>
+objects · pose · layout · color
+</p>
+</div>
+<div class="quality-card fragment texture-quality">
+<span>RECONSTRUCTION A</span> <img src="../../labs/09-semantic-segmentation/starter/data/segmentation-scenes/cats.jpg" alt="Softened reconstruction that retains the two cats">
+<p>
+same scene, softer texture
+</p>
+</div>
+<div class="quality-card fragment structure-quality">
+<span>RECONSTRUCTION B</span> <img src="../../labs/09-semantic-segmentation/starter/data/segmentation-scenes/cats.jpg" alt="Strongly blurred reconstruction where fine structure is lost">
+<p>
+colors survive, objects fade
+</p>
+</div>
+</div>
+<div class="question-prompt fragment">
+<p>Which error is acceptable depends on what the representation will be used for.</p>
+</div>
+<aside class="notes">
+<p>Reveal the reconstructions in order. A keeps the scene and loses high-frequency texture; B preserves broad color statistics but damages object structure. Both may be close under some pixel metric, yet they are not equally useful. This is the first warning that a reconstruction loss defines what “similar” means. Later sections connect that choice to denoising and anomaly detection.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="turn-reconstruction-into-a-learning-signal" class="slide level2">
+<h2>Turn reconstruction into a learning signal</h2>
+<div class="loss-story">
+<div class="loss-question">
+<p><span>FOR EACH IMAGE <span class="math inline">\(x\)</span></span></p>
+<ol type="1">
+<li>produce a reconstruction <span class="math inline">\(\hat{x}\)</span></li>
+<li>compare it with the input</li>
+<li>update the network to reduce the mismatch</li>
+</ol>
+</div>
+<div class="loss-equation fragment">
+<p><span class="math display">\[
+\mathcal{L}_{\mathrm{rec}}(x,\hat{x})
+= \frac{1}{D}\sum_{j=1}^{D}(x_j-\hat{x}_j)^2
+\]</span></p>
+<p>
+Mean squared error asks every reconstructed pixel to approach its target.
+</p>
+</div>
+</div>
+<div class="self-supervision fragment">
+<p><span>input</span><strong><span class="math inline">\(x\)</span></strong><i>is also the target</i><strong><span class="math inline">\(x\)</span></strong><span>target</span></p>
+</div>
+<div class="takeaway fragment">
+<p>No class label is required: the image supplies its own target.</p>
+</div>
+<aside class="notes">
+<p>Only now introduce the loss. D is the number of pixel-channel values. MSE averages squared residuals, so large pixel errors are penalized more strongly. The key conceptual step is not the formula; it is that the target is available for every image without manual annotation. Reconstruction is therefore a self-supervised learning task. Mention that binary cross-entropy is also common for suitably scaled or binary data, but keep MSE as the running loss.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="predict-what-the-bottleneck-will-preserve" class="slide level2">
+<h2>Predict what the bottleneck will preserve</h2>
+<div class="exercise-prompt">
+<p>A <span class="math inline">\(64 \times 64\)</span> RGB cat image must pass through only <strong>32 values</strong>. Rank these from most likely to least likely to survive: exact whisker pixels, number of cats, broad color regions, sensor noise.</p>
+</div>
+<div class="exercise-pause">
+<p><span>PAUSE</span><b>60 seconds</b><small>First decide which information helps reconstruct many training images—not only this one.</small></p>
+</div>
+<div class="preservation-rank" aria-label="Four candidate properties to rank">
+<div>
+<span>?</span><b>exact whisker pixels</b>
+</div>
+<div>
+<span>?</span><b>number of cats</b>
+</div>
+<div>
+<span>?</span><b>broad color regions</b>
+</div>
+<div>
+<span>?</span><b>sensor noise</b>
+</div>
+</div>
+<div class="exercise-solution fragment">
+<p><span class="solution-label">WORKED SOLUTION</span></p>
+<p><strong>Likely:</strong> broad color regions and object/layout cues such as two cat-shaped regions. <strong>Unlikely:</strong> exact whisker pixels and unpredictable sensor noise.</p>
+<p>The precise ranking is learned from the data and loss; the bottleneck creates pressure, not a guarantee.</p>
+</div>
+<p class="exercise-extension fragment">
+Transfer: what would change if the training target were a clean image but the input were noisy?
+</p>
+<aside class="notes">
+<p>Enforce the pause before revealing the answer. The number of cats is a semantic phrase rather than a pixel property, so avoid claiming the model must explicitly store the integer two. A useful reconstruction often preserves object and layout cues from which two cats remain visible. The qualification matters: a bottleneck encourages compact regularities, but it does not guarantee human-interpretable factors. For the transfer question, students should anticipate denoising: noise becomes information the system is rewarded for discarding.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="reconstruction-is-the-task-representation-is-the-prize" class="slide level2">
+<h2>Reconstruction is the task; representation is the prize</h2>
+<div class="section-synthesis">
+<div>
+<span>01</span><strong>Use the image as its own target</strong><small>No manual class annotation</small>
+</div>
+<i></i>
+<div>
+<span>02</span><strong>Restrict the information path</strong><small>Identity copying becomes impossible</small>
+</div>
+<i></i>
+<div>
+<span>03</span><strong>Preserve recurring structure</strong><small>A compact code becomes useful</small>
+</div>
+</div>
+<div class="course-takeaway-dark fragment">
+<p><span>NEXT</span></p>
+<p>Who creates the compact code, and who turns it back into an image?</p>
+</div>
+<aside class="notes">
+<p>Close the section by distinguishing the visible objective from the hoped-for outcome. We optimize reconstruction; we care about the representation forced to support it. Do not promise that every compact code is automatically semantic. The next section names the two learned functions and establishes their tensor contract.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="the-autoencoder-contract-1" class="title-slide slide level1 section-slide autoencoder-section contract-section center" data-section-progress="2 / 6" style="--section-progress:33.333%">
+<h1>02 · The autoencoder contract</h1>
+
+</section>
+<section id="one-inputtwo-learned-transformations" class="slide level2">
+<h2>One input—two learned transformations</h2>
+<div class="ae-contract-flow">
+<div class="ae-tensor input-tensor">
+<span>IMAGE</span><strong><span class="math inline">\(x\)</span></strong><small><span class="math inline">\(H \times W \times C\)</span></small>
+</div>
+<i class="ae-arrow fragment"></i>
+<div class="ae-module encoder-module fragment">
+<span>LEARNED FUNCTION</span><strong>encoder</strong><small><span class="math inline">\(f_\theta\)</span></small>
+</div>
+<i class="ae-arrow fragment"></i>
+<div class="ae-tensor latent-tensor fragment">
+<span>HIDDEN CODE</span><strong><span class="math inline">\(z\)</span></strong><small><span class="math inline">\(d\)</span> values</small>
+</div>
+<i class="ae-arrow fragment"></i>
+<div class="ae-module decoder-module fragment">
+<span>LEARNED FUNCTION</span><strong>decoder</strong><small><span class="math inline">\(g_\phi\)</span></small>
+</div>
+<i class="ae-arrow fragment"></i>
+<div class="ae-tensor output-tensor fragment">
+<span>RECONSTRUCTION</span><strong><span class="math inline">\(\hat{x}\)</span></strong><small><span class="math inline">\(H \times W \times C\)</span></small>
+</div>
+</div>
+<div class="contract-equations fragment">
+<p><span><span class="math inline">\(z=f_\theta(x)\)</span></span><b>then</b><span><span class="math inline">\(\hat{x}=g_\phi(z)\)</span></span></p>
+</div>
+<div class="takeaway fragment">
+<p>The encoder changes representation; the decoder returns to the input space.</p>
+</div>
+<aside class="notes">
+<p>Reveal the path in the order data moves. The encoder f with parameters theta maps the image to a compact code z. The decoder g with parameters phi maps that code back to an image-shaped reconstruction. Stress that both functions are learned jointly. The two ends share shape, but x-hat is a prediction—not a stored copy. This pair of functions is the autoencoder contract.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-hidden-state-forms-an-hourglass" class="slide level2">
+<h2>The hidden state forms an hourglass</h2>
+<div class="ae-hourglass" role="img" aria-label="An autoencoder hourglass. Tall input state x passes through progressively smaller encoder layers to compact latent state z. Mirrored decoder layers grow back to a tall reconstruction x hat.">
+<div class="hourglass-half encoder-hourglass">
+<div class="hourglass-label">
+<span>ENCODER</span><strong><span class="math inline">\(f_\theta\)</span></strong><small>compress representation</small>
+</div>
+<div class="hourglass-path">
+<div class="state-bar state-x">
+<span>INPUT</span><strong><span class="math inline">\(x\)</span></strong><small><span class="math inline">\(D\)</span></small>
+</div>
+<i class="state-edge"></i>
+<div class="state-bar state-h1">
+<span>HIDDEN</span><strong><span class="math inline">\(h_1\)</span></strong><small><span class="math inline">\(m_1\)</span></small>
+</div>
+<i class="state-edge"></i>
+<div class="state-bar state-h2">
+<span>HIDDEN</span><strong><span class="math inline">\(h_2\)</span></strong><small><span class="math inline">\(m_2\)</span></small>
+</div>
+</div>
+</div>
+<i class="state-edge latent-edge"></i>
+<div class="state-bar state-z">
+<span>CODE</span><strong><span class="math inline">\(z\)</span></strong><small><span class="math inline">\(d\)</span></small>
+</div>
+<p><i class="state-edge latent-edge fragment"></i></p>
+<div class="hourglass-half decoder-hourglass fragment">
+<div class="hourglass-label">
+<span>DECODER</span><strong><span class="math inline">\(g_\phi\)</span></strong><small>expand representation</small>
+</div>
+<div class="hourglass-path">
+<div class="state-bar state-h2">
+<span>HIDDEN</span><strong><span class="math inline">\(\tilde h_2\)</span></strong><small><span class="math inline">\(m_2\)</span></small>
+</div>
+<i class="state-edge"></i>
+<div class="state-bar state-h1">
+<span>HIDDEN</span><strong><span class="math inline">\(\tilde h_1\)</span></strong><small><span class="math inline">\(m_1\)</span></small>
+</div>
+<i class="state-edge"></i>
+<div class="state-bar state-x state-xhat">
+<span>RECONSTRUCTION</span><strong><span class="math inline">\(\hat{x}\)</span></strong><small><span class="math inline">\(D\)</span></small>
+</div>
+</div>
+</div>
+</div>
+<div class="hourglass-contract fragment">
+<p><span><span class="math inline">\(D &gt; m_1 &gt; m_2 &gt; d\)</span></span> <strong>representation shrinks toward <span class="math inline">\(z\)</span>, then expands back to the input dimension</strong></p>
+</div>
+<div class="question-prompt fragment">
+<p>The architecture may vary; the general contract remains <span class="math inline">\(x \rightarrow z \rightarrow \hat{x}\)</span>.</p>
+</div>
+<aside class="notes">
+<p>Read the diagram from left to right. Each vertical rounded bar represents a full hidden state, and its height encodes the number of coordinates rather than a literal layer width on screen. The encoder f theta is a succession of transformations that reduce the representation from D to m1 to m2 and finally d.&nbsp;The decoder g phi mirrors the dimensional journey until x-hat again has D coordinates. The two halves need not be perfectly symmetric in a real model; what generalizes is the contraction toward z and reconstruction back in the input space.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="start-from-a-cnn-students-already-know" class="slide level2">
+<h2>Start from a CNN students already know</h2>
+<div class="architecture-contrast">
+<div class="architecture-route classifier-route">
+<span>IMAGE CLASSIFIER</span>
+<div class="layer-bar image-bar">
+image<small><span class="math inline">\(3\!\times\!64\!\times\!64\)</span></small>
+</div>
+<i></i>
+<div class="layer-bar feature-bar">
+CNN features<small><span class="math inline">\(128\!\times\!8\!\times\!8\)</span></small>
+</div>
+<i></i>
+<div class="layer-bar vector-bar">
+feature vector<small><span class="math inline">\(d\)</span></small>
+</div>
+<i></i>
+<div class="layer-bar class-bar">
+class scores<small><span class="math inline">\(K\)</span></small>
+</div>
+<p>
+Compress, then answer a label question.
+</p>
+</div>
+<div class="architecture-route autoencoder-route fragment">
+<span>AUTOENCODER</span>
+<div class="layer-bar image-bar">
+image<small><span class="math inline">\(3\!\times\!64\!\times\!64\)</span></small>
+</div>
+<i></i>
+<div class="layer-bar feature-bar">
+CNN features<small><span class="math inline">\(128\!\times\!8\!\times\!8\)</span></small>
+</div>
+<i></i>
+<div class="layer-bar vector-bar">
+latent vector<small><span class="math inline">\(d\)</span></small>
+</div>
+<i></i>
+<div class="layer-bar decoder-bar">
+decoder<small>expand</small>
+</div>
+<i></i>
+<div class="layer-bar reconstruction-bar">
+image<small><span class="math inline">\(3\!\times\!64\!\times\!64\)</span></small>
+</div>
+<p>
+Compress, then answer an image question.
+</p>
+</div>
+</div>
+<div class="course-takeaway-dark fragment">
+<p><span>NEW MODULE</span></p>
+<p>The encoder is familiar feature extraction. The decoder learns the reverse journey in shape—not a mathematical inverse.</p>
+</div>
+<aside class="notes">
+<p>Begin with the classifier pipeline from the CNN lectures. Its feature extractor already compresses an image into a representation. The autoencoder keeps that familiar front half but replaces the classifier with a decoder that expands the code into an image. Be careful with the word reverse: the decoder reverses the progression of tensor shapes, but it is not generally the algebraic inverse of the encoder because compression discarded information.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-contract-is-defined-by-spaces-and-shapes" class="slide level2">
+<h2>The contract is defined by spaces and shapes</h2>
+<div class="mapping-contract">
+<div class="mapping-card encoder-map">
+<p><span>ENCODER</span></p>
+<p><span class="math display">\[
+f_\theta:\mathbb{R}^{H\times W\times C}\rightarrow\mathbb{R}^{d}
+\]</span></p>
+<p>
+many pixel values → compact coordinates
+</p>
+</div>
+<div class="mapping-card decoder-map fragment">
+<p><span>DECODER</span></p>
+<p><span class="math display">\[
+g_\phi:\mathbb{R}^{d}\rightarrow\mathbb{R}^{H\times W\times C}
+\]</span></p>
+<p>
+compact coordinates → image-shaped prediction
+</p>
+</div>
+</div>
+<div class="batch-contract fragment">
+<div>
+<span>INPUT BATCH</span><strong><span class="math inline">\((N,C,H,W)\)</span></strong>
+</div>
+<i>encoder</i>
+<div>
+<span>LATENT BATCH</span><strong><span class="math inline">\((N,d)\)</span></strong>
+</div>
+<i>decoder</i>
+<div>
+<span>OUTPUT BATCH</span><strong><span class="math inline">\((N,C,H,W)\)</span></strong>
+</div>
+</div>
+<div class="question-prompt fragment">
+<p>Invariant to protect: the decoder output must have the same shape and value convention as its target.</p>
+</div>
+<aside class="notes">
+<p>Read each mapping as an input/output promise rather than an implementation. With batched PyTorch tensors, the batch axis N survives both transformations. The reconstruction must match not only the target shape but also its value convention: for example, inputs scaled to zero through one require an appropriate final activation and loss. A sigmoid output is common for zero-to-one pixels; unrestricted outputs may be used with standardized data.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-smallest-useful-architecture" class="slide level2">
+<h2>A smallest useful architecture</h2>
+<div class="compact-ae-architecture">
+<div class="compact-half encoder-half">
+<span>ENCODER · REMOVE DIMENSIONS</span>
+<div class="compact-layers">
+<div class="compact-layer pixels-layer">
+<b>pixels</b><small>784</small>
+</div>
+<i></i>
+<div class="compact-layer hidden-layer">
+<b>hidden</b><small>128</small>
+</div>
+<i></i>
+<div class="compact-layer code-layer">
+<b><span class="math inline">\(z\)</span></b><small>32</small>
+</div>
+</div>
+</div>
+<div class="compact-half decoder-half fragment">
+<span>DECODER · RESTORE DIMENSIONS</span>
+<div class="compact-layers">
+<div class="compact-layer code-layer">
+<b><span class="math inline">\(z\)</span></b><small>32</small>
+</div>
+<i></i>
+<div class="compact-layer hidden-layer">
+<b>hidden</b><small>128</small>
+</div>
+<i></i>
+<div class="compact-layer pixels-layer">
+<b><span class="math inline">\(\hat{x}\)</span></b><small>784</small>
+</div>
+</div>
+</div>
+</div>
+<div class="activation-contract fragment">
+<div>
+<span>HIDDEN ACTIVATIONS</span><strong>ReLU</strong><small>build nonlinear features</small>
+</div>
+<div>
+<span>OUTPUT ACTIVATION</span><strong>Sigmoid</strong><small>match pixels scaled to <span class="math inline">\([0,1]\)</span></small>
+</div>
+</div>
+<div class="takeaway fragment">
+<p>Symmetric widths are convenient, not mandatory. Matching the output contract is mandatory.</p>
+</div>
+<aside class="notes">
+<p>Use a 28 by 28 grayscale image so the complete architecture is visible without convolution details. Flattening gives 784 values. The encoder maps 784 to 128 to 32; the decoder maps 32 to 128 to 784. This visual symmetry is a design convenience, not a requirement. Explain why ReLU is appropriate inside and sigmoid is compatible with targets scaled to zero through one. If targets are standardized, the output choice should change.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="map-the-modules-directly-into-pytorch" class="slide level2">
+<h2>Map the modules directly into PyTorch</h2>
+<div class="ae-code-layout">
+<div class="ae-code-visual">
+<div>
+<span>INPUT</span><strong><span class="math inline">\((N,1,28,28)\)</span></strong>
+</div>
+<i>Flatten</i>
+<div>
+<span>ENCODER OUTPUT</span><strong><span class="math inline">\((N,32)\)</span></strong>
+</div>
+<i>decoder</i>
+<div>
+<span>RECONSTRUCTION</span><strong><span class="math inline">\((N,1,28,28)\)</span></strong>
+</div>
+</div>
+<div class="light-code-editor ae-code-editor">
+<div class="editor-bar">
+<span>EXECUTABLE CONTRACT</span><strong>autoencoder.py</strong>
+</div>
+<pre><code><span class="py-kw">class</span> Autoencoder(nn.Module):
+    <span class="py-kw">def</span> __init__(self):
+        <span class="py-kw">super</span>().__init__()
+        self.encoder = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(<span class="py-num">784</span>, <span class="py-num">128</span>), nn.ReLU(),
+            nn.Linear(<span class="py-num">128</span>, <span class="py-num">32</span>)
+        )
+        self.decoder = nn.Sequential(
+            nn.Linear(<span class="py-num">32</span>, <span class="py-num">128</span>), nn.ReLU(),
+            nn.Linear(<span class="py-num">128</span>, <span class="py-num">784</span>), nn.Sigmoid(),
+            nn.Unflatten(<span class="py-num">1</span>, (<span class="py-num">1</span>, <span class="py-num">28</span>, <span class="py-num">28</span>))
+        )
+
+    <span class="py-kw">def</span> forward(self, x):
+        z = self.encoder(x)
+        x_hat = self.decoder(z)
+        <span class="py-kw">return</span> x_hat</code></pre>
+</div>
+</div>
+<aside class="notes">
+<p>Trace the code against the three shapes on the left. Flatten preserves N and converts the remaining axes into 784 values. The encoder owns the compression layers; the decoder owns expansion and restores the image axes with Unflatten. The forward method makes the conceptual contract literal. Point out that returning only x-hat is enough for reconstruction training, while returning both x-hat and z is useful when inspecting representations later.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="trace-the-contract-before-running-the-model" class="slide level2">
+<h2>Trace the contract before running the model</h2>
+<div class="exercise-prompt">
+<p>A batch contains <strong>16 grayscale <span class="math inline">\(28\times28\)</span> images</strong>. The encoder is <code>Flatten → Linear(784,128) → Linear(128,32)</code>. The decoder mirrors it and unflattens the result. Write the shape after each named stage.</p>
+</div>
+<div class="exercise-pause">
+<p><span>PAUSE</span><b>75 seconds</b><small>Keep the batch dimension; only transform the axes after it.</small></p>
+</div>
+<div class="shape-contract-exercise">
+<div>
+<span>input</span><strong><span class="math inline">\((16,1,28,28)\)</span></strong>
+</div>
+<i>Flatten</i>
+<div>
+<span>flat</span><strong>?</strong>
+</div>
+<i>encoder</i>
+<div>
+<span><span class="math inline">\(z\)</span></span><strong>?</strong>
+</div>
+<i>decoder + unflatten</i>
+<div>
+<span><span class="math inline">\(\hat{x}\)</span></span><strong>?</strong>
+</div>
+</div>
+<div class="exercise-solution fragment">
+<p><span class="solution-label">WORKED SOLUTION</span></p>
+<p><span class="math display">\[
+(16,1,28,28)\rightarrow(16,784)\rightarrow(16,32)\rightarrow(16,1,28,28)
+\]</span></p>
+<p>The model changes each example’s representation; it never merges the 16 examples.</p>
+</div>
+<p class="exercise-extension fragment">
+Debugging check: what shape mismatch would appear if <code>Unflatten</code> were omitted?
+</p>
+<aside class="notes">
+<p>Require students to retain the batch dimension in every answer. Flatten begins at dimension one, giving 16 by 784. The latent batch is 16 by 32. The decoder returns 16 by 784, and Unflatten restores 16 by 1 by 28 by 28. Without Unflatten, the numerical element count matches but the reconstruction and image target have different ranks and spatial semantics.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-contract-separates-rolesnot-objectives" class="slide level2">
+<h2>The contract separates roles—not objectives</h2>
+<div class="role-summary">
+<div>
+<span><span class="math inline">\(f_\theta\)</span></span><strong>encode</strong><small>decide what reaches <span class="math inline">\(z\)</span></small>
+</div>
+<div>
+<span><span class="math inline">\(z\)</span></span><strong>represent</strong><small>carry the compact evidence</small>
+</div>
+<div>
+<span><span class="math inline">\(g_\phi\)</span></span><strong>decode</strong><small>turn evidence into <span class="math inline">\(\hat{x}\)</span></small>
+</div>
+</div>
+<div class="joint-training fragment">
+<p><span>ONE RECONSTRUCTION LOSS</span> <strong>updates both <span class="math inline">\(\theta\)</span> and <span class="math inline">\(\phi\)</span> together</strong></p>
+</div>
+<div class="course-takeaway-dark fragment">
+<p><span>NEXT</span></p>
+<p>Why does shrinking <span class="math inline">\(z\)</span> change what the pair learns?</p>
+</div>
+<aside class="notes">
+<p>Synthesize the named roles without suggesting three independent objectives. The reconstruction loss at the output sends gradients through the decoder and then the encoder, updating phi and theta jointly. The contract tells us what each module consumes and produces. It does not yet explain why the latent representation becomes useful. Section 3 studies the learning pressure created by the bottleneck.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="learning-through-a-bottleneck-1" class="title-slide slide level1 section-slide autoencoder-section bottleneck-section center" data-section-progress="3 / 6" style="--section-progress:50%">
+<h1>03 · Learning through a bottleneck</h1>
+
+</section>
+<section id="hold-everything-fixedchange-only-d" class="slide level2">
+<h2>Hold everything fixed—change only <span class="math inline">\(d\)</span></h2>
+<div class="latent-explorer" data-dimension="8" data-sample="2">
+<div class="dimension-switcher" aria-label="Select latent dimension">
+<p><span>LATENT DIMENSION</span> <button type="button" data-d="2">2</button><button type="button" data-d="4">4</button><button type="button" data-d="8">8</button><button type="button" data-d="16">16</button><button type="button" data-d="32">32</button><button type="button" data-d="64">64</button><button type="button" data-d="128">128</button></p>
+</div>
+<div class="reconstruction-stage">
+<figure>
+<span>INPUT</span><img data-role="input" src="assets/latent-sweep/sample-2-input.png" alt="Fashion-MNIST input sample">
+<figcaption data-role="class">
+Pullover
+</figcaption>
+</figure>
+<i class="stage-arrow"></i>
+<figure class="reconstruction-frame">
+<span>RECONSTRUCTION · <span class="math inline">\(d=\)</span><b data-role="dimension">8</b></span><img data-role="reconstruction" src="assets/latent-sweep/d-8-sample-2-reconstruction.png" alt="Autoencoder reconstruction">
+<figcaption>
+sample MSE <b data-role="sample-mse">0.0320</b>
+</figcaption>
+</figure>
+<figure class="error-frame">
+<span>ABSOLUTE ERROR</span><img data-role="error" src="assets/latent-sweep/d-8-sample-2-error.png" alt="Absolute pixel reconstruction error">
+<figcaption>
+bright = larger error
+</figcaption>
+</figure>
+</div>
+<div class="explorer-metrics">
+<div>
+<span>COORDINATES KEPT</span><strong><b data-role="dimension">8</b> / 784</strong>
+</div>
+<div>
+<span>WIDTH RATIO</span><strong data-role="ratio">1.0%</strong>
+</div>
+<div>
+<span>TEST MSE</span><strong data-role="test-mse">0.0168</strong>
+</div>
+</div>
+<div class="sample-switcher" aria-label="Select Fashion-MNIST example">
+<button type="button" data-sample="0">
+<img src="assets/latent-sweep/sample-0-input.png" alt="T-shirt">
+</button>
+<button type="button" data-sample="1">
+<img src="assets/latent-sweep/sample-1-input.png" alt="Trouser">
+</button>
+<button type="button" data-sample="2">
+<img src="assets/latent-sweep/sample-2-input.png" alt="Pullover">
+</button>
+<button type="button" data-sample="3">
+<img src="assets/latent-sweep/sample-3-input.png" alt="Dress">
+</button>
+<button type="button" data-sample="4">
+<img src="assets/latent-sweep/sample-4-input.png" alt="Coat">
+</button>
+<button type="button" data-sample="5">
+<img src="assets/latent-sweep/sample-5-input.png" alt="Sandal">
+</button>
+<button type="button" data-sample="6">
+<img src="assets/latent-sweep/sample-6-input.png" alt="Shirt">
+</button>
+<button type="button" data-sample="7">
+<img src="assets/latent-sweep/sample-7-input.png" alt="Sneaker">
+</button>
+<button type="button" data-sample="8">
+<img src="assets/latent-sweep/sample-8-input.png" alt="Bag">
+</button>
+<button type="button" data-sample="9">
+<img src="assets/latent-sweep/sample-9-input.png" alt="Ankle boot">
+</button>
+</div>
+</div>
+<aside class="notes">
+<p>This is the section’s controlled experiment. Every model uses the same Fashion-MNIST split, MLP architecture, optimizer, seed, six epochs, and ten fixed test examples; only latent width d changes. Click different garments, then sweep d from 2 to 128. Ask students to identify what appears first—global silhouette—and what arrives later—edges, openings, and fine contrast. Do not claim monotonic improvement for every individual image: the measured result is deliberately visible.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="watch-one-reconstruction-acquire-detail" class="slide level2">
+<h2>Watch one reconstruction acquire detail</h2>
+<div class="reconstruction-filmstrip">
+<figure class="filmstrip-input">
+<span>INPUT</span><img src="assets/latent-sweep/sample-2-input.png" alt="Original Fashion-MNIST pullover">
+<figcaption>
+pullover
+</figcaption>
+</figure>
+<i></i>
+<figure>
+<span><span class="math inline">\(d=2\)</span></span><img src="assets/latent-sweep/d-2-sample-2-reconstruction.png" alt="Pullover reconstructed with latent dimension 2">
+<figcaption>
+.0473
+</figcaption>
+</figure>
+<figure>
+<span><span class="math inline">\(d=4\)</span></span><img src="assets/latent-sweep/d-4-sample-2-reconstruction.png" alt="Pullover reconstructed with latent dimension 4">
+<figcaption>
+.0368
+</figcaption>
+</figure>
+<figure>
+<span><span class="math inline">\(d=8\)</span></span><img src="assets/latent-sweep/d-8-sample-2-reconstruction.png" alt="Pullover reconstructed with latent dimension 8">
+<figcaption>
+.0320
+</figcaption>
+</figure>
+<figure>
+<span><span class="math inline">\(d=16\)</span></span><img src="assets/latent-sweep/d-16-sample-2-reconstruction.png" alt="Pullover reconstructed with latent dimension 16">
+<figcaption>
+.0280
+</figcaption>
+</figure>
+<figure>
+<span><span class="math inline">\(d=32\)</span></span><img src="assets/latent-sweep/d-32-sample-2-reconstruction.png" alt="Pullover reconstructed with latent dimension 32">
+<figcaption>
+.0312
+</figcaption>
+</figure>
+<figure>
+<span><span class="math inline">\(d=64\)</span></span><img src="assets/latent-sweep/d-64-sample-2-reconstruction.png" alt="Pullover reconstructed with latent dimension 64">
+<figcaption>
+.0263
+</figcaption>
+</figure>
+<figure>
+<span><span class="math inline">\(d=128\)</span></span><img src="assets/latent-sweep/d-128-sample-2-reconstruction.png" alt="Pullover reconstructed with latent dimension 128">
+<figcaption>
+.0282
+</figcaption>
+</figure>
+</div>
+<div class="filmstrip-reading">
+<p><span>sample MSE ↓</span> <strong>Silhouette survives first; fine structure improves unevenly.</strong></p>
+</div>
+<div class="question-prompt fragment">
+<p>Prediction check: if width alone determined quality, what pattern should these seven errors follow?</p>
+</div>
+<aside class="notes">
+<p>Read the images before the numbers. With d equals 2, the pullover remains recognizable but is heavily averaged. Additional coordinates recover more structure. The sample error is not monotonic: d equals 32 and 128 are worse than nearby widths under the fixed six-epoch training budget. Width changes capacity, but optimization and generalization still matter. This is precisely why we measure rather than narrate a guaranteed curve.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="measure-the-gain-instead-of-assuming-it" class="slide level2">
+<h2>Measure the gain instead of assuming it</h2>
+<div class="latent-curve">
+
+</div>
+<div class="curve-reading">
+<p><span>CONTROLLED SWEEP · 10,000 TEST IMAGES</span> <strong><span class="math inline">\(d:2\rightarrow8\)</span> cuts test MSE by 42%.</strong> <small>From <span class="math inline">\(d=8\)</span> to <span class="math inline">\(128\)</span>, four more doublings buy only a modest additional reduction.</small></p>
+</div>
+<aside class="notes">
+<p>The curve aggregates all ten thousand Fashion-MNIST test images. Test MSE drops from 0.0292 at d equals 2 to 0.0168 at d equals 8, a reduction of roughly 42 percent. Beyond that point, gains flatten and are slightly uneven because every model received the same finite training budget. The curve supports an evidence-based claim: larger d expands capacity, but useful returns diminish for this architecture and training setup.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="choose-a-bottleneck-from-evidence" class="slide level2">
+<h2>Choose a bottleneck from evidence</h2>
+<div class="bottleneck-decision">
+<div class="decision-curve latent-curve">
+
+</div>
+<div class="decision-marker">
+<span>DEPLOYMENT LIMIT</span><strong>at most 16 coordinates</strong><i></i>
+</div>
+</div>
+<div class="exercise-prompt">
+<p>You need recognizable reconstructions for a low-bandwidth device. Based on this experiment, choose <span class="math inline">\(d\in\{2,4,8,16\}\)</span> and justify the extra coordinates using the test curve—not intuition alone.</p>
+</div>
+<div class="exercise-pause">
+<p><span>PAUSE</span><b>60 seconds</b><small>Compare marginal error reduction against each increase in width.</small></p>
+</div>
+<div class="exercise-solution fragment">
+<p><span class="solution-label">EVIDENCE-BASED DECISION</span></p>
+<p>Start with <strong><span class="math inline">\(d=8\)</span></strong>: it reaches test MSE <span class="math inline">\(0.0168\)</span> using only <span class="math inline">\(1.0\%\)</span> as many coordinates as the input. Moving to <span class="math inline">\(d=16\)</span> doubles the channel width but improves MSE by only <span class="math inline">\(0.0006\)</span>. Choose <span class="math inline">\(16\)</span> only if that small measured gain matters for the application.</p>
+</div>
+<p class="exercise-extension fragment">
+The decision belongs to this dataset, architecture, loss, and training budget—not to autoencoders universally.
+</p>
+<aside class="notes">
+<p>Require a decision and a quantitative justification. d equals 8 is the natural elbow in this controlled run. d equals 16 remains defensible when reconstruction fidelity is worth the extra coordinates. The point is not to decree one correct dimension; it is to make students use validation evidence and deployment constraints together.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+<script src="assets/latent-sweep.js"></script>
+</section>
+
+
+
+
+
+</section>
+<section>
+<section id="reading-the-latent-space-1" class="title-slide slide level1 section-slide autoencoder-section latent-section center" data-section-progress="4 / 6" style="--section-progress:66.667%">
+<h1>04 · Reading the latent space</h1>
+
+</section>
+<section id="explore-the-map-before-seeing-the-labels" class="slide level2">
+<h2>Explore the map before seeing the labels</h2>
+<div class="latent-map-widget latent-map-unlabelled" data-coloured="false" data-selected="200">
+<div class="latent-map-canvas">
+<canvas data-role="scatter" width="820" height="520" aria-label="Unlabelled scatterplot of 1,000 Fashion-MNIST test images encoded into two latent dimensions">
+</canvas>
+<p><span class="axis-z1"><span class="math inline">\(z_1\)</span></span><span class="axis-z2"><span class="math inline">\(z_2\)</span></span></p>
+</div>
+<div class="latent-inspector">
+<span>CLICK ANY POINT</span>
+<canvas data-role="input" width="210" height="210">
+</canvas>
+<div class="inspector-arrow">
+→
+</div>
+<canvas data-role="reconstruction" width="210" height="210">
+</canvas>
+<div class="inspector-caption">
+<strong data-role="class">Pullover</strong><small><span class="math inline">\(z=\)</span> <b data-role="coords"></b> · MSE <b data-role="mse"></b></small>
+</div>
+</div>
+</div>
+<div class="map-question">
+Without labels, where do shapes change smoothly—and where do abrupt boundaries appear?
+</div>
+<aside class="notes">
+<p>Teaching goal: let students discover that a latent space is a map they can interrogate, not merely a vector produced by the encoder.</p>
+<p>Begin without naming any clothing classes. Explain that every dot is one held-out Fashion-MNIST image passed through the same trained encoder, and that its horizontal and vertical positions are the two learned coordinates <span class="math inline">\(z_1\)</span> and <span class="math inline">\(z_2\)</span>. These are not PCA axes and they were not chosen by a human. The map contains 1,000 test images; none of their labels were used by the autoencoder.</p>
+<p>Demonstrate one click first. The left thumbnail is the original test image, the right thumbnail is <span class="math inline">\(g_\phi(f_\theta(x))\)</span>, and the displayed MSE is the per-image reconstruction error. Then ask students to direct two or three clicks: one inside a dense region, one on an isolated point, and one near a visible boundary. Pause after each click and ask, “What changed in the image as we moved across the map?” Seek observations about silhouette, height, width, orientation, and texture—not class names yet.</p>
+<p>Emphasize that nearby dots mean nearby encoder outputs under ordinary Euclidean distance in this two-dimensional coordinate system. They do not automatically mean identical inputs or identical semantic labels. A detached island may indicate a distinctive visual pattern, but it may also expose an unusual example or a distortion caused by forcing the representation into only two dimensions.</p>
+<p>Close the slide with the causal point: reconstruction supplied the only training signal. Whatever organization appears was useful for predicting pixels through the decoder. Transition by asking whether those visual regions happen to align with the labels humans assigned.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="reveal-what-occupies-each-region" class="slide level2">
+<h2>Reveal what occupies each region</h2>
+<div class="latent-map-widget latent-map-labelled" data-coloured="true" data-selected="700">
+<div class="latent-map-canvas">
+<canvas data-role="scatter" width="880" height="510" aria-label="Fashion-MNIST latent map colored by the ten ground-truth classes">
+</canvas>
+<p><span class="axis-z1"><span class="math inline">\(z_1\)</span></span><span class="axis-z2"><span class="math inline">\(z_2\)</span></span></p>
+</div>
+<div class="latent-inspector compact-inspector">
+<canvas data-role="input" width="175" height="175">
+</canvas>
+<canvas data-role="reconstruction" width="175" height="175">
+</canvas>
+<p><strong data-role="class">Sneaker</strong><small><span class="math inline">\(z=\)</span> <b data-role="coords"></b></small></p>
+</div>
+<div class="latent-class-legend">
+<p><span style="--class-color:#2878c8">T-shirt</span><span style="--class-color:#ef5b45">Trouser</span><span style="--class-color:#008e9b">Pullover</span><span style="--class-color:#7655ad">Dress</span><span style="--class-color:#d58b16">Coat</span><span style="--class-color:#3c8d63">Sandal</span><span style="--class-color:#c44f86">Shirt</span><span style="--class-color:#586a78">Sneaker</span><span style="--class-color:#9a6b35">Bag</span><span style="--class-color:#00a3b4">Boot</span></p>
+</div>
+</div>
+<div class="map-reading fragment">
+<strong>Structure emerged:</strong> footwear separates from tops, while visually similar shirts, coats, and pullovers overlap.
+</div>
+<aside class="notes">
+<p>Teaching goal: distinguish emergent semantic structure from supervised class separation.</p>
+<p>Reveal the colors only after students have described the unlabeled geometry. Remind them that the colors are a diagnostic overlay added after training; the encoder and decoder never received these class labels. Read the map from the easiest evidence first. Trousers form a visibly distinctive region because their two-leg silhouette differs strongly from most tops. Bags and footwear also occupy characteristic areas. Sandals, sneakers, and ankle boots show partial separation, while shirts, coats, pullovers, and T-shirts overlap substantially.</p>
+<p>Click representative points from a clean region and then from an overlap region. For each, compare the original with the reconstruction. Ask: “What evidence could the decoder use to reconstruct this shape, even if that evidence is insufficient to assign the human label?” Students should notice that coarse outline, vertical extent, and mass distribution can be reconstruction-useful without cleanly distinguishing coat from pullover.</p>
+<p>When the conclusion fragment appears, state the claim carefully. The plot is evidence that semantic structure can emerge, not evidence that the autoencoder has learned a classifier. A supervised objective would explicitly push decision boundaries between labels; reconstruction instead groups examples according to factors that help reproduce their pixels. Also note that a two-dimensional bottleneck exaggerates overlaps and cannot preserve every factor present in the original <span class="math inline">\(28\times28\)</span> image.</p>
+<p>Transition: a global colored map suggests structure, but a representation becomes operational when we ask what examples it retrieves as similar.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="zoom-from-a-point-into-its-neighborhood" class="slide level2">
+<h2>Zoom from a point into its neighborhood</h2>
+<div class="latent-map-widget neighbourhood-widget" data-coloured="true" data-selected="600">
+<div class="neighbourhood-top">
+<div class="latent-map-canvas mini-map">
+<canvas data-role="scatter" width="560" height="350" aria-label="Clickable two-dimensional latent map for selecting a neighborhood anchor">
+</canvas>
+<p><span class="axis-z1"><span class="math inline">\(z_1\)</span></span><span class="axis-z2"><span class="math inline">\(z_2\)</span></span></p>
+</div>
+<div class="anchor-view">
+<span>ANCHOR</span>
+<canvas data-role="input" width="185" height="185">
+</canvas>
+<p><strong data-role="class">Shirt</strong><small><span class="math inline">\(z=\)</span> <b data-role="coords"></b></small></p>
+</div>
+</div>
+<div class="neighbour-strip" data-role="neighbours">
+<div class="neighbour-item">
+<canvas data-kind="input" width="105" height="105">
+</canvas>
+<canvas data-kind="reconstruction" width="105" height="105">
+</canvas>
+<b></b><small></small>
+</div>
+<div class="neighbour-item">
+<canvas data-kind="input" width="105" height="105">
+</canvas>
+<canvas data-kind="reconstruction" width="105" height="105">
+</canvas>
+<b></b><small></small>
+</div>
+<div class="neighbour-item">
+<canvas data-kind="input" width="105" height="105">
+</canvas>
+<canvas data-kind="reconstruction" width="105" height="105">
+</canvas>
+<b></b><small></small>
+</div>
+<div class="neighbour-item">
+<canvas data-kind="input" width="105" height="105">
+</canvas>
+<canvas data-kind="reconstruction" width="105" height="105">
+</canvas>
+<b></b><small></small>
+</div>
+<div class="neighbour-item">
+<canvas data-kind="input" width="105" height="105">
+</canvas>
+<canvas data-kind="reconstruction" width="105" height="105">
+</canvas>
+<b></b><small></small>
+</div>
+<div class="neighbour-item">
+<canvas data-kind="input" width="105" height="105">
+</canvas>
+<canvas data-kind="reconstruction" width="105" height="105">
+</canvas>
+<b></b><small></small>
+</div>
+<div class="neighbour-item">
+<canvas data-kind="input" width="105" height="105">
+</canvas>
+<canvas data-kind="reconstruction" width="105" height="105">
+</canvas>
+<b></b><small></small>
+</div>
+</div>
+</div>
+<div class="neighbour-key">
+<span>top: input</span><span>bottom: reconstruction</span><strong>Nearest in <span class="math inline">\(z\)</span> means similar evidence for this decoder—not necessarily the same class.</strong>
+</div>
+<aside class="notes">
+<p>Teaching goal: turn the vague phrase “similar representations” into a concrete retrieval operation.</p>
+<p>Click a point to choose an anchor. The large image on the right is the anchor input. The seven columns below are its nearest test examples under Euclidean distance in <span class="math inline">\(z\)</span>; within each column, the top image is the original and the bottom image is the decoder reconstruction. Give students a few seconds to compare the row before reading the labels.</p>
+<p>Ask three questions in order. First: “What visual property stays stable across this neighborhood?” Look for silhouette, orientation, brightness distribution, sleeve length, or footwear height. Second: “Do all neighbors share the anchor’s class?” Usually they do not, especially in the overlapping top-clothing region. Third: “Does the reconstruction make the neighbors look more alike than the inputs do?” This exposes the decoder’s smoothing and the information discarded by the bottleneck.</p>
+<p>Try anchors in contrasting regions if time permits: a trouser or bag from a separated region, then a shirt or coat from an overlap region. The former usually retrieves a semantically cleaner neighborhood; the latter demonstrates that proximity reflects the factors learned for reconstruction rather than a guarantee of category identity.</p>
+<p>Define the operational statement explicitly: for this model, “similar” means small <span class="math inline">\(\lVert f_\theta(x_i)-f_\theta(x_j)\rVert_2\)</span>. That metric can be useful for retrieval, but usefulness must be evaluated against the intended downstream task. A different encoder, latent dimension, normalization, or distance function could produce different neighbors.</p>
+<p>Transition: nearest neighbors inspect observed points. Interpolation asks the harder question of what the decoder believes exists between two observed points.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="decode-pathsnot-just-points" class="slide level2">
+<h2>Decode paths—not just points</h2>
+<div class="interpolation-evidence">
+<div class="interpolation-path">
+<div class="path-label">
+<span>PATH A</span><strong>sneaker → ankle boot</strong><small><span class="math inline">\(z(t)=(1-t)z_a+t z_b\)</span></small>
+</div>
+<img src="assets/latent-geometry/interpolation-footwear.png" alt="Nine decoded interpolation steps from a sneaker to an ankle boot">
+<div class="path-scale">
+<span><span class="math inline">\(t=0\)</span></span><i></i><span><span class="math inline">\(t=1\)</span></span>
+</div>
+</div>
+<div class="interpolation-path fragment">
+<div class="path-label">
+<span>PATH B</span><strong>shirt → coat</strong><small>same straight-line rule</small>
+</div>
+<img src="assets/latent-geometry/interpolation-tops.png" alt="Nine decoded interpolation steps from a shirt to a coat">
+<div class="path-scale">
+<span><span class="math inline">\(t=0\)</span></span><i></i><span><span class="math inline">\(t=1\)</span></span>
+</div>
+</div>
+</div>
+<div class="question-prompt fragment">
+<p>Where does the decoder change smoothly, and where does it blur incompatible evidence together?</p>
+</div>
+<div class="course-takeaway-dark fragment">
+<p><span>READING <span class="math inline">\(z\)</span></span></p>
+<p>Points reveal neighborhoods; paths reveal whether the space between them decodes coherently.</p>
+</div>
+<aside class="notes">
+<p>Teaching goal: use interpolation as a test of the geometry between encoded examples, while avoiding the claim that smoothness alone makes the model generative.</p>
+<p>Start with Path A only. The endpoints are real test images encoded as <span class="math inline">\(z_a\)</span> and <span class="math inline">\(z_b\)</span>. Each intermediate code is computed by the displayed linear rule, <span class="math inline">\(z(t)=(1-t)z_a+t z_b\)</span>, for evenly spaced values from <span class="math inline">\(t=0\)</span> to <span class="math inline">\(t=1\)</span>, and then passed through the decoder. Read the strip left to right. Point out the gradual rise of the footwear silhouette and the changing ankle region. Ask whether any transition appears abrupt or whether two incompatible shapes are visibly averaged.</p>
+<p>Reveal Path B and repeat the same inspection before showing the question. The shirt-to-coat path changes more subtly; several middle frames look blurred or averaged. Connect this to the previous map: top-clothing classes occupied overlapping regions, so a straight path through that area asks the decoder to combine evidence that the two-dimensional code did not cleanly separate.</p>
+<p>Use the prompt as a genuine pause. Students should identify both smooth transformations and regions where smooth pixel change does not correspond to an unambiguous garment. Then reveal the takeaway: points let us study local neighborhoods, while paths probe the decoder’s behavior between points.</p>
+<p>State three cautions. First, linear movement in coordinates is a choice, not proof that the true data manifold is linear. Second, a decoder is a continuous neural network, so visually smooth outputs can occur even through low-density regions where the training data contain few or no examples. Third, blurry intermediate images may reflect the MSE objective averaging several plausible pixel configurations. Therefore interpolation is a diagnostic of the learned representation and decoder—not by itself proof that every intermediate is a realistic sample.</p>
+<p>Transition to the final section: reconstruction becomes useful when we deliberately choose what corruption, invariance, or downstream behavior the representation should support.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+<script src="assets/latent-geometry.js"></script>
+</section></section>
+<section>
+<section id="when-reconstruction-becomes-useful-1" class="title-slide slide level1 section-slide autoencoder-section useful-section center" data-section-progress="5 / 6" style="--section-progress:83.333%">
+<h1>05 · When reconstruction becomes useful</h1>
+
+</section>
+<section id="corrupt-the-inputpreserve-the-target" class="slide level2">
+<h2>Corrupt the input—preserve the target</h2>
+<div class="denoise-stage">
+<div class="denoise-row noisy-row">
+<span>NETWORK SEES</span><img src="assets/useful-reconstruction/denoise-noisy.png" alt="Six Fashion-MNIST test images corrupted by Gaussian noise">
+</div>
+<div class="denoise-flow">
+<i></i><strong><span class="math inline">\(f_\theta \rightarrow z \rightarrow g_\phi\)</span></strong><i></i>
+</div>
+<div class="denoise-row restored-row">
+<span>NETWORK PRODUCES</span><img src="assets/useful-reconstruction/denoise-restored.png" alt="Six noisy images restored by a trained denoising autoencoder">
+</div>
+<div class="denoise-row target-row fragment">
+<span>LOSS COMPARES WITH</span><img src="assets/useful-reconstruction/denoise-clean.png" alt="Six clean target images used by the denoising loss">
+</div>
+</div>
+<div class="denoise-result fragment">
+<strong>Noise MSE</strong> 0.101 <i>→</i> <strong>after reconstruction</strong> 0.021
+</div>
+<aside class="notes">
+<p>Teaching goal: show that reconstruction becomes useful when input and target are deliberately different.</p>
+<p>Begin with only the noisy row visible. These are real Fashion-MNIST test images after additive Gaussian noise with <span class="math inline">\(\sigma=0.45\)</span>. Ask what information remains recoverable: the corruption damages individual pixels, but the global silhouettes are still visible.</p>
+<p>Trace the images through the encoder, 16-dimensional code, and decoder. The middle row contains the model’s actual outputs after six epochs of denoising training. Invite students to compare specific details: trouser legs reappear, isolated bright noise disappears, and fine edges become smoother.</p>
+<p>Reveal the clean targets last. Stress the changed contract: the network receives <span class="math inline">\(\tilde{x}\)</span> but the loss compares its output with <span class="math inline">\(x\)</span>. Across these six held-out examples, mean corruption error falls from 0.101 to reconstruction error 0.021. This is not a generic image filter programmed by hand; the model learned recurring Fashion-MNIST structure from many noisy-clean pairs.</p>
+<p>Mention the tradeoff visible in the results: noise is suppressed, but some legitimate fine detail is also removed. The model restores what its training distribution makes predictable, not necessarily every authentic pixel.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-target-defines-what-must-survive" class="slide level2">
+<h2>The target defines what must survive</h2>
+<div class="contract-switch">
+<div class="contract-input">
+<img src="assets/useful-reconstruction/denoise-noisy.png" alt="Noisy Fashion-MNIST inputs"><span><span class="math inline">\(\tilde{x}=x+\epsilon\)</span></span>
+</div>
+<div class="contract-machine">
+<span>ENCODE</span><b>16 numbers</b><span>DECODE</span>
+</div>
+<div class="contract-target">
+<img src="assets/useful-reconstruction/denoise-clean.png" alt="Clean Fashion-MNIST targets"><span>target <span class="math inline">\(=x\)</span></span>
+</div>
+</div>
+<div class="contract-equation fragment">
+<span class="math inline">\(\displaystyle \min_{\theta,\phi}\;\mathbb{E}_{x,\epsilon}\left[\left\|x-g_\phi(f_\theta(x+\epsilon))\right\|_2^2\right]\)</span>
+</div>
+<div class="invariance-reading fragment">
+<span>THE DESIGN MOVE</span><strong>Destroy a nuisance in the input; require the output to recover without it.</strong>
+</div>
+<aside class="notes">
+<p>Teaching goal: derive denoising as a precise change to the autoencoder contract, then generalize the design principle.</p>
+<p>Read the diagram left to right. We sample a clean image <span class="math inline">\(x\)</span>, corrupt it to obtain <span class="math inline">\(\tilde{x}=x+\epsilon\)</span>, and feed only <span class="math inline">\(\tilde{x}\)</span> to the encoder. The clean <span class="math inline">\(x\)</span> bypasses the network and appears only as the supervision target. Therefore copying noisy pixels cannot minimize the loss consistently.</p>
+<p>Reveal the objective and identify each random quantity. The expectation is over both training examples and fresh corruption. Re-sampling noise matters: if every image always received the same fixed corruption, a sufficiently capable model could memorize those pairs. With varied corruption, the reusable strategy is to model regularities of clean garments.</p>
+<p>Reveal the design statement. A narrow code restricts capacity structurally; corruption changes the learning problem statistically. They can be combined, but they are not the same mechanism. Denoising pressure comes from predicting information absent from the particular input but predictable from the data distribution.</p>
+<p>Ask for transfer examples orally: masking patches encourages contextual completion; color jitter can encourage color invariance; removing one sensor channel can train cross-channel prediction. Caution that corruption defines the nuisance. If it removes task-relevant evidence, the representation may learn the wrong invariance.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="reconstruction-error-can-expose-the-unfamiliar" class="slide level2">
+<h2>Reconstruction error can expose the unfamiliar</h2>
+<div class="anomaly-gallery">
+<div class="gallery-heading">
+<span>TRAINED ONLY ON</span><strong>sandals · sneakers · ankle boots</strong>
+</div>
+<div class="gallery-strip">
+<span>INPUT</span><img src="assets/useful-reconstruction/anomaly-inputs.png" alt="Six familiar footwear inputs followed by six unfamiliar garment inputs">
+</div>
+<div class="gallery-strip">
+<span>RECONSTRUCTION</span><img src="assets/useful-reconstruction/anomaly-reconstructions.png" alt="Reconstructions from an autoencoder trained only on footwear">
+</div>
+<div class="score-ribbon">
+<i style="--score:.0040"></i><i style="--score:.0094"></i><i style="--score:.0127"></i><i style="--score:.0171"></i><i style="--score:.0210"></i><i style="--score:.0268"></i><i class="foreign" style="--score:.1874"></i><i class="foreign" style="--score:.1765"></i><i class="foreign" style="--score:.1737"></i><i class="foreign" style="--score:.1670"></i><i class="foreign" style="--score:.1661"></i><i class="foreign" style="--score:.1653"></i>
+</div>
+<div class="gallery-braces">
+<span>familiar footwear</span><span>unseen garments</span>
+</div>
+</div>
+<div class="anomaly-rule fragment">
+<span class="math inline">\(s(x)=\|x-\hat{x}\|_2^2\)</span> <i></i> large error is evidence of mismatch
+</div>
+<aside class="notes">
+<p>Teaching goal: make anomaly detection a consequence of a deliberately restricted training distribution.</p>
+<p>State the setup before interpreting the pictures. This second autoencoder was trained only on Fashion-MNIST sandals, sneakers, and ankle boots. The left six columns are held-out footwear examples; the right six are garments that the model never encountered during training. Each input is aligned vertically with its reconstruction.</p>
+<p>Ask students to inspect the images before looking at scores. Familiar footwear is reconstructed with recognizable shape. Unseen tops are forced through a decoder specialized for footwear and collapse into implausible smears or shoe-like structures. The bars underneath encode per-image MSE on one common scale; orange marks examples outside the training family.</p>
+<p>Reveal the score rule. Reconstruction error becomes an anomaly score because the model is expected to reconstruct normal examples better than inputs outside its learned regularities. Here, median MSE is 0.0168 for held-out footwear and 0.0838 for the other seven classes.</p>
+<p>Give the essential caution: high error means mismatch with what this model reconstructs well; it does not explain the cause and does not prove an input is harmful. A damaged shoe, rare shoe, distribution shift, or poorly trained model can also produce high error. Conversely, a powerful autoencoder may reconstruct anomalies too well.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="set-the-alarm-before-seeing-the-answer" class="slide level2">
+<h2>Set the alarm before seeing the answer</h2>
+<div class="threshold-evidence">
+<div class="threshold-axis">
+<span>0.00</span><i></i><span>0.20 MSE</span><b class="threshold-line fragment"></b>
+</div>
+<div class="threshold-points familiar-points">
+<span>HELD-OUT FOOTWEAR</span><i style="left:2%"></i><i style="left:5%"></i><i style="left:6.5%"></i><i style="left:8.5%"></i><i style="left:10.5%"></i><i style="left:13.5%"></i>
+</div>
+<div class="threshold-points foreign-points">
+<span>UNSEEN GARMENTS</span><i style="left:82.7%"></i><i style="left:83.1%"></i><i style="left:83.5%"></i><i style="left:86.8%"></i><i style="left:88.3%"></i><i style="left:93.7%"></i>
+</div>
+</div>
+<div class="exercise-prompt">
+<p><strong>Given:</strong> footwear is “normal”; false alarms are costly. <strong>Task:</strong> place a threshold and name one failure mode.</p>
+</div>
+<div class="exercise-pause">
+<p><span>PAUSE</span><strong>60 seconds</strong><small>Choose from validation scores—not from the anomalies you hope to detect.</small></p>
+</div>
+<div class="exercise-solution fragment">
+<p><strong>Worked choice:</strong> the 95th percentile of normal validation error gives <span class="math inline">\(\tau=0.0397\)</span>.</p>
+<p>Flag when <span class="math inline">\(s(x)&gt;\tau\)</span>. This controls false alarms on validation footwear—but novel inputs that reconstruct well can still pass.</p>
+</div>
+<aside class="notes">
+<p>Teaching goal: prevent students from treating the anomaly threshold as a universal constant or choosing it after inspecting test anomalies.</p>
+<p>The dots reuse the twelve examples from the preceding gallery on a common 0–0.20 MSE axis. Before revealing the vertical threshold, ask where students would place it if false alarms on legitimate footwear are costly. Require them to state what data they are allowed to use.</p>
+<p>Display the pause panel for about one minute. The key reasoning is that the threshold must be calibrated on separate normal validation data, not selected to separate the displayed anomalies. A threshold chosen after examining target anomalies leaks test information and gives an optimistic evaluation.</p>
+<p>Reveal the worked choice. In the full held-out footwear validation set, the 95th percentile is <span class="math inline">\(\tau=0.0397\)</span>. The rule is <span class="math inline">\(s(x)&gt;\tau\)</span>. Interpret the percentile: roughly five percent of normal validation examples exceed the threshold, so this choice explicitly accepts that validation false-positive rate. Deployment rates may differ under shift.</p>
+<p>Ask for failure modes: an unusual but valid shoe triggers an alarm; a simple anomaly reconstructs too well; preprocessing changes raise every score; or MSE overlooks a small but important defect. Close by separating the ingredients: the model supplies a score, validation calibrates a threshold, and the application determines the cost tradeoff.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="why-sampling-still-fails-1" class="title-slide slide level1 section-slide autoencoder-section sampling-section center" data-section-progress="6 / 6" style="--section-progress:100%">
+<h1>06 · Why sampling still fails</h1>
+
+</section>
+<section id="the-decoder-accepts-coordinates-it-never-learned" class="slide level2">
+<h2>The decoder accepts coordinates it never learned</h2>
+<div class="sampling-map-layout">
+<div class="sampling-map-frame">
+<canvas data-role="sampling-map" width="790" height="500" aria-label="Encoded Fashion-MNIST points with uniformly sampled latent coordinates overlaid">
+</canvas>
+<div class="sampling-legend">
+<span>encoded test image</span><span>uniform random coordinate</span>
+</div>
+</div>
+<div class="sampling-question">
+<p><span>250 LEGAL INPUTS TO <span class="math inline">\(g_\phi\)</span></span> <strong>Which colored points were supported by training data?</strong> <small>Color warms as distance to the nearest encoded example increases.</small></p>
+</div>
+</div>
+<div class="sampling-answer fragment">
+The reconstruction objective defined <strong>where encoded data landed</strong>—not a distribution from which to sample new <span class="math inline">\(z\)</span>.
+</div>
+<aside class="notes">
+<p>Teaching goal: separate the decoder’s mathematical domain from the part of latent space supported by encoded data.</p>
+<p>The gray cloud contains the same 1,000 encoded test images used in Section 4. The colored dots are 250 coordinates sampled uniformly inside the rectangular range of that cloud. Every colored coordinate has the correct shape—two real numbers—and the decoder will accept all of them.</p>
+<p>Ask students to compare the rectangle with the gray support. Many random points fall inside holes, sparse edges, or regions between curved concentrations. Warmer color means a greater Euclidean distance to the nearest encoded example. The important distinction is “valid tensor” versus “supported representation.” Shape checking can guarantee only the first.</p>
+<p>Reveal the answer after students identify empty regions. During ordinary training, <span class="math inline">\(g_\phi\)</span> receives codes of the form <span class="math inline">\(f_\theta(x)\)</span> for training examples. The objective never asks random coordinates from a simple prior to decode well. The encoder may arrange data in disconnected islands, stretched filaments, or an irregularly occupied region.</p>
+<p>Transition: the map shows unsupported coordinates abstractly; next we decode an entire regular grid and inspect what the model actually produces there.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="decode-the-empty-space" class="slide level2">
+<h2>Decode the empty space</h2>
+<div class="decoder-atlas">
+<div class="atlas-y">
+<span>high <span class="math inline">\(z_2\)</span></span><i></i><span>low <span class="math inline">\(z_2\)</span></span>
+</div>
+<img src="assets/sampling-failure/decoder-atlas.png" alt="A ten-by-ten atlas of images decoded across a regular grid in the learned two-dimensional latent space">
+<div class="atlas-x">
+<span>low <span class="math inline">\(z_1\)</span></span><i></i><span>high <span class="math inline">\(z_1\)</span></span>
+</div>
+</div>
+<div class="atlas-prompt fragment">
+Trace a row: where does a recognizable garment become an average, a hybrid, or nearly blank?
+</div>
+<div class="course-takeaway-dark fragment">
+<p><span>CONTINUITY IS NOT COVERAGE</span></p>
+<p>The decoder changes smoothly across the grid, even where no training image supplied evidence.</p>
+</div>
+<aside class="notes">
+<p>Teaching goal: let students see that smooth decoder output does not imply a well-supported generative latent space.</p>
+<p>This is a real 10-by-10 decoder atlas. We span the central 98 percent range of each learned coordinate, evaluate a regular grid of 100 codes, and decode every code with the same two-dimensional autoencoder. Neighboring cells differ by a fixed step in latent space.</p>
+<p>Read one horizontal row and then one vertical column. Some regions contain recognizable footwear or tops. Other regions contain faint averages, abrupt semantic mixtures, or nearly blank images. Invite students to point to a boundary where visual identity becomes ambiguous.</p>
+<p>Reveal the prompt and allow several interpretations. Then make the precise claim: neural-network continuity encourages nearby coordinates to produce nearby pixel arrays. It does not ensure those arrays lie on the data distribution. A smooth transition can pass through implausible images, as already hinted by interpolation.</p>
+<p>Connect back to the first slide: the weak cells tend to occur where the grid traverses sparse or unsupported regions. We need both a way to sample codes and a reason for sampled codes to occupy regions the decoder learned.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-prior-does-not-repair-a-missing-contract" class="slide level2">
+<h2>A prior does not repair a missing contract</h2>
+<div class="probe-evidence">
+<div class="probe-map">
+<canvas data-role="sampling-map" width="520" height="335" aria-label="Latent support and random probes">
+</canvas>
+</div>
+<div class="probe-decodes">
+<span>RANDOM PROBES · nearest four → farthest four</span> <img src="assets/sampling-failure/random-probes.png" alt="Eight decoded random latent probes ordered from close to far from encoded data">
+<div class="probe-distance">
+<b>0.02</b><i></i><b>8.64 distance to data</b>
+</div>
+</div>
+</div>
+<div class="exercise-prompt">
+<p><strong>Proposal:</strong> “Let us generate by drawing <span class="math inline">\(z\sim\mathcal{N}(0,I)\)</span>.” <strong>Task:</strong> identify the missing guarantee.</p>
+</div>
+<div class="exercise-pause">
+<p><span>PAUSE</span><strong>45 seconds</strong><small>Ask what loss term ever compared encoded points with that Gaussian.</small></p>
+</div>
+<div class="exercise-solution fragment">
+<p><strong>Missing guarantee:</strong> nothing trained <span class="math inline">\(f_\theta(x)\)</span> to follow <span class="math inline">\(\mathcal N(0,I)\)</span>, so prior samples can land far from every code the decoder saw.</p>
+</div>
+<aside class="notes">
+<p>Teaching goal: make students reject an arbitrary sampling rule by checking it against the training objective.</p>
+<p>The eight decoded probes are ordered by distance to the nearest encoded test point. The first four random coordinates happen to land close to data support; the last four occupy the most unsupported regions among 250 uniform draws. Use them as evidence, not as a claim that distance alone perfectly measures realism.</p>
+<p>Present the Gaussian proposal as plausible. The decoder accepts two numbers, and a standard normal is easy to sample. Then show the pause panel. The expected response is not merely “the samples may look bad”; students must name the missing training constraint.</p>
+<p>Reveal the solution. Our loss optimized reconstruction only for <span class="math inline">\(z=f_\theta(x)\)</span>. It neither matched the aggregate collection of codes to a standard normal nor ensured that neighborhoods around arbitrary prior samples were populated. Changing the random-number generator after training cannot retroactively organize latent space.</p>
+<p>Clarify that some Gaussian draws might still decode plausibly by accident, especially if scale and center roughly overlap the codes. The issue is absence of a guarantee and unreliable coverage, not impossibility of ever obtaining a good sample.</p>
+<p>Do not teach the VAE mechanism here. End the slide by asking what additional contract a genuinely sampleable model would need; the final synthesis names the requirement without solving it.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="reconstruction-taught-us-where-the-next-question-begins" class="slide level2">
+<h2>Reconstruction taught us where the next question begins</h2>
+<div class="lecture-synthesis">
+<div class="synthesis-route learned-route">
+<span>WHAT WE TRAINED</span><b><span class="math inline">\(x\)</span></b><i>→</i><b><span class="math inline">\(z=f_\theta(x)\)</span></b><i>→</i><b><span class="math inline">\(\hat{x}\)</span></b><strong>preserve what predicts the target</strong>
+</div>
+<div class="synthesis-route useful-route fragment">
+<span>WHAT WE USED</span><b><span class="math inline">\(\tilde{x}\)</span></b><i>→</i><b>clean <span class="math inline">\(\hat{x}\)</span></b><em>+</em><b><span class="math inline">\(\|x-\hat{x}\|^2\)</span></b><strong>denoise · retrieve · flag mismatch</strong>
+</div>
+<div class="synthesis-route missing-route fragment">
+<span>WHAT IS STILL MISSING</span><b>sample <span class="math inline">\(z\)</span></b><i>→</i><b>supported region?</b><i>→</i><b>realistic <span class="math inline">\(x\)</span>?</b><strong>a training contract for the distribution of latent codes</strong>
+</div>
+</div>
+<div class="course-takeaway-dark fragment">
+<p><span>NEXT QUESTION</span></p>
+<p>How can we learn representations that reconstruct well <strong>and</strong> make sampling reliable?</p>
+</div>
+<aside class="notes">
+<p>Teaching goal: close the lecture by composing mechanisms already established, then leave one precise unresolved requirement.</p>
+<p>Read the first route as the core contract: the encoder maps an observed image to a code, the decoder reconstructs it, and the loss rewards preservation of target-predictive information. Recall that bottleneck width changes pressure and that neighborhoods and paths let us inspect the resulting representation.</p>
+<p>Reveal the second route as applications, not separate architectures. Denoising changes the input-target pair. Retrieval uses distance between codes. Anomaly detection turns reconstruction mismatch into a score and requires validation-based calibration. Each use depends on how the training task defines what should be preserved.</p>
+<p>Reveal the third route and pause at each question mark. Ordinary reconstruction training gives no chosen sampling distribution for <span class="math inline">\(z\)</span> and no coverage guarantee between encoded examples. This is exactly why “has a decoder” does not imply “is a reliable generator.”</p>
+<p>Finish with the next question. Do not introduce KL divergence, reparameterization, or the VAE objective yet. The intellectual handoff is simply the missing specification: future training must retain reconstruction while organizing latent codes so samples come from supported regions.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+<script src="assets/sampling-failure.js"></script>
+
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+<p>Deep Learning · Chapter 10</p>
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="../../site_libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="../../site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="../../site_libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="../../site_libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="../../site_libs/revealjs/plugin/search/search.js"></script>
+  <script src="../../site_libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="../../site_libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': false,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1440,
+
+        height: 900,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 5.5e-2,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>
