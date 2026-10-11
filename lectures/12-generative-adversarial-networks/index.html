@@ -1,0 +1,2254 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-html/tabby.min.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.10.18">
+
+  <meta name="author" content="Dr.&nbsp;A. Belcaid">
+  <title>Deep Learning – Generative Adversarial Networks</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-f3e585dc122d45960ea2c31f625881dd.css">
+  <link rel="stylesheet" href="../01-what-is-learning/slides.css">
+  <link rel="stylesheet" href="week12.css">
+  <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" data-visibility="hidden" class="quarto-title-block center">
+  <h1 class="title">Generative Adversarial Networks</h1>
+  <p class="subtitle">Learning to generate through a learned judge</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Dr.&nbsp;A. Belcaid
+</div>
+</div>
+</div>
+
+</section>
+<section id="generative-adversarial-networks" class="slide level2 deck-title">
+<h2>Generative Adversarial Networks</h2>
+<div class="deck-title-grid">
+<div class="deck-title-copy">
+<div class="eyebrow">
+CHAPTER 12 · GENERATIVE MODELS
+</div>
+<h3 id="learning-to-generate-through-a-learned-judge">Learning to generate through a learned judge</h3>
+<p>What if another network supplied the feedback for making an image?</p>
+<p><span class="deck-author">Dr.&nbsp;A. Belcaid</span></p>
+</div>
+<div class="deck-title-art">
+<p><img data-src="assets/gan-hero.svg" alt="Conceptual illustration: random noise passes through a generator to a garment image. Real and generated garments enter the same discriminator; a dashed feedback path returns toward the generator. Schematic, not model outputs."></p>
+</div>
+</div>
+<aside class="notes">
+<p>This is the final lecture of the course; the following two weeks are student project presentations. Begin from what students already know: drawing a latent vector and decoding it can produce an image. Keep that generation path familiar and make the new training signal the question.</p>
+<p>Ask: if a generated garment has no paired target image, who tells the generator what to improve? Let students suggest criteria before introducing the learned discriminator. Do not frame GANs as universally better than VAEs or imply that sharp-looking outputs establish diversity or generalization.</p>
+<p>The thumbnail is an original course-made schematic inspired by the GAN training setup in Goodfellow et al., https://arxiv.org/abs/1406.2661. The upper garment represents observed data; the lower one represents a generated image. Both feed the same discriminator. The dashed return path previews training feedback through the discriminator, not a second image-generation path. It omits losses, targets, and alternating optimizer updates, which will be developed later. At generation time only the generator is needed. These drawn silhouettes are not experimental results.</p>
+<p>The opening is approved. Section 1 now develops the need for learned feedback through actual images, a target-selection experiment, and a measured source classifier. Section 2 develops the two module contracts. Section 3 develops the learning objectives. Section 4 develops alternating updates. Section 5 builds and inspects a convolutional GAN. Section 6 evaluates the recorded model and concludes the lecture.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-first-level-map-of-the-lecture" class="slide level2">
+<h2>A first-level map of the lecture</h2>
+<div class="lecture-toc">
+<div class="lecture-toc-item" style="--toc-color:#2878c8">
+<p><span>01</span></p>
+<h3 id="from-generating-images-to-learning-a-judge">From generating images to learning a judge</h3>
+</div>
+<div class="lecture-toc-item" style="--toc-color:#008e9b">
+<p><span>02</span></p>
+<h3 id="two-networks-two-different-jobs">Two networks, two different jobs</h3>
+</div>
+<div class="lecture-toc-item" style="--toc-color:#ef5b45">
+<p><span>03</span></p>
+<h3 id="turning-competition-into-learning-objectives">Turning competition into learning objectives</h3>
+</div>
+<div class="lecture-toc-item" style="--toc-color:#7655ad">
+<p><span>04</span></p>
+<h3 id="training-one-network-at-a-time">Training one network at a time</h3>
+</div>
+<div class="lecture-toc-item" style="--toc-color:#38865a">
+<p><span>05</span></p>
+<h3 id="building-an-image-gan-with-convolutions">Building an image GAN with convolutions</h3>
+</div>
+<div class="lecture-toc-item" style="--toc-color:#c94f78">
+<p><span>06</span></p>
+<h3 id="judging-samples-diversity-and-failure">Judging samples, diversity, and failure</h3>
+</div>
+</div>
+<aside class="notes">
+<p>Keep the screen at this first level. Plan approximately 90 minutes and 20–30 substantive teaching slides, adjusting section lengths to the evidence rather than imposing a slide count. Use Fashion-MNIST as the continuous visual problem so setup does not obscure the new mechanism.</p>
+<ol type="1">
+<li>From generating images to learning a judge (about 10 minutes). Retrieve the prior-to-decoder sampling path briefly. Use real images and actual model outputs to ask what feedback a generator needs when no paired reconstruction target exists. Let students judge examples before proposing a learned discriminator.</li>
+<li>Two networks, two different jobs (about 15 minutes). Compare the visible VAE training modules with the GAN modules before formalizing roles. Show random input → generator → image and real/generated image → shared discriminator. Connect the structure to a minimal PyTorch module contract. Distinguish training from generation; an unconditional GAN does not need an inference encoder.</li>
+<li>Turning competition into learning objectives (about 15 minutes). Start with concrete discriminator scores and the direction each player wants them to move. Derive discriminator BCE and the practical non-saturating generator loss from those decisions. Distinguish that generator objective from the original minimax form; do not claim each minibatch solves the game or that a discriminator score is a universal realism metric. Primary source: Goodfellow et al., https://arxiv.org/abs/1406.2661.</li>
+<li>Training one network at a time (about 20 minutes). Trace the two updates with a stateful graph and executable code. Show when fake images are detached, when the discriminator’s parameters are frozen, and why generator training still requires derivatives through the discriminator. Include a short predict–pause–reveal gradient-path exercise. Use fixed latent draws across checkpoints so changing samples reveal training rather than changing noise.</li>
+<li>Building an image GAN with convolutions (about 15 minutes). Compare the existing dense pair with a DCGAN-style convolutional pair; map changes in spatial shape to code. Reuse the course’s compact architecture bars and familiar CNN operations, deriving any new upsampling operation before using it. Use recorded outputs from a documented run, with preprocessing and output range consistent. Source: Radford, Metz, and Chintala, https://arxiv.org/abs/1511.06434. Treat architecture guidelines as empirical design choices, not guarantees of stable training.</li>
+<li>Judging samples, diversity, and failure (about 15 minutes). Inspect unfiltered fixed-seed galleries, repeated samples, and training trajectories. Let evidence expose mode collapse and instability; distinguish a limited gallery from a distribution-level evaluation. Do not use a loss curve alone as a quality ranking. Close by composing the taught data, generator, discriminator, losses, alternating updates, and evaluation into an image-generation task. A brief AE/VAE/GAN synthesis belongs here; leave substantial new model families out of the conclusion.</li>
+</ol>
+<p>These are speaker planning notes for future sections. No empty section-divider slides are included in this opening draft.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section>
+<section id="from-generating-images-to-learning-a-judge-1" class="title-slide slide level1 section-slide gan-section center" data-section-progress="1 / 6" data-background-color="#17212b">
+<h1>01 · From generating images to learning a judge</h1>
+<aside class="notes">
+<p>Allow about 10–12 minutes for this section: roughly 2 minutes for the source exercise, 3 for the target experiment, 3 for the measured classifier, and 2 for the transition. Students already know generation from a latent draw. Do not repeat the VAE derivation.</p>
+<p>The four slides move from evidence to a problem with choosing feedback, then to a measured learned judge, and finally to the GAN idea. The only new trained component in the section’s experiment is a binary classifier. The generator stays frozen throughout. Actual GAN training belongs to later sections.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-source-exercise" class="slide level2">
+<h2>Which images came from the dataset?</h2>
+<div class="exercise-prompt">
+Six garments: three dataset images and three outputs of our VAE.<br>For each letter, predict the source and name one visual clue.
+</div>
+<div class="gan-blind-gallery">
+<figure>
+<figcaption>
+A
+</figcaption>
+<img src="assets/evidence/section1/gallery-0.png" alt="Unlabeled garment A for the source-identification exercise.">
+<div class="fragment gan-origin" data-fragment-index="0">
+Dataset
+</div>
+</figure>
+<figure>
+<figcaption>
+B
+</figcaption>
+<img src="assets/evidence/section1/gallery-1.png" alt="Unlabeled garment B for the source-identification exercise.">
+<div class="fragment gan-origin" data-fragment-index="0">
+VAE output
+</div>
+</figure>
+<figure>
+<figcaption>
+C
+</figcaption>
+<img src="assets/evidence/section1/gallery-2.png" alt="Unlabeled garment C for the source-identification exercise.">
+<div class="fragment gan-origin" data-fragment-index="0">
+VAE output
+</div>
+</figure>
+<figure>
+<figcaption>
+D
+</figcaption>
+<img src="assets/evidence/section1/gallery-3.png" alt="Unlabeled garment D for the source-identification exercise.">
+<div class="fragment gan-origin" data-fragment-index="0">
+Dataset
+</div>
+</figure>
+<figure>
+<figcaption>
+E
+</figcaption>
+<img src="assets/evidence/section1/gallery-4.png" alt="Unlabeled garment E for the source-identification exercise.">
+<div class="fragment gan-origin" data-fragment-index="0">
+VAE output
+</div>
+</figure>
+<figure>
+<figcaption>
+F
+</figcaption>
+<img src="assets/evidence/section1/gallery-5.png" alt="Unlabeled garment F for the source-identification exercise.">
+<div class="fragment gan-origin" data-fragment-index="0">
+Dataset
+</div>
+</figure>
+</div>
+<div class="exercise-pause">
+<span>PAUSE</span><b>45 seconds</b><small>Commit to your guesses before the sources appear.</small>
+</div>
+<div class="fragment exercise-solution gan-source-solution" data-fragment-index="0">
+<span class="solution-label">WORKED SOLUTION · RECORDED PROVENANCE</span>
+<p>
+<strong>Dataset: A, D, F.</strong> &nbsp; <strong>VAE outputs: B, C, E.</strong><br>Blur or texture may be clues here; the labels come from how the images were produced.
+</p>
+</div>
+<p class="gan-source">
+Actual <a href="https://arxiv.org/abs/1708.07747">Fashion-MNIST</a> images and frozen course VAE outputs · first three held-out examples per source, interleaved · illustrative gallery, not a quality benchmark.
+</p>
+<aside class="notes">
+<p>Begin by asking students to look closely rather than defining adversarial learning. The task supplies the exact source balance; students predict the three dataset images and justify one choice with visible evidence. Give the full pause before advancing. On the next advancement, all six source labels and the worked solution appear together.</p>
+<p>Do not announce that one family always looks blurry, or that a sharp boundary proves an image is real. In this small VAE’s outputs, smooth texture is a useful clue; a future generator may remove that cue. The solution is established by provenance, not by a visual theorem. We did not choose examples according to classifier confidence or visual quality. Students’ guesses on six known-balanced examples are an informal exercise, not a measured human benchmark.</p>
+<p>All six images come from the section’s held-out source-classification pool. A/D/F are the first three validation dataset images under split seed 41 (positions 12,000 onward in a permutation of Fashion-MNIST’s training split). B/C/E are the first three independent standard-normal latent draws with seed 302 decoded by the existing lab’s beta=1 VAE. We display decoder means, not sampled Bernoulli pixels. The saved generator was trained previously; no model changes during this exercise.</p>
+<p>Ask after the reveal: could a network learn some of the distinctions you just used? Keep that question open until the classifier experiment; first establish what feedback an unconditional image generator lacks.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-target-experiment" class="slide level2">
+<h2>Which real image should this draw match?</h2>
+<p class="gan-lead">
+Keep the generated image fixed. Change only the proposed target.
+</p>
+<div class="gan-target-controls" role="group" aria-label="Choose an unrelated real image as the proposed pixel target">
+<span>Proposed target</span><button type="button" data-target="A" aria-pressed="true">A · T-shirt</button><button type="button" data-target="B" aria-pressed="false">B · Boot</button><button type="button" data-target="C" aria-pressed="false">C · Bag</button>
+</div>
+<div class="gan-target-stage">
+<figure>
+<figcaption>
+One fixed VAE output
+</figcaption>
+<img src="assets/evidence/section1/candidate.png" alt="Fixed actual VAE decoder output from the first held-out latent draw."><small id="gan-fixed-code">A fixed prior draw</small>
+</figure>
+<figure>
+<figcaption id="gan-target-title">
+Proposed target A
+</figcaption>
+<img id="gan-target-image" src="assets/evidence/section1/target-A.png" alt="Unrelated real Fashion-MNIST T-shirt proposed as a target."><small>No pairing was supplied by the data.</small>
+</figure>
+<figure>
+<figcaption>
+Absolute pixel difference
+</figcaption>
+<img id="gan-difference-image" src="assets/evidence/section1/difference-A.png" alt="Absolute pixel difference between the fixed generated image and proposed target A; black is zero, orange is one."><small>Same scale: black 0 → orange 1</small>
+</figure>
+</div>
+<div class="gan-target-measure" aria-live="polite">
+<span>Mean squared pixel error</span><strong id="gan-target-mse">—</strong><span>The output did not change.</span>
+</div>
+<div class="fragment takeaway">
+<p>The dataset gives us examples—not a target image for each random code.</p>
+</div>
+<p class="gan-source">
+Course experiment · actual frozen VAE output and unrelated Fashion-MNIST validation images · pixel errors computed from the original floating-point tensors.
+</p>
+<aside class="notes">
+<p>Retrieve only the part of autoencoder training that matters: when x is encoded, x is the reconstruction target. Now point to the generated image. It was decoded from a fresh normal draw; no input was encoded. There is no paired target x attached to that draw.</p>
+<p>Ask students to nominate a target before using the three buttons. Each button changes the observed target, the difference heatmap, and measured mean squared pixel error. The generated output and its latent coordinates remain fixed. Choose A, B, then C and ask: did the generator improve when the displayed error decreased? No; only our chosen comparison changed.</p>
+<p>The experiment does not claim that pixel error is meaningless, that generative learning without pairing is impossible, or that VAEs lack a valid objective. It shows why arbitrarily pairing each unconditional draw with one unrelated training image does not specify the desired task. Different legitimate garments can be far apart in pixels. Training against independent random targets with MSE tends toward an average; do not derive that result here or present the three displayed comparisons as its proof.</p>
+<p>Reveal the takeaway only after students have interpreted the changing cost. We want the generated collection to resemble the data distribution. A learned discriminator is one way to obtain feedback about the difference; it is not the only possible distributional training method.</p>
+<p>The candidate is the same output as B in the first exercise. Targets are the first validation example in each of three predefined classes, T-shirt, ankle boot, and bag. They were not selected to force an ordering of the MSE values. The heatmap is absolute difference with a common linear color scale; the scalar metric squares those differences before averaging over all 784 pixels. Minor visible quantization comes from PNG display; metrics use original tensors.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-judge-experiment" class="slide level2">
+<h2>Can a network learn the distinction?</h2>
+<p class="gan-lead">
+Same six images. Same frozen VAE. Only the classifier learns.
+</p>
+<div class="gan-judge-controls" role="group" aria-label="Choose a recorded classifier checkpoint">
+<span>Classifier training</span><button type="button" data-epoch="0" aria-pressed="true">Before training</button><button type="button" data-epoch="1" aria-pressed="false">1 epoch</button><button type="button" data-epoch="4" aria-pressed="false">4 epochs</button><button type="button" data-epoch="8" aria-pressed="false">8 epochs</button>
+</div>
+<p class="gan-score-key">
+Score for “dataset source”: <strong>0 = generated</strong> · <strong>1 = dataset</strong>
+</p>
+<div class="gan-judge-gallery">
+<figure>
+<figcaption>
+A · Dataset
+</figcaption>
+<img src="assets/evidence/section1/gallery-0.png" alt="Same garment A from the earlier exercise; source: Dataset.">
+<div class="gan-score-track">
+<i id="judge-bar-A"></i>
+</div>
+<strong id="judge-score-A">—</strong>
+</figure>
+<figure>
+<figcaption>
+B · VAE output
+</figcaption>
+<img src="assets/evidence/section1/gallery-1.png" alt="Same garment B from the earlier exercise; source: VAE output.">
+<div class="gan-score-track">
+<i id="judge-bar-B"></i>
+</div>
+<strong id="judge-score-B">—</strong>
+</figure>
+<figure>
+<figcaption>
+C · VAE output
+</figcaption>
+<img src="assets/evidence/section1/gallery-2.png" alt="Same garment C from the earlier exercise; source: VAE output.">
+<div class="gan-score-track">
+<i id="judge-bar-C"></i>
+</div>
+<strong id="judge-score-C">—</strong>
+</figure>
+<figure>
+<figcaption>
+D · Dataset
+</figcaption>
+<img src="assets/evidence/section1/gallery-3.png" alt="Same garment D from the earlier exercise; source: Dataset.">
+<div class="gan-score-track">
+<i id="judge-bar-D"></i>
+</div>
+<strong id="judge-score-D">—</strong>
+</figure>
+<figure>
+<figcaption>
+E · VAE output
+</figcaption>
+<img src="assets/evidence/section1/gallery-4.png" alt="Same garment E from the earlier exercise; source: VAE output.">
+<div class="gan-score-track">
+<i id="judge-bar-E"></i>
+</div>
+<strong id="judge-score-E">—</strong>
+</figure>
+<figure>
+<figcaption>
+F · Dataset
+</figcaption>
+<img src="assets/evidence/section1/gallery-5.png" alt="Same garment F from the earlier exercise; source: Dataset.">
+<div class="gan-score-track">
+<i id="judge-bar-F"></i>
+</div>
+<strong id="judge-score-F">—</strong>
+</figure>
+</div>
+<div class="gan-heldout" aria-live="polite">
+<div>
+<span>Held-out source accuracy</span><strong id="judge-accuracy">—</strong>
+</div>
+<p>
+1,000 dataset images + 1,000 VAE outputs<br><small>Threshold 0.5 · balanced set · 50% chance baseline</small>
+</p>
+</div>
+<div class="fragment takeaway">
+<p>A learned distinction can supply feedback. Its score is not a universal realism rating.</p>
+</div>
+<p class="gan-source">
+Measured course experiment · 784–128–64–1 classifier · 6,000 training examples per source · fixed generator, held-out images and latent draws · <a href="assets/evidence/section1/manifest.json">protocol and measurements</a>.
+</p>
+<aside class="notes">
+<p>Start at “Before training.” Ask what students expect from a randomly initialized classifier. A score near 0.5 is not informed uncertainty; the model has not learned the distinction. The initial accuracy can equal the chance baseline by predicting the same class for nearly every image.</p>
+<p>Click 1 epoch, then 4, then 8. The samples do not change. Each bar is an actual saved sigmoid output at that checkpoint. The large accuracy number is computed on all 2,000 held-out examples, not inferred from these six images. Ask students to compare their visual clues with what could be predictive for this source-classification problem. We have not inspected the classifier’s features, so do not claim it definitely used blur, edges, or any particular visual cue.</p>
+<p>This is a supervised binary classification experiment using a frozen VAE as the generated source. It is deliberately NOT an adversarially trained GAN. The source labels are available automatically: we know whether an example came from the dataset or generator. Garment-category labels are not the discriminator targets. The classifier’s architecture is a familiar MLP with LeakyReLU hidden activations; it is not the convolutional model we will build later.</p>
+<p>The generator is the previous homework’s saved beta=1 VAE decoder, trained on 12,000 examples. The judge sees the first 6,000 of that training partition as its real training images and 6,000 fresh generated examples (noise seed 301). Its real validation images are at permutation positions 12,000–12,999, unseen during VAE or judge training. Its 1,000 generated validation images use a separate latent stream (seed 302). Judge initialization is seed 303, minibatch order seed 304, Adam at 0.001, batch 256, eight epochs. Rendering the website never trains this model.</p>
+<p>Reveal the takeaway after inspecting the metrics. High discrimination accuracy means the current sources are distinguishable under this experiment. It is not evidence of a good generator, a calibrated probability of realism, or performance against another generator. The scores do not establish semantic understanding. This changing learned decision function is the ingredient we will connect to a trainable image maker.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-feedback-idea" class="slide level2">
+<h2>Could the judge teach the image maker?</h2>
+<p class="gan-lead">
+We have learned to distinguish sources. Now give the image maker a reason to change.
+</p>
+<div class="course-network-diagram gan-feedback-diagram">
+<svg viewbox="0 0 1280 485" role="img" aria-labelledby="gan-flow-title gan-flow-desc">
+<title id="gan-flow-title">
+The proposed adversarial feedback loop
+</title>
+<desc id="gan-flow-desc">Real examples and generated images reach the same learned judge. On advancement, a dashed training-feedback path appears from the judge toward the generator. This is a conceptual GAN setup, not measured GAN training.</desc> <defs><marker id="gan-flow-arrow" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="6" markerheight="6" orient="auto"><path d="M1 1 9 5 1 9" fill="none" stroke="#526575" stroke-width="1.5"></path></marker><marker id="gan-feedback-arrow" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="6" markerheight="6" orient="auto"><path d="M1 1 9 5 1 9" fill="none" stroke="#ef5b45" stroke-width="1.5"></path></marker></defs> <g font-family="Manrope,sans-serif" fill="#17212b"> <text x="45" y="104" font-size="26">Dataset</text> <image href="assets/evidence/section1/gallery-0.png" x="630" y="30" width="142" height="142"></image> <text x="701" y="205" text-anchor="middle" font-size="23">Real image</text> <text x="45" y="302" font-size="26">Random z</text> <rect x="246" y="247" width="240" height="104" rx="16" fill="#dceeff" stroke="#9ebdd1" stroke-width="2"></rect> <text x="366" y="289" text-anchor="middle" font-size="28" font-weight="700">Image maker</text><text x="366" y="325" text-anchor="middle" font-size="22">Generator</text> <image href="assets/evidence/section1/candidate.png" x="630" y="233" width="142" height="142"></image> <text x="701" y="406" text-anchor="middle" font-size="23">Generated image</text> <rect x="960" y="155" width="275" height="118" rx="16" fill="#f6e1d9" stroke="#d7aea0" stroke-width="2"></rect> <text x="1097" y="202" text-anchor="middle" font-size="28" font-weight="700">Learned judge</text><text x="1097" y="241" text-anchor="middle" font-size="22">Discriminator</text> <g fill="none" stroke="#526575" stroke-width="3" marker-end="url(#gan-flow-arrow)"><path d="M181 100H612"></path><path d="M181 298H228"></path><path d="M504 298H612"></path><path d="M790 100H882Q901 100 901 120V185H942"></path><path d="M790 304H882Q901 304 901 284V244H942"></path></g> <g class="fragment" data-fragment-index="0"><path d="M1096 293V434Q1096 452 1078 452H384Q366 452 366 434V369" fill="none" stroke="#ef5b45" stroke-width="4" stroke-dasharray="11 8" marker-end="url(#gan-feedback-arrow)"></path><rect x="449" y="427" width="490" height="46" fill="#f5f1e8"></rect><text x="694" y="457" text-anchor="middle" font-size="24" fill="#c44834">Training feedback to the generator</text></g> </g>
+</svg>
+</div>
+<div class="fragment takeaway" data-fragment-index="0">
+<p>The discriminator learns to separate. The generator learns to challenge it.</p>
+</div>
+<p class="gan-source">
+Schematic GAN training idea, not a measured adversarial run · image tiles reuse the earlier experiment · course diagram based on <a href="https://arxiv.org/abs/1406.2661">Goodfellow et al., 2014</a>.
+</p>
+<aside class="notes">
+<p>Before revealing the dashed path, ask: which model did we improve in the previous experiment? Only the judge. The generated images stayed exactly the same. What additional change would make this a generative learning procedure?</p>
+<p>Advance once to reveal the training-feedback path and conclusion together. The discriminator is trained to distinguish observed examples from generated ones. The generator is trained using feedback through that discriminator to make its outputs harder to distinguish from data. This introduces the idea; the next section will compare module structures, separate the two roles, and map them to code.</p>
+<p>The arrow represents a training signal implemented through a differentiable objective and derivatives through the discriminator; it is not a request to copy a real image and does not mean a binary label alone tells us how to edit every pixel. During a generator update, gradients pass through the discriminator to the generator; later we will distinguish that gradient path from updating discriminator parameters. Do not explain detach/freeze syntax here.</p>
+<p>The diagram is explicitly schematic. It reuses the previous actual images as visual tokens, but no GAN generator has been trained for this section and this slide claims no improvement. In a full GAN both networks change over training, so the judge is a moving source of feedback. Later sections will examine instability and missing diversity instead of treating competition as a guarantee of success. At generation time the generator alone maps a fresh latent draw to an image.</p>
+<p>This setup follows Goodfellow et al., Generative Adversarial Nets (2014). The familiar VAE decoder in the preliminary experiment was a way to obtain a fixed generated source, not a requirement that GANs use a VAE or its encoder. Close with the question for section 2: what does each network receive, produce, and learn?</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="two-networks-two-different-jobs-1" class="title-slide slide level1 gan-section gan-section-two center" data-background-color="#17212b" data-section-progress="02 / 06">
+<h1>Two networks, two different jobs</h1>
+<aside class="notes">
+<p>Budget about 15 minutes for this section, including the tensor exercise. Carry the visual identities forward: blue is the generator, peach is the discriminator. The objective is to understand the two module contracts before introducing their losses and alternating updates.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-architecture" class="slide level2 gan-s2">
+<h2>Keep the sampler. Change the training system.</h2>
+<div class="course-network-diagram gan-architecture-comparison">
+<svg viewbox="0 0 1280 580" role="img" aria-labelledby="architecture-comparison-title">
+<title id="architecture-comparison-title">
+architecture comparison
+</title>
+<defs><marker id="architecture-comparison-arrow" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="6" markerheight="6" orient="auto"><path d="M1 1 9 5 1 9" fill="none" stroke="#526575" stroke-width="1.5"></path></marker></defs><text class="network-label" x="35" y="32" style="font-size:26px">VAE · training path</text><image href="assets/evidence/section1/gallery-0.png" x="40" y="82" width="110" height="110"></image><text class="network-label" x="95" y="225" style="font-size:25px" text-anchor="middle">x</text><g><rect class="network-node network-encoder" x="205" y="91" width="175" height="94" rx="15"></rect><text class="network-label" x="292.5" y="132.0" text-anchor="middle" font-weight="700">Encoder</text><text class="network-detail" x="292.5" y="165.0" text-anchor="middle">μ, log variance</text></g><g><rect class="network-node network-value" x="432" y="91" width="142" height="94" rx="15"></rect><text class="network-label" x="503.0" y="146.0" text-anchor="middle" font-weight="700">Sample z</text></g><g><rect class="network-node network-generator" x="644" y="91" width="218" height="94" rx="15"></rect><text class="network-label" x="753.0" y="146.0" text-anchor="middle" font-weight="700">Decoder</text></g><g><rect class="network-node network-value" x="941" y="91" width="110" height="94" rx="15"></rect><text class="network-label" x="996.0" y="146.0" text-anchor="middle" font-weight="700">x̂</text></g><text class="network-label" x="996" y="225" style="font-size:23px" text-anchor="middle">Reconstruction</text><path class="network-edge" d="M166 138H189" marker-end="url(#architecture-comparison-arrow)"></path><path class="network-edge" d="M396 138H416" marker-end="url(#architecture-comparison-arrow)"></path><path class="network-edge" d="M590 138H628" marker-end="url(#architecture-comparison-arrow)"></path><path class="network-edge" d="M878 138H925" marker-end="url(#architecture-comparison-arrow)"></path><text class="network-label" x="1110" y="127" style="font-size:23px">Compare</text><text class="network-label" x="1110" y="157" style="font-size:23px">with x</text><g class="fragment" data-fragment-index="0"><text class="network-label" x="35" y="304" style="font-size:26px">GAN · training paths</text><g><rect class="network-node network-value" x="432" y="435" width="142" height="94" rx="15"></rect><text class="network-label" x="503.0" y="490.0" text-anchor="middle" font-weight="700">Random z</text></g><g><rect class="network-node network-generator" x="644" y="435" width="218" height="94" rx="15"></rect><text class="network-label" x="753.0" y="490.0" text-anchor="middle" font-weight="700">Generator</text></g><g><rect class="network-node network-value" x="923" y="439" width="86" height="86" rx="15"></rect><text class="network-label" x="966.0" y="490.0" text-anchor="middle" font-weight="700">x̃</text></g><text class="network-label" x="966" y="558" style="font-size:21px" text-anchor="middle">Generated</text><image href="assets/evidence/section1/gallery-0.png" x="923" y="300" width="86" height="86"></image><text class="network-label" x="890" y="326" style="font-size:21px" text-anchor="end">Real x</text><g><rect class="network-node network-discriminator" x="1100" y="389" width="155" height="142" rx="15"></rect><text class="network-label" x="1177.5" y="454.0" text-anchor="middle" font-weight="700">Judge</text><text class="network-detail" x="1177.5" y="487.0" text-anchor="middle">shared D</text></g><path class="network-edge" d="M590 482H628" marker-end="url(#architecture-comparison-arrow)"></path><path class="network-edge" d="M878 482H907" marker-end="url(#architecture-comparison-arrow)"></path><path class="network-edge" d="M1025 343H1050V425H1084" marker-end="url(#architecture-comparison-arrow)"></path><path class="network-edge" d="M1025 482H1084" marker-end="url(#architecture-comparison-arrow)"></path></g>
+</svg>
+</div>
+<div class="fragment takeaway" data-fragment-index="0">
+<p>An unconditional GAN needs no encoder: random code → image → learned judge.</p>
+</div>
+<p class="gan-source">
+Course-made structural comparison · schematic paths, not trained GAN results · <a href="https://arxiv.org/abs/1312.6114">Kingma &amp; Welling, 2013</a>; <a href="https://arxiv.org/abs/1406.2661">Goodfellow et al., 2014</a>.
+</p>
+<aside class="notes">
+<p>Start with the VAE row. Retrieve the familiar path briefly: an observed image determines a distribution over latent codes; a sampled code goes through the decoder; the reconstruction is compared with the same input. The diagram abbreviates the VAE training system and omits the KL regularizer. The reconstruction symbol is schematic, not an empirical reconstruction. Ask which module actually makes pixels.</p>
+<p>Reveal the GAN row. The decoder-like mapping survives as the generator’s role, but this does not mean reusing the VAE weights. We will instantiate a fresh network. The unconditional generator starts from a random code; it does not need an input-image encoder or a paired reconstruction target. Real and generated images meet the SAME discriminator. The dataset image is an actual Fashion-MNIST example; the generated-image symbol makes no claim about trained quality.</p>
+<p>The key structural change is the additional learned discriminator supplying a training criterion. Do not present the discriminator as a replacement encoder: its output is a source-classification logit, not a latent representation used to reconstruct the image. An encoder can be added to other adversarial formulations, but it is not required in this basic unconditional GAN.</p>
+<p>Trace the familiar sampling path in blue. At generation time only random z and G remain. Keep optimization and losses for the next sections. The two roles do not require two particular architecture families: both can be MLPs initially, then convolutional networks later.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-routing-exercise" class="slide level2 gan-s2">
+<h2>Trace one batch through the two networks</h2>
+<p class="gan-lead">
+Given: <strong>4 codes of length 16</strong>; grayscale images are <strong>28 × 28</strong>.<br>Find both output shapes. Which modules are needed only to generate?
+</p>
+<div class="course-network-diagram gan-routing">
+<svg viewbox="0 0 1280 410" role="img" aria-labelledby="routing-title">
+<title id="routing-title">
+routing
+</title>
+<defs><marker id="routing-arrow" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="6" markerheight="6" orient="auto"><path d="M1 1 9 5 1 9" fill="none" stroke="#526575" stroke-width="1.5"></path></marker></defs><g data-path="real"><rect class="network-node network-value" x="35" y="52" width="205" height="91" rx="15"></rect><text class="network-label" x="137.5" y="91.5" text-anchor="middle" font-weight="700">Real images</text><text class="network-detail" x="137.5" y="124.5" text-anchor="middle">(4, 1, 28, 28)</text></g><g data-path="generator"><rect class="network-node network-value" x="35" y="246" width="205" height="91" rx="15"></rect><text class="network-label" x="137.5" y="285.5" text-anchor="middle" font-weight="700">Random z</text><text class="network-detail" x="137.5" y="318.5" text-anchor="middle">(4, 16)</text></g><g data-path="generator"><rect class="network-node network-generator" x="332" y="246" width="203" height="91" rx="15"></rect><text class="network-label" x="433.5" y="299.5" text-anchor="middle" font-weight="700">G</text></g><g data-path="generator"><rect class="network-node network-value" x="638" y="246" width="205" height="91" rx="15"></rect><text class="network-label" x="740.5" y="299.5" text-anchor="middle" font-weight="700">Image batch</text></g><g data-path="judge"><rect class="network-node network-discriminator" x="963" y="141" width="196" height="108" rx="15"></rect><text class="network-label" x="1061.0" y="203.0" text-anchor="middle" font-weight="700">D</text></g><text class="network-label" x="1061" y="297" style="font-size:23px" text-anchor="middle" data-path="judge">One raw logit / image</text><path class="network-edge" d="M258 97H863Q887 97 887 120V175H945" marker-end="url(#routing-arrow)" data-path="real"></path><path class="network-edge" d="M258 291H314" marker-end="url(#routing-arrow)" data-path="generator"></path><path class="network-edge" d="M553 291H620" marker-end="url(#routing-arrow)" data-path="generator"></path><path class="network-edge" d="M861 291H883Q902 291 902 274V216H945" marker-end="url(#routing-arrow)" data-path="fake"></path><g class="fragment" data-fragment-index="0"><text class="network-label" x="740" y="373" style="font-size:25px" text-anchor="middle" data-path="generator">(4, 1, 28, 28)</text><text class="network-label" x="1061" y="335" style="font-size:25px" text-anchor="middle" data-path="judge">(4, 1)</text></g>
+</svg>
+</div>
+<div class="exercise-pause">
+<span>PAUSE</span><b>60 seconds</b><small>Keep the batch axis. Count outputs for one image first.</small>
+</div>
+<div class="exercise-solution fragment gan-routing-solution" data-fragment-index="0">
+<span class="solution-label">WORKED SOLUTION</span>
+<p>
+G: 4 × 1 × 28 × 28 pixels. D: 4 × 1 logits. Generation uses G alone.
+</p>
+<div class="gan-judge-controls" role="group" aria-label="Trace a network path">
+<button type="button" data-route="real" aria-pressed="false">
+Score real
+</button>
+<button type="button" data-route="fake" aria-pressed="false">
+Score generated
+</button>
+<button type="button" data-route="sample" aria-pressed="false">
+Generate only
+</button>
+</div>
+<p id="gan-route-status" aria-live="polite">
+Trace a path: the same D accepts either image source.
+</p>
+</div>
+<p class="gan-source">
+Batch-first PyTorch shapes · one source logit per image, not ten garment-class scores · <a href="assets/gan_modules.py">executable module checks</a>.
+</p>
+<aside class="notes">
+<p>Let students solve before revealing either output shape. State that D produces one raw binary source-classification logit for each image. The task is to account for axes, not to guess an architecture. The leading 4 is the batch dimension; 1 is grayscale; 28 by 28 are spatial dimensions. Four images produce four logits, not one judgment for the entire batch.</p>
+<p>Advance once: both missing shape labels and the worked solution appear. The pause panel is replaced by the solution in the same space. Use the buttons to trace three forward paths. Score real: the dataset batch goes straight to D. Score generated: z goes through G, then its image batch goes through D. Generate only: z goes through G and stops at the images. Dimmed modules are unused in that forward path; this is not a statement about freezing parameters or gradient tracking during training.</p>
+<p>Ask: does the generator consume a real garment here? No.&nbsp;Does changing image source instantiate a second discriminator? No.&nbsp;The two calls use the same object and weights. The controls highlight a schematic; the shapes are verified by actual forward passes in the linked source. No inference or training is run by the buttons. If students ask about optimization, distinguish forward routing from parameter updates and defer the latter to section 4.</p>
+<p>Reset all routes when returning to the unrevealed exercise so the answer remains hidden. The code examples use latent dimension 16 for a small demonstrator; this is a design choice, not a GAN requirement.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-generator-code" class="slide level2 gan-s2">
+<h2>G turns a code into an image tensor</h2>
+<div class="gan-code-layout">
+<div>
+<div class="course-network-diagram gan-generator-contract">
+<svg viewbox="0 0 380 570" role="img" aria-labelledby="generator-contract-title">
+<title id="generator-contract-title">
+generator contract
+</title>
+<defs><marker id="generator-contract-arrow" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="6" markerheight="6" orient="auto"><path d="M1 1 9 5 1 9" fill="none" stroke="#526575" stroke-width="1.5"></path></marker></defs><text class="network-label" x="190" y="32" style="font-size:24px" text-anchor="middle">z · (4, 16)</text><g><rect class="network-node network-generator" x="60" y="95" width="260" height="100" rx="15"></rect><text class="network-label" x="190.0" y="139.0" text-anchor="middle" font-weight="700">Generator G</text><text class="network-detail" x="190.0" y="172.0" text-anchor="middle">16 → 128 → 256 → 784</text></g><path class="network-edge" d="M190 48V79" marker-end="url(#generator-contract-arrow)"></path><text class="network-label" x="190" y="234" style="font-size:22px" text-anchor="middle">Sigmoid + reshape</text><path class="network-edge" d="M190 251V288" marker-end="url(#generator-contract-arrow)"></path><image href="assets/evidence/section2/fake-0.png" x="112" y="305" width="156" height="156"></image><text class="network-label" x="190" y="504" style="font-size:24px" text-anchor="middle">(4, 1, 28, 28)</text><text class="network-label" x="190" y="544" style="font-size:20px" text-anchor="middle">First output · untrained</text>
+</svg>
+</div>
+</div>
+<div>
+<div class="light-code-editor">
+<div class="editor-bar">
+<span>PYTORCH · GENERATOR</span><strong>untrained module contract</strong>
+</div>
+<pre><code><span class="py-kw">import</span> torch
+<span class="py-kw">from</span> torch <span class="py-kw">import</span> nn
+
+latent_dim = 16
+G = nn.Sequential(
+    nn.Linear(latent_dim, 128), nn.ReLU(),
+    nn.Linear(128, 256), nn.ReLU(),
+    nn.Linear(256, 784), nn.Sigmoid(),
+    nn.Unflatten(1, (1, 28, 28)),
+)
+
+<span class="fragment" data-fragment-index="0">z = torch.randn(4, latent_dim)
+fake = G(z)
+print(fake.shape)
+# torch.Size([4, 1, 28, 28])</span></code></pre>
+</div>
+</div>
+</div>
+<div class="fragment takeaway" data-fragment-index="0">
+<p>784 outputs become 1 × 28 × 28 pixels. Sigmoid matches real images scaled to [0, 1].</p>
+</div>
+<p class="gan-source">
+Actual first output of this randomly initialized G · no training · <a href="assets/gan_modules.py">runnable source</a> and <a href="assets/evidence/section2/contracts.json">measured checks</a> · real data: <a href="https://github.com/zalandoresearch/fashion-mnist">Fashion-MNIST</a>.
+</p>
+<aside class="notes">
+<p>Walk from the diagram to matching code. Each row of z has 16 independent standard-normal coordinates. Linear layers transform the last dimension while preserving the batch axis. The output layer has 784 scalar activations, and Unflatten reshapes dimension 1 into channel, height, and width. The image tensor remains differentiable; reshaping does not generate new pixels.</p>
+<p>Ask what pixel range the final activation imposes, then reveal the forward call and measured shape. The provided real-image pipeline converts uint8 intensities to floating-point values divided by 255, so the two sources use the same [0,1] convention. An alternative tanh output would require matching the real-image scale to [-1,1]; avoid making a preprocessing difference an easy source clue.</p>
+<p>The gray texture is the first actual output of this initialized generator for the seeded batch, not a trained GAN result. This demonstrates a correct programming contract, not successful generative learning. It is expected to look unstructured: no objective or optimization has been supplied. The locally recorded output makes the code-to-image mapping inspectable without running a model in the browser.</p>
+<p>The checked executable source confirms the exact shapes for batch sizes 1, 4, and 7, finite outputs, the [0,1] range, and repeatability for the same code with fixed weights. Different random codes change outputs. The later convolutional architecture will improve the image-specific inductive bias; these MLP widths are simply an accessible reference implementation.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-discriminator-code" class="slide level2 gan-s2">
+<h2>D returns one logit for each image</h2>
+<div class="gan-code-layout">
+<div>
+<div class="course-network-diagram gan-discriminator-contract">
+<svg viewbox="0 0 380 570" role="img" aria-labelledby="discriminator-contract-title">
+<title id="discriminator-contract-title">
+discriminator contract
+</title>
+<defs><marker id="discriminator-contract-arrow" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="6" markerheight="6" orient="auto"><path d="M1 1 9 5 1 9" fill="none" stroke="#526575" stroke-width="1.5"></path></marker></defs><image href="assets/evidence/section2/real-0.png" x="25" y="20" width="135" height="135"></image><image href="assets/evidence/section2/fake-0.png" x="220" y="20" width="135" height="135"></image><text class="network-label" x="92" y="190" style="font-size:23px" text-anchor="middle">Real</text><text class="network-label" x="287" y="190" style="font-size:23px" text-anchor="middle">Generated</text><path class="network-edge" d="M92 209V249H155V284" marker-end="url(#discriminator-contract-arrow)"></path><path class="network-edge" d="M287 209V249H225V284" marker-end="url(#discriminator-contract-arrow)"></path><g><rect class="network-node network-discriminator" x="45" y="300" width="290" height="100" rx="15"></rect><text class="network-label" x="190.0" y="344.0" text-anchor="middle" font-weight="700">One shared D</text><text class="network-detail" x="190.0" y="377.0" text-anchor="middle">784 → 256 → 128 → 1</text></g><path class="network-edge" d="M190 418V455" marker-end="url(#discriminator-contract-arrow)"></path><text class="network-label" x="190" y="496" style="font-size:26px" text-anchor="middle">Logits · (4, 1)</text><text class="network-label" x="190" y="539" style="font-size:22px" text-anchor="middle">Any real value</text>
+</svg>
+</div>
+</div>
+<div>
+<div class="light-code-editor">
+<div class="editor-bar">
+<span>PYTORCH · DISCRIMINATOR</span><strong>untrained module contract</strong>
+</div>
+<pre><code>D = nn.Sequential(
+    nn.Flatten(),
+    nn.Linear(784, 256), nn.LeakyReLU(0.2),
+    nn.Linear(256, 128), nn.LeakyReLU(0.2),
+    nn.Linear(128, 1),
+)
+
+<span class="fragment" data-fragment-index="0">real_logits = D(real)
+fake_logits = D(fake)
+print(fake_logits.shape)
+display_scores = fake_logits.sigmoid()
+# torch.Size([4, 1])</span></code></pre>
+</div>
+</div>
+</div>
+<div class="fragment takeaway" data-fragment-index="0">
+<p>One D, two image sources. Its raw output is a logit; sigmoid converts it to a score.</p>
+</div>
+<p class="gan-source">
+Actual real image and untrained G output · independently initialized G and D · <a href="assets/gan_modules.py">executable source</a> · logits follow the <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html">PyTorch binary-loss contract</a>.
+</p>
+<aside class="notes">
+<p>Map the merge in the diagram to the two calls to D. Both batches have the same shape and intensity convention. Flatten preserves the batch axis and gives 784 features per image. The last linear layer emits one number per row, so both calls return (4,1). G and D own separate parameter sets, but there is only one D shared across real and generated inputs.</p>
+<p>Reveal the forward calls. Here real is the supplied batch of dataset images from the exercise; fake is the output of the previous slide. These are contiguous excerpts from the runnable reference file. The printed shape belongs to fake_logits. Applying sigmoid afterward is optional for displaying the source score; it is not a layer inside this D. In the next section the numerically stable binary loss will consume logits directly, so we must not apply sigmoid twice.</p>
+<p>A raw logit can be any real number: zero maps to 0.5, positive values to scores above 0.5, and negative values to scores below 0.5. Once targets are specified, a larger logit will favor the dataset-source label. At initialization that number has no learned realism interpretation. This network is not predicting garment categories; class labels are unused.</p>
+<p>The executable check verifies both calls individually and verifies that evaluating the concatenated batch produces the same values, with unchanged D parameters. This simple MLP has no batch-dependent or stochastic layers. Do not generalize that numerical equivalence to every possible architecture in training mode. End by asking: what should each network try to change? That motivates section 3’s different objectives.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="turning-competition-into-learning-objectives-1" class="title-slide slide level1 gan-section gan-section-three center" data-background-color="#17212b" data-section-progress="03 / 06">
+<h1>Turning competition into learning objectives</h1>
+<aside class="notes">
+<p>Allow about 18 minutes. Students already know binary classification, logits, and backpropagation. Retrieve binary cross-entropy through one pair of predictions, then expose the conflicting objectives on one generated example. The gradient comparison explains the generator loss we will implement. Parameter updates and detach/freeze belong to section 4.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-discriminator-loss" class="slide level2 gan-s3">
+<h2>What should a correct judge be rewarded for?</h2>
+<p class="gan-lead">
+Two illustrative predictions. Which source target belongs to each image?
+</p>
+<div class="course-network-diagram gan-loss-graph">
+<svg viewbox="0 0 1280 485" role="img" aria-label="Two images enter the same discriminator; real has target one, generated has target zero. Illustrative scores 0.8 and 0.2.">
+<defs><marker id="loss-arrow" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="6" markerheight="6" orient="auto"><path d="M1 1 9 5 1 9" fill="none" stroke="#526575" stroke-width="1.5"></path></marker></defs><rect class="network-node network-value" x="25" y="70" width="230" height="100" rx="15"></rect><text x="140.0" y="129.0" class="network-label" style="font-size:27px" text-anchor="middle">Real x</text><path class="network-edge" d="M273 120H325" marker-end="url(#loss-arrow)"></path><rect class="network-node network-discriminator" x="343" y="70" width="155" height="100" rx="15"></rect><text x="420.5" y="129.0" class="network-label" style="font-size:27px" text-anchor="middle">D</text><path class="network-edge" d="M516 120H568" marker-end="url(#loss-arrow)"></path><text x="590" y="110" class="network-label" style="font-size:32px">p = 0.80</text><text x="590" y="152" class="network-label" style="font-size:20px">p = sigmoid(logit)</text><g class="fragment" data-fragment-index="0"><text x="870" y="95" class="network-label" style="font-size:24px">Target 1</text><text x="870" y="148" class="network-label" style="font-size:27px">−ln(0.80) = 0.223</text></g><rect class="network-node network-value" x="25" y="285" width="230" height="100" rx="15"></rect><text x="140.0" y="344.0" class="network-label" style="font-size:27px" text-anchor="middle">Generated x̃</text><path class="network-edge" d="M273 335H325" marker-end="url(#loss-arrow)"></path><rect class="network-node network-discriminator" x="343" y="285" width="155" height="100" rx="15"></rect><text x="420.5" y="344.0" class="network-label" style="font-size:27px" text-anchor="middle">D</text><path class="network-edge" d="M516 335H568" marker-end="url(#loss-arrow)"></path><text x="590" y="325" class="network-label" style="font-size:32px">p = 0.20</text><text x="590" y="367" class="network-label" style="font-size:20px">p = sigmoid(logit)</text><g class="fragment" data-fragment-index="0"><text x="870" y="310" class="network-label" style="font-size:24px">Target 0</text><text x="870" y="363" class="network-label" style="font-size:27px">−ln(1 − 0.20) = 0.223</text></g><text x="28" y="455" class="network-label" style="font-size:25px">Same D · source labels come from how the image was obtained</text>
+</svg>
+</div>
+<div class="fragment gan-loss-equation" data-fragment-index="0">
+L<sub>D</sub> = mean<sub>real</sub>[−ln p(x)] + mean<sub>z</sub>[−ln(1 − p(G(z)))]
+</div>
+<div class="fragment takeaway" data-fragment-index="1">
+<p>For this pair: L<sub>D</sub> = 0.223 + 0.223 = 0.446. Minimize it by raising real scores and lowering fake scores.</p>
+</div>
+<p class="gan-source">
+p(u) = sigmoid(D(u)); D returns logits in our code · natural logarithms · sum of two source means, without a ½ factor · course example based on <a href="https://arxiv.org/abs/1406.2661">Goodfellow et al., 2014, §3</a>.
+</p>
+<aside class="notes">
+<p>Begin with the two score predictions, explicitly invented for easy arithmetic. These are not predictions attached to a displayed model output. Ask which target follows from provenance. Reveal both targets, per-example costs, and the batch expression together. A real sample has source target 1; a generated sample has source target 0. No human realism rating or garment-category annotation is needed.</p>
+<p>We distinguish the code API from the paper’s notation: our D emits a logit a, and p(u)=sigmoid(D(u)) denotes its source score. Binary cross-entropy is −y ln p −(1−y) ln(1−p). For target 1 only −ln p remains; for target 0 only −ln(1−p) remains. The two 0.8 probabilities of the correct source give equal costs. Reveal the total after students have evaluated the terms. All logs are natural.</p>
+<p>For a batch, average over real examples and independently average over latent draws, then add the means. This matches the two expectations in the original discriminator objective after changing its sign for minimization. We choose this convention consistently in code. Averaging the two means instead would halve the loss and gradients; it preserves minimizers but changes gradient scale. Do not silently switch conventions when reporting values.</p>
+<p>The generator outputs are considered fixed for this discriminator objective. Minimizing this loss changes the judge so real logits increase and fake logits decrease. That statement is a desired direction at individual outputs, not a guarantee that a shared network can improve every example simultaneously. The familiar supervised loss supplies D’s objective; the next slide asks why G must not minimize that same source-classification loss.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-opposing-losses" class="slide level2 gan-s3">
+<h2>One generated image. Opposite desired scores.</h2>
+<p class="gan-lead">
+Hold the image source fixed: <strong>generated</strong>. Move its hypothetical judge score.
+</p>
+<div class="gan-score-lab">
+<div class="gan-score-control">
+<label for="gan-fake-score">p(G(z))</label><input id="gan-fake-score" type="range" min="1" max="99" value="20" step="1" aria-label="Hypothetical discriminator score on a generated image">
+<output id="gan-fake-score-value" for="gan-fake-score">
+0.20
+</output>
+</div>
+<div class="gan-score-direction">
+<span>0 · classified as generated</span><span>1 · classified as dataset</span>
+</div>
+<div class="gan-loss-readouts">
+<div>
+<h3>
+D’s objective on this image
+</h3>
+<p>
+Target 0 · push p down ←
+</p>
+<div class="gan-loss-formula">
+−ln(1 − p)
+</div>
+<output id="gan-d-fake-loss">
+0.223
+</output>
+<div class="gan-loss-meter">
+<i id="gan-d-loss-bar"></i>
+</div>
+</div>
+<div class="fragment" data-fragment-index="0">
+<h3>
+G’s objective on this image
+</h3>
+<p>
+Target 1 · push p up →
+</p>
+<div class="gan-loss-formula">
+−ln p
+</div>
+<output id="gan-g-fake-loss">
+1.609
+</output>
+<div class="gan-loss-meter">
+<i id="gan-g-loss-bar"></i>
+</div>
+</div>
+</div>
+</div>
+<div class="fragment gan-loss-equation" data-fragment-index="0">
+L<sub>G</sub> = mean<sub>z</sub>[−ln p(G(z))] <span>non-saturating generator loss</span>
+</div>
+<div class="fragment takeaway" data-fragment-index="1">
+<p>Target 1 expresses what G wants D to predict. The image is still generated.</p>
+</div>
+<p class="gan-source">
+Exact loss arithmetic for a hypothetical score; the slider does not train or alter an image · both loss bars use a common 0–4.61 scale · <a href="https://arxiv.org/abs/1406.2661">Goodfellow et al., 2014, §3</a>.
+</p>
+<aside class="notes">
+<p>Start with only D’s side visible. Move from 0.20 to 0.80: its fake-example cost rises from 0.223 to 1.609. Ask what would happen if the generator minimized this same target-zero cost: it would favor being identified as generated. Reveal G’s target-one loss and the mean-over-codes expression. Now repeat the movement: G’s cost falls from 1.609 to 0.223 while D’s fake-example cost rises. Show 0.50, where both per-example costs are ln 2, about 0.693. Equal costs at this hypothetical score do not certify a good generator.</p>
+<p>The slider is a scalar thought experiment. It changes a hypothetical p while holding source identity fixed; it is not an optimizer step or a measured change in an image. Bars use the same scale across both objectives, with a maximum of −ln(0.01), and outputs update immediately. It avoids comparing disconnected numerical scales.</p>
+<p>Target 1 in the generator objective means “make D classify this generated sample as coming from the dataset.” It does not relabel the sample as real for D’s own training. During the G objective D supplies a differentiable function, and the adjustable parameters are G’s. D’s real-image term has no dependence on G and is unnecessary here. Later we will make parameter ownership explicit in code.</p>
+<p>This is the non-saturating objective used in our implementation. It is not simply the negative of the entire discriminator loss. The original minimax generator minimizes mean ln(1−p); it also favors increasing p, but has different gradient behavior. The next slide gives the reason for choosing −ln p instead. Neither this target choice nor a low generator loss is by itself an evaluation of coverage, diversity, or sample quality.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-gradient-loss" class="slide level2 gan-s3">
+<h2>Rejected samples still need a useful gradient</h2>
+<div class="gan-gradient-layout">
+<div>
+<div class="course-network-diagram gan-gradient-plot">
+<svg viewbox="0 0 1120 490" role="img" aria-label="Gradient magnitude versus discriminator logit. Minimax has weak gradient for confidently rejected generated images; the non-saturating loss has a strong gradient there.">
+<text x="90" y="34" class="network-label" style="font-size:27px">Gradient magnitude at the discriminator logit</text><path d="M90 390H1050" stroke="#d8dfe2"></path><text x="70" y="397" class="network-label" style="font-size:20px" text-anchor="end">0</text><path d="M90 315.0H1050" stroke="#d8dfe2"></path><text x="70" y="322.0" class="network-label" style="font-size:20px" text-anchor="end">0.25</text><path d="M90 240.0H1050" stroke="#d8dfe2"></path><text x="70" y="247.0" class="network-label" style="font-size:20px" text-anchor="end">0.5</text><path d="M90 165.0H1050" stroke="#d8dfe2"></path><text x="70" y="172.0" class="network-label" style="font-size:20px" text-anchor="end">0.75</text><path d="M90 90H1050" stroke="#d8dfe2"></path><text x="70" y="97" class="network-label" style="font-size:20px" text-anchor="end">1</text><text x="90" y="428" class="network-label" style="font-size:21px" text-anchor="middle">-6</text><text x="250" y="428" class="network-label" style="font-size:21px" text-anchor="middle">-4</text><text x="410" y="428" class="network-label" style="font-size:21px" text-anchor="middle">-2</text><text x="570" y="428" class="network-label" style="font-size:21px" text-anchor="middle">0</text><text x="730" y="428" class="network-label" style="font-size:21px" text-anchor="middle">2</text><text x="890" y="428" class="network-label" style="font-size:21px" text-anchor="middle">4</text><text x="1050" y="428" class="network-label" style="font-size:21px" text-anchor="middle">6</text><text x="570" y="475" class="network-label" style="font-size:24px" text-anchor="middle">Discriminator logit a on a generated image</text><polyline points="90.00,389.26 94.00,389.22 98.00,389.18 102.00,389.14 106.00,389.09 110.00,389.05 114.00,389.00 118.00,388.95 122.00,388.89 126.00,388.84 130.00,388.78 134.00,388.72 138.00,388.65 142.00,388.58 146.00,388.51 150.00,388.43 154.00,388.35 158.00,388.27 162.00,388.18 166.00,388.09 170.00,387.99 174.00,387.89 178.00,387.78 182.00,387.67 186.00,387.55 190.00,387.43 194.00,387.30 198.00,387.16 202.00,387.01 206.00,386.86 210.00,386.70 214.00,386.54 218.00,386.36 222.00,386.18 226.00,385.98 230.00,385.78 234.00,385.57 238.00,385.34 242.00,385.11 246.00,384.86 250.00,384.60 254.00,384.33 258.00,384.05 262.00,383.75 266.00,383.44 270.00,383.11 274.00,382.76 278.00,382.40 282.00,382.02 286.00,381.62 290.00,381.21 294.00,380.77 298.00,380.31 302.00,379.83 306.00,379.33 310.00,378.80 314.00,378.25 318.00,377.67 322.00,377.07 326.00,376.43 330.00,375.77 334.00,375.08 338.00,374.35 342.00,373.60 346.00,372.80 350.00,371.97 354.00,371.11 358.00,370.20 362.00,369.26 366.00,368.27 370.00,367.24 374.00,366.17 378.00,365.05 382.00,363.88 386.00,362.66 390.00,361.40 394.00,360.07 398.00,358.70 402.00,357.27 406.00,355.78 410.00,354.24 414.00,352.63 418.00,350.97 422.00,349.24 426.00,347.44 430.00,345.59 434.00,343.66 438.00,341.67 442.00,339.61 446.00,337.47 450.00,335.27 454.00,333.00 458.00,330.66 462.00,328.24 466.00,325.75 470.00,323.19 474.00,320.56 478.00,317.85 482.00,315.08 486.00,312.23 490.00,309.32 494.00,306.33 498.00,303.28 502.00,300.17 506.00,296.99 510.00,293.75 514.00,290.46 518.00,287.10 522.00,283.70 526.00,280.24 530.00,276.74 534.00,273.19 538.00,269.61 542.00,265.99 546.00,262.33 550.00,258.65 554.00,254.95 558.00,251.23 562.00,247.49 566.00,243.75 570.00,240.00 574.00,236.25 578.00,232.51 582.00,228.77 586.00,225.05 590.00,221.35 594.00,217.67 598.00,214.01 602.00,210.39 606.00,206.81 610.00,203.26 614.00,199.76 618.00,196.30 622.00,192.90 626.00,189.54 630.00,186.25 634.00,183.01 638.00,179.83 642.00,176.72 646.00,173.67 650.00,170.68 654.00,167.77 658.00,164.92 662.00,162.15 666.00,159.44 670.00,156.81 674.00,154.25 678.00,151.76 682.00,149.34 686.00,147.00 690.00,144.73 694.00,142.53 698.00,140.39 702.00,138.33 706.00,136.34 710.00,134.41 714.00,132.56 718.00,130.76 722.00,129.03 726.00,127.37 730.00,125.76 734.00,124.22 738.00,122.73 742.00,121.30 746.00,119.93 750.00,118.60 754.00,117.34 758.00,116.12 762.00,114.95 766.00,113.83 770.00,112.76 774.00,111.73 778.00,110.74 782.00,109.80 786.00,108.89 790.00,108.03 794.00,107.20 798.00,106.40 802.00,105.65 806.00,104.92 810.00,104.23 814.00,103.57 818.00,102.93 822.00,102.33 826.00,101.75 830.00,101.20 834.00,100.67 838.00,100.17 842.00,99.69 846.00,99.23 850.00,98.79 854.00,98.38 858.00,97.98 862.00,97.60 866.00,97.24 870.00,96.89 874.00,96.56 878.00,96.25 882.00,95.95 886.00,95.67 890.00,95.40 894.00,95.14 898.00,94.89 902.00,94.66 906.00,94.43 910.00,94.22 914.00,94.02 918.00,93.82 922.00,93.64 926.00,93.46 930.00,93.30 934.00,93.14 938.00,92.99 942.00,92.84 946.00,92.70 950.00,92.57 954.00,92.45 958.00,92.33 962.00,92.22 966.00,92.11 970.00,92.01 974.00,91.91 978.00,91.82 982.00,91.73 986.00,91.65 990.00,91.57 994.00,91.49 998.00,91.42 1002.00,91.35 1006.00,91.28 1010.00,91.22 1014.00,91.16 1018.00,91.11 1022.00,91.05 1026.00,91.00 1030.00,90.95 1034.00,90.91 1038.00,90.86 1042.00,90.82 1046.00,90.78 1050.00,90.74" fill="none" stroke="#c44834" stroke-width="5"></polyline><polyline points="90.00,90.74 94.00,90.78 98.00,90.82 102.00,90.86 106.00,90.91 110.00,90.95 114.00,91.00 118.00,91.05 122.00,91.11 126.00,91.16 130.00,91.22 134.00,91.28 138.00,91.35 142.00,91.42 146.00,91.49 150.00,91.57 154.00,91.65 158.00,91.73 162.00,91.82 166.00,91.91 170.00,92.01 174.00,92.11 178.00,92.22 182.00,92.33 186.00,92.45 190.00,92.57 194.00,92.70 198.00,92.84 202.00,92.99 206.00,93.14 210.00,93.30 214.00,93.46 218.00,93.64 222.00,93.82 226.00,94.02 230.00,94.22 234.00,94.43 238.00,94.66 242.00,94.89 246.00,95.14 250.00,95.40 254.00,95.67 258.00,95.95 262.00,96.25 266.00,96.56 270.00,96.89 274.00,97.24 278.00,97.60 282.00,97.98 286.00,98.38 290.00,98.79 294.00,99.23 298.00,99.69 302.00,100.17 306.00,100.67 310.00,101.20 314.00,101.75 318.00,102.33 322.00,102.93 326.00,103.57 330.00,104.23 334.00,104.92 338.00,105.65 342.00,106.40 346.00,107.20 350.00,108.03 354.00,108.89 358.00,109.80 362.00,110.74 366.00,111.73 370.00,112.76 374.00,113.83 378.00,114.95 382.00,116.12 386.00,117.34 390.00,118.60 394.00,119.93 398.00,121.30 402.00,122.73 406.00,124.22 410.00,125.76 414.00,127.37 418.00,129.03 422.00,130.76 426.00,132.56 430.00,134.41 434.00,136.34 438.00,138.33 442.00,140.39 446.00,142.53 450.00,144.73 454.00,147.00 458.00,149.34 462.00,151.76 466.00,154.25 470.00,156.81 474.00,159.44 478.00,162.15 482.00,164.92 486.00,167.77 490.00,170.68 494.00,173.67 498.00,176.72 502.00,179.83 506.00,183.01 510.00,186.25 514.00,189.54 518.00,192.90 522.00,196.30 526.00,199.76 530.00,203.26 534.00,206.81 538.00,210.39 542.00,214.01 546.00,217.67 550.00,221.35 554.00,225.05 558.00,228.77 562.00,232.51 566.00,236.25 570.00,240.00 574.00,243.75 578.00,247.49 582.00,251.23 586.00,254.95 590.00,258.65 594.00,262.33 598.00,265.99 602.00,269.61 606.00,273.19 610.00,276.74 614.00,280.24 618.00,283.70 622.00,287.10 626.00,290.46 630.00,293.75 634.00,296.99 638.00,300.17 642.00,303.28 646.00,306.33 650.00,309.32 654.00,312.23 658.00,315.08 662.00,317.85 666.00,320.56 670.00,323.19 674.00,325.75 678.00,328.24 682.00,330.66 686.00,333.00 690.00,335.27 694.00,337.47 698.00,339.61 702.00,341.67 706.00,343.66 710.00,345.59 714.00,347.44 718.00,349.24 722.00,350.97 726.00,352.63 730.00,354.24 734.00,355.78 738.00,357.27 742.00,358.70 746.00,360.07 750.00,361.40 754.00,362.66 758.00,363.88 762.00,365.05 766.00,366.17 770.00,367.24 774.00,368.27 778.00,369.26 782.00,370.20 786.00,371.11 790.00,371.97 794.00,372.80 798.00,373.60 802.00,374.35 806.00,375.08 810.00,375.77 814.00,376.43 818.00,377.07 822.00,377.67 826.00,378.25 830.00,378.80 834.00,379.33 838.00,379.83 842.00,380.31 846.00,380.77 850.00,381.21 854.00,381.62 858.00,382.02 862.00,382.40 866.00,382.76 870.00,383.11 874.00,383.44 878.00,383.75 882.00,384.05 886.00,384.33 890.00,384.60 894.00,384.86 898.00,385.11 902.00,385.34 906.00,385.57 910.00,385.78 914.00,385.98 918.00,386.18 922.00,386.36 926.00,386.54 930.00,386.70 934.00,386.86 938.00,387.01 942.00,387.16 946.00,387.30 950.00,387.43 954.00,387.55 958.00,387.67 962.00,387.78 966.00,387.89 970.00,387.99 974.00,388.09 978.00,388.18 982.00,388.27 986.00,388.35 990.00,388.43 994.00,388.51 998.00,388.58 1002.00,388.65 1006.00,388.72 1010.00,388.78 1014.00,388.84 1018.00,388.89 1022.00,388.95 1026.00,389.00 1030.00,389.05 1034.00,389.09 1038.00,389.14 1042.00,389.18 1046.00,389.22 1050.00,389.26" fill="none" stroke="#2878c8" stroke-width="5"></polyline><line id="gradient-cursor" x1="202.39" x2="202.39" y1="80" y2="390" stroke="#526575" stroke-dasharray="7 7" stroke-width="2"></line><circle id="gradient-minimax" cx="202.39" cy="387" r="8" fill="#c44834"></circle><circle id="gradient-nonsat" cx="202.39" cy="93" r="8" fill="#2878c8"></circle>
+</svg>
+</div>
+</div>
+<div class="gan-gradient-values">
+<p class="gan-minimax">
+<strong>Original minimax</strong><br>ℓ = ln(1 − p)<br>∂ℓ/∂a = −p
+</p>
+<p class="gan-nonsat">
+<strong>Non-saturating</strong><br>ℓ = −ln p<br>∂ℓ/∂a = p − 1
+</p>
+<p>
+a = D(G(z)); p = sigmoid(a)
+</p>
+</div>
+</div>
+<div class="gan-judge-controls" role="group" aria-label="Inspect a generated-image score">
+<span>Inspect p</span><button type="button" data-gradient-p="0.01" aria-pressed="true">0.01 · rejected</button><button type="button" data-gradient-p="0.20" aria-pressed="false">0.20</button><button type="button" data-gradient-p="0.80" aria-pressed="false">0.80</button><strong id="gan-gradient-values">|∂ℓ/∂a|: 0.01 vs 0.99</strong>
+</div>
+<div class="fragment takeaway" data-fragment-index="0">
+<p>At p = 0.01, non-saturating gives 99× the gradient magnitude at the logit. Both losses push it upward.</p>
+</div>
+<p class="gan-source">
+Analytic curves; selected points verified with <a href="assets/evidence/section3/loss-checks.json">PyTorch autograd</a> · logit gradients, not full parameter-gradient norms · course figure based on <a href="https://arxiv.org/abs/1406.2661">Goodfellow et al., 2014, §3</a>.
+</p>
+<aside class="notes">
+<p>Begin at p=0.01, a≈−4.595. This is a confidently rejected generated sample. The vertical dashed line selects its logit on the shared horizontal axis. The red original-minimax curve is nearly zero; the blue non-saturating curve is nearly one. Ask which supplies the stronger local signal, then reveal the numerical ratio and shared direction. This claim concerns gradient magnitude at the discriminator logit, not an observed training-speed improvement.</p>
+<p>Derive only as much as students need: dp/da=p(1−p). For ln(1−p), the chain rule gives −p.&nbsp;For −ln p, it gives −(1−p)=p−1. Both derivatives are negative, so descent favors increasing a. The old minimax generator cost can be negative; loss positivity is not required. Inspect p=0.20 and 0.80 to see that non-saturating is not larger everywhere. It specifically avoids the small sigmoid-related gradient when D confidently rejects a generated sample.</p>
+<p>The full generator gradient also multiplies the derivative of the discriminator logit with respect to its input and the derivative of G with respect to its parameters. A stronger scalar derivative does not guarantee useful image directions, eliminate vanishing derivatives elsewhere, ensure convergence, or solve mode collapse. At fixed G, D, and one sample these scalar factors multiply the same remaining chain, but aggregate minibatch gradient norms need not obey this simple ratio.</p>
+<p>These are exact analytic functions, not empirical training trajectories. The local builder independently differentiates both losses with PyTorch float64 at p=0.01, 0.20, 0.50, 0.80, and 0.99 and checks the formulas to numerical precision. The 2014 paper explicitly motivates the non-saturating alternative for stronger early gradients. Our loss code next implements that choice.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-loss-code-exercise" class="slide level2 gan-s3">
+<h2>Three targets. Which ones belong in the code?</h2>
+<p class="gan-lead">
+Given: real_logits and fake_logits both have shape <strong>(4, 1)</strong>.<br>Fill each “?” with a tensor of zeros or ones. Use the non-saturating G loss.
+</p>
+<div class="gan-loss-code-layout">
+<div class="gan-loss-contract">
+<p>
+<strong>Real → D</strong><br>Identify the dataset source.
+</p>
+<p>
+<strong>Generated → D</strong><br>Identify the generated source.
+</p>
+<p>
+<strong>Generated → G objective</strong><br>Make D favor the dataset source.
+</p>
+</div>
+<div>
+<div class="light-code-editor">
+<div class="editor-bar">
+<span>PYTORCH · LOSS VALUES</span><strong>targets match the logits</strong>
+</div>
+<pre><code>bce = nn.BCEWithLogitsLoss()
+loss_D = (
+    bce(real_logits, <span class="gan-target-blank"><span class="gan-question">?</span><span class="fragment" data-fragment-index="0">torch.ones_like(real_logits)</span></span>)
+    + bce(fake_logits, <span class="gan-target-blank"><span class="gan-question">?</span><span class="fragment" data-fragment-index="0">torch.zeros_like(fake_logits)</span></span>)
+)
+loss_G = bce(fake_logits, <span class="gan-target-blank"><span class="gan-question">?</span><span class="fragment" data-fragment-index="0">torch.ones_like(fake_logits)</span></span>)</code></pre>
+</div>
+</div>
+</div>
+<div class="exercise-pause">
+<span>PAUSE</span><b>60 seconds</b><small>Match target shape and dtype to the logits. Do not apply sigmoid first.</small>
+</div>
+<div class="exercise-solution fragment gan-loss-code-solution" data-fragment-index="0">
+<span class="solution-label">WORKED SOLUTION · 1, 0, 1</span>
+<p>
+On section 2’s recorded logits: L<sub>D</sub> = <strong>1.4044</strong>; L<sub>G</sub> = <strong>0.7014</strong>.
+</p>
+</div>
+<p class="gan-source">
+Loss arithmetic only; separate forward passes and optimizer updates follow in section 4 · measured on untrained section 2 outputs · <a href="assets/build_section3.py">executable checks</a> · <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html">PyTorch BCEWithLogitsLoss</a>.
+</p>
+<aside class="notes">
+<p>Let students choose 1,0,1 before advancing. The task provides the logits; it is not a complete training loop. The first two targets supervise D using provenance, while the final target implements G’s desired prediction. Advance once to replace all three question marks with the exact code and reveal the measured losses. All targets use ones_like or zeros_like so shape, floating dtype, and device match the logits.</p>
+<p>BCEWithLogitsLoss combines the sigmoid and binary cross-entropy in a numerically stable operation. Passing an already sigmoid-transformed score would apply the transformation again and change the objective. Default reduction is mean: each call averages its four examples, and the two discriminator means are added. The generator averages its four target-one terms. These measured values use the unchanged logits saved in section 2, not the earlier invented 0.8/0.2 pair.</p>
+<p>The reference script executes precisely this loss arithmetic, checks agreement with direct probability formulas at moderate logits, and separately checks the logit derivatives in float64. It does not train a GAN. In an actual training loop, use appropriate fresh forward passes and parameter ownership for each loss; do not call backward on these two losses as if a shared cached graph were a complete update recipe. Section 4 will show that recipe, including detach and how gradients can pass through a frozen discriminator into G.</p>
+<p>End with the unresolved implementation question: if each loss goes through D, how do we change only the network whose turn it is? Students now have the two objectives; the next section will make the update paths visible.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="training-one-network-at-a-time-1" class="title-slide slide level1 gan-section gan-section-four center" data-background-color="#17212b" data-section-progress="04 / 06">
+<h1>Training one network at a time</h1>
+<aside class="notes">
+<p>About 15 minutes. Follow one alternating update through its graph, exact executable code, and a debugging exercise. The new distinction is between a network whose parameters are fixed and an operation whose input derivative must still be computed.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-alternating-paths" class="slide level2 gan-s4">
+<h2>Same networks. Different update paths.</h2>
+<div class="gan-judge-controls" role="group" aria-label="Choose whose training turn to trace">
+<span>One iteration</span><button type="button" data-update-turn="D" aria-pressed="true">1 · D’s turn</button><button type="button" data-update-turn="G" aria-pressed="false">2 · G’s turn</button>
+</div>
+<div class="course-network-diagram gan-update-flow">
+<svg viewbox="0 0 1280 500" role="img" aria-label="update flow">
+<defs><marker id="update-flow-arrow" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="6" markerheight="6" orient="auto-start-reverse"><path d="M1 1 9 5 1 9" fill="none" stroke="context-stroke" stroke-width="1.5"></path></marker></defs><text class="network-label" x="35" y="58" style="font-size:25px">Forward: compute a loss</text><g><rect class="network-node network-value" x="30" y="190" width="100" height="110" rx="15"></rect><text class="network-label" x="80.0" y="253.0" style="font-size:27px" text-anchor="middle">z</text></g><g><rect class="network-node network-generator" x="210" y="190" width="190" height="110" rx="15"></rect><text class="network-label" x="305.0" y="253.0" style="font-size:27px" text-anchor="middle">G</text></g><g><rect class="network-node network-value" x="495" y="190" width="180" height="110" rx="15"></rect><text class="network-label" x="585.0" y="253.0" style="font-size:27px" text-anchor="middle">image</text></g><g><rect class="network-node network-discriminator" x="780" y="190" width="190" height="110" rx="15"></rect><text class="network-label" x="875.0" y="253.0" style="font-size:27px" text-anchor="middle">D</text></g><g><rect class="network-node network-value" x="1080" y="190" width="170" height="110" rx="15"></rect><text class="network-label" x="1165.0" y="253.0" style="font-size:27px" text-anchor="middle">loss</text></g><path d="M148 245H192" fill="none" stroke="#526575" stroke-width="3" marker-end="url(#update-flow-arrow)"></path><path d="M418 245H477" fill="none" stroke="#526575" stroke-width="3" marker-end="url(#update-flow-arrow)"></path><path d="M693 245H762" fill="none" stroke="#526575" stroke-width="3" marker-end="url(#update-flow-arrow)"></path><path d="M988 245H1062" fill="none" stroke="#526575" stroke-width="3" marker-end="url(#update-flow-arrow)"></path><g data-turn-only="D"><g><rect class="network-node network-value" x="495" y="60" width="180" height="75" rx="15"></rect><text class="network-label" x="585.0" y="105.5" style="font-size:27px" text-anchor="middle">real x</text></g><path d="M693 97H875V172" fill="none" stroke="#526575" stroke-width="3" marker-end="url(#update-flow-arrow)"></path><text class="network-label" x="720" y="337" style="font-size:23px" text-anchor="middle">detach</text><path d="M725 220V270" stroke="#c44834" stroke-width="5"></path></g><text class="network-label" x="800" y="58" style="font-size:25px">Backward: gradients</text><path d="M1165 319V385H875V319" fill="none" stroke="#c44834" stroke-width="3" marker-end="url(#update-flow-arrow)"></path><g data-turn-only="G"><path d="M800 319V385H305V319" fill="none" stroke="#c44834" stroke-width="3" marker-end="url(#update-flow-arrow)"></path></g><text class="network-label" x="305" y="455" style="font-size:27px" text-anchor="middle" id="turn-g-label">G fixed</text><text class="network-label" x="875" y="455" style="font-size:27px" text-anchor="middle" id="turn-d-label">D updates</text>
+</svg>
+</div>
+<p class="gan-lead" id="gan-turn-status" aria-live="polite">
+D’s turn: classify both sources. Stop the generated-image path before G.
+</p>
+<div class="fragment takeaway" data-fragment-index="0">
+<p>A fixed network can still transmit gradients to its input.</p>
+</div>
+<p class="gan-source">
+Schematic forward and backward paths; red arrows represent derivatives, not image flow · one D step then one G step in our example · <a href="https://arxiv.org/abs/1406.2661">Goodfellow et al., 2014, Algorithm 1</a>.
+</p>
+<aside class="notes">
+<p>Begin with D’s turn. The gray arrows carry values toward the loss; red arrows represent backward differentiation. The real branch and the generated branch feed the same D. A detach boundary makes the generated image a fixed input for this loss. D’s optimizer steps, and G’s parameters remain unchanged.</p>
+<p>Switch to G’s turn. The real branch disappears because this loss depends only on generated examples. The forward path through D remains, and the red derivative path continues all the way into G. D’s parameters are held fixed, but its response to changes in its input is still needed. Reveal the takeaway after tracing that distinction. Toggle the two turns once more, asking students to predict which parameter set changes each time.</p>
+<p>The buttons switch a schematic, not training. The next slides show a measured one-iteration audit using the exact MLPs from section 2. One D step followed by one G step is the chosen teaching schedule; update ratios can vary. Each optimizer owns only its network’s parameters and maintains independent state. Backward computes derivatives; optimizer.step changes the parameters owned by that optimizer. Computing a gradient does not itself update a weight.</p>
+<p>We will recompute G(z) and D outputs in the G turn after the D update, avoiding a stale forward graph. The same z may be reused for this illustration; a new draw is also possible. Do not imply that alternating updates guarantee convergence.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-d-update" class="slide level2 gan-s4">
+<h2>D’s turn: treat generated images as fixed inputs</h2>
+<div class="gan-code-layout">
+<div>
+<div class="course-network-diagram gan-d-update-contract">
+<svg viewbox="0 0 380 580" role="img" aria-label="d update contract">
+<defs><marker id="d-update-contract-arrow" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="6" markerheight="6" orient="auto-start-reverse"><path d="M1 1 9 5 1 9" fill="none" stroke="context-stroke" stroke-width="1.5"></path></marker></defs><g><rect class="network-node network-generator" x="55" y="65" width="270" height="95" rx="15"></rect><text class="network-label" x="190.0" y="120.5" style="font-size:27px" text-anchor="middle">Generator G</text></g><g><rect class="network-node network-discriminator" x="55" y="305" width="270" height="95" rx="15"></rect><text class="network-label" x="190.0" y="360.5" style="font-size:27px" text-anchor="middle">Discriminator D</text></g><path d="M190 267V287" fill="none" stroke="#526575" stroke-width="3" marker-end="url(#d-update-contract-arrow)"></path><text class="network-label" x="190" y="220" style="font-size:25px" text-anchor="middle">detach()</text><text class="network-label" x="190" y="255" style="font-size:21px" text-anchor="middle">stop G gradients</text><text class="network-label" x="190" y="35" style="font-size:23px" text-anchor="middle">G: fixed parameters</text><text class="network-label" x="190" y="446" style="font-size:23px" text-anchor="middle">D: backward + step</text><text class="network-label" x="190" y="511" style="font-size:20px" text-anchor="middle">Changed tensors after step</text><g class="fragment" data-fragment-index="0"><text class="network-label" x="190" y="550" style="font-size:25px" text-anchor="middle">G: 0 / 6 · D: 6 / 6</text></g>
+</svg>
+</div>
+</div>
+<div>
+<div class="light-code-editor">
+<div class="editor-bar">
+<span>PYTORCH · DISCRIMINATOR TURN</span><strong>one optimizer step</strong>
+</div>
+<pre><code>D.requires_grad_(True)
+opt_D.zero_grad(set_to_none=True)
+fake = G(z)
+real_logits = D(real)
+fake_logits = D(fake.detach())
+loss_D = (
+    bce(real_logits, torch.ones_like(real_logits))
+    + bce(fake_logits, torch.zeros_like(fake_logits))
+)
+<span class="fragment" data-fragment-index="0">loss_D.backward()
+opt_D.step()</span></code></pre>
+</div>
+</div>
+</div>
+<div class="fragment takeaway" data-fragment-index="0">
+<p>.detach() cuts this route into G. opt_D.step() updates only D’s parameters.</p>
+</div>
+<p class="gan-source">
+Executed on four Fashion-MNIST training examples and four generated outputs · Adam, lr = 0.001 · <a href="assets/build_section4.py">runnable update audit</a> · <a href="assets/evidence/section4/update-checks.json">recorded parameter checks</a>.
+</p>
+<aside class="notes">
+<p>The setup is the section 2 MLPs, BCEWithLogitsLoss, and two independent Adam optimizers: opt_D=Adam(D.parameters(), lr=0.001) and opt_G=Adam(G.parameters(), lr=0.001). real is a (4,1,28,28) floating tensor scaled to [0,1]; z is (4,16). The linked runnable script includes all initialization. This is a single audited iteration, not a quality experiment or recommended learning-rate sweep.</p>
+<p>Read the forward computation first. Ensure D parameters require gradients, clear its previous gradients, compute fake, and pass fake.detach() into D. Detach does not change pixel values or copy a different generated image; it returns a tensor disconnected from G’s graph. We do not modify it in place. The real and fake target choices match section 3.</p>
+<p>Before advancing, ask which parameters will change. Reveal backward and the optimizer step with the takeaway. The measured audit compares parameter tensors bit for bit: all six D tensors change, and all six G tensors remain unchanged. Each model has three linear layers, each with a weight and bias, hence six tensors rather than six scalar parameters. With cleared initial gradients, no G gradients are produced in this turn.</p>
+<p>Computing G under no_grad would also avoid building its graph for D’s turn. Detach is shown to make the boundary visible. It is the optimizer ownership that determines which parameters are stepped; detach additionally prevents unnecessary gradients into G. It does not clear stale G gradients left by previous turns, so the G turn explicitly clears its own gradients before backward.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-g-update" class="slide level2 gan-s4">
+<h2>G’s turn: pass through D without updating D</h2>
+<div class="gan-code-layout">
+<div>
+<div class="course-network-diagram gan-g-update-contract">
+<svg viewbox="0 0 380 580" role="img" aria-label="g update contract">
+<defs><marker id="g-update-contract-arrow" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="6" markerheight="6" orient="auto-start-reverse"><path d="M1 1 9 5 1 9" fill="none" stroke="context-stroke" stroke-width="1.5"></path></marker></defs><g><rect class="network-node network-generator" x="55" y="65" width="270" height="95" rx="15"></rect><text class="network-label" x="190.0" y="120.5" style="font-size:27px" text-anchor="middle">Generator G</text></g><g><rect class="network-node network-discriminator" x="55" y="305" width="270" height="95" rx="15"></rect><text class="network-label" x="190.0" y="360.5" style="font-size:27px" text-anchor="middle">Discriminator D</text></g><path d="M190 267V287" fill="none" stroke="#526575" stroke-width="3" marker-end="url(#g-update-contract-arrow)"></path><path d="M345 354H365V110H343" fill="none" stroke="#c44834" stroke-width="3" marker-end="url(#g-update-contract-arrow)"></path><text class="network-label" x="190" y="220" style="font-size:25px" text-anchor="middle">Keep this graph</text><text class="network-label" x="190" y="255" style="font-size:21px" text-anchor="middle">D still differentiates</text><text class="network-label" x="190" y="35" style="font-size:23px" text-anchor="middle">G: backward + step</text><text class="network-label" x="190" y="446" style="font-size:23px" text-anchor="middle">D: fixed parameters</text><text class="network-label" x="190" y="511" style="font-size:20px" text-anchor="middle">Changed tensors after step</text><g class="fragment" data-fragment-index="0"><text class="network-label" x="190" y="550" style="font-size:25px" text-anchor="middle">G: 6 / 6 · D: 0 / 6</text></g>
+</svg>
+</div>
+</div>
+<div>
+<div class="light-code-editor">
+<div class="editor-bar">
+<span>PYTORCH · GENERATOR TURN</span><strong>one optimizer step</strong>
+</div>
+<pre><code>D.requires_grad_(False)
+opt_G.zero_grad(set_to_none=True)
+fake = G(z)
+fake_logits = D(fake)
+loss_G = bce(
+    fake_logits, torch.ones_like(fake_logits)
+)
+<span class="fragment" data-fragment-index="0">loss_G.backward()
+opt_G.step()
+D.requires_grad_(True)</span></code></pre>
+</div>
+</div>
+</div>
+<div class="fragment takeaway" data-fragment-index="0">
+<p>Freeze D’s parameters, keep its input derivative, and step G’s optimizer.</p>
+</div>
+<p class="gan-source">
+Same audited iteration, after the D step · fresh forward computation through the updated D · <a href="assets/evidence/section4/update-checks.json">G: 6/6 tensors changed; D: 0/6</a> · <a href="https://docs.pytorch.org/docs/stable/notes/autograd.html">PyTorch autograd mechanics</a>.
+</p>
+<aside class="notes">
+<p>Read requires_grad_(False) as “do not accumulate gradients for D’s parameters,” not “disable differentiation through D.” fake still requires gradients because it was computed by G. Autograd must therefore record the D operations necessary to differentiate the output with respect to fake, and then back into G.</p>
+<p>Clear G’s previous gradients and recompute fake=G(z). Compute fresh discriminator logits after the preceding D optimizer step. Do not reuse cached fake_logits from the D turn: those used detached images and the earlier D parameters. Use the target-one objective, then reveal backward, opt_G.step, and restoration of D’s requires_grad flag. Only G’s optimizer is stepped. All six G parameter tensors change in the audit; D’s tensors remain bit-for-bit identical during this turn.</p>
+<p>The audit clears D’s old gradients separately before measuring new gradient production, because freezing parameters does not erase stored .grad fields. That audit-only clearing is not needed for the displayed update’s correctness; the next D turn clears D gradients before its backward. No retain_graph=True is needed because these are fresh forward computations.</p>
+<p>This reference D is an MLP without BatchNorm or dropout. Freezing parameters is not the same as calling eval(), and it does not freeze mutable running statistics in architectures that have them. The next architecture section will need an explicit policy for such layers. no_grad around D is not a substitute here: it would remove the path to G. The next exercise exposes that bug with measured evidence.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-update-debug" class="slide level2 gan-s4">
+<h2>“Freeze D” — did we cut too much?</h2>
+<p class="gan-lead">
+Given: it is G’s turn; G is trainable and its old gradients are cleared.<br>Predict what happens at backward. Repair the highlighted block.
+</p>
+<div class="gan-debug-code light-code-editor">
+<div class="editor-bar">
+<span>PYTORCH · DIAGNOSE THE G TURN</span><strong>one misplaced context</strong>
+</div>
+<pre><code>fake = G(z)
+<span class="gan-bug-line">with torch.no_grad():
+    fake_logits = D(fake)</span>
+loss_G = bce(fake_logits, torch.ones_like(fake_logits))
+loss_G.backward()</code></pre>
+</div>
+<div class="exercise-pause">
+<span>PAUSE</span><b>60 seconds</b><small>Does the loss still have a differentiable path to G?</small>
+</div>
+<div class="exercise-solution fragment gan-update-solution" data-fragment-index="0">
+<span class="solution-label">WORKED SOLUTION · VERIFIED IN PYTORCH</span>
+<p>
+<strong>loss_G.requires_grad is False.</strong> backward raises an error; G receives no gradients.
+</p>
+<pre><code>D.requires_grad_(False)
+fake_logits = D(fake)  # ordinary grad mode</code></pre>
+<p>
+After G’s step, restore <code>D.requires_grad_(True)</code>.
+</p>
+</div>
+<p class="gan-source">
+Actual failing execution captured in the <a href="assets/evidence/section4/update-checks.json">update audit</a> · original course debugging example · <a href="https://docs.pytorch.org/docs/stable/notes/autograd.html#locally-disabling-gradient-computation">PyTorch: locally disabling gradient computation</a>.
+</p>
+<aside class="notes">
+<p>Students should predict an error, not merely “the generator will learn slowly.” With this code the fake logits were computed in no_grad mode. Since the targets do not require gradients either, the loss has requires_grad=False and no grad_fn. Calling backward therefore raises RuntimeError. The runnable audit executes this exact failure, captures the error, and verifies that G’s gradients remain absent after its previous gradients have been cleared.</p>
+<p>Reveal the diagnosis and repair together. Replace the no_grad context with D.requires_grad_(False) and call D in ordinary gradient mode. Keep the forward path from fake to the loss. Restore D’s parameter flags after stepping G. This changes which leaf parameters receive gradients while preserving differentiation with respect to the input.</p>
+<p>Using fake.detach() in this generator turn would also cut the required path. If D remained trainable, such a bug could still yield a valid loss and D gradients, while G receives none, making it less obvious than this example. Ask that as an oral transfer question only after the main repair is understood.</p>
+<p>Conclude with three distinct responsibilities: choose the loss target, preserve or cut the correct gradient path, and step only the intended optimizer. We now have a functioning alternating MLP update. Section 5 will replace its image-processing modules with convolutional structure without changing those responsibilities.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="building-an-image-gan-with-convolutions-1" class="title-slide slide level1 gan-section gan-section-five center" data-background-color="#17212b" data-section-progress="05 / 06">
+<h1>Building an image GAN with convolutions</h1>
+<aside class="notes">
+<p>Allow about 15 minutes. Retrieve convolution briefly; the new mechanism is learned spatial expansion. Compare structure first, expose weighted overlap, then trace exact layers and inspect locally recorded outputs. This is a small DCGAN-inspired adaptation for 28×28 grayscale images, not a reproduction of the original paper.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-conv-architecture" class="slide level2 gan-s5">
+<h2>Give the generator a spatial structure</h2>
+<div class="gan-layer-diagram">
+<svg viewbox="0 0 1280 550" role="img" aria-label="Dense versus convolutional generator structure, excluding the batch axis">
+<text x="25" y="35" fill="#17212b" font-family="Manrope,sans-serif" font-size="27">Dense generator · pixels appear only at the final reshape</text><rect x="25" y="75" width="265" height="48" rx="5" fill="#53758c"></rect><text x="157.5" y="107.0" text-anchor="middle" fill="white" font-family="Manrope,sans-serif" font-size="23">Linear + ReLU</text><text x="157" y="159" fill="#17212b" font-family="Manrope,sans-serif" font-size="24" text-anchor="middle">16 → 128</text><text x="302" y="109" fill="#17212b" font-family="Manrope,sans-serif" font-size="27">→</text><rect x="335" y="75" width="265" height="48" rx="5" fill="#53758c"></rect><text x="467.5" y="107.0" text-anchor="middle" fill="white" font-family="Manrope,sans-serif" font-size="23">Linear + ReLU</text><text x="467" y="159" fill="#17212b" font-family="Manrope,sans-serif" font-size="24" text-anchor="middle">128 → 256</text><text x="612" y="109" fill="#17212b" font-family="Manrope,sans-serif" font-size="27">→</text><rect x="645" y="75" width="265" height="48" rx="5" fill="#53758c"></rect><text x="777.5" y="107.0" text-anchor="middle" fill="white" font-family="Manrope,sans-serif" font-size="23">Linear + sigmoid</text><text x="777" y="159" fill="#17212b" font-family="Manrope,sans-serif" font-size="24" text-anchor="middle">256 → 784</text><text x="922" y="109" fill="#17212b" font-family="Manrope,sans-serif" font-size="27">→</text><rect x="955" y="75" width="265" height="48" rx="5" fill="#71818c"></rect><text x="1087.5" y="107.0" text-anchor="middle" fill="white" font-family="Manrope,sans-serif" font-size="23">Reshape</text><text x="1087" y="159" fill="#17212b" font-family="Manrope,sans-serif" font-size="24" text-anchor="middle">1 × 28 × 28</text><g class="fragment" data-fragment-index="0"><text x="25" y="245" fill="#17212b" font-family="Manrope,sans-serif" font-size="27">Convolutional generator · grow a spatial representation</text><rect x="25" y="285" width="335" height="48" rx="5" fill="#2878c8"></rect><text x="192.5" y="317.0" text-anchor="middle" fill="white" font-family="Manrope,sans-serif" font-size="23">ConvT 7 × 7</text><rect x="25" y="338" width="335" height="48" rx="5" fill="#458666"></rect><text x="192.5" y="370.0" text-anchor="middle" fill="white" font-family="Manrope,sans-serif" font-size="23">BatchNorm + ReLU</text><text x="192" y="432" fill="#17212b" font-family="Manrope,sans-serif" font-size="26" text-anchor="middle">64 × 7 × 7</text><text x="395" y="320" fill="#17212b" font-family="Manrope,sans-serif" font-size="30">→</text><rect x="455" y="285" width="335" height="48" rx="5" fill="#2878c8"></rect><text x="622.5" y="317.0" text-anchor="middle" fill="white" font-family="Manrope,sans-serif" font-size="23">ConvT 4 × 4, s=2</text><rect x="455" y="338" width="335" height="48" rx="5" fill="#458666"></rect><text x="622.5" y="370.0" text-anchor="middle" fill="white" font-family="Manrope,sans-serif" font-size="23">BatchNorm + ReLU</text><text x="622" y="432" fill="#17212b" font-family="Manrope,sans-serif" font-size="26" text-anchor="middle">32 × 14 × 14</text><text x="825" y="320" fill="#17212b" font-family="Manrope,sans-serif" font-size="30">→</text><rect x="885" y="285" width="335" height="48" rx="5" fill="#2878c8"></rect><text x="1052.5" y="317.0" text-anchor="middle" fill="white" font-family="Manrope,sans-serif" font-size="23">ConvT 4 × 4, s=2</text><rect x="885" y="338" width="335" height="48" rx="5" fill="#986caa"></rect><text x="1052.5" y="370.0" text-anchor="middle" fill="white" font-family="Manrope,sans-serif" font-size="23">Tanh</text><text x="1052" y="432" fill="#17212b" font-family="Manrope,sans-serif" font-size="26" text-anchor="middle">1 × 28 × 28</text><text x="25" y="501" fill="#17212b" font-family="Manrope,sans-serif" font-size="25">Input: 16 × 1 × 1 · Shared local filters at each spatial stage</text></g>
+</svg>
+</div>
+<div class="fragment takeaway" data-fragment-index="0">
+<p>G grows feature maps into pixels; D compresses pixels into one logit. The two losses and alternating updates stay the same.</p>
+</div>
+<p class="gan-source">
+Course-made architecture comparison · shapes omit the batch axis · ConvT = transposed convolution · small 28×28 adaptation inspired by <a href="https://arxiv.org/abs/1511.06434">Radford, Metz &amp; Chintala, 2015</a>.
+</p>
+<aside class="notes">
+<p>Start with the dense generator students have just executed. Every hidden representation is a vector; the final 784 values acquire their image arrangement at reshape. Reveal the convolutional alternative. The latent coordinates are reshaped to 16 channels at one spatial location, not a 4×4 image. A learned 7×7 transposed convolution creates 64 feature maps at 7×7. Two learned stride-two expansions produce 14×14 and 28×28.</p>
+<p>The blue bars are spatial transformations; green bars are normalization and activation within a hidden stage; the purple final activation controls image range. Channels decrease while spatial resolution increases in this small generator. A discriminator follows the opposite spatial direction with ordinary strided convolutions. It is not a tied-weight inverse of G. Convolutions impose local connectivity and shared spatial weights; they do not guarantee good samples or establish superiority over the MLP without a controlled comparison.</p>
+<p>The original DCGAN work motivates using strided convolutions, learned upsampling, normalization, and appropriate activations. Our compact 28×28 variant changes channel widths and omits discriminator BatchNorm to keep parameter-freezing behavior explicit. G uses BatchNorm and ReLU internally, then Tanh; D uses LeakyReLU and returns logits. These are architecture choices, not a new adversarial objective. The next slide isolates what a transposed convolution actually computes.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-spatial-architecture" class="slide level2 gan-s5">
+<h2>G builds an image. D reduces it to a logit.</h2>
+<div class="gan-spatial-architecture">
+<svg viewbox="0 0 1280 685" role="img" aria-labelledby="spatial-gan-title spatial-gan-desc">
+<title id="spatial-gan-title">
+Generator expands feature maps; discriminator compresses them to a logit
+</title>
+<desc id="spatial-gan-desc">Generator: 16 by 1 by 1 to 64 by 7 by 7 to 32 by 14 by 14 to a 1 by 28 by 28 image. Discriminator: image to 32 by 14 by 14 to 64 by 7 by 7 to one logit. Cuboid faces suggest spatial size, stack depth suggests channels; dimensions are labeled exactly and drawing sizes are schematic.</desc><defs><marker id="spatial-arrow" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="6" markerheight="6" orient="auto"><path d="M1 1 9 5 1 9" fill="none" stroke="context-stroke" stroke-width="1.5"></path></marker></defs><text x="25" y="32" text-anchor="start" font-family="Manrope,sans-serif" font-size="29" fill="#2878c8">G · grow spatial resolution</text><path d="M97.0 157.0l18 -9.0h26l-18 9.0Z" fill="#dceeff" stroke="#6c9ec3" stroke-width="2"></path><path d="M123.0 157.0l18 -9.0v26l-18 9.0Z" fill="#dceeff" stroke="#6c9ec3" stroke-width="2"></path><path d="M131.0 153.0v26" stroke="#6c9ec3" opacity=".45"></path><path d="M139.0 149.0v26" stroke="#6c9ec3" opacity=".45"></path><rect x="97.0" y="157.0" width="26" height="26" fill="#dceeff" stroke="#6c9ec3" stroke-width="2"></rect><text x="110" y="178" text-anchor="middle" font-family="Manrope,sans-serif" font-size="24" fill="#17212b">z</text><text x="110" y="298" text-anchor="middle" font-family="Manrope,sans-serif" font-size="26" fill="#17212b">16 × 1 × 1</text><path d="M159.0 170H389.5" stroke="#2878c8" stroke-width="3" fill="none" marker-end="url(#spatial-arrow)"></path><text x="274.25" y="141" text-anchor="middle" font-family="Manrope,sans-serif" font-size="22" fill="#2878c8">ConvT</text><text x="274.25" y="205" text-anchor="middle" font-family="Manrope,sans-serif" font-size="19" fill="#17212b">k=7, s=1, p=0</text><path d="M407.5 137.5l48 -24.0h65l-48 24.0Z" fill="#dceeff" stroke="#6c9ec3" stroke-width="2"></path><path d="M472.5 137.5l48 -24.0v65l-48 24.0Z" fill="#dceeff" stroke="#6c9ec3" stroke-width="2"></path><path d="M480.5 133.5v65" stroke="#6c9ec3" opacity=".45"></path><path d="M488.5 129.5v65" stroke="#6c9ec3" opacity=".45"></path><path d="M496.5 125.5v65" stroke="#6c9ec3" opacity=".45"></path><path d="M504.5 121.5v65" stroke="#6c9ec3" opacity=".45"></path><path d="M512.5 117.5v65" stroke="#6c9ec3" opacity=".45"></path><rect x="407.5" y="137.5" width="65" height="65" fill="#dceeff" stroke="#6c9ec3" stroke-width="2"></rect><path d="M416.7857142857143 137.5v65M407.5 146.78571428571428h65" stroke="#6c9ec3" opacity=".3"></path><path d="M426.07142857142856 137.5v65M407.5 156.07142857142858h65" stroke="#6c9ec3" opacity=".3"></path><path d="M435.35714285714283 137.5v65M407.5 165.35714285714286h65" stroke="#6c9ec3" opacity=".3"></path><path d="M444.64285714285717 137.5v65M407.5 174.64285714285714h65" stroke="#6c9ec3" opacity=".3"></path><path d="M453.92857142857144 137.5v65M407.5 183.92857142857144h65" stroke="#6c9ec3" opacity=".3"></path><path d="M463.2142857142857 137.5v65M407.5 193.21428571428572h65" stroke="#6c9ec3" opacity=".3"></path><text x="440" y="298" text-anchor="middle" font-family="Manrope,sans-serif" font-size="26" fill="#17212b">64 × 7 × 7</text><path d="M538.5 170H714.5" stroke="#2878c8" stroke-width="3" fill="none" marker-end="url(#spatial-arrow)"></path><text x="626.5" y="141" text-anchor="middle" font-family="Manrope,sans-serif" font-size="22" fill="#2878c8">ConvT</text><text x="626.5" y="205" text-anchor="middle" font-family="Manrope,sans-serif" font-size="19" fill="#17212b">k=4, s=2, p=1</text><path d="M732.5 112.5l30 -15.0h115l-30 15.0Z" fill="#dceeff" stroke="#6c9ec3" stroke-width="2"></path><path d="M847.5 112.5l30 -15.0v115l-30 15.0Z" fill="#dceeff" stroke="#6c9ec3" stroke-width="2"></path><path d="M855.5 108.5v115" stroke="#6c9ec3" opacity=".45"></path><path d="M863.5 104.5v115" stroke="#6c9ec3" opacity=".45"></path><path d="M871.5 100.5v115" stroke="#6c9ec3" opacity=".45"></path><rect x="732.5" y="112.5" width="115" height="115" fill="#dceeff" stroke="#6c9ec3" stroke-width="2"></rect><path d="M748.9285714285714 112.5v115M732.5 128.92857142857142h115" stroke="#6c9ec3" opacity=".3"></path><path d="M765.3571428571429 112.5v115M732.5 145.35714285714286h115" stroke="#6c9ec3" opacity=".3"></path><path d="M781.7857142857143 112.5v115M732.5 161.78571428571428h115" stroke="#6c9ec3" opacity=".3"></path><path d="M798.2142857142857 112.5v115M732.5 178.21428571428572h115" stroke="#6c9ec3" opacity=".3"></path><path d="M814.6428571428571 112.5v115M732.5 194.64285714285714h115" stroke="#6c9ec3" opacity=".3"></path><path d="M831.0714285714286 112.5v115M732.5 211.07142857142856h115" stroke="#6c9ec3" opacity=".3"></path><text x="790" y="298" text-anchor="middle" font-family="Manrope,sans-serif" font-size="26" fill="#17212b">32 × 14 × 14</text><path d="M895.5 170H1037.0" stroke="#2878c8" stroke-width="3" fill="none" marker-end="url(#spatial-arrow)"></path><text x="966.25" y="141" text-anchor="middle" font-family="Manrope,sans-serif" font-size="22" fill="#2878c8">ConvT</text><text x="966.25" y="205" text-anchor="middle" font-family="Manrope,sans-serif" font-size="19" fill="#17212b">k=4, s=2, p=1</text><path d="M1055.0 85.0l4 -2.0h170l-4 2.0Z" fill="#dceeff" stroke="#6c9ec3" stroke-width="2"></path><path d="M1225.0 85.0l4 -2.0v170l-4 2.0Z" fill="#dceeff" stroke="#6c9ec3" stroke-width="2"></path><rect x="1055.0" y="85.0" width="170" height="170" fill="#dceeff" stroke="#6c9ec3" stroke-width="2"></rect><image href="assets/evidence/section5/epoch-60-sample-0.png" x="1057.0" y="87.0" width="166" height="166" style="image-rendering:pixelated"></image><text x="1140" y="298" text-anchor="middle" font-family="Manrope,sans-serif" font-size="26" fill="#17212b">1 × 28 × 28</text><text x="110" y="258" text-anchor="middle" font-family="Manrope,sans-serif" font-size="20" fill="#17212b">random code</text><text x="440" y="258" text-anchor="middle" font-family="Manrope,sans-serif" font-size="20" fill="#17212b">BN + ReLU</text><text x="790" y="258" text-anchor="middle" font-family="Manrope,sans-serif" font-size="20" fill="#17212b">BN + ReLU</text><text x="1140" y="327" text-anchor="middle" font-family="Manrope,sans-serif" font-size="20" fill="#17212b">Tanh</text><g class="fragment" data-fragment-index="0"><text x="25" y="377" text-anchor="start" font-family="Manrope,sans-serif" font-size="29" fill="#b26950">D · compress spatial evidence</text><path d="M25.0 419.0l4 -2.0h170l-4 2.0Z" fill="#f6e1d9" stroke="#bd8d7b" stroke-width="2"></path><path d="M195.0 419.0l4 -2.0v170l-4 2.0Z" fill="#f6e1d9" stroke="#bd8d7b" stroke-width="2"></path><rect x="25.0" y="419.0" width="170" height="170" fill="#f6e1d9" stroke="#bd8d7b" stroke-width="2"></rect><image href="assets/evidence/section5/epoch-60-sample-0.png" x="27.0" y="421.0" width="166" height="166" style="image-rendering:pixelated"></image><text x="110" y="630" text-anchor="middle" font-family="Manrope,sans-serif" font-size="26" fill="#17212b">1 × 28 × 28</text><path d="M217.0 504H364.5" stroke="#b26950" stroke-width="3" fill="none" marker-end="url(#spatial-arrow)"></path><text x="290.75" y="475" text-anchor="middle" font-family="Manrope,sans-serif" font-size="22" fill="#b26950">Conv2d</text><text x="290.75" y="539" text-anchor="middle" font-family="Manrope,sans-serif" font-size="19" fill="#17212b">k=4, s=2, p=1</text><path d="M382.5 446.5l30 -15.0h115l-30 15.0Z" fill="#f6e1d9" stroke="#bd8d7b" stroke-width="2"></path><path d="M497.5 446.5l30 -15.0v115l-30 15.0Z" fill="#f6e1d9" stroke="#bd8d7b" stroke-width="2"></path><path d="M505.5 442.5v115" stroke="#bd8d7b" opacity=".45"></path><path d="M513.5 438.5v115" stroke="#bd8d7b" opacity=".45"></path><path d="M521.5 434.5v115" stroke="#bd8d7b" opacity=".45"></path><rect x="382.5" y="446.5" width="115" height="115" fill="#f6e1d9" stroke="#bd8d7b" stroke-width="2"></rect><path d="M398.92857142857144 446.5v115M382.5 462.92857142857144h115" stroke="#bd8d7b" opacity=".3"></path><path d="M415.35714285714283 446.5v115M382.5 479.35714285714283h115" stroke="#bd8d7b" opacity=".3"></path><path d="M431.7857142857143 446.5v115M382.5 495.7857142857143h115" stroke="#bd8d7b" opacity=".3"></path><path d="M448.2142857142857 446.5v115M382.5 512.2142857142857h115" stroke="#bd8d7b" opacity=".3"></path><path d="M464.6428571428571 446.5v115M382.5 528.6428571428571h115" stroke="#bd8d7b" opacity=".3"></path><path d="M481.07142857142856 446.5v115M382.5 545.0714285714286h115" stroke="#bd8d7b" opacity=".3"></path><text x="440" y="630" text-anchor="middle" font-family="Manrope,sans-serif" font-size="26" fill="#17212b">32 × 14 × 14</text><path d="M545.5 504H739.5" stroke="#b26950" stroke-width="3" fill="none" marker-end="url(#spatial-arrow)"></path><text x="642.5" y="475" text-anchor="middle" font-family="Manrope,sans-serif" font-size="22" fill="#b26950">Conv2d</text><text x="642.5" y="539" text-anchor="middle" font-family="Manrope,sans-serif" font-size="19" fill="#17212b">k=4, s=2, p=1</text><path d="M757.5 471.5l48 -24.0h65l-48 24.0Z" fill="#f6e1d9" stroke="#bd8d7b" stroke-width="2"></path><path d="M822.5 471.5l48 -24.0v65l-48 24.0Z" fill="#f6e1d9" stroke="#bd8d7b" stroke-width="2"></path><path d="M830.5 467.5v65" stroke="#bd8d7b" opacity=".45"></path><path d="M838.5 463.5v65" stroke="#bd8d7b" opacity=".45"></path><path d="M846.5 459.5v65" stroke="#bd8d7b" opacity=".45"></path><path d="M854.5 455.5v65" stroke="#bd8d7b" opacity=".45"></path><path d="M862.5 451.5v65" stroke="#bd8d7b" opacity=".45"></path><rect x="757.5" y="471.5" width="65" height="65" fill="#f6e1d9" stroke="#bd8d7b" stroke-width="2"></rect><path d="M766.7857142857143 471.5v65M757.5 480.7857142857143h65" stroke="#bd8d7b" opacity=".3"></path><path d="M776.0714285714286 471.5v65M757.5 490.07142857142856h65" stroke="#bd8d7b" opacity=".3"></path><path d="M785.3571428571429 471.5v65M757.5 499.35714285714283h65" stroke="#bd8d7b" opacity=".3"></path><path d="M794.6428571428571 471.5v65M757.5 508.64285714285717h65" stroke="#bd8d7b" opacity=".3"></path><path d="M803.9285714285714 471.5v65M757.5 517.9285714285714h65" stroke="#bd8d7b" opacity=".3"></path><path d="M813.2142857142857 471.5v65M757.5 527.2142857142857h65" stroke="#bd8d7b" opacity=".3"></path><text x="790" y="630" text-anchor="middle" font-family="Manrope,sans-serif" font-size="26" fill="#17212b">64 × 7 × 7</text><path d="M888.5 504H1109.0" stroke="#b26950" stroke-width="3" fill="none" marker-end="url(#spatial-arrow)"></path><text x="998.75" y="475" text-anchor="middle" font-family="Manrope,sans-serif" font-size="22" fill="#b26950">Conv2d</text><text x="998.75" y="539" text-anchor="middle" font-family="Manrope,sans-serif" font-size="19" fill="#17212b">k=7, s=1, p=0</text><rect x="1127.0" y="491.0" width="26" height="26" fill="#f6e1d9" stroke="#bd8d7b" stroke-width="2"></rect><text x="1140" y="512" text-anchor="middle" font-family="Manrope,sans-serif" font-size="24" fill="#17212b">a</text><text x="1140" y="630" text-anchor="middle" font-family="Manrope,sans-serif" font-size="26" fill="#17212b">1 logit</text><text x="110" y="659" text-anchor="middle" font-family="Manrope,sans-serif" font-size="20" fill="#17212b">real or generated</text><text x="440" y="591" text-anchor="middle" font-family="Manrope,sans-serif" font-size="20" fill="#17212b">LeakyReLU</text><text x="790" y="591" text-anchor="middle" font-family="Manrope,sans-serif" font-size="20" fill="#17212b">LeakyReLU</text><text x="1140" y="591" text-anchor="middle" font-family="Manrope,sans-serif" font-size="20" fill="#17212b">flatten</text></g>
+</svg>
+</div>
+<p class="gan-spatial-key">
+Dimensions: <strong>channels × height × width</strong> · ConvT = transposed convolution · depth suggests channels.
+</p>
+<p class="gan-source">
+Original course schematic of the exact section 5 models; block sizes are illustrative, not to scale · image: actual epoch-60 output, draw 1 · G and D have independent weights · <a href="https://arxiv.org/abs/1511.06434">DCGAN architecture context: Radford et al., 2015</a>.
+</p>
+<aside class="notes">
+<p>This is the spatial overview to keep in mind throughout the section. Start with G alone. The tiny face at the left represents 16 latent channels at a single spatial location; it is not a small observed image. Follow the growing faces: 1×1 becomes 7×7, then 14×14, then 28×28. Stack depth suggests the number of channels, while labels give exact values. The 64-channel feature map is spatially smaller but deeper than the 32-channel map. These intermediate grids are schematic features, not measured activations.</p>
+<p>The first operation projects the latent code spatially with a 7×7 transposed convolution. The next two use kernel 4, stride 2, padding 1. Hidden stages use BatchNorm and ReLU, and the image stage uses Tanh. The image is an actual recorded sample from our model, not an invented illustration. Transposed convolution is sometimes called deconvolution in architecture figures; it is a learned expansion, not an inverse reconstruction operation.</p>
+<p>Advance once to reveal D. Its input can be a real dataset image or a generated image; this schematic uses the same generated sample as a visual token to connect the two rows. D’s faces shrink from 28×28 to 14×14 to 7×7 to 1×1. Channels increase from 1 to 32 to 64 before the final convolution combines all features into one channel at one position. Flatten then yields one raw logit per example, with batch shape (B,1); no final sigmoid is used because the loss consumes logits.</p>
+<p>Both paths run left to right. G and D have independently learned weights; the opposing geometry does not make them mathematical inverses. Face sizes and depth are schematic so small stages remain readable; the printed dimensions are authoritative. This overview supplements the compact layer bars and code views, exposing the spatial geometry that their lists of shapes can obscure. The next slide explains the weighted-overlap mechanism behind expansion.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-transpose-mechanism" class="slide level2 gan-s5">
+<h2>Enlarge by placing and adding learned patterns</h2>
+<p class="gan-lead">
+One channel in 1D: input <strong>[1, 2]</strong>, kernel <strong>[1, 2, 1]</strong>, stride <strong>2</strong>, no padding.<br>The second input places its weighted kernel two positions to the right.
+</p>
+<div class="gan-overlap-grid">
+<div class="gan-overlap-row" data-fragment-index="0">
+<strong>Input 1 × kernel</strong><span class="gan-overlap-cell">1</span><span class="gan-overlap-cell">2</span><span class="gan-overlap-cell overlap">1</span><span class="gan-overlap-cell">·</span><span class="gan-overlap-cell">·</span>
+</div>
+<div class="gan-overlap-row" data-fragment-index="0">
+<strong>Input 2 × kernel</strong><span class="gan-overlap-cell">·</span><span class="gan-overlap-cell">·</span><span class="gan-overlap-cell overlap">2</span><span class="gan-overlap-cell">4</span><span class="gan-overlap-cell">2</span>
+</div>
+<div class="gan-overlap-row fragment" data-fragment-index="0">
+<strong>Add overlaps</strong><span class="gan-overlap-cell">1</span><span class="gan-overlap-cell">2</span><span class="gan-overlap-cell overlap">3</span><span class="gan-overlap-cell">4</span><span class="gan-overlap-cell">2</span>
+</div>
+</div>
+<div class="gan-transpose-formula">
+Output length = (input length − 1) × stride − 2 × padding + kernel size
+</div>
+<div class="fragment gan-loss-equation" data-fragment-index="0">
+(2 − 1) × 2 + 3 = 5 positions
+</div>
+<div class="fragment takeaway" data-fragment-index="1">
+<p>For our 2D layer: (7 − 1) × 2 − 2 × 1 + 4 = 14, along both height and width.</p>
+</div>
+<p class="gan-source">
+Exact toy computation verified with PyTorch · dilation 1, output_padding 0, no bias in the toy · transposed convolution applies a learned linear map, not an inverse convolution · <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.ConvTranspose2d.html">official API and output-size rule</a>.
+</p>
+<aside class="notes">
+<p>Read the first contribution as input value 1 multiplied by the entire kernel, placed at positions 0,1,2. The second contribution is value 2 times the same kernel, placed at positions 2,3,4 because stride is 2. Dots mean no contribution. Ask what happens at the highlighted overlap before revealing the sum. The result is [1,2,3,4,2]. This exact computation is checked with ConvTranspose1d in the training script; the kernel is chosen for arithmetic clarity, not learned in this toy.</p>
+<p>The output support runs from the first kernel’s beginning to the final kernel’s end, explaining (n−1)s+k with no padding. The displayed rule includes symmetric padding under dilation 1 and output_padding 0. Reveal the numerical application to the generator’s second layer: 7 becomes 14 with kernel 4, stride 2, padding 1. In 2D, each input activation places a weighted kernel patch, contributions overlap and add across spatial positions and input channels, and each output channel has learned weights.</p>
+<p>The operation is the transpose of the linear convolution operator for the matching geometry, not an inverse that recovers lost image information. There is no encoder output to invert in this unconditional generator. The weights are learned by the generator objective. Increasing resolution alone does not invent meaningful structure; that structure must be learned. Kernel/stride choices also affect overlap patterns. Detailed artifact evaluation belongs in the last section.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-conv-code" class="slide level2 gan-s5">
+<h2>Trace each spatial stage into its layer</h2>
+<div class="gan-judge-controls" role="group" aria-label="Inspect the convolutional generator or discriminator">
+<span>Inspect</span><button type="button" data-conv-module="G" aria-pressed="true">Generator G</button><button type="button" data-conv-module="D" aria-pressed="false">Discriminator D</button>
+</div>
+<div class="gan-code-layout gan-conv-code-panel" data-conv-panel="G">
+<div>
+<div class="gan-layer-diagram">
+<svg viewbox="0 0 380 530" role="img" aria-label="G tensor shapes excluding batch">
+<text x="190" y="30" fill="#17212b" font-family="Manrope,sans-serif" font-size="26" text-anchor="middle">16 × 1 × 1</text><text x="190" y="70" fill="#17212b" font-family="Manrope,sans-serif" font-size="27" text-anchor="middle">↓</text><rect x="15" y="95" width="350" height="48" rx="5" fill="#2878c8"></rect><text x="190.0" y="127.0" text-anchor="middle" fill="white" font-family="Manrope,sans-serif" font-size="23">ConvT + BN + ReLU</text><text x="190" y="179" fill="#17212b" font-family="Manrope,sans-serif" font-size="26" text-anchor="middle">64 × 7 × 7</text><text x="190" y="219" fill="#17212b" font-family="Manrope,sans-serif" font-size="27" text-anchor="middle">↓</text><rect x="15" y="240" width="350" height="48" rx="5" fill="#2878c8"></rect><text x="190.0" y="272.0" text-anchor="middle" fill="white" font-family="Manrope,sans-serif" font-size="23">ConvT + BN + ReLU</text><text x="190" y="324" fill="#17212b" font-family="Manrope,sans-serif" font-size="26" text-anchor="middle">32 × 14 × 14</text><text x="190" y="364" fill="#17212b" font-family="Manrope,sans-serif" font-size="27" text-anchor="middle">↓</text><rect x="15" y="385" width="350" height="48" rx="5" fill="#2878c8"></rect><text x="190.0" y="417.0" text-anchor="middle" fill="white" font-family="Manrope,sans-serif" font-size="23">ConvT + Tanh</text><text x="190" y="469" fill="#17212b" font-family="Manrope,sans-serif" font-size="26" text-anchor="middle">1 × 28 × 28</text>
+</svg>
+</div>
+</div>
+<div>
+<div class="light-code-editor">
+<div class="editor-bar">
+<span>PYTORCH · G</span><strong>kernel, stride, padding</strong>
+</div>
+<pre><code>G = nn.Sequential(
+    nn.ConvTranspose2d(16, 64, 7, 1, 0, bias=False),
+    nn.BatchNorm2d(64), nn.ReLU(),
+    nn.ConvTranspose2d(64, 32, 4, 2, 1, bias=False),
+    nn.BatchNorm2d(32), nn.ReLU(),
+    nn.ConvTranspose2d(32, 1, 4, 2, 1), nn.Tanh(),
+)
+
+<span class="fragment" data-fragment-index="0">z = torch.randn(4, 16, 1, 1)
+fake = G(z)  # (4, 1, 28, 28)</span></code></pre>
+</div>
+</div>
+</div>
+<div class="gan-code-layout gan-conv-code-panel" data-conv-panel="D" hidden="">
+<div>
+<div class="gan-layer-diagram">
+<svg viewbox="0 0 380 530" role="img" aria-label="D tensor shapes excluding batch">
+<text x="190" y="30" fill="#17212b" font-family="Manrope,sans-serif" font-size="26" text-anchor="middle">1 × 28 × 28</text><text x="190" y="70" fill="#17212b" font-family="Manrope,sans-serif" font-size="27" text-anchor="middle">↓</text><rect x="15" y="95" width="350" height="48" rx="5" fill="#b26950"></rect><text x="190.0" y="127.0" text-anchor="middle" fill="white" font-family="Manrope,sans-serif" font-size="23">Conv + LeakyReLU</text><text x="190" y="179" fill="#17212b" font-family="Manrope,sans-serif" font-size="26" text-anchor="middle">32 × 14 × 14</text><text x="190" y="219" fill="#17212b" font-family="Manrope,sans-serif" font-size="27" text-anchor="middle">↓</text><rect x="15" y="240" width="350" height="48" rx="5" fill="#b26950"></rect><text x="190.0" y="272.0" text-anchor="middle" fill="white" font-family="Manrope,sans-serif" font-size="23">Conv + LeakyReLU</text><text x="190" y="324" fill="#17212b" font-family="Manrope,sans-serif" font-size="26" text-anchor="middle">64 × 7 × 7</text><text x="190" y="364" fill="#17212b" font-family="Manrope,sans-serif" font-size="27" text-anchor="middle">↓</text><rect x="15" y="385" width="350" height="48" rx="5" fill="#b26950"></rect><text x="190.0" y="417.0" text-anchor="middle" fill="white" font-family="Manrope,sans-serif" font-size="23">Conv → flatten</text><text x="190" y="469" fill="#17212b" font-family="Manrope,sans-serif" font-size="26" text-anchor="middle">1 × 1 × 1</text>
+</svg>
+</div>
+</div>
+<div>
+<div class="light-code-editor">
+<div class="editor-bar">
+<span>PYTORCH · D</span><strong>kernel, stride, padding</strong>
+</div>
+<pre><code>D = nn.Sequential(
+    nn.Conv2d(1, 32, 4, 2, 1), nn.LeakyReLU(0.2),
+    nn.Conv2d(32, 64, 4, 2, 1), nn.LeakyReLU(0.2),
+    nn.Conv2d(64, 1, 7, 1, 0),
+    nn.Flatten(1),
+)
+
+<span class="fragment" data-fragment-index="0">logits = D(fake)  # (4, 1)
+# raw logits for BCEWithLogitsLoss</span></code></pre>
+</div>
+</div>
+</div>
+<div class="fragment takeaway" data-fragment-index="0">
+<p>Tanh outputs [−1, 1]: scale real pixels to the same range. D still returns raw logits.</p>
+</div>
+<p class="gan-source">
+Exact modules used in the recorded run · <a href="assets/conv_gan.py">runnable source</a> · G BatchNorm: train mode on G turns, eval mode on D turns and snapshots; D has no BatchNorm · <a href="https://arxiv.org/abs/1511.06434">DCGAN-inspired adaptation</a>.
+</p>
+<aside class="notes">
+<p>Trace the G bars into the code line by line. ConvTranspose2d arguments here are input channels, output channels, kernel, stride, and padding. The first layer maps a (B,16,1,1) code to (B,64,7,7); the next two double resolution. Bias is disabled before BatchNorm. Advance once to show the tested forward shape. Switch to D without leaving the slide: its ordinary stride-two convolutions reduce 28 to 14 to 7, and the last 7×7 kernel collapses the spatial extent to 1×1. Flatten preserves the batch axis and yields (B,1). The source checks batch sizes 1,4,128 in evaluation mode.</p>
+<p>Tanh changes the image contract from the earlier sigmoid MLP. Real pixels are converted by x/127.5−1, and saved images are mapped back by (x+1)/2 for display. BCEWithLogitsLoss still receives D’s unbounded logits; do not add sigmoid to D. LeakyReLU has the same slope 0.2 used earlier. No new loss or target convention is introduced.</p>
+<p>Make the BatchNorm policy explicit because section 4’s MLP had no mutable buffers. This adaptation uses BatchNorm only in G. During D turns, G is in eval mode and no_grad, so it supplies images without updating its running statistics. During G turns, G is in train mode so its running statistics update and its parameters learn. Snapshots use eval mode. D has no BatchNorm, so freezing its parameters entails no hidden running-statistic updates. This is a deliberate small-course-run policy, not the only possible GAN convention or an exact original-DCGAN recipe. Training/evaluation modes and gradient recording are separate controls.</p>
+<p>The two model views share one code font and color grammar. The modules are extracted directly from the training source, avoiding a mismatch between the illustrated architecture and the displayed samples. Section 4’s fresh forward computations, target choices, and optimizer ownership still apply.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-conv-training" class="slide level2 gan-s5">
+<h2>Hold the codes fixed. Watch the images change.</h2>
+<p class="gan-lead">
+Six fixed latent draws. One convolutional GAN. Only the learned model state changes.
+</p>
+<div class="gan-judge-controls" role="group" aria-label="Inspect a recorded GAN checkpoint">
+<span>Recorded epoch</span><button type="button" data-gan-epoch="0" aria-pressed="true">0</button><button type="button" data-gan-epoch="1" aria-pressed="false">1</button><button type="button" data-gan-epoch="5" aria-pressed="false">5</button><button type="button" data-gan-epoch="20" aria-pressed="false">20</button><button type="button" data-gan-epoch="60" aria-pressed="false">60</button>
+</div>
+<div class="gan-training-gallery">
+<figure>
+<img data-gan-sample="0" src="assets/evidence/section5/epoch-0-sample-0.png" alt="Generated image from fixed latent draw 1, before training">
+<figcaption>
+Draw 1
+</figcaption>
+</figure>
+<figure>
+<img data-gan-sample="1" src="assets/evidence/section5/epoch-0-sample-1.png" alt="Generated image from fixed latent draw 2, before training">
+<figcaption>
+Draw 2
+</figcaption>
+</figure>
+<figure>
+<img data-gan-sample="2" src="assets/evidence/section5/epoch-0-sample-2.png" alt="Generated image from fixed latent draw 3, before training">
+<figcaption>
+Draw 3
+</figcaption>
+</figure>
+<figure>
+<img data-gan-sample="3" src="assets/evidence/section5/epoch-0-sample-3.png" alt="Generated image from fixed latent draw 4, before training">
+<figcaption>
+Draw 4
+</figcaption>
+</figure>
+<figure>
+<img data-gan-sample="4" src="assets/evidence/section5/epoch-0-sample-4.png" alt="Generated image from fixed latent draw 5, before training">
+<figcaption>
+Draw 5
+</figcaption>
+</figure>
+<figure>
+<img data-gan-sample="5" src="assets/evidence/section5/epoch-0-sample-5.png" alt="Generated image from fixed latent draw 6, before training">
+<figcaption>
+Draw 6
+</figcaption>
+</figure>
+</div>
+<p class="gan-training-status" id="gan-training-status" aria-live="polite">
+Epoch 0 · untrained initialization · fixed draws 1–6
+</p>
+<div class="fragment takeaway" data-fragment-index="0">
+<p>Structure emerges in this run. Six images cannot establish quality or diversity across the generated distribution.</p>
+</div>
+<p class="gan-source">
+Actual locally recorded outputs, not browser inference · first six fixed draws, no ranking or removal · 12,000 Fashion-MNIST training images; 60 epochs; seed 1205; Adam 0.0002, β=(0.5,0.999) · <a href="assets/evidence/section5/run.json">full protocol</a> · <a href="https://github.com/zalandoresearch/fashion-mnist">dataset source</a>.
+</p>
+<aside class="notes">
+<p>Begin at initialization. Use epochs 1,5,20,60 and ask students what visible structure changes: foreground/background organization, silhouettes, and local texture. The six latent vectors and their ordering remain fixed; model parameters and G’s BatchNorm running statistics change. Do not imply that a fixed latent draw preserves garment identity throughout training. All displays are evaluation-mode outputs from locally recorded checkpoints; the buttons do not train or run inference.</p>
+<p>These are the first six normal draws from seed 1206, recorded at epochs 0,1,5,20,60 without sorting, cherry-picking, or removing failures. The data are the first 12,000 examples of the permutation used earlier (seed 41); category labels are unused. The initial 20-epoch run was extended to 60 after inspecting its rough outputs; the six draws and earlier snapshots were retained. Model initialization is seed 1205, minibatch order seed 1207, batch 128 with the final smaller batch retained, giving 94 alternating iterations per epoch. Each iteration uses one D step and one non-saturating G step. Both independent Adam optimizers have lr 0.0002 and betas (0.5,0.999). The source and final checkpoint preserve the run for reproduction.</p>
+<p>Do not compare this gallery against the earlier MLP’s untrained output as evidence that convolutions are superior: the training exposure is different and no trained MLP baseline was run. The purpose is to ground the architecture and update code in actual generated outputs. A single small run and six examples do not measure coverage, memorization, or stability. Any imperfect silhouettes remain visible. Reveal the takeaway after observation, setting up section 6’s distinction between plausible individual samples and a good generated distribution.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="judging-samples-diversity-and-failure-1" class="title-slide slide level1 gan-section gan-section-six center" data-background-color="#17212b" data-section-progress="06 / 06">
+<h1>Judging samples, diversity, and failure</h1>
+<aside class="notes">
+<p>About 12–15 minutes, including the closing exercise. Evaluate the actual course model without turning a small visual gallery into a population-level claim. Separate visible fidelity, variety, potential memorization, and the interpretation of training losses. Close by composing the mechanisms already taught; no new architecture or loss is introduced.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-evaluate-gallery" class="slide level2 gan-s6">
+<h2>A plausible image is only one part of the job</h2>
+<div class="gan-judge-controls" role="group" aria-label="Inspect fresh sample batches">
+<span>Fresh batch</span><button type="button" data-eval-batch="0" aria-pressed="true">1</button><button type="button" data-eval-batch="1" aria-pressed="false">2</button><button type="button" data-eval-batch="2" aria-pressed="false">3</button><button type="button" id="gan-repeat-control" aria-pressed="false">Show repetition control</button>
+</div>
+<div class="gan-eval-galleries">
+<figure>
+<figcaption>
+Held-out dataset images
+</figcaption>
+<img id="gan-eval-real" src="assets/evidence/section6/real-0.png" alt="First twelve held-out Fashion-MNIST images">
+</figure>
+<figure>
+<figcaption id="gan-eval-generated-label">
+Actual G · 12 fresh latent draws
+</figcaption>
+<img id="gan-eval-generated" src="assets/evidence/section6/generated-0.png" alt="First twelve fresh outputs from the epoch-60 generator">
+</figure>
+</div>
+<p class="gan-eval-status" id="gan-eval-status" aria-live="polite">
+Recorded outputs · batch 1 of 3 · no selection by quality
+</p>
+<div class="fragment takeaway" data-fragment-index="0">
+<p>Inspect both fidelity and variety. Mode collapse maps many latent codes to a narrow set of outputs.</p>
+</div>
+<p class="gan-source">
+36 actual fresh outputs, seed 1208; three consecutive batches · held-out images were unseen during G/D training · repetition control deliberately duplicates one output; it is not observed collapse in this run · <a href="assets/evidence/section6/evaluation.json">protocol</a> · <a href="https://arxiv.org/abs/1511.01844">evaluation context: Theis et al., 2016</a>.
+</p>
+<aside class="notes">
+<p>Inspect batch 1 before naming failure modes. Ask what looks garment-like and which structures look implausible or ambiguous. Move through all three batches, comparing visible variety with the real reference. These images are fresh standard-normal codes distinct from the six fixed training-viewer codes. Outputs are consecutive samples, not chosen by discriminator score or visual quality. The reference images are the first 36 held-out examples in the established split, not category-balanced selections.</p>
+<p>Toggle the repetition control. The right gallery now repeats the first output of the selected batch twelve times. The caption and status explicitly mark it as constructed evidence, and the button offers a return to actual outputs. Ask what a single-image inspection would miss. Reveal fidelity versus variety and define mode collapse: many latent codes yield only a narrow subset of plausible possibilities. Exact duplication is the limiting case used for this controlled illustration, not a claim that this trained model has collapsed. Real collapse may still show small pixel variations.</p>
+<p>Thirty-six outputs cannot establish category coverage, match of category frequencies, or absence of collapse across the latent distribution. The point is to inspect larger, uncurated batches instead of showing a few successes. Real-looking outputs can still miss modes; diverse-looking outputs can still be poor images. Image-by-image realism and distributional adequacy are distinct questions. Evaluation must serve the intended use, as emphasized by Theis et al.&nbsp;Do not introduce FID or another substantial new metric in the conclusion.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-evaluate-losses" class="slide level2 gan-s6">
+<h2>Training losses are diagnostics, not a quality score</h2>
+<div class="gan-judge-controls" role="group" aria-label="Compare recorded checkpoints with training losses">
+<span>Checkpoint</span><button type="button" data-loss-checkpoint="5" aria-pressed="false">5</button><button type="button" data-loss-checkpoint="20" aria-pressed="true">20</button><button type="button" data-loss-checkpoint="60" aria-pressed="false">60</button>
+</div>
+<div class="gan-loss-evidence">
+<div>
+<div class="gan-loss-legend">
+<span>D loss · sum of source means</span><span>G loss · non-saturating</span>
+</div>
+<div class="gan-training-loss-plot">
+<svg viewbox="0 0 900 440" role="img" aria-label="Recorded discriminator and generator training losses over 60 epochs, using a shared zero to four vertical axis">
+<path d="M70 355H850" stroke="#d8dfe2"></path><text x="52" y="362" text-anchor="end">0</text><path d="M70 283H850" stroke="#d8dfe2"></path><text x="52" y="290" text-anchor="end">1</text><path d="M70 211H850" stroke="#d8dfe2"></path><text x="52" y="218" text-anchor="end">2</text><path d="M70 139H850" stroke="#d8dfe2"></path><text x="52" y="146" text-anchor="end">3</text><path d="M70 67H850" stroke="#d8dfe2"></path><text x="52" y="74" text-anchor="end">4</text><text x="70.0" y="395" text-anchor="middle">1</text><text x="321.18644067796606" y="395" text-anchor="middle">20</text><text x="585.5932203389831" y="395" text-anchor="middle">40</text><text x="850.0" y="395" text-anchor="middle">60</text><text x="460" y="435" text-anchor="middle">Epoch · mean of minibatch losses</text><polyline points="70.00,288.93 83.22,294.00 96.44,281.32 109.66,258.12 122.88,258.41 136.10,258.51 149.32,254.76 162.54,257.15 175.76,258.02 188.98,259.64 202.20,262.60 215.42,263.32 228.64,262.84 241.86,262.79 255.08,262.52 268.31,262.60 281.53,263.37 294.75,262.68 307.97,261.97 321.19,260.63 334.41,260.95 347.63,259.64 360.85,259.10 374.07,258.28 387.29,257.90 400.51,257.79 413.73,257.46 426.95,257.76 440.17,257.46 453.39,257.50 466.61,257.32 479.83,256.87 493.05,256.81 506.27,256.78 519.49,256.89 532.71,256.66 545.93,256.60 559.15,256.55 572.37,256.49 585.59,256.38 598.81,256.43 612.03,256.49 625.25,256.36 638.47,256.32 651.69,256.41 664.92,256.48 678.14,256.38 691.36,256.40 704.58,256.51 717.80,256.33 731.02,256.40 744.24,256.48 757.46,256.34 770.68,256.39 783.90,256.27 797.12,256.39 810.34,256.35 823.56,256.37 836.78,256.25 850.00,256.32" fill="none" stroke="#b26950" stroke-width="3"></polyline><polyline points="70.00,303.42 83.22,287.63 96.44,282.83 109.66,290.14 122.88,298.89 136.10,298.39 149.32,302.28 162.54,301.51 175.76,300.20 188.98,298.80 202.20,297.95 215.42,298.06 228.64,298.16 241.86,297.72 255.08,296.92 268.31,297.61 281.53,297.71 294.75,298.72 307.97,298.74 321.19,300.02 334.41,299.81 347.63,300.59 360.85,300.94 374.07,302.02 387.29,302.11 400.51,301.98 413.73,302.48 426.95,302.18 440.17,302.35 453.39,302.62 466.61,302.64 479.83,302.87 493.05,303.11 506.27,303.05 519.49,302.72 532.71,303.28 545.93,303.09 559.15,303.28 572.37,303.29 585.59,303.31 598.81,303.28 612.03,303.35 625.25,303.41 638.47,303.56 651.69,303.21 664.92,303.19 678.14,303.04 691.36,303.20 704.58,303.47 717.80,303.20 731.02,303.40 744.24,303.53 757.46,303.12 770.68,303.47 783.90,303.48 797.12,303.34 810.34,303.57 823.56,303.39 836.78,303.49 850.00,303.37" fill="none" stroke="#2878c8" stroke-width="3"></polyline><line id="gan-loss-epoch-marker" x1="321.19" x2="321.19" y1="55" y2="360" stroke="#526575" stroke-dasharray="6 6"></line>
+</svg>
+</div>
+</div>
+<figure>
+<figcaption>
+Same two latent draws
+</figcaption>
+<img id="gan-loss-sample-a" src="assets/evidence/section5/epoch-20-sample-0.png" alt="Fixed latent draw 1 at epoch 20"><img id="gan-loss-sample-b" src="assets/evidence/section5/epoch-20-sample-4.png" alt="Fixed latent draw 5 at epoch 20"><small id="gan-loss-checkpoint-values" aria-live="polite">Loading recorded loss values…</small>
+</figure>
+</div>
+<div class="fragment takeaway" data-fragment-index="0">
+<p>Both networks keep changing. Read the curves alongside fixed-code samples and fresh batches.</p>
+</div>
+<p class="gan-source">
+Actual section 5 training record, all 60 epochs · losses measured on each network’s own turn and averaged over minibatches · same shared vertical axis · <a href="assets/evidence/section6/losses.json">recorded values</a> · moving objectives: <a href="https://arxiv.org/abs/1406.2661">Goodfellow et al., 2014</a>.
+</p>
+<aside class="notes">
+<p>The orange line is D’s sum of real and generated source means; the blue line is the non-saturating G mean. These values are not directly comparable performance scores. Select checkpoints 5,20,60 and inspect the same two latent draws. The images are evaluation-mode recordings; the loss values are the epoch means collected during alternating training, not losses recomputed on these two images.</p>
+<p>Ask whether a single lower point would be enough to choose a checkpoint. D changes the function against which G is judged, and G changes the negative examples D must recognize. Improvements in a source-classification objective do not necessarily track image fidelity or diversity. A discriminator score near 0.5 can arise from a weak discriminator as well as difficult discrimination, so it is not a certificate of distribution matching.</p>
+<p>Use this actual record to practice relating curves to evidence, not to establish a universal shape of successful GAN training. Oscillation can be part of adversarial dynamics; one should inspect sample behavior, gradient/update correctness, and reproducibility before diagnosing instability from a curve alone. A sudden non-finite loss or absent required gradients would motivate implementation checks; section 4 supplied those checks. Keep several checkpoints and consistent fixed codes so changes can be examined rather than inferred from the final gallery.</p>
+<p>The marker selects an epoch on the true horizontal axis. Every recorded epoch remains visible, without smoothing or cropping. The chart uses one shared zero-to-four y-axis. Two sample images are illustrative continuity evidence from the earlier six-draw viewer, not a benchmark or a selected best-pair claim.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-nearest-neighbors" class="slide level2 gan-s6">
+<h2>Does “looks familiar” mean it was copied?</h2>
+<p class="gan-lead">
+Three consecutive fresh outputs. Reveal each nearest image among <strong>12,000 training examples</strong>.
+</p>
+<div class="gan-neighbor-gallery">
+<figure>
+<figcaption>
+Fresh draw 1
+</figcaption>
+<img src="assets/evidence/section6/query-0.png" alt="Fresh generated sample 1">
+<div class="fragment" data-fragment-index="0">
+<span>Nearest training image</span><img src="assets/evidence/section6/nearest-0.png" alt="Pixel-MSE nearest training image for generated sample 1"><small>MSE = 0.0312</small>
+</div>
+</figure>
+<figure>
+<figcaption>
+Fresh draw 2
+</figcaption>
+<img src="assets/evidence/section6/query-1.png" alt="Fresh generated sample 2">
+<div class="fragment" data-fragment-index="0">
+<span>Nearest training image</span><img src="assets/evidence/section6/nearest-1.png" alt="Pixel-MSE nearest training image for generated sample 2"><small>MSE = 0.0299</small>
+</div>
+</figure>
+<figure>
+<figcaption>
+Fresh draw 3
+</figcaption>
+<img src="assets/evidence/section6/query-2.png" alt="Fresh generated sample 3">
+<div class="fragment" data-fragment-index="0">
+<span>Nearest training image</span><img src="assets/evidence/section6/nearest-2.png" alt="Pixel-MSE nearest training image for generated sample 3"><small>MSE = 0.0746</small>
+</div>
+</figure>
+</div>
+<div class="fragment takeaway" data-fragment-index="1">
+<p>Nearest neighbors are a useful sanity check. Pixel distance alone cannot establish whether a model memorized.</p>
+</div>
+<p class="gan-source">
+Actual outputs and exhaustive nearest-neighbor search · mean squared pixel error in [0,1], using original floating-point outputs · no query selection · <a href="assets/evidence/section6/evaluation.json">indices and distances</a> · training data: <a href="https://github.com/zalandoresearch/fashion-mnist">Fashion-MNIST</a>.
+</p>
+<aside class="notes">
+<p>Ask students to inspect the generated images first. Reveal their nearest training images and exact pixel-MSE distances together. The queries are fresh draws 1,2,3 from the preceding gallery, not selected to illustrate either copying or novelty. The search covers all 12,000 training images with the original generated tensors; displayed PNGs are rounded only for visualization.</p>
+<p>A match can help identify obvious copying or suspicious repeated templates. A different-looking nearest image is not proof of novelty, and a similar-looking nearest image is not proof of memorization. Aligned grayscale garments can be legitimately similar, while a translation or small deformation can produce substantial pixel distance. Our three query distances are observations, not thresholds for accepting the model. We do not claim a memorization test from a handful of visual pairs.</p>
+<p>Reveal the limitation after students interpret the pairs. A broader audit would compare more uncurated samples and training versus held-out relationships under a similarity notion appropriate to the task. Do not turn that into an unexplained new metric here. This lecture establishes the discipline of asking what evidence supports a claim and preserving the experiment’s limitations.</p>
+<p>Connect the three checks: fresh batches probe visible variety and failures; fixed-code checkpoints expose changes over training; nearest-training-image inspection probes suspicious similarity. They answer different questions and do not replace one another. The last slide assembles this evaluation discipline with the generator, discriminator, losses, and update procedure already taught.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gan-final-synthesis" class="slide level2 gan-s6">
+<h2>Assemble the system—and the evidence to judge it</h2>
+<p class="gan-lead">
+Task: generate varied <strong>28 × 28 grayscale garments</strong> from random codes.<br>You have unlabeled images and a held-out split. Specify the five parts below.
+</p>
+<div class="gan-final-prompts">
+<span>Data<br><strong>range + split?</strong></span><span>Hypothesis<br><strong>G and D?</strong></span><span>Loss<br><strong>targets?</strong></span><span>Optimization<br><strong>which weights?</strong></span><span>Evaluation<br><strong>what evidence?</strong></span>
+</div>
+<div class="exercise-pause">
+<span>PAUSE</span><b>90 seconds</b><small>State the sampling path too: which network is needed after training?</small>
+</div>
+<div class="exercise-solution fragment gan-final-solution" data-fragment-index="0">
+<span class="solution-label">WORKED SOLUTION · ONE COHERENT PIPELINE</span>
+<table>
+<tbody>
+<tr>
+<th>
+Data
+</th>
+<td>
+Scale real images to [−1, 1]; keep a held-out reference.
+</td>
+</tr>
+<tr>
+<th>
+Hypothesis
+</th>
+<td>
+z → convolutional G → image → convolutional D → logit.
+</td>
+</tr>
+<tr>
+<th>
+Loss
+</th>
+<td>
+D targets: real 1, fake 0. G target: 1 through D.
+</td>
+</tr>
+<tr>
+<th>
+Optimization
+</th>
+<td>
+D turn: detach G output. G turn: keep the path through fixed D.
+</td>
+</tr>
+<tr>
+<th>
+Evaluation
+</th>
+<td>
+Fresh batches + fixed-code history + nearest training images.
+</td>
+</tr>
+</tbody>
+</table>
+<p>
+<strong>Sampling:</strong> draw z → G in eval mode → image. D is a training partner.
+</p>
+</div>
+<p class="gan-source">
+Lecture synthesis · the objective, gradient paths, model shapes, and evidence checks have all been demonstrated · runnable reference: <a href="assets/conv_gan.py">convolutional GAN</a> and <a href="assets/build_section6.py">evaluation builder</a>.
+</p>
+<aside class="notes">
+<p>Give the full pause. The task is unconditional generation, not selecting a requested garment category, so no conditioning machinery is needed. Students should combine the five familiar parts rather than list unrelated GAN facts. Encourage them to trace one D update, one G update, and one sampling call.</p>
+<p>Reveal the complete worked solution. Data preprocessing and generator output range must agree. The convolutional architecture maps random codes into images and images into logits. The targets express the two distinct objectives. Optimizer ownership and gradient paths ensure the correct parameters change. Evaluation needs complementary evidence; neither a visually attractive single sample nor a low loss settles the task.</p>
+<p>For the reference architecture, retain the BatchNorm policy explained in section 5. At sampling time use G.eval() and no_grad, then map Tanh outputs back into display range. D is unnecessary for this unconditional forward-generation path. The code reference includes those details; no new implementation contract is being introduced here.</p>
+<p>Return to the opening problem: a random code has no paired target image. The learned discriminator supplies a differentiable training criterion; the generator learns an image-making mapping; alternating updates coordinate their competing goals. End with the responsibility to judge the resulting distribution using evidence appropriate to the task. The next scheduled course meetings are student project presentations, with exact presentation slots announced separately.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+<p>Deep Learning · Chapter 12</p>
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="../../site_libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="../../site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="../../site_libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="../../site_libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="../../site_libs/revealjs/plugin/search/search.js"></script>
+  <script src="../../site_libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="../../site_libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': false,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1440,
+
+        height: 900,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 5.5e-2,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script>
+    (async function () {
+      const root = 'assets/evidence/section1/';
+      const response = await fetch(root + 'manifest.json');
+      if (!response.ok) throw new Error('Unable to load recorded GAN section 1 evidence');
+      const data = await response.json();
+      const names = {A: 'T-shirt', B: 'Boot', C: 'Bag'};
+      function target(letter) {
+        const item = data.targets.find(x => x.letter === letter);
+        document.querySelectorAll('[data-target]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.target === letter)));
+        document.getElementById('gan-target-title').textContent = 'Proposed target ' + letter + ' · ' + names[letter];
+        const image = document.getElementById('gan-target-image');
+        image.src = root + item.file; image.alt = 'Unrelated real Fashion-MNIST ' + names[letter] + ' proposed as target ' + letter + '.';
+        const difference = document.getElementById('gan-difference-image');
+        difference.src = root + item.difference; difference.alt = 'Absolute pixel difference for target ' + letter + '; black is zero, orange is one.';
+        document.getElementById('gan-target-mse').textContent = item.mse.toFixed(4);
+      }
+      function checkpoint(epoch) {
+        const row = data.history.find(x => x.epoch === epoch);
+        document.querySelectorAll('[data-epoch]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.epoch) === epoch)));
+        data.gallery.forEach((item, i) => {
+          const score = row.gallery_scores[i];
+          document.getElementById('judge-score-' + item.letter).textContent = score < .001 ? '<0.001' : score > .999 ? '>0.999' : score.toFixed(3);
+          document.getElementById('judge-bar-' + item.letter).style.width = (100 * score) + '%';
+        });
+        document.getElementById('judge-accuracy').textContent = (100 * row.accuracy).toFixed(1) + '%';
+      }
+      document.querySelectorAll('[data-target]').forEach(button => button.addEventListener('click', () => target(button.dataset.target)));
+      document.querySelectorAll('[data-epoch]').forEach(button => button.addEventListener('click', () => checkpoint(Number(button.dataset.epoch))));
+      document.getElementById('gan-fixed-code').textContent = 'z = (' + data.candidate_z.map(x => x.toFixed(2)).join(', ') + ') · fixed decoder';
+      target('A'); checkpoint(0);
+    })().catch(error => {
+      console.error(error);
+      for (const id of ['gan-target-mse', 'judge-accuracy']) {
+        const element = document.getElementById(id); if (element) element.textContent = 'Evidence unavailable';
+      }
+    });
+    </script>
+    <script>
+    (() => {
+      const slide = document.getElementById('gan-routing-exercise');
+      if (!slide) return;
+      const status = document.getElementById('gan-route-status');
+      const descriptions = {
+        real: 'Real batch → D → 4 logits. G is unused on this path.',
+        fake: '4 random codes → G → 4 images → the same D → 4 logits.',
+        sample: '4 random codes → G → 4 images. D is unused when sampling.'
+      };
+      const active = {real: ['real','judge'], fake: ['generator','fake','judge'], sample: ['generator']};
+      function route(value) {
+        slide.querySelectorAll('[data-route]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.route === value)));
+        slide.querySelectorAll('[data-path]').forEach(el => el.classList.toggle('route-inactive', Boolean(value) && !active[value].includes(el.dataset.path)));
+        status.textContent = descriptions[value] || 'Trace a path: the same D accepts either image source.';
+      }
+      slide.querySelectorAll('[data-route]').forEach(b => b.addEventListener('click', () => route(b.dataset.route)));
+      function hook() {
+        Reveal.on('fragmenthidden', e => { if (slide.contains(e.fragment)) route(null); });
+        Reveal.on('slidechanged', () => route(null));
+      }
+      if (typeof Reveal !== 'undefined') hook();
+      else window.addEventListener('load', hook, {once:true});
+    })();
+    </script>
+    <script>
+    (() => {
+     const slider=document.getElementById('gan-fake-score');
+     if(!slider)return;
+     function updateScore(){
+      const p=Number(slider.value)/100,d=-Math.log1p(-p),g=-Math.log(p),max=-Math.log(.01);
+      document.getElementById('gan-fake-score-value').textContent=p.toFixed(2);
+      document.getElementById('gan-d-fake-loss').textContent=d.toFixed(3);
+      document.getElementById('gan-g-fake-loss').textContent=g.toFixed(3);
+      document.getElementById('gan-d-loss-bar').style.width=(100*d/max)+'%';
+      document.getElementById('gan-g-loss-bar').style.width=(100*g/max)+'%';
+     }
+     slider.addEventListener('input',updateScore);updateScore();
+     document.querySelectorAll('[data-gradient-p]').forEach(button=>button.addEventListener('click',()=>{
+      const p=Number(button.dataset.gradientP),a=Math.log(p/(1-p)),x=90+(a+6)*80;
+      document.querySelectorAll('[data-gradient-p]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+      const cursor=document.getElementById('gradient-cursor');cursor.setAttribute('x1',x);cursor.setAttribute('x2',x);
+      for(const [id,v] of [['gradient-minimax',p],['gradient-nonsat',1-p]]){const dot=document.getElementById(id);dot.setAttribute('cx',x);dot.setAttribute('cy',390-v*300);}
+      document.getElementById('gan-gradient-values').textContent='|∂ℓ/∂a|: '+p.toFixed(2)+' vs '+(1-p).toFixed(2);
+     }));
+    })();
+    </script>
+    <script>
+    (() => {
+     const slide=document.getElementById('gan-alternating-paths');if(!slide)return;
+     function update(turn){
+      slide.querySelectorAll('[data-update-turn]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.updateTurn===turn)));
+      slide.querySelectorAll('[data-turn-only]').forEach(el=>{if(el.dataset.turnOnly===turn)el.removeAttribute('hidden');else el.setAttribute('hidden','');});
+      document.getElementById('turn-g-label').textContent=turn==='G'?'G updates':'G fixed';
+      document.getElementById('turn-d-label').textContent=turn==='D'?'D updates':'D fixed';
+      document.getElementById('gan-turn-status').textContent=turn==='D'?"D's turn: classify both sources. Stop the generated-image path before G.":"G's turn: target 1. Differentiate through D; update only G.";
+     }
+     slide.querySelectorAll('[data-update-turn]').forEach(b=>b.addEventListener('click',()=>update(b.dataset.updateTurn)));update('D');
+    })();
+    </script>
+    <script>
+    (() => {
+     const moduleButtons=document.querySelectorAll('[data-conv-module]');
+     moduleButtons.forEach(b=>b.addEventListener('click',()=>{
+      moduleButtons.forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+      document.querySelectorAll('[data-conv-panel]').forEach(p=>{p.hidden=p.dataset.convPanel!==b.dataset.convModule;});
+      if(typeof Reveal!=='undefined')Reveal.layout();
+     }));
+     const epochButtons=document.querySelectorAll('[data-gan-epoch]');
+     epochButtons.forEach(b=>b.addEventListener('click',()=>{
+      const epoch=b.dataset.ganEpoch;
+      epochButtons.forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+      document.querySelectorAll('[data-gan-sample]').forEach(im=>{
+       im.src='assets/evidence/section5/epoch-'+epoch+'-sample-'+im.dataset.ganSample+'.png';
+       im.alt='Actual generated image from fixed latent draw '+(Number(im.dataset.ganSample)+1)+', recorded epoch '+epoch;
+      });
+      document.getElementById('gan-training-status').textContent='Epoch '+epoch+' · '+(epoch==='0'?'untrained initialization':(Number(epoch)*94)+' alternating updates')+' · fixed draws 1–6';
+     }));
+    })();
+    </script>
+    <script>
+    (() => {
+     let batch=0,repeated=false;
+     const repeat=document.getElementById('gan-repeat-control');if(!repeat)return;
+     function showBatch(){
+      document.querySelectorAll('[data-eval-batch]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.evalBatch)===batch)));
+      repeat.setAttribute('aria-pressed',String(repeated));repeat.textContent=repeated?'Return to actual outputs':'Show repetition control';
+      const real=document.getElementById('gan-eval-real'),generated=document.getElementById('gan-eval-generated');
+      real.src='assets/evidence/section6/real-'+batch+'.png';real.alt='Held-out Fashion-MNIST reference batch '+(batch+1);
+      generated.src='assets/evidence/section6/'+(repeated?'repeated':'generated')+'-'+batch+'.png';
+      generated.alt=repeated?'Constructed control: one output repeated twelve times':'Twelve actual fresh generated outputs, batch '+(batch+1);
+      document.getElementById('gan-eval-generated-label').textContent=repeated?'Constructed control · one image repeated':'Actual G · 12 fresh latent draws';
+      document.getElementById('gan-eval-status').textContent=repeated?'CONTROL: duplicated display, not observed model collapse':'Recorded outputs · batch '+(batch+1)+' of 3 · no selection by quality';
+     }
+     document.querySelectorAll('[data-eval-batch]').forEach(b=>b.addEventListener('click',()=>{batch=Number(b.dataset.evalBatch);showBatch();}));
+     repeat.addEventListener('click',()=>{repeated=!repeated;showBatch();});showBatch();
+     fetch('assets/evidence/section6/losses.json').then(r=>{if(!r.ok)throw Error('Loss record unavailable');return r.json();}).then(history=>{
+      function select(epoch){
+       const row=history.find(r=>r.epoch===epoch),x=70+(epoch-1)*780/59;
+       document.querySelectorAll('[data-loss-checkpoint]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.lossCheckpoint)===epoch)));
+       const marker=document.getElementById('gan-loss-epoch-marker');marker.setAttribute('x1',x);marker.setAttribute('x2',x);
+       for(const [id,i] of [['gan-loss-sample-a',0],['gan-loss-sample-b',4]]){const im=document.getElementById(id);im.src='assets/evidence/section5/epoch-'+epoch+'-sample-'+i+'.png';im.alt='Fixed draw '+(i+1)+', recorded epoch '+epoch;}
+       document.getElementById('gan-loss-checkpoint-values').textContent='Epoch '+epoch+' · D: '+row.loss_D.toFixed(3)+' · G: '+row.loss_G.toFixed(3);
+      }
+      document.querySelectorAll('[data-loss-checkpoint]').forEach(b=>b.addEventListener('click',()=>select(Number(b.dataset.lossCheckpoint))));select(20);
+     }).catch(()=>{document.getElementById('gan-loss-checkpoint-values').textContent='Recorded values could not be loaded.';});
+    })();
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

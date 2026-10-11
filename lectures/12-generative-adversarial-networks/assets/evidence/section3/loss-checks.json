@@ -1,0 +1,48 @@
+{
+  "purpose": "Exact scalar examples and losses on recorded untrained section 2 logits; no training",
+  "loss_D": 1.4043543338775635,
+  "loss_G": 0.7014364004135132,
+  "gradient_checks": [
+    {
+      "p": 0.01,
+      "logit": -4.59511985013459,
+      "minimax": -0.010050335853501442,
+      "non_saturating": 4.605170185988091,
+      "minimax_derivative": -0.01,
+      "non_saturating_derivative": -0.99
+    },
+    {
+      "p": 0.2,
+      "logit": -1.3862943611198906,
+      "minimax": -0.22314355131420976,
+      "non_saturating": 1.6094379124341003,
+      "minimax_derivative": -0.2,
+      "non_saturating_derivative": -0.8
+    },
+    {
+      "p": 0.5,
+      "logit": 0.0,
+      "minimax": -0.6931471805599453,
+      "non_saturating": 0.6931471805599453,
+      "minimax_derivative": -0.5,
+      "non_saturating_derivative": -0.5
+    },
+    {
+      "p": 0.8,
+      "logit": 1.3862943611198908,
+      "minimax": -1.6094379124341005,
+      "non_saturating": 0.2231435513142097,
+      "minimax_derivative": -0.8,
+      "non_saturating_derivative": -0.19999999999999996
+    },
+    {
+      "p": 0.99,
+      "logit": 4.595119850134589,
+      "minimax": -4.60517018598809,
+      "non_saturating": 0.01005033585350145,
+      "minimax_derivative": -0.99,
+      "non_saturating_derivative": -0.010000000000000009
+    }
+  ],
+  "torch": "2.13.0+cu130"
+}

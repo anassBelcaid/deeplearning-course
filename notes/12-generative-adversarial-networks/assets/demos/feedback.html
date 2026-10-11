@@ -1,0 +1,33 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="../../../../lectures/12-generative-adversarial-networks/"><title>GAN notes: feedback</title><link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-f3e585dc122d45960ea2c31f625881dd.css"><link rel="stylesheet" href="../01-what-is-learning/slides.css"><link rel="stylesheet" href="week12.css"><style>
+ html,body { margin:0; padding:0; background:#f5f1e8; overflow:hidden; }
+ #canvas { width:1280px; transform-origin:top left; }
+ .reveal { width:1280px; height:auto; font-size:28px; }
+ .reveal .slides { width:1280px!important; height:auto!important; position:relative; inset:auto; margin:0; transform:none!important; perspective:none; text-align:left; }
+ .reveal .slides>section { display:block; position:relative; top:auto; left:auto; padding:22px; width:100%; height:auto; box-sizing:border-box; transform:none; opacity:1; pointer-events:auto; }
+ .reveal .fragment { opacity:1; visibility:visible; }
+ .reveal section [hidden] { display:none!important; }
+ .reveal .gan-source,.reveal .slide-number { display:none; }
+ .reveal .gan-code-layout { margin:0; }
+ .reveal .gan-code-layout>div:empty { display:none; }
+ .reveal .gan-routing-solution { position:relative; top:auto; left:auto; right:auto; margin-top:12px; box-shadow:none; }
+ .reveal .gan-spatial-architecture svg { max-width:100%; }
+ </style></head><body><div id="canvas"><div class="reveal"><div class="slides"><section class="slide level2 present" id="gan-feedback-idea">
+
+<p class="gan-lead">
+We have learned to distinguish sources. Now give the image maker a reason to change.
+</p>
+<div class="course-network-diagram gan-feedback-diagram">
+<svg aria-labelledby="gan-flow-title gan-flow-desc" role="img" viewbox="0 0 1280 485">
+<title id="gan-flow-title">
+The proposed adversarial feedback loop
+</title>
+<desc id="gan-flow-desc">Real examples and generated images reach the same learned judge. On advancement, a dashed training-feedback path appears from the judge toward the generator. This is a conceptual GAN setup, not measured GAN training.</desc> <defs><marker id="gan-flow-arrow" markerheight="6" markerwidth="6" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M1 1 9 5 1 9" fill="none" stroke="#526575" stroke-width="1.5"></path></marker><marker id="gan-feedback-arrow" markerheight="6" markerwidth="6" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M1 1 9 5 1 9" fill="none" stroke="#ef5b45" stroke-width="1.5"></path></marker></defs> <g fill="#17212b" font-family="Manrope,sans-serif"> <text font-size="26" x="45" y="104">Dataset</text> <image height="142" href="assets/evidence/section1/gallery-0.png" width="142" x="630" y="30"/> <text font-size="23" text-anchor="middle" x="701" y="205">Real image</text> <text font-size="26" x="45" y="302">Random z</text> <rect fill="#dceeff" height="104" rx="16" stroke="#9ebdd1" stroke-width="2" width="240" x="246" y="247"></rect> <text font-size="28" font-weight="700" text-anchor="middle" x="366" y="289">Image maker</text><text font-size="22" text-anchor="middle" x="366" y="325">Generator</text> <image height="142" href="assets/evidence/section1/candidate.png" width="142" x="630" y="233"/> <text font-size="23" text-anchor="middle" x="701" y="406">Generated image</text> <rect fill="#f6e1d9" height="118" rx="16" stroke="#d7aea0" stroke-width="2" width="275" x="960" y="155"></rect> <text font-size="28" font-weight="700" text-anchor="middle" x="1097" y="202">Learned judge</text><text font-size="22" text-anchor="middle" x="1097" y="241">Discriminator</text> <g fill="none" marker-end="url(#gan-flow-arrow)" stroke="#526575" stroke-width="3"><path d="M181 100H612"></path><path d="M181 298H228"></path><path d="M504 298H612"></path><path d="M790 100H882Q901 100 901 120V185H942"></path><path d="M790 304H882Q901 304 901 284V244H942"></path></g> <g class="" data-fragment-index="0"><path d="M1096 293V434Q1096 452 1078 452H384Q366 452 366 434V369" fill="none" marker-end="url(#gan-feedback-arrow)" stroke="#ef5b45" stroke-dasharray="11 8" stroke-width="4"></path><rect fill="#f5f1e8" height="46" width="490" x="449" y="427"></rect><text fill="#c44834" font-size="24" text-anchor="middle" x="694" y="457">Training feedback to the generator</text></g> </g>
+</svg>
+</div>
+
+
+
+</section></div></div></div><script>window.Reveal={on:()=>{},layout:()=>{}};</script><script>
+function resize(){const c=document.getElementById('canvas'),s=Math.min(1,innerWidth/1280);c.style.transform='scale('+s+')';const h=Math.ceil(c.getBoundingClientRect().height)+2;document.body.style.height=h+'px';parent.postMessage({type:'gan-notes-height',height:h},location.origin);}
+new ResizeObserver(resize).observe(document.querySelector('#canvas .slides'));addEventListener('resize',resize);addEventListener('load',resize);document.fonts.ready.then(resize);resize();
+</script></body></html>

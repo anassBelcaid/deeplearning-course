@@ -1,0 +1,79 @@
+---
+title: "Anime face generation: an experimental report"
+author: "Replace with your name"
+format:
+  html:
+    embed-resources: true
+    toc: true
+  pdf:
+    toc: false
+    documentclass: article
+    geometry: margin=22mm
+execute:
+  enabled: false
+---
+
+<!-- Replace every prompt with your analysis. Figures live in anime_results/ next to this file.
+Render: quarto render report_template.qmd --to html
+Optional: quarto render report_template.qmd --to pdf (requires LaTeX).
+The notebook also supplies an HTML renderer that does not require Quarto or LaTeX. -->
+
+## Question and hypothesis
+
+State your model family, one controlled change, initial prediction and what would falsify it.
+
+## Dataset
+
+Cite [Kaggle Anime Face Dataset](https://www.kaggle.com/datasets/splcher/animefacedataset).
+Record version/date, source attribution, terms, measured discovered/scanned/retained counts,
+exclusions, exact-duplicate policy, split sizes, preprocessing, and dataset biases.
+
+![Training-data preview. Replace with selection and preprocessing details.](anime_results/dataset_preview.png)
+
+## Architecture and objective
+
+Insert your diagram and tensor dimensions. Explain parameter counts, activations, normalization,
+output range, exact objective equations and reduction convention.
+
+![Your architecture: shapes, operations and parameter counts.](anime_results/architecture.png)
+
+## Training protocol
+
+Report both actual runs: software/hardware, seed(s), optimizer(s), learning rates, batch size,
+updates/epochs, elapsed time, examples seen, mode policy, stopping and checkpoint selection.
+Distinguish planned budget from actual compute. Explain what remained controlled.
+
+| Setting | Baseline A | Variant B |
+|---|---|---|
+| Changed factor | Fill | Fill |
+| Steps / examples seen | Fill | Fill |
+| Training time / hardware | Fill | Fill |
+| Checkpoint selection | Fill | Fill |
+
+## Results and metrics
+
+Insert measurements from evaluation.json and final_evaluation.json. State sample counts, image range,
+resolution, reference pool size, seeds and definitions. Explain what each diagnostic can and cannot show.
+
+![Baseline losses with reductions and update axis.](anime_results/A/curves.png)
+
+![Variant losses with the same declared protocol.](anime_results/B/curves.png)
+
+![Fixed codes across checkpoints; name the epochs or steps.](anime_results/fixed_history.png)
+
+![Baseline: first 64 development draws, not curated.](anime_results/A/fresh.png)
+
+![Variant: first 64 development draws, not curated.](anime_results/B/fresh.png)
+
+![Final selected model: first 64 new draws after validation selection.](anime_results/final_samples.png)
+
+<!-- Insert the selected run's nearest.png here, with reference pool size and query-selection rule. -->
+
+## Limitations and conclusion
+
+Answer the initial question using evidence. Separate observation from causal explanation.
+Include failures, possible near-duplicate leakage, metric limitations, compute limits and one next experiment.
+
+## References and assistance
+
+Cite dataset, papers, adapted code, and external/AI assistance. Explain which code and decisions are yours.

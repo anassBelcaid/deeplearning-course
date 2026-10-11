@@ -1,0 +1,89 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="../../../../lectures/12-generative-adversarial-networks/"><title>GAN notes: training</title><link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-f3e585dc122d45960ea2c31f625881dd.css"><link rel="stylesheet" href="../01-what-is-learning/slides.css"><link rel="stylesheet" href="week12.css"><style>
+ html,body { margin:0; padding:0; background:#f5f1e8; overflow:hidden; }
+ #canvas { width:1280px; transform-origin:top left; }
+ .reveal { width:1280px; height:auto; font-size:28px; }
+ .reveal .slides { width:1280px!important; height:auto!important; position:relative; inset:auto; margin:0; transform:none!important; perspective:none; text-align:left; }
+ .reveal .slides>section { display:block; position:relative; top:auto; left:auto; padding:22px; width:100%; height:auto; box-sizing:border-box; transform:none; opacity:1; pointer-events:auto; }
+ .reveal .fragment { opacity:1; visibility:visible; }
+ .reveal section [hidden] { display:none!important; }
+ .reveal .gan-source,.reveal .slide-number { display:none; }
+ .reveal .gan-code-layout { margin:0; }
+ .reveal .gan-code-layout>div:empty { display:none; }
+ .reveal .gan-routing-solution { position:relative; top:auto; left:auto; right:auto; margin-top:12px; box-shadow:none; }
+ .reveal .gan-spatial-architecture svg { max-width:100%; }
+ </style></head><body><div id="canvas"><div class="reveal"><div class="slides"><section class="slide level2 gan-s5 present" id="gan-conv-training">
+
+<p class="gan-lead">
+Six fixed latent draws. One convolutional GAN. Only the learned model state changes.
+</p>
+<div aria-label="Inspect a recorded GAN checkpoint" class="gan-judge-controls" role="group">
+<span>Recorded epoch</span><button aria-pressed="true" data-gan-epoch="0" type="button">0</button><button aria-pressed="false" data-gan-epoch="1" type="button">1</button><button aria-pressed="false" data-gan-epoch="5" type="button">5</button><button aria-pressed="false" data-gan-epoch="20" type="button">20</button><button aria-pressed="false" data-gan-epoch="60" type="button">60</button>
+</div>
+<div class="gan-training-gallery">
+<figure>
+<img alt="Generated image from fixed latent draw 1, before training" data-gan-sample="0" src="assets/evidence/section5/epoch-0-sample-0.png"/>
+<figcaption>
+Draw 1
+</figcaption>
+</figure>
+<figure>
+<img alt="Generated image from fixed latent draw 2, before training" data-gan-sample="1" src="assets/evidence/section5/epoch-0-sample-1.png"/>
+<figcaption>
+Draw 2
+</figcaption>
+</figure>
+<figure>
+<img alt="Generated image from fixed latent draw 3, before training" data-gan-sample="2" src="assets/evidence/section5/epoch-0-sample-2.png"/>
+<figcaption>
+Draw 3
+</figcaption>
+</figure>
+<figure>
+<img alt="Generated image from fixed latent draw 4, before training" data-gan-sample="3" src="assets/evidence/section5/epoch-0-sample-3.png"/>
+<figcaption>
+Draw 4
+</figcaption>
+</figure>
+<figure>
+<img alt="Generated image from fixed latent draw 5, before training" data-gan-sample="4" src="assets/evidence/section5/epoch-0-sample-4.png"/>
+<figcaption>
+Draw 5
+</figcaption>
+</figure>
+<figure>
+<img alt="Generated image from fixed latent draw 6, before training" data-gan-sample="5" src="assets/evidence/section5/epoch-0-sample-5.png"/>
+<figcaption>
+Draw 6
+</figcaption>
+</figure>
+</div>
+<p aria-live="polite" class="gan-training-status" id="gan-training-status">
+Epoch 0 · untrained initialization · fixed draws 1–6
+</p>
+
+
+
+</section></div></div></div><script>window.Reveal={on:()=>{},layout:()=>{}};</script><script>
+(() => {
+ const moduleButtons=document.querySelectorAll('[data-conv-module]');
+ moduleButtons.forEach(b=>b.addEventListener('click',()=>{
+  moduleButtons.forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+  document.querySelectorAll('[data-conv-panel]').forEach(p=>{p.hidden=p.dataset.convPanel!==b.dataset.convModule;});
+  if(typeof Reveal!=='undefined')Reveal.layout();
+ }));
+ const epochButtons=document.querySelectorAll('[data-gan-epoch]');
+ epochButtons.forEach(b=>b.addEventListener('click',()=>{
+  const epoch=b.dataset.ganEpoch;
+  epochButtons.forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+  document.querySelectorAll('[data-gan-sample]').forEach(im=>{
+   im.src='assets/evidence/section5/epoch-'+epoch+'-sample-'+im.dataset.ganSample+'.png';
+   im.alt='Actual generated image from fixed latent draw '+(Number(im.dataset.ganSample)+1)+', recorded epoch '+epoch;
+  });
+  document.getElementById('gan-training-status').textContent='Epoch '+epoch+' · '+(epoch==='0'?'untrained initialization':(Number(epoch)*94)+' alternating updates')+' · fixed draws 1–6';
+ }));
+})();
+</script>
+<script>
+function resize(){const c=document.getElementById('canvas'),s=Math.min(1,innerWidth/1280);c.style.transform='scale('+s+')';const h=Math.ceil(c.getBoundingClientRect().height)+2;document.body.style.height=h+'px';parent.postMessage({type:'gan-notes-height',height:h},location.origin);}
+new ResizeObserver(resize).observe(document.querySelector('#canvas .slides'));addEventListener('resize',resize);addEventListener('load',resize);document.fonts.ready.then(resize);resize();
+</script></body></html>

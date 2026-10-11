@@ -1,0 +1,46 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="../../../../lectures/12-generative-adversarial-networks/"><title>GAN notes: updates</title><link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-f3e585dc122d45960ea2c31f625881dd.css"><link rel="stylesheet" href="../01-what-is-learning/slides.css"><link rel="stylesheet" href="week12.css"><style>
+ html,body { margin:0; padding:0; background:#f5f1e8; overflow:hidden; }
+ #canvas { width:1280px; transform-origin:top left; }
+ .reveal { width:1280px; height:auto; font-size:28px; }
+ .reveal .slides { width:1280px!important; height:auto!important; position:relative; inset:auto; margin:0; transform:none!important; perspective:none; text-align:left; }
+ .reveal .slides>section { display:block; position:relative; top:auto; left:auto; padding:22px; width:100%; height:auto; box-sizing:border-box; transform:none; opacity:1; pointer-events:auto; }
+ .reveal .fragment { opacity:1; visibility:visible; }
+ .reveal section [hidden] { display:none!important; }
+ .reveal .gan-source,.reveal .slide-number { display:none; }
+ .reveal .gan-code-layout { margin:0; }
+ .reveal .gan-code-layout>div:empty { display:none; }
+ .reveal .gan-routing-solution { position:relative; top:auto; left:auto; right:auto; margin-top:12px; box-shadow:none; }
+ .reveal .gan-spatial-architecture svg { max-width:100%; }
+ </style></head><body><div id="canvas"><div class="reveal"><div class="slides"><section class="slide level2 gan-s4 present" id="gan-alternating-paths">
+
+<div aria-label="Choose whose training turn to trace" class="gan-judge-controls" role="group">
+<span>One iteration</span><button aria-pressed="true" data-update-turn="D" type="button">1 · D’s turn</button><button aria-pressed="false" data-update-turn="G" type="button">2 · G’s turn</button>
+</div>
+<div class="course-network-diagram gan-update-flow">
+<svg aria-label="update flow" role="img" viewbox="0 0 1280 500">
+<defs><marker id="update-flow-arrow" markerheight="6" markerwidth="6" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M1 1 9 5 1 9" fill="none" stroke="context-stroke" stroke-width="1.5"></path></marker></defs><text class="network-label" style="font-size:25px" x="35" y="58">Forward: compute a loss</text><g><rect class="network-node network-value" height="110" rx="15" width="100" x="30" y="190"></rect><text class="network-label" style="font-size:27px" text-anchor="middle" x="80.0" y="253.0">z</text></g><g><rect class="network-node network-generator" height="110" rx="15" width="190" x="210" y="190"></rect><text class="network-label" style="font-size:27px" text-anchor="middle" x="305.0" y="253.0">G</text></g><g><rect class="network-node network-value" height="110" rx="15" width="180" x="495" y="190"></rect><text class="network-label" style="font-size:27px" text-anchor="middle" x="585.0" y="253.0">image</text></g><g><rect class="network-node network-discriminator" height="110" rx="15" width="190" x="780" y="190"></rect><text class="network-label" style="font-size:27px" text-anchor="middle" x="875.0" y="253.0">D</text></g><g><rect class="network-node network-value" height="110" rx="15" width="170" x="1080" y="190"></rect><text class="network-label" style="font-size:27px" text-anchor="middle" x="1165.0" y="253.0">loss</text></g><path d="M148 245H192" fill="none" marker-end="url(#update-flow-arrow)" stroke="#526575" stroke-width="3"></path><path d="M418 245H477" fill="none" marker-end="url(#update-flow-arrow)" stroke="#526575" stroke-width="3"></path><path d="M693 245H762" fill="none" marker-end="url(#update-flow-arrow)" stroke="#526575" stroke-width="3"></path><path d="M988 245H1062" fill="none" marker-end="url(#update-flow-arrow)" stroke="#526575" stroke-width="3"></path><g data-turn-only="D"><g><rect class="network-node network-value" height="75" rx="15" width="180" x="495" y="60"></rect><text class="network-label" style="font-size:27px" text-anchor="middle" x="585.0" y="105.5">real x</text></g><path d="M693 97H875V172" fill="none" marker-end="url(#update-flow-arrow)" stroke="#526575" stroke-width="3"></path><text class="network-label" style="font-size:23px" text-anchor="middle" x="720" y="337">detach</text><path d="M725 220V270" stroke="#c44834" stroke-width="5"></path></g><text class="network-label" style="font-size:25px" x="800" y="58">Backward: gradients</text><path d="M1165 319V385H875V319" fill="none" marker-end="url(#update-flow-arrow)" stroke="#c44834" stroke-width="3"></path><g data-turn-only="G"><path d="M800 319V385H305V319" fill="none" marker-end="url(#update-flow-arrow)" stroke="#c44834" stroke-width="3"></path></g><text class="network-label" id="turn-g-label" style="font-size:27px" text-anchor="middle" x="305" y="455">G fixed</text><text class="network-label" id="turn-d-label" style="font-size:27px" text-anchor="middle" x="875" y="455">D updates</text>
+</svg>
+</div>
+<p aria-live="polite" class="gan-lead" id="gan-turn-status">
+D’s turn: classify both sources. Stop the generated-image path before G.
+</p>
+
+
+
+</section></div></div></div><script>window.Reveal={on:()=>{},layout:()=>{}};</script><script>
+(() => {
+ const slide=document.getElementById('gan-alternating-paths');if(!slide)return;
+ function update(turn){
+  slide.querySelectorAll('[data-update-turn]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.updateTurn===turn)));
+  slide.querySelectorAll('[data-turn-only]').forEach(el=>{if(el.dataset.turnOnly===turn)el.removeAttribute('hidden');else el.setAttribute('hidden','');});
+  document.getElementById('turn-g-label').textContent=turn==='G'?'G updates':'G fixed';
+  document.getElementById('turn-d-label').textContent=turn==='D'?'D updates':'D fixed';
+  document.getElementById('gan-turn-status').textContent=turn==='D'?"D's turn: classify both sources. Stop the generated-image path before G.":"G's turn: target 1. Differentiate through D; update only G.";
+ }
+ slide.querySelectorAll('[data-update-turn]').forEach(b=>b.addEventListener('click',()=>update(b.dataset.updateTurn)));update('D');
+})();
+</script>
+<script>
+function resize(){const c=document.getElementById('canvas'),s=Math.min(1,innerWidth/1280);c.style.transform='scale('+s+')';const h=Math.ceil(c.getBoundingClientRect().height)+2;document.body.style.height=h+'px';parent.postMessage({type:'gan-notes-height',height:h},location.origin);}
+new ResizeObserver(resize).observe(document.querySelector('#canvas .slides'));addEventListener('resize',resize);addEventListener('load',resize);document.fonts.ready.then(resize);resize();
+</script></body></html>

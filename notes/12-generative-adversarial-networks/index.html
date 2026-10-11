@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dr.&nbsp;A. Belcaid">
+<meta name="description" content="Complete visual notes, recorded GAN experiments, mathematical derivations, and a four-page technical review.">
+
+<title>Generative Adversarial Networks – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e90830a6c3a870e8aa2cd7457ccbff49.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="assets/notes.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../schedule.html"> 
+<span class="menu-text">Schedule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../student-projects/index.html"> 
+<span class="menu-text">Student Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../logistics.html"> 
+<span class="menu-text">Logistics</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://edstem.org/us/courses/102787/"> 
+<span class="menu-text">ED</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#from-generating-images-to-learning-a-judge" id="toc-from-generating-images-to-learning-a-judge" class="nav-link active" data-scroll-target="#from-generating-images-to-learning-a-judge"><span class="header-section-number">1</span> From generating images to learning a judge</a>
+  <ul class="collapse">
+  <li><a href="#first-inspect-the-evidence" id="toc-first-inspect-the-evidence" class="nav-link" data-scroll-target="#first-inspect-the-evidence"><span class="header-section-number">1.1</span> First inspect the evidence</a></li>
+  <li><a href="#why-not-compare-a-generated-draw-with-a-real-image" id="toc-why-not-compare-a-generated-draw-with-a-real-image" class="nav-link" data-scroll-target="#why-not-compare-a-generated-draw-with-a-real-image"><span class="header-section-number">1.2</span> Why not compare a generated draw with a real image?</a></li>
+  <li><a href="#a-classifier-can-learn-a-source-distinction" id="toc-a-classifier-can-learn-a-source-distinction" class="nav-link" data-scroll-target="#a-classifier-can-learn-a-source-distinction"><span class="header-section-number">1.3</span> A classifier can learn a source distinction</a></li>
+  <li><a href="#turn-the-classifier-into-a-training-partner" id="toc-turn-the-classifier-into-a-training-partner" class="nav-link" data-scroll-target="#turn-the-classifier-into-a-training-partner"><span class="header-section-number">1.4</span> Turn the classifier into a training partner</a></li>
+  </ul></li>
+  <li><a href="#two-networks-two-different-jobs" id="toc-two-networks-two-different-jobs" class="nav-link" data-scroll-target="#two-networks-two-different-jobs"><span class="header-section-number">2</span> Two networks, two different jobs</a>
+  <ul class="collapse">
+  <li><a href="#keep-sampling-separate-from-training" id="toc-keep-sampling-separate-from-training" class="nav-link" data-scroll-target="#keep-sampling-separate-from-training"><span class="header-section-number">2.1</span> Keep sampling separate from training</a></li>
+  <li><a href="#tensor-contracts-before-objectives" id="toc-tensor-contracts-before-objectives" class="nav-link" data-scroll-target="#tensor-contracts-before-objectives"><span class="header-section-number">2.2</span> Tensor contracts before objectives</a></li>
+  </ul></li>
+  <li><a href="#turning-competition-into-learning-objectives" id="toc-turning-competition-into-learning-objectives" class="nav-link" data-scroll-target="#turning-competition-into-learning-objectives"><span class="header-section-number">3</span> Turning competition into learning objectives</a>
+  <ul class="collapse">
+  <li><a href="#derive-ds-objective-from-source-labels" id="toc-derive-ds-objective-from-source-labels" class="nav-link" data-scroll-target="#derive-ds-objective-from-source-labels"><span class="header-section-number">3.1</span> Derive D’s objective from source labels</a></li>
+  <li><a href="#g-wants-the-opposite-decision-on-its-outputs" id="toc-g-wants-the-opposite-decision-on-its-outputs" class="nav-link" data-scroll-target="#g-wants-the-opposite-decision-on-its-outputs"><span class="header-section-number">3.2</span> G wants the opposite decision on its outputs</a></li>
+  <li><a href="#why-non-saturating-feedback-helps-at-a-rejected-sample" id="toc-why-non-saturating-feedback-helps-at-a-rejected-sample" class="nav-link" data-scroll-target="#why-non-saturating-feedback-helps-at-a-rejected-sample"><span class="header-section-number">3.3</span> Why non-saturating feedback helps at a rejected sample</a></li>
+  <li><a href="#what-would-an-ideal-discriminator-tell-us" id="toc-what-would-an-ideal-discriminator-tell-us" class="nav-link" data-scroll-target="#what-would-an-ideal-discriminator-tell-us"><span class="header-section-number">3.4</span> What would an ideal discriminator tell us?</a></li>
+  <li><a href="#implement-the-three-targets" id="toc-implement-the-three-targets" class="nav-link" data-scroll-target="#implement-the-three-targets"><span class="header-section-number">3.5</span> Implement the three targets</a></li>
+  </ul></li>
+  <li><a href="#training-one-network-at-a-time" id="toc-training-one-network-at-a-time" class="nav-link" data-scroll-target="#training-one-network-at-a-time"><span class="header-section-number">4</span> Training one network at a time</a>
+  <ul class="collapse">
+  <li><a href="#separate-gradient-paths-from-parameter-ownership" id="toc-separate-gradient-paths-from-parameter-ownership" class="nav-link" data-scroll-target="#separate-gradient-paths-from-parameter-ownership"><span class="header-section-number">4.1</span> Separate gradient paths from parameter ownership</a></li>
+  <li><a href="#ds-turn-learn-from-fixed-generated-examples" id="toc-ds-turn-learn-from-fixed-generated-examples" class="nav-link" data-scroll-target="#ds-turn-learn-from-fixed-generated-examples"><span class="header-section-number">4.2</span> D’s turn: learn from fixed generated examples</a></li>
+  <li><a href="#gs-turn-a-fixed-judge-with-a-differentiable-input" id="toc-gs-turn-a-fixed-judge-with-a-differentiable-input" class="nav-link" data-scroll-target="#gs-turn-a-fixed-judge-with-a-differentiable-input"><span class="header-section-number">4.3</span> G’s turn: a fixed judge with a differentiable input</a></li>
+  <li><a href="#debug-a-disconnected-generator" id="toc-debug-a-disconnected-generator" class="nav-link" data-scroll-target="#debug-a-disconnected-generator"><span class="header-section-number">4.4</span> Debug a disconnected generator</a></li>
+  <li><a href="#why-alternating-optimization-is-not-ordinary-loss-descent" id="toc-why-alternating-optimization-is-not-ordinary-loss-descent" class="nav-link" data-scroll-target="#why-alternating-optimization-is-not-ordinary-loss-descent"><span class="header-section-number">4.5</span> Why alternating optimization is not ordinary loss descent</a></li>
+  </ul></li>
+  <li><a href="#building-an-image-gan-with-convolutions" id="toc-building-an-image-gan-with-convolutions" class="nav-link" data-scroll-target="#building-an-image-gan-with-convolutions"><span class="header-section-number">5</span> Building an image GAN with convolutions</a>
+  <ul class="collapse">
+  <li><a href="#preserve-the-objectives-give-the-mappings-spatial-structure" id="toc-preserve-the-objectives-give-the-mappings-spatial-structure" class="nav-link" data-scroll-target="#preserve-the-objectives-give-the-mappings-spatial-structure"><span class="header-section-number">5.1</span> Preserve the objectives; give the mappings spatial structure</a></li>
+  <li><a href="#transposed-convolution-place-weight-and-add" id="toc-transposed-convolution-place-weight-and-add" class="nav-link" data-scroll-target="#transposed-convolution-place-weight-and-add"><span class="header-section-number">5.2</span> Transposed convolution: place, weight, and add</a></li>
+  <li><a href="#trace-every-layer-into-executable-code" id="toc-trace-every-layer-into-executable-code" class="nav-link" data-scroll-target="#trace-every-layer-into-executable-code"><span class="header-section-number">5.3</span> Trace every layer into executable code</a></li>
+  <li><a href="#observe-a-documented-training-trajectory" id="toc-observe-a-documented-training-trajectory" class="nav-link" data-scroll-target="#observe-a-documented-training-trajectory"><span class="header-section-number">5.4</span> Observe a documented training trajectory</a></li>
+  </ul></li>
+  <li><a href="#judging-samples-diversity-and-failure" id="toc-judging-samples-diversity-and-failure" class="nav-link" data-scroll-target="#judging-samples-diversity-and-failure"><span class="header-section-number">6</span> Judging samples, diversity, and failure</a>
+  <ul class="collapse">
+  <li><a href="#individual-plausibility-and-distributional-variety" id="toc-individual-plausibility-and-distributional-variety" class="nav-link" data-scroll-target="#individual-plausibility-and-distributional-variety"><span class="header-section-number">6.1</span> Individual plausibility and distributional variety</a></li>
+  <li><a href="#read-the-loss-history-together-with-images" id="toc-read-the-loss-history-together-with-images" class="nav-link" data-scroll-target="#read-the-loss-history-together-with-images"><span class="header-section-number">6.2</span> Read the loss history together with images</a></li>
+  <li><a href="#nearest-training-images-a-limited-copying-check" id="toc-nearest-training-images-a-limited-copying-check" class="nav-link" data-scroll-target="#nearest-training-images-a-limited-copying-check"><span class="header-section-number">6.3</span> Nearest training images: a limited copying check</a></li>
+  <li><a href="#assemble-the-complete-system" id="toc-assemble-the-complete-system" class="nav-link" data-scroll-target="#assemble-the-complete-system"><span class="header-section-number">6.4</span> Assemble the complete system</a></li>
+  </ul></li>
+  <li><a href="#annotated-reading-and-reproducibility" id="toc-annotated-reading-and-reproducibility" class="nav-link" data-scroll-target="#annotated-reading-and-reproducibility">Annotated reading and reproducibility</a>
+  <ul class="collapse">
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Generative Adversarial Networks</h1>
+<p class="subtitle lead">Chapter 12 · Learning an image distribution through a learned judge</p>
+</div>
+
+<div>
+  <div class="description">
+    Complete visual notes, recorded GAN experiments, mathematical derivations, and a four-page technical review.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dr.&nbsp;A. Belcaid </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="assets/chapter-cover.svg" class="img-fluid figure-img" alt="Blue expanding generator layers connect random codes to a generated garment. That image and a real garment enter orange contracting discriminator layers, with a dashed training-feedback path returning to the generator."></p>
+<figcaption>Random codes expand through a generator; generated and observed garments meet a shared discriminator. The dashed return path represents training feedback. Original course schematic with actual Fashion-MNIST and course GAN images; the bars are not measured activations.</figcaption>
+</figure>
+</div>
+<p>An unconditional image generator receives a random vector and returns an image. The difficult question is not how to produce 784 numbers, but <strong>what should make those numbers change during learning?</strong> A random code has no paired correct garment. In this chapter, a second network learns to distinguish observed images from generated ones, supplying a differentiable criterion for the image-making network.</p>
+<p>These notes follow the <a href="../../lectures/12-generative-adversarial-networks/index.html">approved lecture</a>, retain its visual evidence, and expand the reasoning behind its implementation. The <a href="index.pdf">four-page PDF</a> is a compact mathematical reference. The controls below replay recorded evidence or manipulate explicitly labeled schematics; they do not train a model in the browser.</p>
+<p>We assume familiarity with the VAE sampling path, binary cross-entropy, backpropagation, convolutions, and PyTorch optimizers. Our continuous example is <strong>unconditional generation of 28 × 28 grayscale Fashion-MNIST garments</strong>. Category labels are not used to train G or D. The same five questions organize the chapter: what data, what model, what loss, which update, and what evaluation?</p>
+<section id="from-generating-images-to-learning-a-judge" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> From generating images to learning a judge</h1>
+<section id="first-inspect-the-evidence" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="first-inspect-the-evidence"><span class="header-section-number">1.1</span> First inspect the evidence</h2>
+<p><strong>Exercise · 45 seconds.</strong> Exactly three of these six images come from the dataset and three are outputs of the previous chapter’s frozen VAE. Predict each source and record one visual clue before opening the solution.</p>
+<div class="blind-gallery">
+<figure class="figure">
+<img src="../../lectures/12-generative-adversarial-networks/assets/evidence/section1/gallery-0.png" alt="Garment A: source concealed for the exercise" class="figure-img">
+<figcaption>
+A
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/12-generative-adversarial-networks/assets/evidence/section1/gallery-1.png" alt="Garment B: source concealed for the exercise" class="figure-img">
+<figcaption>
+B
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/12-generative-adversarial-networks/assets/evidence/section1/gallery-2.png" alt="Garment C: source concealed for the exercise" class="figure-img">
+<figcaption>
+C
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/12-generative-adversarial-networks/assets/evidence/section1/gallery-3.png" alt="Garment D: source concealed for the exercise" class="figure-img">
+<figcaption>
+D
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/12-generative-adversarial-networks/assets/evidence/section1/gallery-4.png" alt="Garment E: source concealed for the exercise" class="figure-img">
+<figcaption>
+E
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../../lectures/12-generative-adversarial-networks/assets/evidence/section1/gallery-5.png" alt="Garment F: source concealed for the exercise" class="figure-img">
+<figcaption>
+F
+</figcaption>
+</figure>
+</div>
+<details>
+<summary>
+Worked solution: recorded sources
+</summary>
+<p><strong>Dataset: A, D, F. VAE outputs: B, C, E.</strong> These are the first three held-out examples from each source, interleaved; they were not selected by visual quality or classifier confidence. The generated images are decoder means for three independent prior draws, not Bernoulli pixel samples.</p>
+<p>Texture or smoothness may help with these examples. Neither proves an image’s source. The answer comes from provenance, and six guesses are not a measured human benchmark. A generator can change the cues on which a source classifier relies.</p>
+</details>
+<p>The observed images come from Fashion-MNIST <span class="citation" data-cites="xiao2017fashion">(<a href="#ref-xiao2017fashion" role="doc-biblioref">Xiao et al. 2017</a>)</span>. The source experiment uses a frozen VAE decoder from the preceding lab. <strong>It is not yet GAN training:</strong> only a source classifier will learn. Keeping this distinction matters when interpreting its numerical results.</p>
+</section>
+<section id="why-not-compare-a-generated-draw-with-a-real-image" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="why-not-compare-a-generated-draw-with-a-real-image"><span class="header-section-number">1.2</span> Why not compare a generated draw with a real image?</h2>
+<p>In an autoencoder, an observed input <span class="math inline">\(x\)</span> supplies its own reconstruction target. For unconditional sampling, we instead draw <span class="math inline">\(z\sim\mathcal N(0,I)\)</span> and compute <span class="math inline">\(\hat x=G(z)\)</span>. The dataset does not specify which observed image should be attached to this particular <span class="math inline">\(z\)</span>.</p>
+<p>Change the proposed target below. The output image, latent draw, and decoder stay fixed. The difference heatmap uses a common black-to-orange scale for absolute pixel difference; the scalar reports squared differences averaged over pixels.</p>
+<div class="gan-demo">
+<iframe src="assets/demos/target.html" title="GAN visual evidence: target" loading="lazy">
+</iframe>
+<a href="assets/demos/target.html" target="_blank">Open this visual in a full window →</a>
+</div>
+<p>The recorded mean squared errors are <strong>0.1410</strong> for the T-shirt, <strong>0.1354</strong> for the boot, and <strong>0.2138</strong> for the bag. Choosing the boot decreases the reported error without improving the generator: only the comparison changed. These are measurements on the original floating-point images; PNGs are rounded for display. The targets are the first held-out example of each predefined class, not hand-selected to force an error ordering.</p>
+<p>There is a precise reason that pairing independent random codes with unrelated images is a poor reconstruction objective. Let <span class="math inline">\(X\)</span> be an image independent of <span class="math inline">\(Z\)</span>, let <span class="math inline">\(\mu=\mathbb E[X]\)</span>, and fix a code <span class="math inline">\(z\)</span>. Expanding the square gives</p>
+<p><span class="math display">\[
+\mathbb E_X\|G(z)-X\|_2^2
+=\|G(z)-\mu\|_2^2+\mathbb E_X\|X-\mu\|_2^2.
+\]</span></p>
+<p>The cross term vanishes because <span class="math inline">\(\mathbb E[X-\mu]=0\)</span>. The second term is independent of <span class="math inline">\(G(z)\)</span>; the first is minimized at <span class="math inline">\(G(z)=\mu\)</span>. With enough freedom, every code is therefore encouraged toward the same average image. Dividing by 784 to obtain MSE leaves the minimizer unchanged. This argument assumes <strong>independent targets and squared error</strong>; it does not invalidate paired reconstruction, conditional prediction, or the VAE objective. The three displayed errors illustrate the pairing problem, while the expectation calculation explains its population consequence.</p>
+<p>What we want instead is agreement between the <strong>distribution of generated images</strong> and the distribution of observations. GANs obtain a learning signal for this task by training a discriminator <span class="citation" data-cites="goodfellow2014gan">(<a href="#ref-goodfellow2014gan" role="doc-biblioref">Goodfellow et al. 2014</a>)</span>.</p>
+</section>
+<section id="a-classifier-can-learn-a-source-distinction" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="a-classifier-can-learn-a-source-distinction"><span class="header-section-number">1.3</span> A classifier can learn a source distinction</h2>
+<p>The next panel keeps the six images and VAE fixed. The only changing object is a binary classifier with architecture <span class="math inline">\(784\to128\to64\to1\)</span>. Its target is dataset source versus generated source, not T-shirt versus boot. The source label is available automatically because we know how each example was obtained.</p>
+<div class="gan-demo">
+<iframe src="assets/demos/judge.html" title="GAN visual evidence: judge" loading="lazy">
+</iframe>
+<a href="assets/demos/judge.html" target="_blank">Open this visual in a full window →</a>
+</div>
+<p>At a threshold of 0.5, held-out accuracy changes from <strong>50.0%</strong> before training to <strong>76.1%, 96.6%, and 97.2%</strong> after 1, 4, and 8 epochs. These accuracies use <strong>1,000 dataset images and 1,000 independent generated images</strong>; the six displayed bars are only individual examples. Initially, predicting dataset source for every image gives the 50% balanced baseline. A score near 0.5 at initialization is not learned uncertainty.</p>
+<p>The classifier was trained on 6,000 images per source with Adam, learning rate 0.001, batch size 256, for eight epochs. Split seed 41 reserves real validation images outside the VAE’s 12,000-image training subset. Training and validation latent streams use seeds 301 and 302; classifier initialization and minibatch order use 303 and 304. The <a href="../../lectures/12-generative-adversarial-networks/assets/evidence/section1/manifest.json">manifest</a> records image IDs, scores, and the frozen decoder’s checksum.</p>
+<p>High accuracy establishes that these two particular sources are distinguishable in this experiment. It does not establish good generation, semantic understanding, calibration, or performance against a different generator. We did not inspect the learned features, so we cannot conclude that the classifier specifically used blur or edges.</p>
+</section>
+<section id="turn-the-classifier-into-a-training-partner" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="turn-the-classifier-into-a-training-partner"><span class="header-section-number">1.4</span> Turn the classifier into a training partner</h2>
+<p>The next step is to let the image maker change in response to the judge. A generated image travels forward through G and then D. During G’s update, derivatives travel back through D’s input computation into G. The feedback arrow is a gradient path; it is not another image-generation pathway.</p>
+<div class="gan-demo">
+<iframe src="assets/demos/feedback.html" title="GAN visual evidence: feedback" loading="lazy">
+</iframe>
+<a href="assets/demos/feedback.html" target="_blank">Open this visual in a full window →</a>
+</div>
+<p>This course-made schematic expresses the training arrangement introduced by <span class="citation" data-cites="goodfellow2014gan">Goodfellow et al. (<a href="#ref-goodfellow2014gan" role="doc-biblioref">2014</a>)</span>. The weights of G and D are separate. D learns to identify the two sources, while G learns to make its outputs receive the dataset-source prediction. The objectives and update rules below make that informal description precise.</p>
+</section>
+</section>
+<section id="two-networks-two-different-jobs" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Two networks, two different jobs</h1>
+<section id="keep-sampling-separate-from-training" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="keep-sampling-separate-from-training"><span class="header-section-number">2.1</span> Keep sampling separate from training</h2>
+<p>A VAE includes an encoder that maps an observed image into parameters of an approximate latent posterior. Its decoder maps a latent draw into an observation model. In the basic unconditional GAN here, G retains the <strong>code-to-image role</strong>, but the training system changes: real and generated images enter one shared discriminator. We initialize G afresh; this is not a claim that the VAE’s weights are reused.</p>
+<div class="gan-demo">
+<iframe src="assets/demos/architecture.html" title="GAN visual evidence: architecture" loading="lazy">
+</iframe>
+<a href="assets/demos/architecture.html" target="_blank">Open this visual in a full window →</a>
+</div>
+<p>D is not an encoder replacement. Its output is one source logit per image, not a latent code for reconstruction. The basic GAN does not require an image-to-latent inverse. At generation time the path is simply <span class="math inline">\(z\to G(z)\)</span>; D is unnecessary for producing an unconditional sample.</p>
+<p>We use <span class="math inline">\(\theta\)</span> for G’s parameters and <span class="math inline">\(\phi\)</span> for D’s. To match the code, distinguish <strong>logit</strong> from <strong>score</strong>:</p>
+<p><span class="math display">\[
+a_\phi(u)=D_\phi(u)\in\mathbb R,
+\qquad s_\phi(u)=\sigma(a_\phi(u))\in(0,1).
+\]</span></p>
+<p>The original GAN paper writes <span class="math inline">\(D(u)\)</span> for the probability-like score. In these notes and the executable examples, <code>D(u)</code> returns the raw logit, and <span class="math inline">\(s_\phi(u)\)</span> denotes its sigmoid. A logit of zero gives score 0.5; a positive logit favors dataset source once the target convention is established.</p>
+<p>The generator induces a distribution <span class="math inline">\(P_\theta\)</span> through its mapping:</p>
+<p><span class="math display">\[
+Z\sim P_Z,\quad X_G=G_\theta(Z),\qquad
+P_\theta(A)=\Pr\{G_\theta(Z)\in A\}.
+\]</span></p>
+<p>This defines a sampling distribution without requiring a tractable pixel-density formula. It is often called an <strong>implicit generative model</strong>. The existence of a sampler does not automatically give a convenient likelihood evaluator or inverse map.</p>
+</section>
+<section id="tensor-contracts-before-objectives" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="tensor-contracts-before-objectives"><span class="header-section-number">2.2</span> Tensor contracts before objectives</h2>
+<p><strong>Exercise · 60 seconds.</strong> A batch contains four latent vectors of length 16. G produces grayscale 28 × 28 images; D produces one source logit per image. Give both output shapes and identify the modules needed only to generate.</p>
+<details>
+<summary>
+Worked solution and interactive path tracing
+</summary>
+<p><span class="math inline">\(G(z)\)</span> has shape <strong>(4, 1, 28, 28)</strong> and <span class="math inline">\(D(G(z))\)</span> has shape <strong>(4, 1)</strong>. The first axis is the batch; D does not collapse four examples into a single batch judgment. Generation uses G alone. The buttons trace three forward routes through the same modules; they do not change parameters.</p>
+<div class="gan-demo">
+<iframe src="assets/demos/routing.html" title="GAN visual evidence: routing" loading="lazy">
+</iframe>
+<a href="assets/demos/routing.html" target="_blank">Open this visual in a full window →</a>
+</div>
+</details>
+<p>The dense generator implements the contract directly. The hidden layers transform each code; the last linear layer emits 784 intensities, sigmoid constrains them to <span class="math inline">\([0,1]\)</span>, and <code>Unflatten</code> restores image axes.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>latent_dim <span class="op">=</span> <span class="dv">16</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>G <span class="op">=</span> nn.Sequential(</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    nn.Linear(latent_dim, <span class="dv">128</span>), nn.ReLU(),</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    nn.Linear(<span class="dv">128</span>, <span class="dv">256</span>), nn.ReLU(),</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    nn.Linear(<span class="dv">256</span>, <span class="dv">784</span>), nn.Sigmoid(),</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    nn.Unflatten(<span class="dv">1</span>, (<span class="dv">1</span>, <span class="dv">28</span>, <span class="dv">28</span>)),</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="gan-demo">
+<iframe src="assets/demos/generator.html" title="GAN visual evidence: generator" loading="lazy">
+</iframe>
+<a href="assets/demos/generator.html" target="_blank">Open this visual in a full window →</a>
+</div>
+<p>The displayed texture is the <strong>first actual output of an untrained generator</strong>, not a successful GAN sample. The <a href="../../lectures/12-generative-adversarial-networks/assets/evidence/section2/contracts.json">module checks</a> verify finite outputs, the intensity range, and correct shapes for batch sizes 1, 4, and 7. A fixed code with fixed weights gives the same output in this deterministic MLP. Changing the code changes the output, but neither property establishes useful generation.</p>
+<p>The discriminator flattens each image independently and emits one unbounded scalar:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>D <span class="op">=</span> nn.Sequential(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    nn.Flatten(),</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    nn.Linear(<span class="dv">784</span>, <span class="dv">256</span>), nn.LeakyReLU(<span class="fl">0.2</span>),</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    nn.Linear(<span class="dv">256</span>, <span class="dv">128</span>), nn.LeakyReLU(<span class="fl">0.2</span>),</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    nn.Linear(<span class="dv">128</span>, <span class="dv">1</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="gan-demo">
+<iframe src="assets/demos/discriminator.html" title="GAN visual evidence: discriminator" loading="lazy">
+</iframe>
+<a href="assets/demos/discriminator.html" target="_blank">Open this visual in a full window →</a>
+</div>
+<p>Both sources must obey the same image shape and preprocessing contract. For this sigmoid generator, real <code>uint8</code> pixels are divided by 255. Otherwise D could exploit an intensity-range mismatch instead of useful image differences. G and D own disjoint parameter sets; real and generated batches use <strong>the same D instance</strong>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> torch.randn(<span class="dv">4</span>, <span class="dv">16</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>fake <span class="op">=</span> G(z)                         <span class="co"># (4, 1, 28, 28)</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>real_logits <span class="op">=</span> D(real)                <span class="co"># (4, 1)</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>fake_logits <span class="op">=</span> D(fake)                <span class="co"># (4, 1)</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>display_scores <span class="op">=</span> fake_logits.sigmoid()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The sigmoid above is for display. The training loss below accepts raw logits. The source check also confirms that scoring concatenated real/generated batches agrees with separate calls for this MLP. That equality is not universal: batch-dependent or stochastic layers can change it in training mode.</p>
+</section>
+</section>
+<section id="turning-competition-into-learning-objectives" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Turning competition into learning objectives</h1>
+<section id="derive-ds-objective-from-source-labels" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="derive-ds-objective-from-source-labels"><span class="header-section-number">3.1</span> Derive D’s objective from source labels</h2>
+<p>Suppose D assigns score 0.8 to a real image and 0.2 to a generated one. Both correct-source probabilities are 0.8. With natural logarithms, binary cross-entropy is</p>
+<p><span class="math display">\[
+\ell(a,y)=-y\log\sigma(a)-(1-y)\log(1-\sigma(a)).
+\]</span></p>
+<p>The real target is 1 and the generated target is 0. Their costs are <span class="math inline">\(-\log(0.8)=0.2231\)</span> each. The following panel preserves the lecture’s illustrative arithmetic; these scores are invented for calculation, not measured image predictions.</p>
+<div class="gan-demo">
+<iframe src="assets/demos/source-loss.html" title="GAN visual evidence: source loss" loading="lazy">
+</iframe>
+<a href="assets/demos/source-loss.html" target="_blank">Open this visual in a full window →</a>
+</div>
+<p>For independent real and latent minibatches, our discriminator loss is</p>
+<p><span class="math display">\[
+L_D(\phi;\theta)=
+-\frac1m\sum_{i=1}^{m}\log s_\phi(x_i)
+-\frac1n\sum_{j=1}^{n}\log\bigl(1-s_\phi(G_\theta(z_j))\bigr).
+\]</span></p>
+<p>During this update, <span class="math inline">\(\theta\)</span> is fixed. We <strong>add the two source means</strong>. Thus the illustrative pair has <span class="math inline">\(L_D\approx0.4463\)</span>. Averaging the two means would halve this value and its gradients; it would preserve the minimizers but change the update scale. We retain the sum convention in the code, plots, and PDF.</p>
+<p>Numerical stability is easiest to see in logit form. Since <span class="math inline">\(\operatorname{softplus}(a)=\log(1+e^a)\)</span>,</p>
+<p><span class="math display">\[
+\ell(a,y)=\operatorname{softplus}(a)-ya,
+\qquad
+\frac{\partial\ell}{\partial a}=\sigma(a)-y.
+\]</span></p>
+<p>A stable implementation avoids explicitly computing tiny probabilities and then taking their logarithms. PyTorch’s <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html"><code>BCEWithLogitsLoss</code></a> implements the combined operation. Passing sigmoid outputs into it applies the wrong contract. Targets should match the logits’ shape, floating dtype, and device.</p>
+</section>
+<section id="g-wants-the-opposite-decision-on-its-outputs" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="g-wants-the-opposite-decision-on-its-outputs"><span class="header-section-number">3.2</span> G wants the opposite decision on its outputs</h2>
+<p>On a generated sample, D’s own target is 0. If G minimized that same cost, it would cooperate in being recognized as generated. Instead, the practical <strong>non-saturating</strong> G objective is</p>
+<p><span class="math display">\[
+L_G^{\mathrm{NS}}(\theta;\phi)
+=-\mathbb E_{Z\sim P_Z}\log s_\phi(G_\theta(Z)).
+\]</span></p>
+<p>Here <span class="math inline">\(\phi\)</span> is fixed and <span class="math inline">\(\theta\)</span> changes. Target 1 expresses the prediction G wants to obtain; it does not change the image’s provenance or D’s target on its own turn. There is no real-image term because it has no dependence on G’s parameters.</p>
+<div class="gan-demo">
+<iframe src="assets/demos/opposing.html" title="GAN visual evidence: opposing" loading="lazy">
+</iframe>
+<a href="assets/demos/opposing.html" target="_blank">Open this visual in a full window →</a>
+</div>
+<p>At score 0.2, D’s fake-image cost is 0.223 and G’s is 1.609. At score 0.8, these values exchange places. At 0.5 both equal <span class="math inline">\(\log2\approx0.693\)</span>. Equal scalar costs do not certify successful generation. The slider changes a hypothetical score, not an image or model.</p>
+<p>The original minimax formulation uses</p>
+<p><span class="math display">\[
+\min_\theta\max_\phi V(\phi,\theta),\qquad
+V=\mathbb E_{P_{\mathrm{data}}}\log s_\phi(X)
++\mathbb E_{P_Z}\log(1-s_\phi(G_\theta(Z))).
+\]</span></p>
+<p>D minimizes <span class="math inline">\(-V\)</span>. The minimax generator minimizes its second term. The non-saturating objective above is an alternative with different gradients, not the negative of the whole discriminator loss <span class="citation" data-cites="goodfellow2014gan">(<a href="#ref-goodfellow2014gan" role="doc-biblioref">Goodfellow et al. 2014, sec. 3</a>)</span>.</p>
+</section>
+<section id="why-non-saturating-feedback-helps-at-a-rejected-sample" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="why-non-saturating-feedback-helps-at-a-rejected-sample"><span class="header-section-number">3.3</span> Why non-saturating feedback helps at a rejected sample</h2>
+<p>Write <span class="math inline">\(a=D_\phi(G_\theta(z))\)</span> and <span class="math inline">\(p=\sigma(a)\)</span>. The sigmoid derivative is <span class="math inline">\(dp/da=p(1-p)\)</span>. Applying the chain rule gives</p>
+<p><span class="math display">\[
+\frac{\partial\log(1-p)}{\partial a}=-p,
+\qquad
+\frac{\partial(-\log p)}{\partial a}=p-1.
+\]</span></p>
+<p>Both are negative, so descent locally favors raising the generated sample’s logit. At <span class="math inline">\(p=0.01\)</span>, the magnitudes are 0.01 and 0.99: a <strong>99-fold difference at the logit</strong>. Non-saturating is not larger everywhere; inspect <span class="math inline">\(p=0.8\)</span> as well.</p>
+<div class="gan-demo">
+<iframe src="assets/demos/gradient.html" title="GAN visual evidence: gradient" loading="lazy">
+</iframe>
+<a href="assets/demos/gradient.html" target="_blank">Open this visual in a full window →</a>
+</div>
+<p>The curves are analytic; the selected points were independently checked with float64 PyTorch autograd. They are not training curves. The full sample gradient is</p>
+<p><span class="math display">\[
+\nabla_\theta\ell_G
+=J_{G_\theta}(z)^\top\,
+\nabla_x a_\phi(x)\big|_{x=G_\theta(z)}\,
+\frac{\partial\ell_G}{\partial a}.
+\]</span></p>
+<p>Improving the last scalar factor cannot guarantee a useful discriminator input direction, a well-conditioned generator Jacobian, or convergence. Across a minibatch, gradients may also cancel. The 99-fold comparison is therefore not a universal ratio between optimizer updates or training speeds.</p>
+</section>
+<section id="what-would-an-ideal-discriminator-tell-us" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="what-would-an-ideal-discriminator-tell-us"><span class="header-section-number">3.4</span> What would an ideal discriminator tell us?</h2>
+<p>This derivation explains the distributional aim behind the practical mechanism. Suppose the data and generated distributions have densities <span class="math inline">\(p_d\)</span> and <span class="math inline">\(p_g\)</span> relative to a common dominating measure. Hold G fixed and allow the score function <span class="math inline">\(s\)</span> arbitrary capacity. At each <span class="math inline">\(x\)</span>, maximize</p>
+<p><span class="math display">\[
+f(s)=p_d(x)\log s+p_g(x)\log(1-s).
+\]</span></p>
+<p>Where both densities are positive, stationarity requires</p>
+<p><span class="math display">\[
+\frac{p_d(x)}{s}-\frac{p_g(x)}{1-s}=0
+\quad\Longrightarrow\quad
+s^*(x)=\frac{p_d(x)}{p_d(x)+p_g(x)}.
+\]</span></p>
+<p>The second derivative is negative, so this is the pointwise maximum. If only one density is positive, the optimum is the corresponding boundary score 1 or 0. Where both vanish, the value of <span class="math inline">\(s\)</span> is irrelevant to the expectations. A finite sigmoid logit can approach but not attain the boundary scores exactly.</p>
+<p>The formula shows why D’s score is <strong>relative to the current generated distribution</strong>. In a region where generated images are scarce compared with data, the ideal score is high. If <span class="math inline">\(p_g=p_d\)</span>, the optimal score is 1/2 almost everywhere under their common distribution. But the converse observation—our learned network emits 1/2—does not establish equality: an untrained or underfit network may also do that.</p>
+<p>Let <span class="math inline">\(m=(p_d+p_g)/2\)</span>. Substituting the optimal score into the minimax value gives</p>
+<p><span class="math display">\[
+\begin{aligned}
+V(s^*,G)
+&amp;=\int p_d\log\frac{p_d}{p_d+p_g}
++\int p_g\log\frac{p_g}{p_d+p_g}\\
+&amp;=-\log4+D_{\mathrm{KL}}(p_d\|m)+D_{\mathrm{KL}}(p_g\|m)\\
+&amp;=-\log4+2\operatorname{JS}(p_d\|p_g).
+\end{aligned}
+\]</span></p>
+<p>Thus the idealized minimax value is minimized when the distributions match. This is an analysis of an unrestricted, optimal discriminator <span class="citation" data-cites="goodfellow2014gan">(<a href="#ref-goodfellow2014gan" role="doc-biblioref">Goodfellow et al. 2014, sec. 4</a>)</span>; it is <strong>not</strong> a statement that finite alternating Adam steps exactly minimize Jensen–Shannon divergence. Our implementation also uses the non-saturating G objective, whose finite-step gradient is different. These qualifications prevent a mathematical equilibrium result from becoming an unsupported convergence claim.</p>
+</section>
+<section id="implement-the-three-targets" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="implement-the-three-targets"><span class="header-section-number">3.5</span> Implement the three targets</h2>
+<p><strong>Exercise · 60 seconds.</strong> Both logit tensors have shape <code>(4, 1)</code>. Fill the three target arguments with matching zeros or ones. Use the non-saturating G loss.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>bce <span class="op">=</span> nn.BCEWithLogitsLoss()</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>loss_D <span class="op">=</span> bce(real_logits, ...) <span class="op">+</span> bce(fake_logits, ...)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>loss_G <span class="op">=</span> bce(fake_logits, ...)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<details>
+<summary>
+Worked solution: real 1, generated 0, generator objective 1
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>loss_D <span class="op">=</span> bce(real_logits, torch.ones_like(real_logits))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>loss_D <span class="op">+=</span> bce(fake_logits, torch.zeros_like(fake_logits))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>loss_G <span class="op">=</span> bce(fake_logits, torch.ones_like(fake_logits))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>On section 2’s recorded untrained logits, these produce <span class="math inline">\(L_D=1.4044\)</span> and <span class="math inline">\(L_G=0.7014\)</span>. This is a loss-arithmetic check, not a training loop. In training, G’s objective needs a fresh forward through D after D’s update. The next section supplies that ordering.</p>
+</details>
+</section>
+</section>
+<section id="training-one-network-at-a-time" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Training one network at a time</h1>
+<section id="separate-gradient-paths-from-parameter-ownership" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="separate-gradient-paths-from-parameter-ownership"><span class="header-section-number">4.1</span> Separate gradient paths from parameter ownership</h2>
+<p>There are two distinct decisions: <strong>which derivatives must be available</strong>, and <strong>which parameters the optimizer may change</strong>. During D’s turn, fake images are fixed inputs. During G’s turn, D’s weights are fixed, but its derivative with respect to the image is essential.</p>
+<div class="gan-demo">
+<iframe src="assets/demos/updates.html" title="GAN visual evidence: updates" loading="lazy">
+</iframe>
+<a href="assets/demos/updates.html" target="_blank">Open this visual in a full window →</a>
+</div>
+<p>The schematic switches between the two turns. The table below records the separate implementation controls.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Control</th>
+<th>What it changes</th>
+<th>What it does not do</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>fake.detach()</code></td>
+<td>Breaks the graph connection from fake to G</td>
+<td>Does not freeze D</td>
+</tr>
+<tr class="even">
+<td><code>torch.no_grad()</code></td>
+<td>Suppresses graph recording in its block</td>
+<td>Does not put a model in evaluation mode</td>
+</tr>
+<tr class="odd">
+<td><code>D.requires_grad_(False)</code></td>
+<td>Disables new gradient accumulation for D’s parameters</td>
+<td>Does not remove derivatives with respect to a differentiable input</td>
+</tr>
+<tr class="even">
+<td><code>optimizer.step()</code></td>
+<td>Updates that optimizer’s parameter collection and state</td>
+<td>Does not infer which model should own a loss</td>
+</tr>
+<tr class="odd">
+<td><code>model.eval()</code></td>
+<td>Changes behavior of mode-dependent layers</td>
+<td>Does not disable autograd</td>
+</tr>
+</tbody>
+</table>
+<p>Calling <code>zero_grad</code> prevents unwanted accumulation into gradient buffers. It does not change weights, clear an optimizer’s momentum history, or disconnect a graph. A parameter with no newly computed gradient is different from one with a measured numerical gradient of zero.</p>
+</section>
+<section id="ds-turn-learn-from-fixed-generated-examples" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="ds-turn-learn-from-fixed-generated-examples"><span class="header-section-number">4.2</span> D’s turn: learn from fixed generated examples</h2>
+<p>The lecture’s MLP update is reproduced directly from its executable source. <code>opt_D</code> owns only D’s parameters; the surrounding program supplies <code>bce</code> and the independent optimizers.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>D.requires_grad_(<span class="va">True</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>opt_D.zero_grad(set_to_none<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>fake <span class="op">=</span> G(z)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>real_logits <span class="op">=</span> D(real)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>fake_logits <span class="op">=</span> D(fake.detach())</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>loss_D <span class="op">=</span> (</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    bce(real_logits, torch.ones_like(real_logits))</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> bce(fake_logits, torch.zeros_like(fake_logits))</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>loss_D.backward()</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>opt_D.step()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The displayed code computes <code>G(z)</code> with tracking and detaches it before D. Generating fake images under <code>no_grad</code> is also appropriate <strong>here</strong>, because this turn does not need G’s derivatives, and avoids building that unused G graph. In either version, the subsequent calls to D must be tracked so its parameters can receive gradients.</p>
+<p>The real and fake losses are source means added together. <code>backward()</code> populates D’s gradients, then <code>opt_D.step()</code> changes D. G’s image-making parameters stay fixed. This is one classifier update against the current generated source, not optimization of D to its global optimum.</p>
+</section>
+<section id="gs-turn-a-fixed-judge-with-a-differentiable-input" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="gs-turn-a-fixed-judge-with-a-differentiable-input"><span class="header-section-number">4.3</span> G’s turn: a fixed judge with a differentiable input</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>D.requires_grad_(<span class="va">False</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>opt_G.zero_grad(set_to_none<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>fake <span class="op">=</span> G(z)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>fake_logits <span class="op">=</span> D(fake)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>loss_G <span class="op">=</span> bce(</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    fake_logits, torch.ones_like(fake_logits)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>loss_G.backward()</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>opt_G.step()</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>D.requires_grad_(<span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Freezing D’s parameters removes the need to compute their gradients. It still permits autograd to differentiate D’s output with respect to <code>G(z)</code>, because that image depends on trainable G parameters. The generator target is one, so gradient descent encourages D to favor dataset source for the generated image. After the step, D’s parameter flags are restored for its next turn.</p>
+<p>Compute a <strong>fresh forward through the updated D</strong>. Reusing logits saved before <code>opt_D.step()</code> asks the wrong function to judge G and may also reference a freed graph or tensors modified in-place. Keeping a graph with <code>retain_graph=True</code> is not a substitute for correct update ownership and ordering. Reusing the same noise values on both turns is allowed; reusing a stale computation is the problem.</p>
+<p>The section 4 audit used one real batch, seed 1204, and independent Adam optimizers at 0.001. Each MLP has six parameter tensors:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Turn</th>
+<th style="text-align: right;">G tensors changed</th>
+<th style="text-align: right;">D tensors changed</th>
+<th style="text-align: right;">G tensors with gradients</th>
+<th style="text-align: right;">D tensors with gradients</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>D update</td>
+<td style="text-align: right;">0 / 6</td>
+<td style="text-align: right;">6 / 6</td>
+<td style="text-align: right;">0 / 6</td>
+<td style="text-align: right;">6 / 6</td>
+</tr>
+<tr class="even">
+<td>G update</td>
+<td style="text-align: right;">6 / 6</td>
+<td style="text-align: right;">0 / 6</td>
+<td style="text-align: right;">6 / 6</td>
+<td style="text-align: right;">0 / 6</td>
+</tr>
+</tbody>
+</table>
+<p>These are measured ownership checks, not claims about image quality. See the <a href="../../lectures/12-generative-adversarial-networks/assets/evidence/section4/update-checks.json">audit and broken-path result</a>. When running your own diagnostic, clear both models’ old gradients first; stale buffers can otherwise mislead you about which turn produced them.</p>
+</section>
+<section id="debug-a-disconnected-generator" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="debug-a-disconnected-generator"><span class="header-section-number">4.4</span> Debug a disconnected generator</h2>
+<p><strong>Exercise · 60 seconds.</strong> The intended operation is a G update with D’s weights fixed. Explain why this code fails, then repair it without allowing D’s optimizer to step.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fake <span class="op">=</span> G(z)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    fake_logits <span class="op">=</span> D(fake)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>loss_G <span class="op">=</span> bce(fake_logits, torch.ones_like(fake_logits))</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>loss_G.backward()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<details>
+<summary>
+Worked solution: freeze parameters, preserve the input derivative
+</summary>
+<p><code>no_grad</code> prevents recording the D computation. Consequently <code>fake_logits</code> has no path back to <code>fake</code>, and the loss has <code>requires_grad=False</code> in this isolated example. Backward raises an error; no G parameter gradients are produced. The recorded probe confirms both observations.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>D.requires_grad_(<span class="va">False</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>opt_G.zero_grad(set_to_none<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>fake_logits <span class="op">=</span> D(G(z))</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>loss_G <span class="op">=</span> bce(fake_logits, torch.ones_like(fake_logits))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>loss_G.backward()</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>opt_G.step()</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>D.requires_grad_(<span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Only G’s optimizer steps, but derivatives pass through the fixed D function. <strong>Transfer:</strong> putting <code>detach()</code> on <code>G(z)</code> would break the same necessary connection. Merely omitting <code>opt_D.step()</code> can leave G’s path intact, but may compute and accumulate unnecessary D parameter gradients unless they are managed.</p>
+</details>
+</section>
+<section id="why-alternating-optimization-is-not-ordinary-loss-descent" class="level2" data-number="4.5">
+<h2 data-number="4.5" class="anchored" data-anchor-id="why-alternating-optimization-is-not-ordinary-loss-descent"><span class="header-section-number">4.5</span> Why alternating optimization is not ordinary loss descent</h2>
+<p>One optimizer sees a classifier whose negative examples move; the other sees a loss function supplied by a moving classifier. There is no requirement that both losses decrease together. Even with correct signs and gradient paths, the game can rotate or oscillate rather than settle like a well-conditioned single-objective problem. The original minimax formulation allows multiple D updates per G update; our small run uses one of each.</p>
+<p>Optimizer states must remain separate. Learning rates, model capacities, and the update ratio affect the dynamics, but no single choice guarantees balance. Before attributing failure to adversarial instability, verify tensor ranges, targets, gradient paths, optimizer ownership, and finite numerical values. These are testable contracts already established above.</p>
+</section>
+</section>
+<section id="building-an-image-gan-with-convolutions" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Building an image GAN with convolutions</h1>
+<section id="preserve-the-objectives-give-the-mappings-spatial-structure" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="preserve-the-objectives-give-the-mappings-spatial-structure"><span class="header-section-number">5.1</span> Preserve the objectives; give the mappings spatial structure</h2>
+<p>The dense pair satisfies the interfaces, but it treats the flattened image as a vector. The convolutional pair introduces shared local operations over spatial feature maps. G progressively increases resolution; D progressively decreases it. The latent prior, source targets, and alternating-update logic stay the same.</p>
+<div class="gan-demo">
+<iframe src="assets/demos/conv-comparison.html" title="GAN visual evidence: conv comparison" loading="lazy">
+</iframe>
+<a href="assets/demos/conv-comparison.html" target="_blank">Open this visual in a full window →</a>
+</div>
+<p>The following paired view makes both spatial paths visible. Feature-map face size represents spatial extent; channel counts are separate labels. The volumes are <strong>schematic geometry, not measured activations</strong>. G and D do not share weights and are not algebraic inverses.</p>
+<div class="gan-demo">
+<iframe src="assets/demos/spatial.html" title="GAN visual evidence: spatial" loading="lazy">
+</iframe>
+<a href="assets/demos/spatial.html" target="_blank">Open this visual in a full window →</a>
+</div>
+<p>This is a small <strong>DCGAN-inspired adaptation</strong>, not a reproduction of the original architecture or its experiments <span class="citation" data-cites="radford2015dcgan">(<a href="#ref-radford2015dcgan" role="doc-biblioref">Radford et al. 2015</a>)</span>. In particular, it produces 28 × 28 grayscale images and puts BatchNorm only in G. The original paper is useful for its empirical architectural design choices, not as a guarantee that any convolutional GAN will train reliably.</p>
+</section>
+<section id="transposed-convolution-place-weight-and-add" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="transposed-convolution-place-weight-and-add"><span class="header-section-number">5.2</span> Transposed convolution: place, weight, and add</h2>
+<p>To grow an image, a learned operation must distribute coarse features over a finer spatial grid. The lecture uses a one-dimensional example first: input <span class="math inline">\([1,2]\)</span>, kernel <span class="math inline">\([1,2,1]\)</span>, stride 2, and no padding. The first input places <span class="math inline">\([1,2,1]\)</span> at positions 0–2; the second places <span class="math inline">\([2,4,2]\)</span> at positions 2–4. Contributions add where they overlap:</p>
+<p><span class="math display">\[
+[1,2,1,0,0]+[0,0,2,4,2]=[1,2,3,4,2].
+\]</span></p>
+<div class="gan-demo">
+<iframe src="assets/demos/transpose.html" title="GAN visual evidence: transpose" loading="lazy">
+</iframe>
+<a href="assets/demos/transpose.html" target="_blank">Open this visual in a full window →</a>
+</div>
+<p>The toy is exactly checked with <code>ConvTranspose1d</code>, not just a drawing. In two dimensions, learned kernels spread each input location into an output patch, contributions sum, and channel mixing combines learned features. A transposed convolution is associated with the <strong>transpose of a convolution’s linear operator</strong>, not its matrix inverse. The informal word “deconvolution” must not suggest guaranteed reconstruction of an earlier input.</p>
+<p>For one spatial axis, with input length <span class="math inline">\(H\)</span>, kernel <span class="math inline">\(k\)</span>, stride <span class="math inline">\(s\)</span>, padding <span class="math inline">\(p\)</span>, dilation <span class="math inline">\(d\)</span>, and output padding <span class="math inline">\(o\)</span>, the output contracts are</p>
+<p><span class="math display">\[
+H_{\mathrm{conv}}=\left\lfloor\frac{H+2p-d(k-1)-1}{s}+1\right\rfloor,
+\qquad
+H_{\mathrm{trans}}=(H-1)s-2p+d(k-1)+o+1.
+\]</span></p>
+<p>In our upsampling layers, <span class="math inline">\(d=1,o=0,k=4,s=2,p=1\)</span>. Starting from 7 gives <span class="math inline">\((7-1)2-2+3+1=14\)</span>; starting from 14 gives 28. The initial <span class="math inline">\(1\to7\)</span> stage uses <span class="math inline">\(k=7,s=1,p=0\)</span>. <code>output_padding</code> resolves output-shape ambiguity; it is not an instruction to append a literal border of zeros. Consult the <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.ConvTranspose2d.html">official operator contract</a> when changing dimensions.</p>
+</section>
+<section id="trace-every-layer-into-executable-code" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="trace-every-layer-into-executable-code"><span class="header-section-number">5.3</span> Trace every layer into executable code</h2>
+<p>The exact G used for the recorded training run is:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>G <span class="op">=</span> nn.Sequential(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    nn.ConvTranspose2d(<span class="dv">16</span>, <span class="dv">64</span>, <span class="dv">7</span>, <span class="dv">1</span>, <span class="dv">0</span>, bias<span class="op">=</span><span class="va">False</span>),</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    nn.BatchNorm2d(<span class="dv">64</span>), nn.ReLU(),</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    nn.ConvTranspose2d(<span class="dv">64</span>, <span class="dv">32</span>, <span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">1</span>, bias<span class="op">=</span><span class="va">False</span>),</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    nn.BatchNorm2d(<span class="dv">32</span>), nn.ReLU(),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    nn.ConvTranspose2d(<span class="dv">32</span>, <span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">1</span>), nn.Tanh(),</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Its feature shapes, excluding batch, are <span class="math inline">\(16\times1\times1\to64\times7\times7\to32\times14\times14\to1\times28\times28\)</span>. Hidden BatchNorm/ReLU stages operate at the first two spatial resolutions. Bias is disabled in convolutions immediately followed by BatchNorm.</p>
+<p>The exact D is:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>D <span class="op">=</span> nn.Sequential(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    nn.Conv2d(<span class="dv">1</span>, <span class="dv">32</span>, <span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">1</span>), nn.LeakyReLU(<span class="fl">0.2</span>),</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    nn.Conv2d(<span class="dv">32</span>, <span class="dv">64</span>, <span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">1</span>), nn.LeakyReLU(<span class="fl">0.2</span>),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    nn.Conv2d(<span class="dv">64</span>, <span class="dv">1</span>, <span class="dv">7</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    nn.Flatten(<span class="dv">1</span>),</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Its path is <span class="math inline">\(1\times28\times28\to32\times14\times14\to64\times7\times7\to1\times1\times1\)</span>, then flattening to <code>(B, 1)</code>. The final convolution uses a 7 × 7 kernel to cover the remaining feature map. D still emits a raw logit; there is no final sigmoid in the module.</p>
+<p><strong>Range contract.</strong> Tanh changes G’s output range to <span class="math inline">\([-1,1]\)</span>. Real pixels become <code>pixels.float() / 127.5 - 1</code>. Convert generated values back with <code>(fake + 1) / 2</code> for display. This change affects image preprocessing, not the discriminator’s source-label convention.</p>
+<p><strong>State contract.</strong> This G has BatchNorm running statistics, which are buffers rather than optimizer parameters. In the recorded run, G is in evaluation mode on D’s turn and during snapshots, and in training mode on G’s turn. G’s running statistics therefore update only on its own turn. D has no BatchNorm. This is a deliberate local policy, not the unique correct GAN convention. <code>no_grad</code> alone would not prevent training-mode BatchNorm from updating its buffers; <code>requires_grad_(False)</code> alone would not either.</p>
+<p>The <a href="../../lectures/12-generative-adversarial-networks/assets/conv_gan.py">complete training source</a> combines these modes with the earlier gradient rules. The tested forward contracts include batch sizes 1, 4, and 128 in evaluation mode. A correct shape or finite output is necessary but does not validate a learned distribution.</p>
+</section>
+<section id="observe-a-documented-training-trajectory" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="observe-a-documented-training-trajectory"><span class="header-section-number">5.4</span> Observe a documented training trajectory</h2>
+<p>Keep all six latent vectors fixed and advance through the checkpoints. Both learned parameters and BatchNorm state can change; the input draws and their ordering do not. A fixed draw need not preserve garment identity throughout training.</p>
+<div class="gan-demo">
+<iframe src="assets/demos/training.html" title="GAN visual evidence: training" loading="lazy">
+</iframe>
+<a href="assets/demos/training.html" target="_blank">Open this visual in a full window →</a>
+</div>
+<p>These are the first six standard-normal draws from seed 1206, with no ranking or removal. The local CPU run used 12,000 training images, seed 1205 for initialization, seed 1207 for minibatch order, and 60 epochs. With batch size 128 and the final batch of 96 retained, there are 94 alternating iterations per epoch and 5,640 in total. Each iteration performs one D update and one non-saturating G update. Both Adam optimizers use learning rate 0.0002 and betas <code>(0.5, 0.999)</code>.</p>
+<p>Convolution weights were initialized from <span class="math inline">\(\mathcal N(0,0.02^2)\)</span>; BatchNorm scale from <span class="math inline">\(\mathcal N(1,0.02^2)\)</span>; biases start at zero. The initial 20-epoch run was extended to 60 after inspecting rough outputs. Earlier snapshots and all six draws were retained, so the reporting does not hide that decision. The <a href="../../lectures/12-generative-adversarial-networks/assets/evidence/section5/run.json">run record</a> stores all losses, seeds, checks, and the final checkpoint checksum.</p>
+<p>Foreground/background structure and garment-like silhouettes emerge in this run, with visible imperfections. The evidence does not establish that convolutions outperform a trained MLP: no comparable trained MLP baseline was run. Nor do six fixed codes measure coverage. They provide continuity for observing how one model changes, motivating the fresh-sample checks next.</p>
+</section>
+</section>
+<section id="judging-samples-diversity-and-failure" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Judging samples, diversity, and failure</h1>
+<section id="individual-plausibility-and-distributional-variety" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="individual-plausibility-and-distributional-variety"><span class="header-section-number">6.1</span> Individual plausibility and distributional variety</h2>
+<p>A generator can produce a plausible image while missing much of the data distribution. Conversely, a visibly varied collection may still contain poor images. We therefore inspect <strong>fresh, uncurated batches</strong>, alongside held-out real examples.</p>
+<div class="gan-demo">
+<iframe src="assets/demos/evaluation.html" title="GAN visual evidence: evaluation" loading="lazy">
+</iframe>
+<a href="assets/demos/evaluation.html" target="_blank">Open this visual in a full window →</a>
+</div>
+<p>The actual generated galleries contain 36 fresh outputs from seed 1208, distinct from the fixed training-viewer draws. The three batches are consecutive groups of 12, with no quality-based selection. The real reference contains the first 36 held-out examples of the established split, unseen during G/D training; it is not a class-balanced selection.</p>
+<p>The repetition button deliberately duplicates the first generated image of the selected batch twelve times. This is a <strong>constructed control</strong>, not observed collapse in the trained run. It shows what looking at just one attractive image can miss. Mode collapse means that many codes map to a narrow set of outputs; it need not produce pixel-identical copies. Small variations around a few templates can still omit important possibilities.</p>
+<p>Thirty-six images cannot establish correct category frequencies, complete support coverage, or absence of collapse. The intended application determines which failures matter, and different evaluation questions cannot be reduced to one visual impression <span class="citation" data-cites="theis2016evaluation">(<a href="#ref-theis2016evaluation" role="doc-biblioref">Theis et al. 2016</a>)</span>. For this course task, keep failed silhouettes visible and report the selection rule along with the gallery.</p>
+</section>
+<section id="read-the-loss-history-together-with-images" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="read-the-loss-history-together-with-images"><span class="header-section-number">6.2</span> Read the loss history together with images</h2>
+<div class="gan-demo">
+<iframe src="assets/demos/loss-history.html" title="GAN visual evidence: loss history" loading="lazy">
+</iframe>
+<a href="assets/demos/loss-history.html" target="_blank">Open this visual in a full window →</a>
+</div>
+<p>The orange curve is D’s <strong>sum of source means</strong>; the blue curve is G’s non-saturating mean. All 60 recorded epochs use one shared vertical axis, without smoothing. The controls compare the same two latent draws at epochs 5, 20, and 60. These displayed images use G in evaluation mode; the curve values are losses collected during each network’s own training turns, not losses recomputed on those two images.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Epoch</th>
+<th style="text-align: right;">Mean D loss</th>
+<th style="text-align: right;">Mean G loss</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>5</td>
+<td style="text-align: right;">1.342</td>
+<td style="text-align: right;">0.779</td>
+</tr>
+<tr class="even">
+<td>20</td>
+<td style="text-align: right;">1.311</td>
+<td style="text-align: right;">0.764</td>
+</tr>
+<tr class="odd">
+<td>60</td>
+<td style="text-align: right;">1.371</td>
+<td style="text-align: right;">0.717</td>
+</tr>
+</tbody>
+</table>
+<p>Each epoch value is an unweighted mean over minibatch loss values, so the smaller final minibatch has the same weight as a full one. This is a documented monitoring convention, not an exact mean over every training example. D and G losses are not directly comparable quality scores: their targets and reductions differ, and both networks change the problem faced by the other.</p>
+<p>Under ideal distribution matching with an optimal score of 1/2, our reduction gives <span class="math inline">\(L_D=2\log2\approx1.386\)</span> and <span class="math inline">\(L_G^{\mathrm{NS}}=\log2\approx0.693\)</span>. <strong>These are not acceptance thresholds.</strong> An untrained weak judge can yield similar numbers for bad images. Conversely, transient oscillation alone does not prove implementation failure. Inspect fresh batches, fixed-code history, finite values, and gradient/update correctness together.</p>
+</section>
+<section id="nearest-training-images-a-limited-copying-check" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="nearest-training-images-a-limited-copying-check"><span class="header-section-number">6.3</span> Nearest training images: a limited copying check</h2>
+<p>The next comparison uses the <strong>first three fresh outputs</strong>, without selecting queries for apparent novelty or similarity. For each query <span class="math inline">\(\hat x_i\)</span>, it searches all 12,000 training images:</p>
+<p><span class="math display">\[
+j^*(i)=\arg\min_{1\le j\le12000}
+\frac1{784}\|\hat x_i-x_j\|_2^2.
+\]</span></p>
+<div class="gan-demo">
+<iframe src="assets/demos/neighbors.html" title="GAN visual evidence: neighbors" loading="lazy">
+</iframe>
+<a href="assets/demos/neighbors.html" target="_blank">Open this visual in a full window →</a>
+</div>
+<p>The search uses original floating-point generated tensors converted to <span class="math inline">\([0,1]\)</span>, not rounded PNGs. Recorded minimum MSEs are <strong>0.0311515, 0.0299349, and 0.0745949</strong>. The dataset IDs of the nearest training images are <strong>52488, 46604, and 2584</strong>. The <a href="../../lectures/12-generative-adversarial-networks/assets/evidence/section6/evaluation.json">evaluation record</a> stores these indices, exact distances, and the generator checkpoint checksum.</p>
+<p>No exact floating-point match was found for these three queries. That is a narrow observation, not proof against memorization. Pixel MSE is sensitive to alignment: a small translation can make related images appear distant, while legitimately similar garments can be close. Suspicious similarity merits inspection, but similarity alone does not establish copying and dissimilarity alone does not establish novelty. A broader audit would use more uncurated queries and a similarity notion suited to the task, comparing relationships with both training and held-out examples.</p>
+<p>The three checks answer different questions. Fresh batches expose visible variety and failures. Fixed-code snapshots expose changes over training. Nearest-training comparisons expose suspicious similarities. None replaces the others, and a small course experiment supports more modest claims than a benchmark study.</p>
+</section>
+<section id="assemble-the-complete-system" class="level2" data-number="6.4">
+<h2 data-number="6.4" class="anchored" data-anchor-id="assemble-the-complete-system"><span class="header-section-number">6.4</span> Assemble the complete system</h2>
+<p><strong>Exercise · 90 seconds.</strong> You have unlabeled 28 × 28 grayscale garment images and a held-out split. Specify a coherent GAN through data, hypothesis, loss, optimization, and evaluation. Also state the path used to generate an image after training.</p>
+<details>
+<summary>
+Worked solution: one coherent pipeline
+</summary>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Part</th>
+<th>Concrete specification</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Data</td>
+<td>Scale training images to <span class="math inline">\([-1,1]\)</span> to match Tanh; retain a held-out reference.</td>
+</tr>
+<tr class="even">
+<td>Hypothesis</td>
+<td>Draw <span class="math inline">\(z\sim\mathcal N(0,I_{16})\)</span>; convolutional G maps it to an image; convolutional D maps an image to one logit.</td>
+</tr>
+<tr class="odd">
+<td>Loss</td>
+<td>D: real target 1 plus generated target 0, using a sum of source means. G: non-saturating target 1 through D.</td>
+</tr>
+<tr class="even">
+<td>Optimization</td>
+<td>On D’s turn disconnect G; on G’s turn keep D’s input derivative while freezing its weights. Use independent optimizer states, fresh forwards, and the documented BatchNorm policy.</td>
+</tr>
+<tr class="odd">
+<td>Evaluation</td>
+<td>Inspect fresh uncurated batches, fixed-code checkpoint history, training losses, and nearest training images with their limitations.</td>
+</tr>
+</tbody>
+</table>
+<p>After training, only G is needed:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>G.<span class="bu">eval</span>()</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    z <span class="op">=</span> torch.randn(<span class="dv">12</span>, <span class="dv">16</span>, <span class="dv">1</span>, <span class="dv">1</span>, device<span class="op">=</span><span class="bu">next</span>(G.parameters()).device)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    images <span class="op">=</span> (G(z) <span class="op">+</span> <span class="dv">1</span>) <span class="op">/</span> <span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This is unconditional sampling; no requested category or source image is supplied. Evaluation mode fixes the running-statistics behavior, while <code>no_grad</code> avoids constructing an unnecessary backward graph.</p>
+</details>
+<p>The comparison with earlier chapters is now precise. An autoencoder learns a reconstruction mapping through a bottleneck. A VAE adds a probabilistic latent model, approximate inference, and an evidence-bound training objective. This GAN learns a direct sampler using a discriminator as a training criterion. These are different contracts, not a universal ranking of model quality. The course ends by combining model design, objective choice, correct optimization, and evidence-based evaluation in the student projects.</p>
+</section>
+</section>
+<section id="annotated-reading-and-reproducibility" class="level1 unnumbered">
+<h1 class="unnumbered">Annotated reading and reproducibility</h1>
+<ol type="1">
+<li><strong><a href="https://arxiv.org/abs/1406.2661">Goodfellow et al., Generative Adversarial Nets</a>.</strong> Read §3 alongside our loss and update sections; distinguish the paper’s probability-valued D from our logit-valued module. Then read §4 for the optimal-discriminator argument and its assumptions. Do not interpret that idealized analysis as a guarantee for our finite Adam run.</li>
+<li><strong><a href="https://arxiv.org/abs/1511.06434">Radford, Metz, and Chintala, DCGAN</a>.</strong> Read the architecture guidelines and compare each with our small grayscale adaptation. Pay particular attention to spatial upsampling, strided discrimination, normalization, and output activation. The paper’s larger experiments are separate from our recorded run.</li>
+<li><strong><a href="https://arxiv.org/abs/1511.01844">Theis, van den Oord, and Bethge, A Note on the Evaluation of Generative Models</a>.</strong> Use this to examine why attractive samples, distributional coverage, and likelihood-oriented criteria answer different questions. Relate the intended application to the evidence you would collect.</li>
+<li><strong><a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html">PyTorch: BCEWithLogitsLoss</a>, <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.ConvTranspose2d.html">ConvTranspose2d</a>, and <a href="https://docs.pytorch.org/docs/stable/notes/autograd.html">autograd mechanics</a>.</strong> These are implementation references for logits, output dimensions, gradient modes, and freezing parameter gradients. Verify the contract before changing the architecture or loop.</li>
+<li><strong><a href="https://github.com/zalandoresearch/fashion-mnist">Fashion-MNIST source and dataset description</a>.</strong> Use the original source for the image format and dataset provenance. The course split is an explicit subset of its training partition, not a claim to use the official test split for every experiment.</li>
+</ol>
+<p>The <a href="../../lectures/12-generative-adversarial-networks/assets/README.md">lecture asset README</a> links the generation scripts and protocols. The <a href="../../lectures/12-generative-adversarial-networks/assets/gan_modules.py">dense module source</a>, <a href="../../lectures/12-generative-adversarial-networks/assets/build_section4.py">update audit builder</a>, <a href="../../lectures/12-generative-adversarial-networks/assets/conv_gan.py">convolutional run</a>, and <a href="../../lectures/12-generative-adversarial-networks/assets/build_section6.py">evaluation builder</a> preserve the executable evidence. Reproduction needs the stated Python dependencies and cached dataset; <strong>rendering these notes does not train</strong>. Exact floating-point results can depend on software and hardware, so the saved records identify the measured run.</p>
+<p>The notes’ visual panels are extracted from the approved rendered lecture by <a href="assets/build_notes_assets.py">a local asset builder</a>. They retain the same images, controls, diagrams, and numerical records, while the surrounding text supplies interpretation. All scientific limitations travel with the evidence: the frozen-VAE judge is not a GAN, the dense pair is untrained, the 60-epoch convolutional run is a single small experiment, and the repeated gallery is constructed.</p>
+<section id="references" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-goodfellow2014gan" class="csl-entry" role="listitem">
+Goodfellow, Ian, Jean Pouget-Abadie, Mehdi Mirza, et al. 2014. <span>“Generative Adversarial Nets.”</span> <em>Advances in Neural Information Processing Systems</em> 27. <a href="https://arxiv.org/abs/1406.2661">https://arxiv.org/abs/1406.2661</a>.
+</div>
+<div id="ref-radford2015dcgan" class="csl-entry" role="listitem">
+Radford, Alec, Luke Metz, and Soumith Chintala. 2015. <span>“Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks.”</span> <em>arXiv Preprint arXiv:1511.06434</em>. <a href="https://arxiv.org/abs/1511.06434">https://arxiv.org/abs/1511.06434</a>.
+</div>
+<div id="ref-theis2016evaluation" class="csl-entry" role="listitem">
+Theis, Lucas, Aaron van den Oord, and Matthias Bethge. 2016. <span>“A Note on the Evaluation of Generative Models.”</span> <em>International Conference on Learning Representations</em>. <a href="https://arxiv.org/abs/1511.01844">https://arxiv.org/abs/1511.01844</a>.
+</div>
+<div id="ref-xiao2017fashion" class="csl-entry" role="listitem">
+Xiao, Han, Kashif Rasul, and Roland Vollgraf. 2017. <span>“Fashion-MNIST: A Novel Image Dataset for Benchmarking Machine Learning Algorithms.”</span> <em>arXiv Preprint arXiv:1708.07747</em>. <a href="https://arxiv.org/abs/1708.07747">https://arxiv.org/abs/1708.07747</a>.
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script>
+window.addEventListener('message',event=>{
+ if(event.origin!==location.origin || event.data?.type!=='gan-notes-height')return;
+ const frame=[...document.querySelectorAll('.gan-demo iframe')].find(f=>f.contentWindow===event.source);
+ if(frame && Number.isFinite(event.data.height))frame.style.height=Math.min(4000,Math.max(80,event.data.height))+'px';
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Deep Learning · ENSA Tétouan</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

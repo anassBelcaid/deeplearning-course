@@ -1,0 +1,31 @@
+.quarto-title-block { display: block; margin-bottom: 1.5rem; }
+.quarto-title-block .description { color: var(--muted); font-size: 1.1rem; margin-top: 1rem; }
+.showcase-intro { max-width: 760px; font-size: 1.25rem; line-height: 1.65; color: var(--muted); }
+.showcase-toolbar { display: flex; align-items: center; gap: 2rem; margin: 1.8rem 0 2.8rem; }
+.showcase-toolbar p { margin: 0; max-width: 580px; font-size: .9rem; color: var(--muted); }
+.showcase-action { display: inline-block; background: var(--ink); color: var(--raised); padding: .85rem 1.15rem; border-radius: 5px; text-decoration: none; font-size: .88rem; font-weight: 700; }
+.showcase-action:hover, .showcase-action:focus-visible { background: #324657; color: white; }
+.showcase-toolbar .showcase-action { white-space: nowrap; }
+.student-project-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; margin: 1.6rem 0 3rem; }
+.student-project-card { min-width: 0; background: var(--raised); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: 0 8px 25px rgba(23,33,43,.04); }
+.student-project-visual { margin: 0; background: #e5eddd; display: flex; flex-direction: column; }
+.student-project-visual img { display: block; width: 100%; height: auto; aspect-ratio: 8 / 5; object-fit: cover; }
+.student-project-visual figcaption { padding: .65rem 1rem; margin: 0; font-size: .7rem; line-height: 1.5; color: #435545; }
+.student-project-copy { padding: 1.65rem; overflow-wrap: anywhere; }
+.student-project-status { display: inline-block; font-family: "DM Mono", monospace; font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; color: #426341; background: #edf2e6; padding: .35rem .6rem; border-radius: 4px; }
+.student-project-copy h3 { margin: .85rem 0 .6rem; font-size: 1.8rem; line-height: 1.12; }
+.student-project-team { font-size: .85rem; font-weight: 700; }
+.student-project-description { font-size: .92rem; line-height: 1.75; }
+.student-project-example { border-top: 1px solid var(--line); padding-top: .9rem; margin-bottom: 0; font-size: .77rem; line-height: 1.6; color: var(--muted); }
+.student-project-links { display: flex; gap: 1rem; flex-wrap: wrap; font-size: .8rem; font-weight: 700; }
+.student-project-card:only-child { grid-column: 1 / -1; display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; }
+.student-project-card:only-child .student-project-copy { padding: 2rem; }
+.student-project-card:only-child h3 { font-size: 2.5rem; }
+@media (max-width: 1000px) { .student-project-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 650px) {
+  .showcase-toolbar { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .student-project-grid { grid-template-columns: 1fr; }
+  .student-project-card:only-child { display: block; }
+  .student-project-card:only-child .student-project-copy { padding: 1.4rem; }
+  .student-project-card:only-child h3 { font-size: 2rem; }
+}

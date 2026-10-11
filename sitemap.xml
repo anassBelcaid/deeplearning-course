@@ -1,52 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/labs/09-semantic-segmentation/starter/seeing_every_pixel.html</loc>
-    <lastmod>2026-09-20T22:06:54.844Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/student-projects/index.html</loc>
+    <lastmod>2026-10-11T18:48:13.236Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/labs/05-reliable-training/starter/reliable_training_clinic.html</loc>
-    <lastmod>2026-09-07T12:28:28.421Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/labs/12-anime-generation/index.html</loc>
+    <lastmod>2026-10-11T18:19:32.203Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/labs/04-optimization/starter/optimizers_from_scratch.html</loc>
-    <lastmod>2026-09-01T17:50:36.891Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/labs/11-variational-autoencoders/index.html</loc>
+    <lastmod>2026-10-08T19:29:22.695Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/06-latent-laboratory/index.html</loc>
-    <lastmod>2026-09-25T20:47:07.104Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/labs/11-variational-autoencoders/starter/vae_lab.html</loc>
+    <lastmod>2026-10-08T19:55:59.632Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/06-latent-laboratory/starter/latent_laboratory.html</loc>
-    <lastmod>2026-09-25T20:48:58.790Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/labs/09-semantic-segmentation/index.html</loc>
+    <lastmod>2026-09-20T22:10:59.355Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/05-flower-architectures/index.html</loc>
-    <lastmod>2026-09-17T10:52:15.864Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/labs/05-reliable-training/index.html</loc>
+    <lastmod>2026-09-07T12:22:49.807Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/04-vision-system/index.html</loc>
-    <lastmod>2026-09-13T11:45:55.683Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/labs/04-optimization/index.html</loc>
+    <lastmod>2026-09-01T17:41:58.968Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/03-autograd/index.html</loc>
-    <lastmod>2026-08-31T10:20:44.297Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/06-latent-laboratory/reading.html</loc>
+    <lastmod>2026-09-25T20:48:58.798Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/02-neural-boundaries/index.html</loc>
-    <lastmod>2026-08-21T21:17:42.083Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/05-flower-architectures/starter/flower_architectures.html</loc>
+    <lastmod>2026-09-17T10:52:03.143Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/01-classical-vision/softmax.html</loc>
-    <lastmod>2026-09-23T16:30:28.825Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/04-vision-system/starter/vision_training_system.html</loc>
+    <lastmod>2026-09-09T12:44:39.414Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/01-classical-vision/starter/softmax_cifar10.html</loc>
-    <lastmod>2026-08-21T12:30:36.854Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/03-autograd/starter/autograd_from_scratch.html</loc>
+    <lastmod>2026-08-31T10:48:19.254Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/01-classical-vision/index.html</loc>
-    <lastmod>2026-09-23T16:30:28.789Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/02-neural-boundaries/starter/neural_boundaries.html</loc>
+    <lastmod>2026-08-21T21:18:15.238Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/01-classical-vision/svm.html</loc>
+    <lastmod>2026-09-23T16:30:28.861Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/01-classical-vision/starter/svm_cifar10.html</loc>
+    <lastmod>2026-08-21T12:40:31.578Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/01-classical-vision/starter/knn_cifar10.html</loc>
+    <lastmod>2026-08-21T12:14:18.322Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/lectures/12-generative-adversarial-networks/index.html</loc>
+    <lastmod>2026-10-11T12:45:55.093Z</lastmod>
   </url>
   <url>
     <loc>https://anassbelcaid.github.io/deeplearning-course/lectures/10-autoencoders-latent-representations/index.html</loc>
@@ -73,72 +89,76 @@
     <lastmod>2026-08-21T20:35:13.342Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/11-variational-autoencoders/index.html</loc>
-    <lastmod>2026-10-08T12:01:43.726Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/12-generative-adversarial-networks/index.html</loc>
+    <lastmod>2026-10-11T13:09:11.918Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/09-segmentation-detection/index.html</loc>
-    <lastmod>2026-09-20T20:37:45.748Z</lastmod>
-  </url>
-  <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/07-convolutional-networks/index.html</loc>
-    <lastmod>2026-09-13T11:37:01.783Z</lastmod>
-  </url>
-  <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/05-training-reliably/index.html</loc>
-    <lastmod>2026-09-07T11:55:09.144Z</lastmod>
-  </url>
-  <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/03-backpropagation/index.html</loc>
-    <lastmod>2026-08-30T13:10:26.631Z</lastmod>
-  </url>
-  <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/02-neurons-mlps/index.html</loc>
-    <lastmod>2026-08-21T20:53:27.475Z</lastmod>
-  </url>
-  <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/notes.html</loc>
-    <lastmod>2026-10-08T12:11:28.093Z</lastmod>
-  </url>
-  <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/schedule.html</loc>
-    <lastmod>2026-10-08T12:11:28.093Z</lastmod>
-  </url>
-  <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/index.html</loc>
-    <lastmod>2026-09-21T11:54:18.023Z</lastmod>
-  </url>
-  <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/projects.html</loc>
-    <lastmod>2026-09-25T20:47:07.268Z</lastmod>
-  </url>
-  <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/logistics.html</loc>
-    <lastmod>2026-09-21T11:30:42.455Z</lastmod>
-  </url>
-  <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/01-what-is-learning/index.html</loc>
-    <lastmod>2026-08-21T20:53:27.317Z</lastmod>
-  </url>
-  <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/03-backpropagation/two-layer-derivation.html</loc>
-    <lastmod>2026-08-30T11:47:15.842Z</lastmod>
-  </url>
-  <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/04-optimization/index.html</loc>
-    <lastmod>2026-09-01T17:23:40.153Z</lastmod>
-  </url>
-  <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/06-pytorch/index.html</loc>
-    <lastmod>2026-09-09T12:02:57.824Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/10-autoencoders-latent-representations/index.html</loc>
+    <lastmod>2026-09-25T20:18:48.631Z</lastmod>
   </url>
   <url>
     <loc>https://anassbelcaid.github.io/deeplearning-course/notes/08-modern-vision-architectures/index.html</loc>
     <lastmod>2026-09-17T10:55:06.825Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/10-autoencoders-latent-representations/index.html</loc>
-    <lastmod>2026-09-25T20:18:48.631Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/06-pytorch/index.html</loc>
+    <lastmod>2026-09-09T12:02:57.824Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/04-optimization/index.html</loc>
+    <lastmod>2026-09-01T17:23:40.153Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/03-backpropagation/two-layer-derivation.html</loc>
+    <lastmod>2026-08-30T11:47:15.842Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/01-what-is-learning/index.html</loc>
+    <lastmod>2026-08-21T20:53:27.317Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/logistics.html</loc>
+    <lastmod>2026-09-21T11:30:42.455Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/projects.html</loc>
+    <lastmod>2026-10-11T18:47:49.914Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/index.html</loc>
+    <lastmod>2026-10-09T22:37:03.404Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/schedule.html</loc>
+    <lastmod>2026-10-11T18:47:49.990Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/notes.html</loc>
+    <lastmod>2026-10-11T13:15:42.580Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/02-neurons-mlps/index.html</loc>
+    <lastmod>2026-08-21T20:53:27.475Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/03-backpropagation/index.html</loc>
+    <lastmod>2026-08-30T13:10:26.631Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/05-training-reliably/index.html</loc>
+    <lastmod>2026-09-07T11:55:09.144Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/07-convolutional-networks/index.html</loc>
+    <lastmod>2026-09-13T11:37:01.783Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/09-segmentation-detection/index.html</loc>
+    <lastmod>2026-09-20T20:37:45.748Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/notes/11-variational-autoencoders/index.html</loc>
+    <lastmod>2026-10-08T12:01:43.726Z</lastmod>
   </url>
   <url>
     <loc>https://anassbelcaid.github.io/deeplearning-course/lectures/01-what-is-learning/index.html</loc>
@@ -169,47 +189,63 @@
     <lastmod>2026-10-08T11:45:09.540Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/01-classical-vision/starter/knn_cifar10.html</loc>
-    <lastmod>2026-08-21T12:14:18.322Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/01-classical-vision/index.html</loc>
+    <lastmod>2026-09-23T16:30:28.789Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/01-classical-vision/starter/svm_cifar10.html</loc>
-    <lastmod>2026-08-21T12:40:31.578Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/01-classical-vision/starter/softmax_cifar10.html</loc>
+    <lastmod>2026-08-21T12:30:36.854Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/01-classical-vision/svm.html</loc>
-    <lastmod>2026-09-23T16:30:28.861Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/01-classical-vision/softmax.html</loc>
+    <lastmod>2026-09-23T16:30:28.825Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/02-neural-boundaries/starter/neural_boundaries.html</loc>
-    <lastmod>2026-08-21T21:18:15.238Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/02-neural-boundaries/index.html</loc>
+    <lastmod>2026-08-21T21:17:42.083Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/03-autograd/starter/autograd_from_scratch.html</loc>
-    <lastmod>2026-08-31T10:48:19.254Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/03-autograd/index.html</loc>
+    <lastmod>2026-08-31T10:20:44.297Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/04-vision-system/starter/vision_training_system.html</loc>
-    <lastmod>2026-09-09T12:44:39.414Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/04-vision-system/index.html</loc>
+    <lastmod>2026-09-13T11:45:55.683Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/05-flower-architectures/starter/flower_architectures.html</loc>
-    <lastmod>2026-09-17T10:52:03.143Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/05-flower-architectures/index.html</loc>
+    <lastmod>2026-09-17T10:52:15.864Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/06-latent-laboratory/reading.html</loc>
-    <lastmod>2026-09-25T20:48:58.798Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/06-latent-laboratory/starter/latent_laboratory.html</loc>
+    <lastmod>2026-09-25T20:48:58.790Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/labs/04-optimization/index.html</loc>
-    <lastmod>2026-09-01T17:41:58.968Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/projects/06-latent-laboratory/index.html</loc>
+    <lastmod>2026-09-25T20:47:07.104Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/labs/05-reliable-training/index.html</loc>
-    <lastmod>2026-09-07T12:22:49.807Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/labs/04-optimization/starter/optimizers_from_scratch.html</loc>
+    <lastmod>2026-09-01T17:50:36.891Z</lastmod>
   </url>
   <url>
-    <loc>https://anassbelcaid.github.io/deeplearning-course/labs/09-semantic-segmentation/index.html</loc>
-    <lastmod>2026-09-20T22:10:59.355Z</lastmod>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/labs/05-reliable-training/starter/reliable_training_clinic.html</loc>
+    <lastmod>2026-09-07T12:28:28.421Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/labs/09-semantic-segmentation/starter/seeing_every_pixel.html</loc>
+    <lastmod>2026-09-20T22:06:54.844Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/labs/11-variational-autoencoders/reading.html</loc>
+    <lastmod>2026-10-08T19:55:59.637Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/labs/12-anime-generation/starter/anime_faces_homework.html</loc>
+    <lastmod>2026-10-11T18:20:28.751Z</lastmod>
+  </url>
+  <url>
+    <loc>https://anassbelcaid.github.io/deeplearning-course/labs/12-anime-generation/reading.html</loc>
+    <lastmod>2026-10-11T18:20:28.754Z</lastmod>
   </url>
 </urlset>

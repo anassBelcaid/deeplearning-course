@@ -1,0 +1,71 @@
+{
+  "generator": "section5 final checkpoint, epoch60, eval mode",
+  "fresh_seed": 1208,
+  "fresh_count": 36,
+  "real_ids": [
+    44708,
+    52338,
+    47111,
+    12789,
+    29693,
+    30165,
+    37809,
+    59770,
+    36122,
+    53916,
+    40944,
+    13857,
+    50432,
+    47295,
+    56687,
+    11470,
+    19042,
+    1565,
+    13255,
+    54876,
+    54998,
+    15043,
+    20842,
+    40793,
+    41371,
+    47333,
+    24021,
+    54873,
+    27828,
+    58664,
+    18223,
+    4337,
+    50171,
+    26404,
+    24826,
+    42929
+  ],
+  "selection": "Three consecutive batches of 12; first three queries for nearest neighbors; no ranking or removal",
+  "repeated_control": "First generated output of each batch repeated 12 times by the viewer data builder; not an observed model collapse",
+  "nearest_search": "Exhaustive pixel MSE in [0,1] against all 12000 training images; original floating point generated outputs",
+  "nearest_pairs": [
+    {
+      "query_index": 0,
+      "training_subset_index": 4585,
+      "dataset_id": 52488,
+      "mse": 0.0311515424400568,
+      "exact_float_match": false
+    },
+    {
+      "query_index": 1,
+      "training_subset_index": 1748,
+      "dataset_id": 46604,
+      "mse": 0.02993490919470787,
+      "exact_float_match": false
+    },
+    {
+      "query_index": 2,
+      "training_subset_index": 3405,
+      "dataset_id": 2584,
+      "mse": 0.0745948776602745,
+      "exact_float_match": false
+    }
+  ],
+  "limitations": "Small galleries do not measure population coverage. Pixel nearest neighbors are a sanity check, not a proof against memorization.",
+  "checkpoint_sha256": "95bbeffa95fd41edc256253349d61ac08756ffa79f8576ef938a72a387872ecf"
+}

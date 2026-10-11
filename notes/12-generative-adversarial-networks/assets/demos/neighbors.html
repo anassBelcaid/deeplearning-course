@@ -1,0 +1,54 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="../../../../lectures/12-generative-adversarial-networks/"><title>GAN notes: neighbors</title><link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-f3e585dc122d45960ea2c31f625881dd.css"><link rel="stylesheet" href="../01-what-is-learning/slides.css"><link rel="stylesheet" href="week12.css"><style>
+ html,body { margin:0; padding:0; background:#f5f1e8; overflow:hidden; }
+ #canvas { width:1280px; transform-origin:top left; }
+ .reveal { width:1280px; height:auto; font-size:28px; }
+ .reveal .slides { width:1280px!important; height:auto!important; position:relative; inset:auto; margin:0; transform:none!important; perspective:none; text-align:left; }
+ .reveal .slides>section { display:block; position:relative; top:auto; left:auto; padding:22px; width:100%; height:auto; box-sizing:border-box; transform:none; opacity:1; pointer-events:auto; }
+ .reveal .fragment { opacity:1; visibility:visible; }
+ .reveal section [hidden] { display:none!important; }
+ .reveal .gan-source,.reveal .slide-number { display:none; }
+ .reveal .gan-code-layout { margin:0; }
+ .reveal .gan-code-layout>div:empty { display:none; }
+ .reveal .gan-routing-solution { position:relative; top:auto; left:auto; right:auto; margin-top:12px; box-shadow:none; }
+ .reveal .gan-spatial-architecture svg { max-width:100%; }
+ </style></head><body><div id="canvas"><div class="reveal"><div class="slides"><section class="slide level2 gan-s6 present" id="gan-nearest-neighbors">
+
+<p class="gan-lead">
+Three consecutive fresh outputs. Reveal each nearest image among <strong>12,000 training examples</strong>.
+</p>
+<div class="gan-neighbor-gallery">
+<figure>
+<figcaption>
+Fresh draw 1
+</figcaption>
+<img alt="Fresh generated sample 1" src="assets/evidence/section6/query-0.png"/>
+<div class="" data-fragment-index="0">
+<span>Nearest training image</span><img alt="Pixel-MSE nearest training image for generated sample 1" src="assets/evidence/section6/nearest-0.png"/><small>MSE = 0.0312</small>
+</div>
+</figure>
+<figure>
+<figcaption>
+Fresh draw 2
+</figcaption>
+<img alt="Fresh generated sample 2" src="assets/evidence/section6/query-1.png"/>
+<div class="" data-fragment-index="0">
+<span>Nearest training image</span><img alt="Pixel-MSE nearest training image for generated sample 2" src="assets/evidence/section6/nearest-1.png"/><small>MSE = 0.0299</small>
+</div>
+</figure>
+<figure>
+<figcaption>
+Fresh draw 3
+</figcaption>
+<img alt="Fresh generated sample 3" src="assets/evidence/section6/query-2.png"/>
+<div class="" data-fragment-index="0">
+<span>Nearest training image</span><img alt="Pixel-MSE nearest training image for generated sample 3" src="assets/evidence/section6/nearest-2.png"/><small>MSE = 0.0746</small>
+</div>
+</figure>
+</div>
+
+
+
+</section></div></div></div><script>window.Reveal={on:()=>{},layout:()=>{}};</script><script>
+function resize(){const c=document.getElementById('canvas'),s=Math.min(1,innerWidth/1280);c.style.transform='scale('+s+')';const h=Math.ceil(c.getBoundingClientRect().height)+2;document.body.style.height=h+'px';parent.postMessage({type:'gan-notes-height',height:h},location.origin);}
+new ResizeObserver(resize).observe(document.querySelector('#canvas .slides'));addEventListener('resize',resize);addEventListener('load',resize);document.fonts.ready.then(resize);resize();
+</script></body></html>

@@ -1,0 +1,111 @@
+{
+  "dataset": "https://www.kaggle.com/datasets/splcher/animefacedataset",
+  "retrieved": "2026-10-11",
+  "selection": "First 12 filenames returned by Kaggle files listing; reordered lexicographically for display. Not representative and not generated outputs.",
+  "listing_license": "DbCL-1.0 (dataset metadata; report the source and check its current terms)",
+  "preprocessing": "EXIF transpose, RGB, center-square crop, bicubic resize to 64, divide by 255",
+  "files": [
+    {
+      "path": "0_2000.jpg",
+      "sha256": "aa726fff1d4b32a813a5275bf248bf429cd019bedf31b70029e74b34d124aad6",
+      "size": [
+        63,
+        63
+      ]
+    },
+    {
+      "path": "10000_2004.jpg",
+      "sha256": "3627ba4ccb19a4aba6a4fc8a3e0b3b09f233eb452fbd4ee7324ed57be01093e7",
+      "size": [
+        62,
+        62
+      ]
+    },
+    {
+      "path": "10001_2004.jpg",
+      "sha256": "661d1ef487303cea1faae52db34d2e30a62cad2ace10e57226a7e82e6cf1cc86",
+      "size": [
+        79,
+        79
+      ]
+    },
+    {
+      "path": "10002_2004.jpg",
+      "sha256": "f5e9f8236b2f534011146b0c817017e303e897a817a53bd2ab24272b328f1d59",
+      "size": [
+        51,
+        51
+      ]
+    },
+    {
+      "path": "10003_2004.jpg",
+      "sha256": "6f389405681f173f2aa8b2c8a59a327b408fe69e44bd7cd8c83012bc8b800d8d",
+      "size": [
+        77,
+        77
+      ]
+    },
+    {
+      "path": "10004_2004.jpg",
+      "sha256": "5b17297ca22afb2245d33858fe67c607504dfb2b9fff805aee4917ee4440b49f",
+      "size": [
+        79,
+        79
+      ]
+    },
+    {
+      "path": "10005_2004.jpg",
+      "sha256": "86df968e5da0a35d81a16d0493e0249d508f83e6782da2643072017bfde1d331",
+      "size": [
+        60,
+        60
+      ]
+    },
+    {
+      "path": "10006_2004.jpg",
+      "sha256": "55fa5b0643e894d01043bf371a1bce568c41b9162f74b72c171446c6ba897cb7",
+      "size": [
+        51,
+        51
+      ]
+    },
+    {
+      "path": "10007_2004.jpg",
+      "sha256": "f669ec329af96471f03cd40e76dcac3ff4e90306895d24c44ff425055b6c3d31",
+      "size": [
+        55,
+        55
+      ]
+    },
+    {
+      "path": "10008_2004.jpg",
+      "sha256": "1792aacb8e7aa0ec7b98d81b9596aba196f167856c088791e4e27b82f627cc7f",
+      "size": [
+        72,
+        72
+      ]
+    },
+    {
+      "path": "10009_2004.jpg",
+      "sha256": "219d173a57f8f9dd7889c107be5efd6e2401e8c5421f23ba69eeb57445b5fc0a",
+      "size": [
+        93,
+        93
+      ]
+    },
+    {
+      "path": "1000_2000.jpg",
+      "sha256": "d152c04374acf18e64561d473574ea74f7ffd69a0490585e0cc0e5a86f981b21",
+      "size": [
+        74,
+        74
+      ]
+    }
+  ],
+  "pairwise_pixel_mse": {
+    "real_preview": 0.14496293258748752,
+    "repeated_control": 0.0,
+    "noise_control": 0.1661427600740989
+  },
+  "scope": "Measured infrastructure examples only; no trained anime generator is supplied."
+}

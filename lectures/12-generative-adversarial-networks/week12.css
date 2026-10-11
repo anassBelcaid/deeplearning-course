@@ -1,0 +1,193 @@
+/* Opening geometry; title and roadmap reuse the shared course components. */
+.reveal .lecture-toc { height: 690px; }
+
+/* Section 1 geometry. Teaching panels retain their shared appearance. */
+.reveal .slides section.gan-section { height:900px!important; top:0!important; }
+.reveal .slides section.gan-section h1 { border-bottom:0; font-size:2.3em; margin:195px 40px 0; text-align:left; max-width:1150px; }
+.reveal .slides section.gan-section::before { content:""; position:absolute; top:560px; left:40px; right:40px; height:18px; border-radius:5px; background:repeating-linear-gradient(to right,transparent 0 calc(16.667% - 3px),#17212b calc(16.667% - 3px) 16.667%),linear-gradient(to right,#2878c8 0 16.667%,#536271 16.667% 100%); }
+.reveal .slides section.gan-section::after { content:attr(data-section-progress); position:absolute; top:602px; right:40px; color:#8fd0ff; font:700 22px monospace; }
+.reveal .gan-source { font:500 13px/1.4 "Manrope",sans-serif; color:var(--muted); margin:20px 0 0; }
+.reveal .gan-lead { font-size:28px; margin:22px 0; }
+.reveal .gan-blind-gallery { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:22px; margin:30px 0 15px; }
+.reveal .gan-blind-gallery figure,.reveal .gan-judge-gallery figure { margin:0; text-align:center; }
+.reveal .gan-blind-gallery figcaption { font:700 26px "DM Mono",monospace; margin-bottom:14px; color:var(--ink); }
+.reveal .gan-blind-gallery img { width:100%; height:auto; image-rendering:pixelated; margin:0; border-radius:8px; }
+.reveal .gan-origin { font-size:23px; margin:14px 0; color:var(--blue); }
+.reveal #gan-source-exercise .exercise-pause { margin-top:28px!important; }
+.reveal .gan-source-solution { top:560px; left:0; right:0; }
+.reveal .gan-source-solution p { font-size:26px; line-height:1.45; margin:12px 0; }
+.reveal #gan-source-exercise .gan-source { margin-top:150px; }
+.reveal #gan-source-exercise:has(.gan-source-solution.visible) .exercise-pause { visibility:hidden; }
+.reveal .gan-target-controls,.reveal .gan-judge-controls { display:flex; gap:14px; align-items:center; margin:22px 0; }
+.reveal .gan-target-controls>span,.reveal .gan-judge-controls>span { font:700 18px "DM Mono",monospace; margin-right:12px; color:var(--blue); }
+.reveal .gan-target-controls button,.reveal .gan-judge-controls button { font:600 21px "Manrope",sans-serif; padding:12px 20px; border:2px solid #b9d3e5; border-radius:9px; background:var(--raised); color:var(--ink); cursor:pointer; }
+.reveal .gan-target-controls button[aria-pressed=true],.reveal .gan-judge-controls button[aria-pressed=true] { background:var(--blue); color:white; border-color:var(--blue); }
+.reveal .gan-target-controls button:focus-visible,.reveal .gan-judge-controls button:focus-visible { outline:4px solid var(--amber); outline-offset:4px; }
+.reveal .gan-target-stage { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:30px; margin:25px 0 20px; }
+.reveal .gan-target-stage figure { margin:0; text-align:center; }
+.reveal .gan-target-stage figcaption { font-size:25px; color:var(--ink); margin:0 0 16px; }
+.reveal .gan-target-stage img { width:252px; height:252px; image-rendering:pixelated; margin:0; border-radius:8px; }
+.reveal .gan-target-stage small { display:block; margin-top:15px; font-size:18px; color:var(--muted); }
+.reveal .gan-target-measure { display:flex; align-items:center; justify-content:center; gap:30px; margin:18px 0; }
+.reveal .gan-target-measure span { font-size:24px; }
+.reveal .gan-target-measure strong { font:700 39px "DM Mono",monospace; color:var(--coral); }
+.reveal #gan-target-experiment .takeaway,.reveal #gan-judge-experiment .takeaway,.reveal #gan-feedback-idea .takeaway { font-size:28px; }
+.reveal .gan-score-key { font-size:22px; margin:24px 0; }
+.reveal .gan-judge-gallery { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:25px; margin-top:15px; }
+.reveal .gan-judge-gallery figcaption { font-size:19px; margin:0 0 12px; color:var(--ink); }
+.reveal .gan-judge-gallery img { width:156px; height:156px; image-rendering:pixelated; margin:0; border-radius:7px; }
+.reveal .gan-score-track { height:13px; background:#d6e0e7; border-radius:4px; margin:18px auto 9px; width:156px; position:relative; }
+.reveal .gan-score-track::after { content:""; position:absolute; left:50%; top:-3px; height:19px; border-left:2px solid #657079; }
+.reveal .gan-score-track i { display:block; height:100%; background:var(--blue); width:0; border-radius:4px; transition:width .25s; }
+.reveal .gan-judge-gallery strong { font:600 24px "DM Mono",monospace; }
+.reveal .gan-heldout { display:flex; gap:50px; align-items:center; justify-content:center; margin:34px 0 20px; }
+.reveal .gan-heldout>div { display:flex; align-items:center; gap:25px; }
+.reveal .gan-heldout span { font-size:23px; }
+.reveal .gan-heldout strong { font:700 44px "DM Mono",monospace; color:var(--blue); }
+.reveal .gan-heldout p { font-size:23px; line-height:1.4; margin:0; }
+.reveal .gan-heldout small { font-size:18px; color:var(--muted); }
+
+
+
+/* Section 2: shared graph identities, distinct comparison/exercise/code compositions. */
+.reveal .slides section.gan-section-two::before { background:repeating-linear-gradient(to right,transparent 0 calc(16.667% - 3px),#17212b calc(16.667% - 3px) 16.667%),linear-gradient(to right,#008e9b 0 33.333%,#536271 33.333% 100%); }
+.reveal .slides section.gan-section-two::after { color:#6fdae1; }
+.reveal .gan-s2 .takeaway { font-size:28px; }
+.reveal .gan-architecture-comparison svg { height:570px; margin:18px 0 10px; }
+.reveal .gan-routing svg { height:365px; margin:12px 0; }
+.reveal #gan-routing-exercise .exercise-pause { margin-top:20px!important; }
+.reveal .gan-routing-solution { top:540px; left:0; right:0; }
+.reveal .gan-routing-solution p { font-size:24px; line-height:1.35; margin:10px 0; }
+.reveal .gan-routing-solution .gan-judge-controls { margin:14px 0; }
+.reveal #gan-route-status { color:var(--blue); font-size:22px; }
+.reveal #gan-routing-exercise>.gan-source { position:absolute; top:800px; margin:0; }
+.reveal #gan-routing-exercise:has(.gan-routing-solution.visible) .exercise-pause { visibility:hidden; }
+.reveal .gan-routing [data-path] { transition:opacity .2s; }
+.reveal .gan-routing [data-path].route-inactive { opacity:.16; }
+.reveal .gan-code-layout { display:grid; grid-template-columns:380px minmax(0,1fr); gap:45px; align-items:center; margin:25px 0 10px; }
+.reveal .gan-code-layout>div { min-width:0; }
+.reveal .gan-code-layout .course-network-diagram svg { height:570px; margin:0; }
+.reveal .light-code-editor pre code { font-size:23px; line-height:1.32; }
+.reveal .gan-code-layout .light-code-editor { margin:0; }
+.reveal .gan-code-layout .light-code-editor pre { padding:22px 26px; }
+.reveal .gan-code-layout .editor-bar { font-size:15px; }
+/* Section 3: loss arithmetic and analytic gradient evidence. */
+.reveal .slides section.gan-section-three::before { background:repeating-linear-gradient(to right,transparent 0 calc(16.667% - 3px),#17212b calc(16.667% - 3px) 16.667%),linear-gradient(to right,#ba852d 0 50%,#536271 50% 100%); }
+.reveal .slides section.gan-section-three::after { color:#f6c56e; }
+.reveal .gan-s3 .takeaway { font-size:28px; }
+.reveal .gan-loss-graph svg { height:430px; margin:8px 0; }
+.reveal .gan-loss-equation { font-size:31px; text-align:center; margin:24px 0; line-height:1.5; }
+.reveal .gan-loss-equation>span { display:block; font-size:21px; color:var(--muted); }
+.reveal .gan-score-lab { margin:35px 30px 15px; }
+.reveal .gan-score-control { display:flex; align-items:center; gap:30px; }
+.reveal .gan-score-control label { font-size:29px; }
+.reveal .gan-score-control input { flex:1; accent-color:var(--blue); height:32px; cursor:pointer; }
+.reveal .gan-score-control output { font:700 38px 'DM Mono',monospace; min-width:115px; }
+.reveal .gan-score-direction { display:flex; justify-content:space-between; font-size:20px; color:var(--muted); margin:10px 145px 30px; }
+.reveal .gan-loss-readouts { display:grid; grid-template-columns:1fr 1fr; gap:70px; }
+.reveal .gan-loss-readouts>div { border-top:4px solid #d7aea0; padding-top:15px; }
+.reveal .gan-loss-readouts>div+div { border-color:#9ebdd1; }
+.reveal .gan-loss-readouts h3 { font-size:30px; margin:0 0 12px; }
+.reveal .gan-loss-readouts p { font-size:25px; margin:12px 0; }
+.reveal .gan-loss-formula { font-size:32px; display:inline-block; margin-right:35px; }
+.reveal .gan-loss-readouts output { font:700 38px 'DM Mono',monospace; }
+.reveal .gan-loss-meter { height:18px; background:#e0e3e2; margin:20px 0 5px; }
+.reveal .gan-loss-meter i { height:100%; display:block; background:#c44834; }
+.reveal #gan-g-loss-bar { background:#2878c8; }
+.reveal .gan-gradient-layout { display:grid; grid-template-columns: minmax(0,1fr) 330px; gap:30px; align-items:center; }
+.reveal .gan-gradient-plot svg { height:470px; margin:20px 0 0; }
+.reveal .gan-gradient-values p { font-size:26px; line-height:1.6; margin:24px 0; }
+.reveal .gan-gradient-values p:last-child { font-size:20px; }
+.reveal .gan-minimax { color:#c44834; }
+.reveal .gan-nonsat { color:#2878c8; }
+.reveal #gan-gradient-values { font:600 24px 'DM Mono',monospace; margin-left:20px; }
+.reveal .gan-loss-code-layout { display:grid; grid-template-columns:300px minmax(0,1fr); gap:30px; align-items:center; margin:35px 0; }
+.reveal .gan-loss-contract p { font-size:24px; line-height:1.4; margin:20px 0; }
+.reveal .gan-loss-contract strong { font-size:25px; }
+.reveal .gan-loss-code-layout .light-code-editor { margin:0; }
+.reveal .gan-loss-code-layout .light-code-editor pre { padding:22px; }
+.reveal .gan-loss-code-layout .editor-bar { font-size:15px; }
+.reveal .gan-target-blank { position:relative; }
+.reveal .gan-question { position:absolute; left:0; top:0; color:var(--coral); font-weight:bold; }
+.reveal .gan-target-blank:has(.visible) .gan-question { visibility:hidden; }
+.reveal .gan-loss-code-solution { top:605px; left:0; right:0; }
+.reveal .gan-loss-code-solution p { font-size:26px; margin:12px 0; }
+.reveal #gan-loss-code-exercise:has(.gan-loss-code-solution.visible) .exercise-pause { visibility:hidden; }
+.reveal #gan-loss-code-exercise>.gan-source { position:absolute; top:800px; margin:0; }
+/* Restrict divider decoration to real slides: Reveal backgrounds copy slide classes. */
+.reveal .slides section.gan-section-four::before { background:repeating-linear-gradient(to right,transparent 0 calc(16.667% - 3px),#17212b calc(16.667% - 3px) 16.667%),linear-gradient(to right,#8b65bd 0 66.667%,#536271 66.667% 100%); }
+.reveal .slides section.gan-section-four::after { color:#c9a7f1; }
+.reveal .gan-s4 .takeaway { font-size:28px; }
+.reveal .gan-update-flow svg { height:455px; margin:10px 0; }
+.reveal #gan-turn-status { font-size:27px; margin:15px 0; }
+.reveal .gan-update-flow [data-turn-only][hidden] { display:none; }
+.reveal .gan-debug-code { margin:30px 0; }
+.reveal .gan-debug-code pre { padding:25px 35px; }
+.reveal .gan-bug-line { background:#f6e1d9; display:inline-block; }
+.reveal .gan-update-solution { top:505px; left:0; right:0; }
+.reveal .gan-update-solution p { font-size:25px; line-height:1.35; margin:13px 0; }
+.reveal .gan-update-solution pre { margin:10px 0; padding:10px 20px; box-shadow:none; background:#f0f4f3; width:auto; }
+.reveal .gan-update-solution pre code { font-size:23px; line-height:1.4; }
+.reveal #gan-update-debug:has(.gan-update-solution.visible) .exercise-pause { visibility:hidden; }
+.reveal #gan-update-debug>.gan-source { position:absolute; top:800px; margin:0; }
+/* Section 5: spatial layer bars, weighted-overlap arithmetic, recorded outputs. */
+.reveal .slides section.gan-section-five::before { background:repeating-linear-gradient(to right,transparent 0 calc(16.667% - 3px),#17212b calc(16.667% - 3px) 16.667%),linear-gradient(to right,#458666 0 83.333%,#536271 83.333% 100%); }
+.reveal .slides section.gan-section-five::after { color:#9bd0b3; }
+.reveal .gan-s5 .takeaway { font-size:28px; }
+.reveal .gan-layer-diagram svg { width:100%; height:565px; display:block; margin:25px 0; }
+.reveal .gan-overlap-grid { margin:40px 30px 20px; }
+.reveal .gan-overlap-row { display:grid; grid-template-columns:300px repeat(5,1fr); gap:18px; align-items:center; margin:18px 0; }
+.reveal .gan-overlap-row strong { font-size:27px; }
+.reveal .gan-overlap-cell { display:flex; align-items:center; justify-content:center; border:2px solid #bac8cf; background:#fffdf7; height:80px; font:600 36px 'DM Mono',monospace; }
+.reveal .gan-overlap-cell.overlap { background:#dceeff; border-color:#2878c8; }
+.reveal .gan-transpose-formula { font-size:27px; text-align:center; margin:25px 0; }
+.reveal .gan-conv-code-panel[hidden] { display:none!important; }
+.reveal .gan-conv-code-panel { margin:0; gap:25px; grid-template-columns:350px minmax(0,1fr); }
+.reveal .gan-conv-code-panel .gan-layer-diagram svg { height:475px; margin:0; }
+.reveal .gan-training-gallery { display:grid; grid-template-columns:repeat(3,1fr); gap:16px 45px; max-width:1000px; margin:16px auto; }
+.reveal .gan-training-gallery figure { margin:0; text-align:center; }
+.reveal .gan-training-gallery img { width:175px; height:175px; image-rendering:pixelated; margin:0; }
+.reveal .gan-training-gallery figcaption { font-size:20px; margin:8px 0 0; }
+.reveal .gan-training-status { font-size:23px; text-align:center; margin:10px 0; }
+.reveal #gan-conv-training .takeaway { font-size:26px; margin:15px 0; }
+.reveal #gan-conv-training .gan-source { margin-top:14px; }
+
+/* Paired spatial overview: both model geometries on one canvas. */
+.reveal .gan-spatial-architecture svg { display:block; width:100%; height:660px; margin:8px 0 0; }
+.reveal .gan-spatial-key { font-size:21px; margin:8px 0; text-align:center; }
+.reveal #gan-spatial-architecture .gan-source { margin-top:12px; }
+/* Section 6: sample evidence, training diagnostics, and the final synthesis. */
+.reveal .slides section.gan-section-six::before { background:repeating-linear-gradient(to right,transparent 0 calc(16.667% - 3px),#17212b calc(16.667% - 3px) 16.667%),linear-gradient(to right,#c44834 0 100%,#536271 100%); }
+.reveal .slides section.gan-section-six::after { color:#ffad9d; }
+.reveal .gan-s6 .takeaway { font-size:27px; }
+.reveal .gan-eval-galleries { display:grid; grid-template-columns:1fr 1fr; gap:50px; margin:25px 30px 12px; }
+.reveal .gan-eval-galleries figure { margin:0; text-align:center; }
+.reveal .gan-eval-galleries figcaption { font-size:25px; margin-bottom:16px; }
+.reveal .gan-eval-galleries img { width:520px; height:390px; margin:0; image-rendering:pixelated; }
+.reveal .gan-eval-status { text-align:center; font-size:23px; margin:15px 0; }
+.reveal .gan-loss-evidence { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:40px; align-items:center; margin:20px 0; }
+.reveal .gan-training-loss-plot svg { width:100%; height:440px; overflow:visible; }
+.reveal .gan-training-loss-plot text { font:22px Manrope,sans-serif; fill:#17212b; }
+.reveal .gan-loss-legend { display:flex; gap:35px; justify-content:center; font-size:21px; margin:18px 0; }
+.reveal .gan-loss-legend span:first-child { color:#b26950; }
+.reveal .gan-loss-legend span:last-child { color:#2878c8; }
+.reveal .gan-loss-evidence figure { margin:0; text-align:center; }
+.reveal .gan-loss-evidence figcaption { font-size:23px; margin-bottom:15px; }
+.reveal .gan-loss-evidence img { display:inline-block; width:145px; height:145px; margin:6px 0; image-rendering:pixelated; }
+.reveal .gan-loss-evidence small { display:block; font-size:22px; line-height:1.6; margin-top:14px; }
+.reveal .gan-neighbor-gallery { display:grid; grid-template-columns:repeat(3,1fr); gap:45px; margin:25px 20px 15px; }
+.reveal .gan-neighbor-gallery figure { margin:0; text-align:center; }
+.reveal .gan-neighbor-gallery figcaption { font-size:24px; margin-bottom:12px; }
+.reveal .gan-neighbor-gallery img { display:block; width:160px; height:160px; margin:0 auto; image-rendering:pixelated; }
+.reveal .gan-neighbor-gallery span { display:block; font-size:22px; margin:18px 0 12px; }
+.reveal .gan-neighbor-gallery small { display:block; font:21px 'DM Mono',monospace; margin-top:12px; }
+.reveal .gan-final-prompts { display:grid; grid-template-columns:repeat(5,1fr); gap:25px; margin:45px 0 40px; text-align:center; }
+.reveal .gan-final-prompts span { font-size:27px; line-height:1.6; border-top:4px solid var(--blue); padding-top:14px; }
+.reveal .gan-final-prompts strong { font-size:23px; font-weight:500; }
+.reveal .gan-final-solution { top:350px; left:0; right:0; }
+.reveal .gan-final-solution table { width:100%; margin:16px 0; font-size:24px; line-height:1.35; }
+.reveal .gan-final-solution th { width:190px; }
+.reveal .gan-final-solution td,.reveal .gan-final-solution th { padding:10px 12px; }
+.reveal .gan-final-solution p { font-size:25px; margin:14px 0; }
+.reveal #gan-final-synthesis:has(.gan-final-solution.visible) .exercise-pause { visibility:hidden; }
+.reveal #gan-final-synthesis>.gan-source { position:absolute; top:810px; margin:0; }

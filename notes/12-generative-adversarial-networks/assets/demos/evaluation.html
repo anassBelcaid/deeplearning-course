@@ -1,0 +1,115 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="../../../../lectures/12-generative-adversarial-networks/"><title>GAN notes: evaluation</title><link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-f3e585dc122d45960ea2c31f625881dd.css"><link rel="stylesheet" href="../01-what-is-learning/slides.css"><link rel="stylesheet" href="week12.css"><style>
+ html,body { margin:0; padding:0; background:#f5f1e8; overflow:hidden; }
+ #canvas { width:1280px; transform-origin:top left; }
+ .reveal { width:1280px; height:auto; font-size:28px; }
+ .reveal .slides { width:1280px!important; height:auto!important; position:relative; inset:auto; margin:0; transform:none!important; perspective:none; text-align:left; }
+ .reveal .slides>section { display:block; position:relative; top:auto; left:auto; padding:22px; width:100%; height:auto; box-sizing:border-box; transform:none; opacity:1; pointer-events:auto; }
+ .reveal .fragment { opacity:1; visibility:visible; }
+ .reveal section [hidden] { display:none!important; }
+ .reveal .gan-source,.reveal .slide-number { display:none; }
+ .reveal .gan-code-layout { margin:0; }
+ .reveal .gan-code-layout>div:empty { display:none; }
+ .reveal .gan-routing-solution { position:relative; top:auto; left:auto; right:auto; margin-top:12px; box-shadow:none; }
+ .reveal .gan-spatial-architecture svg { max-width:100%; }
+ </style></head><body><div id="canvas"><div class="reveal"><div class="slides"><section class="slide level2 gan-s6 present" id="gan-evaluate-gallery">
+
+<div aria-label="Inspect fresh sample batches" class="gan-judge-controls" role="group">
+<span>Fresh batch</span><button aria-pressed="true" data-eval-batch="0" type="button">1</button><button aria-pressed="false" data-eval-batch="1" type="button">2</button><button aria-pressed="false" data-eval-batch="2" type="button">3</button><button aria-pressed="false" id="gan-repeat-control" type="button">Show repetition control</button>
+</div>
+<div class="gan-eval-galleries">
+<figure>
+<figcaption>
+Held-out dataset images
+</figcaption>
+<img alt="First twelve held-out Fashion-MNIST images" id="gan-eval-real" src="assets/evidence/section6/real-0.png"/>
+</figure>
+<figure>
+<figcaption id="gan-eval-generated-label">
+Actual G · 12 fresh latent draws
+</figcaption>
+<img alt="First twelve fresh outputs from the epoch-60 generator" id="gan-eval-generated" src="assets/evidence/section6/generated-0.png"/>
+</figure>
+</div>
+<p aria-live="polite" class="gan-eval-status" id="gan-eval-status">
+Recorded outputs · batch 1 of 3 · no selection by quality
+</p>
+
+
+
+</section></div></div></div><div hidden><section class="slide level2 gan-s6" id="gan-evaluate-losses">
+<h2>Training losses are diagnostics, not a quality score</h2>
+<div aria-label="Compare recorded checkpoints with training losses" class="gan-judge-controls" role="group">
+<span>Checkpoint</span><button aria-pressed="false" data-loss-checkpoint="5" type="button">5</button><button aria-pressed="true" data-loss-checkpoint="20" type="button">20</button><button aria-pressed="false" data-loss-checkpoint="60" type="button">60</button>
+</div>
+<div class="gan-loss-evidence">
+<div>
+<div class="gan-loss-legend">
+<span>D loss · sum of source means</span><span>G loss · non-saturating</span>
+</div>
+<div class="gan-training-loss-plot">
+<svg aria-label="Recorded discriminator and generator training losses over 60 epochs, using a shared zero to four vertical axis" role="img" viewbox="0 0 900 440">
+<path d="M70 355H850" stroke="#d8dfe2"></path><text text-anchor="end" x="52" y="362">0</text><path d="M70 283H850" stroke="#d8dfe2"></path><text text-anchor="end" x="52" y="290">1</text><path d="M70 211H850" stroke="#d8dfe2"></path><text text-anchor="end" x="52" y="218">2</text><path d="M70 139H850" stroke="#d8dfe2"></path><text text-anchor="end" x="52" y="146">3</text><path d="M70 67H850" stroke="#d8dfe2"></path><text text-anchor="end" x="52" y="74">4</text><text text-anchor="middle" x="70.0" y="395">1</text><text text-anchor="middle" x="321.18644067796606" y="395">20</text><text text-anchor="middle" x="585.5932203389831" y="395">40</text><text text-anchor="middle" x="850.0" y="395">60</text><text text-anchor="middle" x="460" y="435">Epoch · mean of minibatch losses</text><polyline fill="none" points="70.00,288.93 83.22,294.00 96.44,281.32 109.66,258.12 122.88,258.41 136.10,258.51 149.32,254.76 162.54,257.15 175.76,258.02 188.98,259.64 202.20,262.60 215.42,263.32 228.64,262.84 241.86,262.79 255.08,262.52 268.31,262.60 281.53,263.37 294.75,262.68 307.97,261.97 321.19,260.63 334.41,260.95 347.63,259.64 360.85,259.10 374.07,258.28 387.29,257.90 400.51,257.79 413.73,257.46 426.95,257.76 440.17,257.46 453.39,257.50 466.61,257.32 479.83,256.87 493.05,256.81 506.27,256.78 519.49,256.89 532.71,256.66 545.93,256.60 559.15,256.55 572.37,256.49 585.59,256.38 598.81,256.43 612.03,256.49 625.25,256.36 638.47,256.32 651.69,256.41 664.92,256.48 678.14,256.38 691.36,256.40 704.58,256.51 717.80,256.33 731.02,256.40 744.24,256.48 757.46,256.34 770.68,256.39 783.90,256.27 797.12,256.39 810.34,256.35 823.56,256.37 836.78,256.25 850.00,256.32" stroke="#b26950" stroke-width="3"></polyline><polyline fill="none" points="70.00,303.42 83.22,287.63 96.44,282.83 109.66,290.14 122.88,298.89 136.10,298.39 149.32,302.28 162.54,301.51 175.76,300.20 188.98,298.80 202.20,297.95 215.42,298.06 228.64,298.16 241.86,297.72 255.08,296.92 268.31,297.61 281.53,297.71 294.75,298.72 307.97,298.74 321.19,300.02 334.41,299.81 347.63,300.59 360.85,300.94 374.07,302.02 387.29,302.11 400.51,301.98 413.73,302.48 426.95,302.18 440.17,302.35 453.39,302.62 466.61,302.64 479.83,302.87 493.05,303.11 506.27,303.05 519.49,302.72 532.71,303.28 545.93,303.09 559.15,303.28 572.37,303.29 585.59,303.31 598.81,303.28 612.03,303.35 625.25,303.41 638.47,303.56 651.69,303.21 664.92,303.19 678.14,303.04 691.36,303.20 704.58,303.47 717.80,303.20 731.02,303.40 744.24,303.53 757.46,303.12 770.68,303.47 783.90,303.48 797.12,303.34 810.34,303.57 823.56,303.39 836.78,303.49 850.00,303.37" stroke="#2878c8" stroke-width="3"></polyline><line id="gan-loss-epoch-marker" stroke="#526575" stroke-dasharray="6 6" x1="321.19" x2="321.19" y1="55" y2="360"></line>
+</svg>
+</div>
+</div>
+<figure>
+<figcaption>
+Same two latent draws
+</figcaption>
+<img alt="Fixed latent draw 1 at epoch 20" id="gan-loss-sample-a" src="assets/evidence/section5/epoch-20-sample-0.png"/><img alt="Fixed latent draw 5 at epoch 20" id="gan-loss-sample-b" src="assets/evidence/section5/epoch-20-sample-4.png"/><small aria-live="polite" id="gan-loss-checkpoint-values">Loading recorded loss values…</small>
+</figure>
+</div>
+<div class="fragment takeaway" data-fragment-index="0">
+<p>Both networks keep changing. Read the curves alongside fixed-code samples and fresh batches.</p>
+</div>
+<p class="gan-source">
+Actual section 5 training record, all 60 epochs · losses measured on each network’s own turn and averaged over minibatches · same shared vertical axis · <a href="assets/evidence/section6/losses.json">recorded values</a> · moving objectives: <a href="https://arxiv.org/abs/1406.2661">Goodfellow et al., 2014</a>.
+</p>
+<aside class="notes">
+<p>The orange line is D’s sum of real and generated source means; the blue line is the non-saturating G mean. These values are not directly comparable performance scores. Select checkpoints 5,20,60 and inspect the same two latent draws. The images are evaluation-mode recordings; the loss values are the epoch means collected during alternating training, not losses recomputed on these two images.</p>
+<p>Ask whether a single lower point would be enough to choose a checkpoint. D changes the function against which G is judged, and G changes the negative examples D must recognize. Improvements in a source-classification objective do not necessarily track image fidelity or diversity. A discriminator score near 0.5 can arise from a weak discriminator as well as difficult discrimination, so it is not a certificate of distribution matching.</p>
+<p>Use this actual record to practice relating curves to evidence, not to establish a universal shape of successful GAN training. Oscillation can be part of adversarial dynamics; one should inspect sample behavior, gradient/update correctness, and reproducibility before diagnosing instability from a curve alone. A sudden non-finite loss or absent required gradients would motivate implementation checks; section 4 supplied those checks. Keep several checkpoints and consistent fixed codes so changes can be examined rather than inferred from the final gallery.</p>
+<p>The marker selects an epoch on the true horizontal axis. Every recorded epoch remains visible, without smoothing or cropping. The chart uses one shared zero-to-four y-axis. Two sample images are illustrative continuity evidence from the earlier six-draw viewer, not a benchmark or a selected best-pair claim.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></div><script>window.Reveal={on:()=>{},layout:()=>{}};</script><script>
+(() => {
+ let batch=0,repeated=false;
+ const repeat=document.getElementById('gan-repeat-control');if(!repeat)return;
+ function showBatch(){
+  document.querySelectorAll('[data-eval-batch]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.evalBatch)===batch)));
+  repeat.setAttribute('aria-pressed',String(repeated));repeat.textContent=repeated?'Return to actual outputs':'Show repetition control';
+  const real=document.getElementById('gan-eval-real'),generated=document.getElementById('gan-eval-generated');
+  real.src='assets/evidence/section6/real-'+batch+'.png';real.alt='Held-out Fashion-MNIST reference batch '+(batch+1);
+  generated.src='assets/evidence/section6/'+(repeated?'repeated':'generated')+'-'+batch+'.png';
+  generated.alt=repeated?'Constructed control: one output repeated twelve times':'Twelve actual fresh generated outputs, batch '+(batch+1);
+  document.getElementById('gan-eval-generated-label').textContent=repeated?'Constructed control · one image repeated':'Actual G · 12 fresh latent draws';
+  document.getElementById('gan-eval-status').textContent=repeated?'CONTROL: duplicated display, not observed model collapse':'Recorded outputs · batch '+(batch+1)+' of 3 · no selection by quality';
+ }
+ document.querySelectorAll('[data-eval-batch]').forEach(b=>b.addEventListener('click',()=>{batch=Number(b.dataset.evalBatch);showBatch();}));
+ repeat.addEventListener('click',()=>{repeated=!repeated;showBatch();});showBatch();
+ fetch('assets/evidence/section6/losses.json').then(r=>{if(!r.ok)throw Error('Loss record unavailable');return r.json();}).then(history=>{
+  function select(epoch){
+   const row=history.find(r=>r.epoch===epoch),x=70+(epoch-1)*780/59;
+   document.querySelectorAll('[data-loss-checkpoint]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.lossCheckpoint)===epoch)));
+   const marker=document.getElementById('gan-loss-epoch-marker');marker.setAttribute('x1',x);marker.setAttribute('x2',x);
+   for(const [id,i] of [['gan-loss-sample-a',0],['gan-loss-sample-b',4]]){const im=document.getElementById(id);im.src='assets/evidence/section5/epoch-'+epoch+'-sample-'+i+'.png';im.alt='Fixed draw '+(i+1)+', recorded epoch '+epoch;}
+   document.getElementById('gan-loss-checkpoint-values').textContent='Epoch '+epoch+' · D: '+row.loss_D.toFixed(3)+' · G: '+row.loss_G.toFixed(3);
+  }
+  document.querySelectorAll('[data-loss-checkpoint]').forEach(b=>b.addEventListener('click',()=>select(Number(b.dataset.lossCheckpoint))));select(20);
+ }).catch(()=>{document.getElementById('gan-loss-checkpoint-values').textContent='Recorded values could not be loaded.';});
+})();
+</script>
+<script>
+function resize(){const c=document.getElementById('canvas'),s=Math.min(1,innerWidth/1280);c.style.transform='scale('+s+')';const h=Math.ceil(c.getBoundingClientRect().height)+2;document.body.style.height=h+'px';parent.postMessage({type:'gan-notes-height',height:h},location.origin);}
+new ResizeObserver(resize).observe(document.querySelector('#canvas .slides'));addEventListener('resize',resize);addEventListener('load',resize);document.fonts.ready.then(resize);resize();
+</script></body></html>

@@ -1,0 +1,33 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="../../../../lectures/12-generative-adversarial-networks/"><title>GAN notes: source-loss</title><link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-f3e585dc122d45960ea2c31f625881dd.css"><link rel="stylesheet" href="../01-what-is-learning/slides.css"><link rel="stylesheet" href="week12.css"><style>
+ html,body { margin:0; padding:0; background:#f5f1e8; overflow:hidden; }
+ #canvas { width:1280px; transform-origin:top left; }
+ .reveal { width:1280px; height:auto; font-size:28px; }
+ .reveal .slides { width:1280px!important; height:auto!important; position:relative; inset:auto; margin:0; transform:none!important; perspective:none; text-align:left; }
+ .reveal .slides>section { display:block; position:relative; top:auto; left:auto; padding:22px; width:100%; height:auto; box-sizing:border-box; transform:none; opacity:1; pointer-events:auto; }
+ .reveal .fragment { opacity:1; visibility:visible; }
+ .reveal section [hidden] { display:none!important; }
+ .reveal .gan-source,.reveal .slide-number { display:none; }
+ .reveal .gan-code-layout { margin:0; }
+ .reveal .gan-code-layout>div:empty { display:none; }
+ .reveal .gan-routing-solution { position:relative; top:auto; left:auto; right:auto; margin-top:12px; box-shadow:none; }
+ .reveal .gan-spatial-architecture svg { max-width:100%; }
+ </style></head><body><div id="canvas"><div class="reveal"><div class="slides"><section class="slide level2 gan-s3 present" id="gan-discriminator-loss">
+
+<p class="gan-lead">
+Two illustrative predictions. Which source target belongs to each image?
+</p>
+<div class="course-network-diagram gan-loss-graph">
+<svg aria-label="Two images enter the same discriminator; real has target one, generated has target zero. Illustrative scores 0.8 and 0.2." role="img" viewbox="0 0 1280 485">
+<defs><marker id="loss-arrow" markerheight="6" markerwidth="6" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M1 1 9 5 1 9" fill="none" stroke="#526575" stroke-width="1.5"></path></marker></defs><rect class="network-node network-value" height="100" rx="15" width="230" x="25" y="70"></rect><text class="network-label" style="font-size:27px" text-anchor="middle" x="140.0" y="129.0">Real x</text><path class="network-edge" d="M273 120H325" marker-end="url(#loss-arrow)"></path><rect class="network-node network-discriminator" height="100" rx="15" width="155" x="343" y="70"></rect><text class="network-label" style="font-size:27px" text-anchor="middle" x="420.5" y="129.0">D</text><path class="network-edge" d="M516 120H568" marker-end="url(#loss-arrow)"></path><text class="network-label" style="font-size:32px" x="590" y="110">p = 0.80</text><text class="network-label" style="font-size:20px" x="590" y="152">p = sigmoid(logit)</text><g class="" data-fragment-index="0"><text class="network-label" style="font-size:24px" x="870" y="95">Target 1</text><text class="network-label" style="font-size:27px" x="870" y="148">−ln(0.80) = 0.223</text></g><rect class="network-node network-value" height="100" rx="15" width="230" x="25" y="285"></rect><text class="network-label" style="font-size:27px" text-anchor="middle" x="140.0" y="344.0">Generated x̃</text><path class="network-edge" d="M273 335H325" marker-end="url(#loss-arrow)"></path><rect class="network-node network-discriminator" height="100" rx="15" width="155" x="343" y="285"></rect><text class="network-label" style="font-size:27px" text-anchor="middle" x="420.5" y="344.0">D</text><path class="network-edge" d="M516 335H568" marker-end="url(#loss-arrow)"></path><text class="network-label" style="font-size:32px" x="590" y="325">p = 0.20</text><text class="network-label" style="font-size:20px" x="590" y="367">p = sigmoid(logit)</text><g class="" data-fragment-index="0"><text class="network-label" style="font-size:24px" x="870" y="310">Target 0</text><text class="network-label" style="font-size:27px" x="870" y="363">−ln(1 − 0.20) = 0.223</text></g><text class="network-label" style="font-size:25px" x="28" y="455">Same D · source labels come from how the image was obtained</text>
+</svg>
+</div>
+<div class="gan-loss-equation" data-fragment-index="0">
+L<sub>D</sub> = mean<sub>real</sub>[−ln p(x)] + mean<sub>z</sub>[−ln(1 − p(G(z)))]
+</div>
+
+
+
+</section></div></div></div><script>window.Reveal={on:()=>{},layout:()=>{}};</script><script>
+function resize(){const c=document.getElementById('canvas'),s=Math.min(1,innerWidth/1280);c.style.transform='scale('+s+')';const h=Math.ceil(c.getBoundingClientRect().height)+2;document.body.style.height=h+'px';parent.postMessage({type:'gan-notes-height',height:h},location.origin);}
+new ResizeObserver(resize).observe(document.querySelector('#canvas .slides'));addEventListener('resize',resize);addEventListener('load',resize);document.fonts.ready.then(resize);resize();
+</script></body></html>

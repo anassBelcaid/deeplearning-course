@@ -117,6 +117,10 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="./student-projects/index.html"> 
+<span class="menu-text">Student Projects</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="./logistics.html"> 
 <span class="menu-text">Logistics</span></a>
   </li>  
@@ -177,7 +181,7 @@ ul.task-list li input[type="checkbox"] {
 <p><span class="status-chip">Provisional roadmap</span></p>
 </div>
 <div class="schedule-legend">
-<p><span class="legend-item"><i class="dot foundations"></i> Foundations</span> <span class="legend-item"><i class="dot scratch"></i> From scratch</span> <span class="legend-item"><i class="dot optimization"></i> Optimization</span> <span class="legend-item"><i class="dot pytorch"></i> PyTorch</span> <span class="legend-item"><i class="dot vision"></i> Vision</span> <span class="legend-item"><i class="dot generative"></i> Generative models</span> <span class="legend-item"><i class="dot sequences"></i> Optional extension</span></p>
+<p><span class="legend-item"><i class="dot foundations"></i> Foundations</span> <span class="legend-item"><i class="dot scratch"></i> From scratch</span> <span class="legend-item"><i class="dot optimization"></i> Optimization</span> <span class="legend-item"><i class="dot pytorch"></i> PyTorch</span> <span class="legend-item"><i class="dot vision"></i> Vision</span> <span class="legend-item"><i class="dot generative"></i> Generative models</span> <span class="legend-item"><i class="dot presentations"></i> Project presentations</span></p>
 </div>
 <div class="schedule-table">
 <div class="schedule-head">
@@ -387,7 +391,7 @@ ul.task-list li input[type="checkbox"] {
 <p><span>Part VI</span></p>
 <section id="generative-representation-learning" class="level2">
 <h2 class="anchored" data-anchor-id="generative-representation-learning">Generative Representation Learning</h2>
-<p>Learn useful latent spaces, generate images, and compare generative mechanisms.</p>
+<p>Learn useful latent spaces and generate images, concluding with generative adversarial networks.</p>
 </section>
 </div>
 <div class="week-row generative">
@@ -417,13 +421,13 @@ ul.task-list li input[type="checkbox"] {
 </section>
 </div>
 <div class="material-cell">
-<p><a href="notes/11-variational-autoencoders/index.html" class="material-pill available">Notes</a><a href="notes/11-variational-autoencoders/index.pdf" class="material-pill available">PDF · technical review</a><a href="lectures/11-variational-autoencoders/index.html" class="material-pill available">Slides</a><span class="material-pill muted">Notebook</span></p>
+<p><a href="notes/11-variational-autoencoders/index.html" class="material-pill available">Notes</a><a href="notes/11-variational-autoencoders/index.pdf" class="material-pill available">PDF · technical review</a><a href="lectures/11-variational-autoencoders/index.html" class="material-pill available">Slides</a><a href="labs/11-variational-autoencoders/index.html" class="material-pill available">VAE Lab · 90 min</a></p>
 </div>
 <div class="links-cell">
 <p><a href="https://arxiv.org/abs/1312.6114">VAE · Kingma &amp; Welling</a><br> <a href="lectures/11-variational-autoencoders/assets/build_generation_evidence.py">Generation experiment</a><br> <a href="lectures/11-variational-autoencoders/assets/vae_training.py">Runnable VAE</a><br> <a href="https://aclanthology.org/K16-1002/">Latent-use failure · Bowman et al.</a></p>
 </div>
 <div class="project-cell track-middle">
-<p><a class="project-track-link" href="projects/06-latent-laboratory/index.html"><span class="project-label">Project 3 · Representations</span><br>Inspect actual codes, PCA views, and nearest neighbors.</a></p>
+<p><a class="project-track-link" href="labs/11-variational-autoencoders/index.html"><span class="project-label">VAE Homework · 90 minutes</span><br>Implement the VAE mechanisms and inspect reconstruction, sampling, and KL.</a></p>
 </div>
 </div>
 <div class="week-row generative">
@@ -435,56 +439,40 @@ ul.task-list li input[type="checkbox"] {
 </section>
 </div>
 <div class="material-cell">
-<p><span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span></p>
+<p><a href="notes/12-generative-adversarial-networks/index.html" class="material-pill available">Notes</a><a href="notes/12-generative-adversarial-networks/index.pdf" class="material-pill available">PDF · technical review</a><a href="lectures/12-generative-adversarial-networks/index.html" class="material-pill available">Slides</a><a href="labs/12-anime-generation/index.html" class="material-pill available">Anime Faces · Homework</a></p>
 </div>
 <div class="links-cell">
-<p><span class="coming-soon">GAN paper · Pretrained generator explorer</span></p>
-</div>
-<div class="project-cell track-middle">
-<p><a class="project-track-link" href="projects/06-latent-laboratory/index.html"><span class="project-label">Project 3 · Interpolation</span><br>Compare latent paths with pixel blending.</a></p>
-</div>
-</div>
-<div class="week-row generative">
-<div class="week-topic">
-<p><span class="week-number">Week 13</span></p>
-<section id="comparing-generative-models" class="level3">
-<h3 class="anchored" data-anchor-id="comparing-generative-models">Comparing Generative Models</h3>
-<p>Choose among autoencoders, VAEs, and GANs through samples, latent structure, evaluation, and failure analysis.</p>
-</section>
-</div>
-<div class="material-cell">
-<p><span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span></p>
-</div>
-<div class="links-cell">
-<p><span class="coming-soon">Model-comparison gallery · Evaluation readings</span></p>
+<p><a href="https://arxiv.org/abs/1406.2661">GAN · Goodfellow et al.</a><br> <a href="https://arxiv.org/abs/1511.06434">DCGAN · Radford et al.</a></p>
+<p><a href="https://arxiv.org/abs/1511.01844">Evaluation · Theis et al.</a></p>
 </div>
 <div class="project-cell track-end">
-<p><a class="project-track-link" href="projects/06-latent-laboratory/index.html"><span class="project-label">Project 3 · Due</span><br>Executed notebook, visual report, and justified choice of d.</a></p>
+<p><a class="project-track-link" href="labs/12-anime-generation/index.html"><span class="project-label">Final Homework · Anime Faces</span><br>Design a generator, test one choice, and report the evidence.</a></p>
 </div>
 </div>
-<div class="part-banner sequences">
-<p><span>Part VII · If time permits</span></p>
-<section id="optional-extension-learning-from-sequences" class="level2">
-<h2 class="anchored" data-anchor-id="optional-extension-learning-from-sequences">Optional Extension: Learning from Sequences</h2>
-<p>A compact bridge to the dedicated NLP course: recurrence, memory, and gated state updates.</p>
+<div class="part-banner presentations">
+<p><span>Part VII</span></p>
+<section id="student-project-presentations" class="level2">
+<h2 class="anchored" data-anchor-id="student-project-presentations">Student Project Presentations</h2>
+<p>The final two weeks are reserved for student project presentations. The exact presentation schedule will be announced later.</p>
 </section>
 </div>
-<div class="week-row sequences">
+<div class="week-row presentations">
 <div class="week-topic">
-<p><span class="week-number">Week 14</span></p>
-<section id="sequence-models-a-first-look" class="level3">
-<h3 class="anchored" data-anchor-id="sequence-models-a-first-look">Sequence Models: A First Look</h3>
-<p>Hidden states, unrolling, unstable gradients, and the motivation for GRU and LSTM gates.</p>
+<p><span class="week-number">Weeks 13–14</span></p>
+<section id="student-project-presentations-1" class="level3">
+<h3 class="anchored" data-anchor-id="student-project-presentations-1">Student Project Presentations</h3>
+<p>Presentations of student projects across the final two weeks.</p>
 </section>
 </div>
 <div class="material-cell">
-<p><span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span></p>
+<p><span class="coming-soon">Presentation schedule to be announced</span></p>
+<p><a href="./student-projects/index.html" class="material-pill available">Project gallery</a></p>
 </div>
 <div class="links-cell">
-<p><span class="coming-soon">Optional sequence visualizations · Follow-up NLP course</span></p>
+<p>Exact dates, times, and presentation order will be announced later.</p>
 </div>
 <div class="project-cell">
-<p><span class="project-label">Optional extension</span><br>No new assessed project milestone.</p>
+<p><a href="./student-projects/index.html"><span class="project-label">Student projects</span><br>Explore proposals and prepare your submission.</a></p>
 </div>
 </div>
 </div>

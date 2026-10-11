@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Anime Faces · Reading Notebook – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2e7c9b518fe54fcaa4a8b379123416fc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+<style>#title-block-header.quarto-title-block {display:block} main h1:not(.title){font-size:1.8rem} main h2{font-size:1.4rem} details{margin:1rem 0} summary{cursor:pointer;font-weight:600}</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../schedule.html"> 
+<span class="menu-text">Schedule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../student-projects/index.html"> 
+<span class="menu-text">Student Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../logistics.html"> 
+<span class="menu-text">Logistics</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://edstem.org/us/courses/102787/"> 
+<span class="menu-text">ED</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#anime-faces-design-train-defend" id="toc-anime-faces-design-train-defend" class="nav-link active" data-scroll-target="#anime-faces-design-train-defend">Anime faces: design, train, defend</a>
+  <ul class="collapse">
+  <li><a href="#scope-and-deliverables" id="toc-scope-and-deliverables" class="nav-link" data-scroll-target="#scope-and-deliverables">Scope and deliverables</a></li>
+  <li><a href="#write-the-experiment-plan-before-training" id="toc-write-the-experiment-plan-before-training" class="nav-link" data-scroll-target="#write-the-experiment-plan-before-training">1 · Write the experiment plan before training</a></li>
+  <li><a href="#prepare-and-audit-the-data-infrastructure-provided" id="toc-prepare-and-audit-the-data-infrastructure-provided" class="nav-link" data-scroll-target="#prepare-and-audit-the-data-infrastructure-provided">2 · Prepare and audit the data (infrastructure provided)</a></li>
+  <li><a href="#design-and-implement-your-model" id="toc-design-and-implement-your-model" class="nav-link" data-scroll-target="#design-and-implement-your-model">3 · Design and implement your model</a></li>
+  <li><a href="#train-a-baseline-and-one-controlled-variant" id="toc-train-a-baseline-and-one-controlled-variant" class="nav-link" data-scroll-target="#train-a-baseline-and-one-controlled-variant">4 · Train a baseline and one controlled variant</a></li>
+  <li><a href="#evaluate-without-selecting-only-attractive-samples" id="toc-evaluate-without-selecting-only-attractive-samples" class="nav-link" data-scroll-target="#evaluate-without-selecting-only-attractive-samples">5 · Evaluate without selecting only attractive samples</a></li>
+  <li><a href="#write-and-render-the-report" id="toc-write-and-render-the-report" class="nav-link" data-scroll-target="#write-and-render-the-report">6 · Write and render the report</a></li>
+  <li><a href="#assessment-100-points" id="toc-assessment-100-points" class="nav-link" data-scroll-target="#assessment-100-points">Assessment (100 points)</a></li>
+  <li><a href="#reading-path" id="toc-reading-path" class="nav-link" data-scroll-target="#reading-path">Reading path</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Anime Faces · Reading Notebook</h1>
+<p class="subtitle lead">An independent generative-model investigation</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><a href="../../labs/12-anime-generation/index.html">Assignment</a> · <a href="starter/anime_faces_homework.ipynb?download=1" download="anime_faces_homework.ipynb">Download notebook</a> · <a href="assets/anime-homework.zip">Starter ZIP</a></p>
+<p>This companion and the notebook are built from one source. The previews and diagnostic controls below are measured infrastructure examples, not a trained-model solution. Website rendering never downloads the dataset or trains a model.</p>
+<section id="anime-faces-design-train-defend" class="level1">
+<h1>Anime faces: design, train, defend</h1>
+<p><strong>Final coding homework · independent take-home investigation · Chapters 10–12</strong></p>
+<p>Create an unconditional model that generates <strong>new RGB anime-face images from random codes</strong>. Choose a <strong>VAE or GAN</strong>, justify the choice, and train your own weights. You may adapt the course’s ideas and cite code you reuse, but you must understand and explain every model and training step. A deterministic autoencoder with arbitrary normal sampling does not by itself meet the requirement.</p>
+<p>This assignment deliberately leaves the architecture, objective implementation, training procedure, and interpretation to you. There is no fill-in-the-blanks model or supplied trained solution. Data auditing, split construction, plotting, diagnostic calculations, logging, and report rendering are provided so your effort goes into the generative experiment.</p>
+<p><strong>The scientific question:</strong> what specific design decision will you test, and what evidence could show that your initial expectation was wrong?</p>
+<section id="scope-and-deliverables" class="level2">
+<h2 class="anchored" data-anchor-id="scope-and-deliverables">Scope and deliverables</h2>
+<p>Build one working baseline and <strong>one controlled variant</strong>. Change one substantive factor, state a prediction first, and compare under a declared matched budget. A small, carefully interpreted run is better than an unexplained long run. Train from scratch; a pretrained face generator is not a submission.</p>
+<p>Planning estimate: <strong>4–6 hours of active work</strong>, plus hardware-dependent training. This is not a 90-minute lab or a promise about convergence. Start with 32 × 32 or 64 × 64 pixels and a reproducible subset. Reserve a modest budget before launching runs; there is no required number of epochs or GPU. If compute is limited, use 32 × 32, fewer channels and fewer images for both runs, and report the limits. You are assessed on design, correctness, evidence and reasoning—not a leaderboard score.</p>
+<p>Submit:</p>
+<ol type="1">
+<li>The executed notebook with code, decisions, visible outputs, and cited assistance.</li>
+<li>A self-contained <strong>report.html</strong> (roughly 1,200–1,800 words plus figures).</li>
+<li>The data manifest, both run configurations and loss logs, evaluation JSON, and final model weights.</li>
+<li>A short reproduction instruction: environment, dataset handle/path, selected run and sampling command.</li>
+</ol>
+<p>Do not bundle the dataset. Due date and submission channel follow the instructor’s announcement.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="assets/preview/dataset.png" class="img-fluid figure-img"></p>
+<figcaption>Actual files from Kaggle Anime Face Dataset (splcher/animefacedataset). First 12 file-list entries, displayed in lexical order; cropped and resized to 64 × 64. This is a small data preview, not generated output or a representative sample.</figcaption>
+</figure>
+</div>
+</section>
+<section id="write-the-experiment-plan-before-training" class="level2">
+<h2 class="anchored" data-anchor-id="write-the-experiment-plan-before-training">1 · Write the experiment plan before training</h2>
+<p>Record your answers in Markdown:</p>
+<ul>
+<li><strong>Question and hypothesis:</strong> name one change and predict its effect and possible downside.</li>
+<li><strong>Model:</strong> VAE or GAN? Why does its objective suit generation from fresh codes?</li>
+<li><strong>Architecture:</strong> resolution, latent dimension, channel widths, activations, normalization and output range.</li>
+<li><strong>Controlled comparison:</strong> what changes between A and B? What stays fixed: split, resolution, batch size, budget definition, initialization seed, data-order seed, sample codes and evaluation protocol?</li>
+<li><strong>Budget:</strong> maximum steps or wall time per run, machine, checkpoint interval, and stopping rule.</li>
+<li><strong>Selection:</strong> use validation evidence to select the model/checkpoint; reserve test images for final reporting.</li>
+</ul>
+<p>Possible factors include latent dimension, channel capacity, G/D learning-rate ratio, or the VAE KL weight. Choose one you can explain. Architecture and learning-rate changes together are not a single-factor study. Do not introduce an unfamiliar loss merely because a tutorial uses it. Advanced methods are optional, not assessed prerequisites; VAE and non-saturating GAN objectives are sufficient.</p>
+<p><strong>Decision record:</strong> write your hypothesis now, then append revisions with reasons. Do not rewrite your initial prediction after seeing the outcomes. A result contradicting it can be a strong report.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>PLAN <span class="op">=</span> {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'student'</span>: <span class="st">'[WRITE your name]'</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'family'</span>: <span class="st">'[CHOOSE VAE or GAN]'</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'question'</span>: <span class="st">'[WRITE one testable question]'</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'hypothesis'</span>: <span class="st">'[WRITE predicted effect and risk]'</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'changed_factor'</span>: <span class="st">'[WRITE one factor]'</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'budget_rule'</span>: <span class="st">'[WRITE equal steps or equal wall time and why]'</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'selection_rule'</span>: <span class="st">'[WRITE validation-based checkpoint rule]'</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="assets/ownership.svg" class="img-fluid figure-img"></p>
+<figcaption>Ownership and information flow. Provided objects hold paths and decode tensors; students own the model parameters, objectives and updates. Only the training split is used for optimization.</figcaption>
+</figure>
+</div>
+</section>
+<section id="prepare-and-audit-the-data-infrastructure-provided" class="level2">
+<h2 class="anchored" data-anchor-id="prepare-and-audit-the-data-infrastructure-provided">2 · Prepare and audit the data (infrastructure provided)</h2>
+<p>Use <a href="https://www.kaggle.com/datasets/splcher/animefacedataset">Anime Face Dataset on Kaggle</a>, handle <code>splcher/animefacedataset</code>. The uploader attributes the source to <a href="https://github.com/Mckinsey666/Anime-Face-Dataset">Mckinsey666/Anime-Face-Dataset</a>, collected from Getchu. Record the version/download date, source attribution, and listed terms in your report. The metadata currently lists DbCL-1.0; check the page when downloading. <strong>Measure your actual file counts</strong> instead of copying a count from the description. A dataset of these selected faces is not representative of all anime art, characters or styles; inspect and discuss its selection biases.</p>
+<p>Choose an access route:</p>
+<ul>
+<li><strong>Kaggle:</strong> attach <code>splcher/animefacedataset</code> through Add Input, then point <code>DATA_ROOT</code> at its images.</li>
+<li><strong>Colab/local:</strong> download and extract the dataset yourself, or use the optional <code>kagglehub</code> cell below.</li>
+<li><strong>Offline:</strong> use a previously extracted copy and set its path. No model download is required.</li>
+</ul>
+<p>Install missing packages once with <code>%pip install torch torchvision pillow numpy matplotlib kagglehub</code>. Only <code>kagglehub</code> needs network access for the optional download; the assignment itself uses PyTorch, Pillow, NumPy and Matplotlib. Keep API tokens in the platform’s secret mechanism, not the notebook. Authentication, when needed, is handled by Kaggle’s normal login flow.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># OPTIONAL DOWNLOAD: leave False if the dataset is already attached/extracted.</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>DOWNLOAD_DATA <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> DOWNLOAD_DATA:</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="im">import</span> kagglehub</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    downloaded_root <span class="op">=</span> kagglehub.dataset_download(<span class="st">'splcher/animefacedataset'</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Dataset folder:'</span>, downloaded_root)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The next cell defines the provided utilities. <code>FaceDataset</code> owns a root path, a list of manifest rows, and a resolution. A row refers to an image file; indexing decodes a fresh tensor. A DataLoader batches these tensors and shuffles <strong>only training</strong>. Model parameters are not stored in the dataset.</p>
+<p>Default preprocessing: apply EXIF orientation, convert to RGB, center-crop a square and bicubic-resize. The returned tensor is <strong>(B, 3, H, W), float, [0,1]</strong>. Adapt the range explicitly if your generator uses Tanh. Exact duplicates after preprocessing are removed <strong>before</strong> the seeded 80/10/10 split; near copies and related characters can remain. Augmentation is your choice, and must affect training only.</p>
+<details>
+<summary>
+Provided infrastructure · expand code
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">"""Provided data, visualization, logging and report infrastructure.</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">No model, loss, optimizer step or trained checkpoint is supplied.</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">Images returned by the loader are RGB float tensors in [0,1].</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> base64, csv, hashlib, html, json, platform, random, time</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.utils.data <span class="im">import</span> Dataset, DataLoader</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image, ImageOps</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>DATASET_HANDLE <span class="op">=</span> <span class="st">'splcher/animefacedataset'</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>DATASET_URL <span class="op">=</span> <span class="st">'https://www.kaggle.com/datasets/'</span> <span class="op">+</span> DATASET_HANDLE</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> seed_everything(seed):</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    random.seed(seed)<span class="op">;</span> np.random.seed(seed)<span class="op">;</span> torch.manual_seed(seed)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> torch.cuda.is_available(): torch.cuda.manual_seed_all(seed)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    torch.backends.cudnn.benchmark <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">'seed'</span>: seed, <span class="st">'python'</span>: platform.python_version(), <span class="st">'torch'</span>: <span class="bu">str</span>(torch.__version__),</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>            <span class="st">'device'</span>: torch.cuda.get_device_name(<span class="dv">0</span>) <span class="cf">if</span> torch.cuda.is_available() <span class="cf">else</span> <span class="st">'cpu'</span>}</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rgb_image(path, size):</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""EXIF orientation, RGB conversion, centered square crop and bicubic resize."""</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> Image.<span class="bu">open</span>(path) <span class="im">as</span> source:</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> ImageOps.fit(ImageOps.exif_transpose(source).convert(<span class="st">'RGB'</span>),</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>                            (size, size), method<span class="op">=</span>Image.Resampling.BICUBIC)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> prepare_data(root, out, size<span class="op">=</span><span class="dv">64</span>, max_images<span class="op">=</span><span class="dv">8000</span>, seed<span class="op">=</span><span class="dv">120</span>, fractions<span class="op">=</span>(<span class="fl">.8</span>,<span class="fl">.1</span>,<span class="fl">.1</span>)):</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Audit a seeded subset; remove exact processed-image duplicates BEFORE splitting.</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="co">    Near duplicates/related characters can remain. Lists store paths, not copied tensors.</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="co">    Reuse the saved manifest for every experiment; don't rerun a new split per model.</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    root<span class="op">=</span>Path(root)<span class="op">;</span>out<span class="op">=</span>Path(out)<span class="op">;</span>out.mkdir(parents<span class="op">=</span><span class="va">True</span>,exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(fractions)<span class="op">!=</span><span class="dv">3</span> <span class="kw">or</span> <span class="bu">any</span>(v<span class="op">&lt;=</span><span class="dv">0</span> <span class="cf">for</span> v <span class="kw">in</span> fractions) <span class="kw">or</span> <span class="kw">not</span> np.isclose(<span class="bu">sum</span>(fractions),<span class="dv">1</span>):</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">'Use three positive train/validation/test fractions summing to one.'</span>)</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    files<span class="op">=</span><span class="bu">sorted</span>(p <span class="cf">for</span> p <span class="kw">in</span> root.rglob(<span class="st">'*'</span>) <span class="cf">if</span> p.suffix.lower() <span class="kw">in</span> {<span class="st">'.jpg'</span>,<span class="st">'.jpeg'</span>,<span class="st">'.png'</span>,<span class="st">'.webp'</span>})</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> files: <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(<span class="st">'No images found. Set DATA_ROOT to the extracted Kaggle image folder.'</span>)</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    order<span class="op">=</span>np.random.default_rng(seed).permutation(<span class="bu">len</span>(files))</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> max_images <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>: order<span class="op">=</span>order[:max_images]</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    kept<span class="op">=</span>[]<span class="op">;</span>rejected<span class="op">=</span>[]<span class="op">;</span>duplicates<span class="op">=</span>[]<span class="op">;</span>seen<span class="op">=</span>{}</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> order:</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>        p<span class="op">=</span>files[<span class="bu">int</span>(j)]<span class="op">;</span>rel<span class="op">=</span><span class="bu">str</span>(p.relative_to(root))</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>            <span class="cf">with</span> Image.<span class="bu">open</span>(p) <span class="im">as</span> im: width,height<span class="op">=</span>im.size<span class="op">;</span>mode<span class="op">=</span>im.mode</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>            image<span class="op">=</span>rgb_image(p,size)</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>            digest<span class="op">=</span>hashlib.sha256(image.tobytes()).hexdigest()</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> digest <span class="kw">in</span> seen:</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>                duplicates.append({<span class="st">'path'</span>:rel,<span class="st">'same_as'</span>:seen[digest]})<span class="op">;</span><span class="cf">continue</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>            seen[digest]<span class="op">=</span>rel</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>            kept.append({<span class="st">'path'</span>:rel,<span class="st">'width'</span>:width,<span class="st">'height'</span>:height,<span class="st">'mode'</span>:mode,<span class="st">'pixel_sha256'</span>:digest})</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> (<span class="pp">OSError</span>,<span class="pp">ValueError</span>) <span class="im">as</span> e: rejected.append({<span class="st">'path'</span>:rel,<span class="st">'reason'</span>:<span class="bu">str</span>(e)})</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(kept)<span class="op">&lt;</span><span class="dv">10</span>: <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">'Need at least 10 unique readable images to form all three splits.'</span>)</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>    n<span class="op">=</span><span class="bu">len</span>(kept)<span class="op">;</span>a<span class="op">=</span><span class="bu">int</span>(n<span class="op">*</span>fractions[<span class="dv">0</span>])<span class="op">;</span>b<span class="op">=</span>a<span class="op">+</span><span class="bu">int</span>(n<span class="op">*</span>fractions[<span class="dv">1</span>])</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>    parts<span class="op">=</span>{<span class="st">'train'</span>:kept[:a],<span class="st">'validation'</span>:kept[a:b],<span class="st">'test'</span>:kept[b:]}</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>    record<span class="op">=</span>{<span class="st">'dataset'</span>:DATASET_URL,<span class="st">'seed'</span>:seed,<span class="st">'size'</span>:size,<span class="st">'files_discovered'</span>:<span class="bu">len</span>(files),</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>            <span class="st">'candidates_scanned'</span>:<span class="bu">len</span>(order),<span class="st">'unique_retained'</span>:n,<span class="st">'rejected'</span>:rejected,<span class="st">'duplicates'</span>:duplicates,</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>            <span class="st">'preprocessing'</span>:<span class="st">'EXIF orientation; RGB; center-square crop; bicubic resize; uint8 / 255'</span>,</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>            <span class="st">'fractions'</span>:<span class="bu">list</span>(fractions),<span class="st">'splits'</span>:parts,</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>            <span class="st">'limitation'</span>:<span class="st">'Exact equality after preprocessing only; near-duplicate/character leakage not eliminated.'</span>}</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    (out<span class="op">/</span><span class="st">'data_manifest.json'</span>).write_text(json.dumps(record,indent<span class="op">=</span><span class="dv">2</span>))</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> record</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> FaceDataset(Dataset):</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Owns file paths and size; __getitem__ decodes one image into a new tensor."""</span></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, root, rows, size): <span class="va">self</span>.root<span class="op">=</span>Path(root)<span class="op">;</span><span class="va">self</span>.rows<span class="op">=</span>rows<span class="op">;</span><span class="va">self</span>.size<span class="op">=</span>size</span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__len__</span>(<span class="va">self</span>): <span class="cf">return</span> <span class="bu">len</span>(<span class="va">self</span>.rows)</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__getitem__</span>(<span class="va">self</span>,i):</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>        im<span class="op">=</span>rgb_image(<span class="va">self</span>.root<span class="op">/</span><span class="va">self</span>.rows[i][<span class="st">'path'</span>],<span class="va">self</span>.size)</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> torch.from_numpy(np.asarray(im).copy()).permute(<span class="dv">2</span>,<span class="dv">0</span>,<span class="dv">1</span>).<span class="bu">float</span>()<span class="op">/</span><span class="dv">255</span></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_loaders(root, manifest, batch_size<span class="op">=</span><span class="dv">64</span>, seed<span class="op">=</span><span class="dv">121</span>):</span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>    datasets<span class="op">=</span>{k:FaceDataset(root,rows,manifest[<span class="st">'size'</span>]) <span class="cf">for</span> k,rows <span class="kw">in</span> manifest[<span class="st">'splits'</span>].items()}</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>    generator<span class="op">=</span>torch.Generator().manual_seed(seed)</span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>    <span class="co"># num_workers=0 is portable across Kaggle, Colab and local notebooks.</span></span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>    loaders<span class="op">=</span>{k:DataLoader(ds,batch_size<span class="op">=</span>batch_size,shuffle<span class="op">=</span>k<span class="op">==</span><span class="st">'train'</span>,num_workers<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>                         generator<span class="op">=</span>generator <span class="cf">if</span> k<span class="op">==</span><span class="st">'train'</span> <span class="cf">else</span> <span class="va">None</span>,drop_last<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>             <span class="cf">for</span> k,ds <span class="kw">in</span> datasets.items()}</span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> datasets,loaders</span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> collect(dataset, n<span class="op">=</span><span class="dv">256</span>):</span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n<span class="op">&lt;</span><span class="dv">1</span> <span class="kw">or</span> n<span class="op">&gt;</span><span class="bu">len</span>(dataset): <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f'n must be in [1,</span><span class="sc">{</span><span class="bu">len</span>(dataset)<span class="sc">}</span><span class="ss">]'</span>)</span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> torch.stack([dataset[i] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n)])</span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> checked_images(x):</span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span>torch.as_tensor(x).detach().cpu().<span class="bu">float</span>()</span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> x.ndim<span class="op">!=</span><span class="dv">4</span> <span class="kw">or</span> x.shape[<span class="dv">1</span>]<span class="op">!=</span><span class="dv">3</span> <span class="kw">or</span> <span class="bu">len</span>(x)<span class="op">==</span><span class="dv">0</span>: <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">'Expected nonempty (N,3,H,W) RGB batch.'</span>)</span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> torch.isfinite(x).<span class="bu">all</span>() <span class="kw">or</span> x.<span class="bu">min</span>() <span class="op">&lt;</span> <span class="op">-</span><span class="fl">1e-5</span> <span class="kw">or</span> x.<span class="bu">max</span>()<span class="op">&gt;</span><span class="dv">1</span><span class="op">+</span><span class="fl">1e-5</span>:</span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">'Convert outputs explicitly to [0,1]; nonfinite/out-of-range values are not silently clipped.'</span>)</span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x.clamp(<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> save_grid(images, path, title<span class="op">=</span><span class="st">''</span>, nrow<span class="op">=</span><span class="dv">8</span>):</span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span>checked_images(images)<span class="op">;</span>n<span class="op">=</span><span class="bu">len</span>(x)<span class="op">;</span>cols<span class="op">=</span><span class="bu">min</span>(nrow,n)<span class="op">;</span>rows<span class="op">=</span>(n<span class="op">+</span>cols<span class="op">-</span><span class="dv">1</span>)<span class="op">//</span>cols</span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>    fig,axes<span class="op">=</span>plt.subplots(rows,cols,figsize<span class="op">=</span>(cols<span class="op">*</span><span class="fl">1.4</span>,rows<span class="op">*</span><span class="fl">1.4</span>),squeeze<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i,ax <span class="kw">in</span> <span class="bu">enumerate</span>(axes.flat):</span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a>        ax.axis(<span class="st">'off'</span>)</span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> i<span class="op">&lt;</span>n: ax.imshow(x[i].permute(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">0</span>).numpy())<span class="op">;</span>ax.set_title(<span class="bu">str</span>(i<span class="op">+</span><span class="dv">1</span>),fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> title:fig.suptitle(title,fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a>    fig.tight_layout()<span class="op">;</span>Path(path).parent.mkdir(parents<span class="op">=</span><span class="va">True</span>,exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a>    fig.savefig(path,dpi<span class="op">=</span><span class="dv">130</span>,bbox_inches<span class="op">=</span><span class="st">'tight'</span>)<span class="op">;</span>plt.close(fig)</span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Path(path)</span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> RunLog:</span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Stores scalar observations; students decide losses, updates and when to record."""</span></span>
+<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, folder, config):</span>
+<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.folder<span class="op">=</span>Path(folder)<span class="op">;</span><span class="va">self</span>.folder.mkdir(parents<span class="op">=</span><span class="va">True</span>,exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.started<span class="op">=</span>time.perf_counter()<span class="op">;</span><span class="va">self</span>.rows<span class="op">=</span>[]</span>
+<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a>        (<span class="va">self</span>.folder<span class="op">/</span><span class="st">'config.json'</span>).write_text(json.dumps(config,indent<span class="op">=</span><span class="dv">2</span>))</span>
+<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> record(<span class="va">self</span>, step, <span class="op">**</span>scalars):</span>
+<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a>        values<span class="op">=</span>{k:<span class="bu">float</span>(v) <span class="cf">for</span> k,v <span class="kw">in</span> scalars.items()}</span>
+<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="bu">all</span>(np.isfinite(v) <span class="cf">for</span> v <span class="kw">in</span> values.values()): <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">'Nonfinite logged value: stop and diagnose.'</span>)</span>
+<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.rows.append({<span class="st">'step'</span>:<span class="bu">int</span>(step),<span class="st">'seconds'</span>:time.perf_counter()<span class="op">-</span><span class="va">self</span>.started,<span class="op">**</span>values})</span>
+<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a>        (<span class="va">self</span>.folder<span class="op">/</span><span class="st">'history.json'</span>).write_text(json.dumps(<span class="va">self</span>.rows,indent<span class="op">=</span><span class="dv">2</span>))</span>
+<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> plot(<span class="va">self</span>, path<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.rows:<span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">'No logged observations.'</span>)</span>
+<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a>        keys<span class="op">=</span><span class="bu">sorted</span>(<span class="bu">set</span>().union(<span class="op">*</span>(r.keys() <span class="cf">for</span> r <span class="kw">in</span> <span class="va">self</span>.rows))<span class="op">-</span>{<span class="st">'step'</span>,<span class="st">'seconds'</span>})</span>
+<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a>        fig,axes<span class="op">=</span>plt.subplots(<span class="bu">len</span>(keys),<span class="dv">1</span>,figsize<span class="op">=</span>(<span class="dv">8</span>,<span class="fl">2.5</span><span class="op">*</span><span class="bu">len</span>(keys)),squeeze<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> ax,key <span class="kw">in</span> <span class="bu">zip</span>(axes.flat,keys):</span>
+<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a>            rows<span class="op">=</span>[r <span class="cf">for</span> r <span class="kw">in</span> <span class="va">self</span>.rows <span class="cf">if</span> key <span class="kw">in</span> r]<span class="op">;</span>ax.plot([r[<span class="st">'step'</span>] <span class="cf">for</span> r <span class="kw">in</span> rows],[r[key] <span class="cf">for</span> r <span class="kw">in</span> rows])<span class="op">;</span>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">'Optimizer iteration (declared convention)'</span>,ylabel<span class="op">=</span>key)<span class="op">;</span>ax.grid(alpha<span class="op">=</span><span class="fl">.2</span>)</span>
+<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a>        fig.tight_layout()<span class="op">;</span>p<span class="op">=</span>Path(path) <span class="cf">if</span> path <span class="cf">else</span> <span class="va">self</span>.folder<span class="op">/</span><span class="st">'curves.png'</span><span class="op">;</span>fig.savefig(p,dpi<span class="op">=</span><span class="dv">140</span>)<span class="op">;</span>plt.close(fig)<span class="op">;</span><span class="cf">return</span> p</span>
+<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> parameter_counts(models):</span>
+<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {name:<span class="bu">sum</span>(p.numel() <span class="cf">for</span> p <span class="kw">in</span> model.parameters()) <span class="cf">for</span> name,model <span class="kw">in</span> models.items()}</span>
+<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> save_checkpoint(path, models, optimizers, config, step):</span>
+<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Weights/optimizer state + config. Not an exact mid-epoch resume protocol."""</span></span>
+<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a>    path<span class="op">=</span>Path(path)<span class="op">;</span>path.parent.mkdir(parents<span class="op">=</span><span class="va">True</span>,exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a>    torch.save({<span class="st">'models'</span>:{k:v.state_dict() <span class="cf">for</span> k,v <span class="kw">in</span> models.items()},</span>
+<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a>                <span class="st">'optimizers'</span>:{k:v.state_dict() <span class="cf">for</span> k,v <span class="kw">in</span> optimizers.items()},</span>
+<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a>                <span class="st">'config'</span>:config,<span class="st">'step'</span>:<span class="bu">int</span>(step),<span class="st">'torch_rng'</span>:torch.get_rng_state()},path)</span>
+<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> path</span>
+<span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pairwise_pixel_mse(images):</span>
+<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Mean pairwise pixel MSE over distinct pairs, not a perceptual quality metric."""</span></span>
+<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span>checked_images(images).flatten(<span class="dv">1</span>).double()<span class="op">;</span>n<span class="op">=</span><span class="bu">len</span>(x)</span>
+<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n<span class="op">&lt;</span><span class="dv">2</span>:<span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">'Need at least two images.'</span>)</span>
+<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Mean unordered-pair squared difference = 2n/(n-1) * population variance.</span></span>
+<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(<span class="dv">2</span><span class="op">*</span>n<span class="op">/</span>(n<span class="op">-</span><span class="dv">1</span>)<span class="op">*</span>x.var(dim<span class="op">=</span><span class="dv">0</span>,unbiased<span class="op">=</span><span class="va">False</span>).mean())</span>
+<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> nearest_pixels(queries, reference, chunk_size<span class="op">=</span><span class="dv">128</span>):</span>
+<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a>    q<span class="op">=</span>checked_images(queries)<span class="op">;</span>r<span class="op">=</span>checked_images(reference)</span>
+<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> q.shape[<span class="dv">1</span>:]<span class="op">!=</span>r.shape[<span class="dv">1</span>:]:<span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">'Match image shapes and preprocessing.'</span>)</span>
+<span id="cb3-143"><a href="#cb3-143" aria-hidden="true" tabindex="-1"></a>    q<span class="op">=</span>q.flatten(<span class="dv">1</span>)<span class="op">;</span>r<span class="op">=</span>r.flatten(<span class="dv">1</span>)<span class="op">;</span>best<span class="op">=</span>torch.full((<span class="bu">len</span>(q),),<span class="bu">float</span>(<span class="st">'inf'</span>))<span class="op">;</span>ids<span class="op">=</span>torch.zeros(<span class="bu">len</span>(q),dtype<span class="op">=</span>torch.<span class="bu">long</span>)</span>
+<span id="cb3-144"><a href="#cb3-144" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Bounded query/reference chunks; no (queries, references, pixels) allocation.</span></span>
+<span id="cb3-145"><a href="#cb3-145" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> start <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>,<span class="bu">len</span>(q),<span class="dv">64</span>):</span>
+<span id="cb3-146"><a href="#cb3-146" aria-hidden="true" tabindex="-1"></a>        block<span class="op">=</span>q[start:start<span class="op">+</span><span class="dv">64</span>]<span class="op">;</span>dist<span class="op">=</span>torch.full((<span class="bu">len</span>(block),),<span class="bu">float</span>(<span class="st">'inf'</span>))<span class="op">;</span>idx<span class="op">=</span>torch.zeros(<span class="bu">len</span>(block),dtype<span class="op">=</span>torch.<span class="bu">long</span>)</span>
+<span id="cb3-147"><a href="#cb3-147" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>,<span class="bu">len</span>(r),chunk_size):</span>
+<span id="cb3-148"><a href="#cb3-148" aria-hidden="true" tabindex="-1"></a>            rb<span class="op">=</span>r[j:j<span class="op">+</span>chunk_size]<span class="op">;</span>d<span class="op">=</span>(block.square().mean(<span class="dv">1</span>)[:,<span class="va">None</span>]<span class="op">+</span>rb.square().mean(<span class="dv">1</span>)[<span class="va">None</span>,:]<span class="op">-</span><span class="dv">2</span><span class="op">*</span>block<span class="op">@</span>rb.T<span class="op">/</span>block.shape[<span class="dv">1</span>]).clamp_min(<span class="dv">0</span>)</span>
+<span id="cb3-149"><a href="#cb3-149" aria-hidden="true" tabindex="-1"></a>            v,k<span class="op">=</span>d.<span class="bu">min</span>(<span class="dv">1</span>)<span class="op">;</span>update<span class="op">=</span>v<span class="op">&lt;</span>dist<span class="op">;</span>dist[update]<span class="op">=</span>v[update]<span class="op">;</span>idx[update]<span class="op">=</span>k[update]<span class="op">+</span>j</span>
+<span id="cb3-150"><a href="#cb3-150" aria-hidden="true" tabindex="-1"></a>        best[start:start<span class="op">+</span><span class="bu">len</span>(block)]<span class="op">=</span>dist<span class="op">;</span>ids[start:start<span class="op">+</span><span class="bu">len</span>(block)]<span class="op">=</span>idx</span>
+<span id="cb3-151"><a href="#cb3-151" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">'mse'</span>:best,<span class="st">'index'</span>:ids}</span>
+<span id="cb3-152"><a href="#cb3-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-153"><a href="#cb3-153" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> save_neighbors(queries, reference, result, path):</span>
+<span id="cb3-154"><a href="#cb3-154" aria-hidden="true" tabindex="-1"></a>    q<span class="op">=</span>checked_images(queries)<span class="op">;</span>r<span class="op">=</span>checked_images(reference)<span class="op">;</span>n<span class="op">=</span><span class="bu">min</span>(<span class="dv">8</span>,<span class="bu">len</span>(q))</span>
+<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a>    fig,axes<span class="op">=</span>plt.subplots(n,<span class="dv">2</span>,figsize<span class="op">=</span>(<span class="dv">5</span>,n<span class="op">*</span><span class="dv">2</span>),squeeze<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-156"><a href="#cb3-156" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> ax,im,label <span class="kw">in</span> [(axes[i,<span class="dv">0</span>],q[i],<span class="ss">f'Query </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">'</span>),(axes[i,<span class="dv">1</span>],r[<span class="bu">int</span>(result[<span class="st">'index'</span>][i])],<span class="ss">f"Nearest · MSE </span><span class="sc">{</span>result[<span class="st">'mse'</span>][i]<span class="sc">:.4f}</span><span class="ss">"</span>)]:</span>
+<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a>            ax.imshow(im.permute(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">0</span>))<span class="op">;</span>ax.set_title(label,fontsize<span class="op">=</span><span class="dv">10</span>)<span class="op">;</span>ax.axis(<span class="st">'off'</span>)</span>
+<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a>    fig.tight_layout()<span class="op">;</span>fig.savefig(path,dpi<span class="op">=</span><span class="dv">120</span>)<span class="op">;</span>plt.close(fig)<span class="op">;</span><span class="cf">return</span> Path(path)</span>
+<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> evaluate_samples(generated, train_reference, heldout_reference):</span>
+<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Same-size reference sets make NN comparisons less confounded by pool size."""</span></span>
+<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a>    g<span class="op">=</span>checked_images(generated)<span class="op">;</span>t<span class="op">=</span>checked_images(train_reference)<span class="op">;</span>h<span class="op">=</span>checked_images(heldout_reference)</span>
+<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(t)<span class="op">!=</span><span class="bu">len</span>(h):<span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">'Use equally sized train and held-out reference pools.'</span>)</span>
+<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a>    nt<span class="op">=</span>nearest_pixels(g,t)<span class="op">;</span>nh<span class="op">=</span>nearest_pixels(g,h)</span>
+<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">'generated_count'</span>:<span class="bu">len</span>(g),<span class="st">'reference_count_each'</span>:<span class="bu">len</span>(t),</span>
+<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a>            <span class="st">'generated_pairwise_pixel_mse'</span>:pairwise_pixel_mse(g),</span>
+<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a>            <span class="st">'heldout_pairwise_pixel_mse'</span>:pairwise_pixel_mse(h),</span>
+<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a>            <span class="st">'mean_nearest_train_pixel_mse'</span>:<span class="bu">float</span>(nt[<span class="st">'mse'</span>].mean()),</span>
+<span id="cb3-170"><a href="#cb3-170" aria-hidden="true" tabindex="-1"></a>            <span class="st">'mean_nearest_heldout_pixel_mse'</span>:<span class="bu">float</span>(nh[<span class="st">'mse'</span>].mean())},nt,nh</span>
+<span id="cb3-171"><a href="#cb3-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-172"><a href="#cb3-172" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> render_report(path, sections, config, metrics, figures):</span>
+<span id="cb3-173"><a href="#cb3-173" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Self-contained HTML; plain-text authored sections + embedded PNGs, printable to PDF.</span></span>
+<span id="cb3-174"><a href="#cb3-174" aria-hidden="true" tabindex="-1"></a><span class="co">    figures is a list of (path, caption). This renders evidence; it does not write conclusions.</span></span>
+<span id="cb3-175"><a href="#cb3-175" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb3-176"><a href="#cb3-176" aria-hidden="true" tabindex="-1"></a>    esc<span class="op">=</span><span class="kw">lambda</span> x:html.escape(<span class="bu">str</span>(x))</span>
+<span id="cb3-177"><a href="#cb3-177" aria-hidden="true" tabindex="-1"></a>    required<span class="op">=</span>[<span class="st">'Question'</span>,<span class="st">'Dataset'</span>,<span class="st">'Architecture'</span>,<span class="st">'Training'</span>,<span class="st">'Results and metrics'</span>,<span class="st">'Limitations and conclusion'</span>,<span class="st">'References'</span>]</span>
+<span id="cb3-178"><a href="#cb3-178" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">any</span>(<span class="kw">not</span> sections.get(k,<span class="st">''</span>).strip() <span class="kw">or</span> <span class="st">'[WRITE'</span> <span class="kw">in</span> sections[k] <span class="cf">for</span> k <span class="kw">in</span> required):</span>
+<span id="cb3-179"><a href="#cb3-179" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">'Write every report section; replace the [WRITE ...] placeholders.'</span>)</span>
+<span id="cb3-180"><a href="#cb3-180" aria-hidden="true" tabindex="-1"></a>    document<span class="op">=</span><span class="st">'&lt;!doctype html&gt;&lt;html lang="en"&gt;&lt;meta charset="utf-8"&gt;&lt;title&gt;Anime face generation · Experimental report&lt;/title&gt;&lt;style&gt;body{max-width:960px;margin:3rem auto;padding:0 1.4rem;font:17px/1.6 system-ui;color:#17212b}h1{font-size:2rem}h2{margin-top:2rem;color:#2878c8}p{white-space:pre-wrap}img{max-width:100%}figure{margin:2rem 0}figcaption{font-size:.9rem}table{border-collapse:collapse;width:100%}td,th{padding:.5rem;border-bottom:1px solid #ccc;text-align:left;overflow-wrap:anywhere}pre{white-space:pre-wrap;background:#f5f1e8;padding:1rem}@media print{body{font-size:10pt;margin:0;max-width:none}figure,table{break-inside:avoid}h2{break-after:avoid}@page{size:A4;margin:18mm</span><span class="sc">}}</span><span class="st">&lt;/style&gt;&lt;body&gt;&lt;h1&gt;Anime face generation&lt;/h1&gt;&lt;p&gt;Experimental report · student-authored analysis&lt;/p&gt;'</span></span>
+<span id="cb3-181"><a href="#cb3-181" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> title <span class="kw">in</span> required:</span>
+<span id="cb3-182"><a href="#cb3-182" aria-hidden="true" tabindex="-1"></a>        document<span class="op">+=</span><span class="ss">f'&lt;h2&gt;</span><span class="sc">{</span>esc(title)<span class="sc">}</span><span class="ss">&lt;/h2&gt;&lt;p&gt;</span><span class="sc">{</span>esc(sections[title])<span class="sc">}</span><span class="ss">&lt;/p&gt;'</span></span>
+<span id="cb3-183"><a href="#cb3-183" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> title<span class="op">==</span><span class="st">'Training'</span>:document<span class="op">+=</span><span class="st">'&lt;pre&gt;'</span><span class="op">+</span>esc(json.dumps(config,indent<span class="op">=</span><span class="dv">2</span>))<span class="op">+</span><span class="st">'&lt;/pre&gt;'</span></span>
+<span id="cb3-184"><a href="#cb3-184" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> title<span class="op">==</span><span class="st">'Results and metrics'</span>:</span>
+<span id="cb3-185"><a href="#cb3-185" aria-hidden="true" tabindex="-1"></a>            document<span class="op">+=</span><span class="st">'&lt;table&gt;&lt;tr&gt;&lt;th&gt;Run&lt;/th&gt;&lt;th&gt;Measurement&lt;/th&gt;&lt;th&gt;Value&lt;/th&gt;&lt;/tr&gt;'</span></span>
+<span id="cb3-186"><a href="#cb3-186" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> run,values <span class="kw">in</span> metrics.items():</span>
+<span id="cb3-187"><a href="#cb3-187" aria-hidden="true" tabindex="-1"></a>                <span class="cf">for</span> key,value <span class="kw">in</span> values.items():document<span class="op">+=</span><span class="ss">f'&lt;tr&gt;&lt;td&gt;</span><span class="sc">{</span>esc(run)<span class="sc">}</span><span class="ss">&lt;/td&gt;&lt;td&gt;</span><span class="sc">{</span>esc(key)<span class="sc">}</span><span class="ss">&lt;/td&gt;&lt;td&gt;</span><span class="sc">{</span>esc(value)<span class="sc">}</span><span class="ss">&lt;/td&gt;&lt;/tr&gt;'</span></span>
+<span id="cb3-188"><a href="#cb3-188" aria-hidden="true" tabindex="-1"></a>            document<span class="op">+=</span><span class="st">'&lt;/table&gt;'</span></span>
+<span id="cb3-189"><a href="#cb3-189" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> <span class="bu">file</span>,caption <span class="kw">in</span> figures:</span>
+<span id="cb3-190"><a href="#cb3-190" aria-hidden="true" tabindex="-1"></a>                <span class="bu">file</span><span class="op">=</span>Path(<span class="bu">file</span>)</span>
+<span id="cb3-191"><a href="#cb3-191" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="bu">file</span>.suffix.lower()<span class="op">!=</span><span class="st">'.png'</span>:<span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">'Report figures must be PNG.'</span>)</span>
+<span id="cb3-192"><a href="#cb3-192" aria-hidden="true" tabindex="-1"></a>                encoded<span class="op">=</span>base64.b64encode(<span class="bu">file</span>.read_bytes()).decode()</span>
+<span id="cb3-193"><a href="#cb3-193" aria-hidden="true" tabindex="-1"></a>                document<span class="op">+=</span><span class="ss">f'&lt;figure&gt;&lt;img src="data:image/png;base64,</span><span class="sc">{</span>encoded<span class="sc">}</span><span class="ss">" alt="</span><span class="sc">{</span>esc(caption)<span class="sc">}</span><span class="ss">"&gt;&lt;figcaption&gt;</span><span class="sc">{</span>esc(caption)<span class="sc">}</span><span class="ss">&lt;/figcaption&gt;&lt;/figure&gt;'</span></span>
+<span id="cb3-194"><a href="#cb3-194" aria-hidden="true" tabindex="-1"></a>    path<span class="op">=</span>Path(path)<span class="op">;</span>path.parent.mkdir(parents<span class="op">=</span><span class="va">True</span>,exist_ok<span class="op">=</span><span class="va">True</span>)<span class="op">;</span>path.write_text(document<span class="op">+</span><span class="st">'&lt;/body&gt;&lt;/html&gt;'</span>)<span class="op">;</span><span class="cf">return</span> path</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>DATA_ROOT <span class="op">=</span> Path(<span class="st">'/kaggle/input/animefacedataset'</span>)  <span class="co"># EDIT to the actual image folder</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>OUTPUT <span class="op">=</span> Path(<span class="st">'anime_results'</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>OUTPUT.mkdir(exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>ENVIRONMENT <span class="op">=</span> seed_everything(<span class="dv">120</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(ENVIRONMENT)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Suggested starting scale, not mandatory design choices.</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>IMAGE_SIZE <span class="op">=</span> <span class="dv">64</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>MAX_IMAGES <span class="op">=</span> <span class="dv">8000</span>  <span class="co"># deterministic subset BEFORE duplicate removal and splitting</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>manifest <span class="op">=</span> prepare_data(DATA_ROOT, OUTPUT, size<span class="op">=</span>IMAGE_SIZE, max_images<span class="op">=</span>MAX_IMAGES, seed<span class="op">=</span><span class="dv">120</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>datasets, loaders <span class="op">=</span> make_loaders(DATA_ROOT, manifest, batch_size<span class="op">=</span><span class="dv">64</span>, seed<span class="op">=</span><span class="dv">121</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>({name: <span class="bu">len</span>(ds) <span class="cf">for</span> name, ds <span class="kw">in</span> datasets.items()})</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Rejected:'</span>, <span class="bu">len</span>(manifest[<span class="st">'rejected'</span>]), <span class="st">'Exact duplicates removed:'</span>, <span class="bu">len</span>(manifest[<span class="st">'duplicates'</span>]))</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>real_batch <span class="op">=</span> <span class="bu">next</span>(<span class="bu">iter</span>(loaders[<span class="st">'train'</span>]))</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> real_batch.ndim <span class="op">==</span> <span class="dv">4</span> <span class="kw">and</span> real_batch.shape[<span class="dv">1</span>:] <span class="op">==</span> (<span class="dv">3</span>, IMAGE_SIZE, IMAGE_SIZE)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> torch.isfinite(real_batch).<span class="bu">all</span>() <span class="kw">and</span> <span class="dv">0</span> <span class="op">&lt;=</span> real_batch.<span class="bu">min</span>() <span class="op">&lt;=</span> real_batch.<span class="bu">max</span>() <span class="op">&lt;=</span> <span class="dv">1</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>save_grid(real_batch[:<span class="dv">32</span>], OUTPUT<span class="op">/</span><span class="st">'dataset_preview.png'</span>, <span class="st">'Training subset preview'</span>)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> display</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> Image <span class="im">as</span> DisplayImage</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>display(DisplayImage(filename<span class="op">=</span><span class="bu">str</span>(OUTPUT<span class="op">/</span><span class="st">'dataset_preview.png'</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Dataset report:</strong> give discovered/scanned/retained counts, corrupt/duplicate exclusions, split counts, original size range, preprocessing and rationale. Inspect the preview: what information does center cropping discard? Do backgrounds, repeated characters or style concentration create easy shortcuts? State the limitation of the duplicate check. Keep this manifest fixed across A/B. The helper caps data before splitting, so MAX_IMAGES is a candidate-subset cap, not the final training count.</p>
+<p><strong>Expected checks:</strong> nonempty disjoint manifests; RGB batches at the selected size; finite [0,1] values; no shared retained pixel hash between splits. These checks do not establish dataset diversity.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>hashes <span class="op">=</span> {k: {r[<span class="st">'pixel_sha256'</span>] <span class="cf">for</span> r <span class="kw">in</span> rows} <span class="cf">for</span> k, rows <span class="kw">in</span> manifest[<span class="st">'splits'</span>].items()}</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="kw">not</span> hashes[<span class="st">'train'</span>] <span class="op">&amp;</span> hashes[<span class="st">'validation'</span>]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="kw">not</span> hashes[<span class="st">'train'</span>] <span class="op">&amp;</span> hashes[<span class="st">'test'</span>]</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="kw">not</span> hashes[<span class="st">'validation'</span>] <span class="op">&amp;</span> hashes[<span class="st">'test'</span>]</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Your audit summary and any justified changes to preparation go here.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="design-and-implement-your-model" class="level2">
+<h2 class="anchored" data-anchor-id="design-and-implement-your-model">3 · Design and implement your model</h2>
+<p>Draw your architecture <strong>before</strong> training: tensor shapes, operations, channels, activations and parameter counts. Explain how resolution grows in the generator/decoder and shrinks in the discriminator/encoder. Keep the notation separate from measured activations. Include the diagram in the report.</p>
+<p>You decide the module organization. Implement your model(s), objective and optimizers below. Provide an adapter <code>sample_from_codes(models, z)</code> that accepts <code>(N, latent_dim)</code> standard-normal codes and returns <code>(N, 3, IMAGE_SIZE, IMAGE_SIZE)</code> images in <strong>[0,1]</strong>. This adapter should use evaluation mode and <code>no_grad</code>; reshape codes for a convolutional G as needed. It must generate without consuming a real image.</p>
+<p>For a <strong>GAN</strong>, explain source targets, raw logits, non-saturating G loss, gradient routing, separate optimizer ownership, and normalization-buffer behavior. For a <strong>VAE</strong>, explain the posterior parameters, reparameterization, reconstruction likelihood/surrogate, KL and loss reductions; sample from the prior through the decoder. A deterministic mean-code reconstruction is not a fresh generated sample.</p>
+<p>You may consult the course code and primary papers. Cite adapted code and identify what you changed. Do not copy an entire online training notebook and present it as your own design.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># STUDENT WORK: modules, objective functions and optimizer construction.</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Add as many cells as you need; no architecture or loss is supplied here.</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_models(config):</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">NotImplementedError</span>(<span class="st">'Design and return a dictionary of your PyTorch models.'</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sample_from_codes(models, z):</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">NotImplementedError</span>(<span class="st">'Generate RGB [0,1] images from codes, with eval mode and no_grad.'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Before a long run:</strong> verify generation at batch sizes 1 and 4; output range and finiteness; nonzero parameter counts; intended gradients and parameter changes after one update. For a GAN, verify each turn changes only its owned parameters. For a VAE, test the reconstruction gradient path separately from the KL term. Verify a saved/reloaded model reproduces evaluation-mode output for fixed codes. These checks are your responsibility; document the evidence, not only “the code ran.”</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># EDIT config values and include every choice needed to reconstruct the model.</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>BASE_CONFIG <span class="op">=</span> {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'family'</span>: PLAN[<span class="st">'family'</span>], <span class="st">'image_size'</span>: IMAGE_SIZE, <span class="st">'latent_dim'</span>: <span class="dv">64</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'seed'</span>: <span class="dv">122</span>, <span class="st">'data_order_seed'</span>: <span class="dv">121</span>, <span class="st">'batch_size'</span>: <span class="dv">64</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'max_steps'</span>: <span class="dv">1000</span>, <span class="st">'max_seconds'</span>: <span class="dv">1800</span>,  <span class="co"># starting caps; justify your actual budget</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add widths, activations, optimizer settings, losses/reductions and mode policy.</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>models <span class="op">=</span> build_models(BASE_CONFIG)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(parameter_counts(models))</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> n <span class="kw">in</span> [<span class="dv">1</span>, <span class="dv">4</span>]:</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Your adapter is responsible for moving z to the model's device.</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    z <span class="op">=</span> torch.randn(n, BASE_CONFIG[<span class="st">'latent_dim'</span>])</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    samples <span class="op">=</span> checked_images(sample_from_codes(models, z))</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> samples.shape <span class="op">==</span> (n, <span class="dv">3</span>, IMAGE_SIZE, IMAGE_SIZE)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Add your one-update ownership/gradient checks and checkpoint round-trip check.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="train-a-baseline-and-one-controlled-variant" class="level2">
+<h2 class="anchored" data-anchor-id="train-a-baseline-and-one-controlled-variant">4 · Train a baseline and one controlled variant</h2>
+<p>Implement <code>train_model(config, train_loader, validation_loader, folder)</code> yourself. Return the trained model dictionary. You own the training loop, objectives, optimizer steps, mode transitions and stopping. The helper <code>RunLog</code> records scalars; it does not train. Use the same step or time convention in both runs.</p>
+<p>Your loop should: respect both caps after each batch; record actual elapsed time and updates; save checkpoints and fixed-code sample grids at declared intervals; keep validation free of optimizer updates; and stop to investigate nonfinite losses. Restore training mode after making evaluation snapshots. A wall-time cap is checked between batches and cannot interrupt a slow operation already in progress.</p>
+<p><strong>What to log:</strong> GAN D/G losses separately with their reductions, or VAE reconstruction/KL/total losses; learning rate(s), examples seen, update count, elapsed time, and validation observations used for selection. Do not call adversarial source accuracy an image-quality metric. Do not compare a VAE objective numerically with a GAN objective as though lower meant better images.</p>
+<p>Example use of provided logging (integrate into your own loop):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>log <span class="op">=</span> RunLog(folder, config)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># after your update:</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>log.record(step, loss_D<span class="op">=</span>loss_D.item(), loss_G<span class="op">=</span>loss_G.item())  <span class="co"># GAN example</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># or log reconstruction, KL and total for a VAE</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>log.plot()</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>save_checkpoint(Path(folder)<span class="op">/</span><span class="st">'checkpoint.pt'</span>, models, optimizers, config, step)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>save_checkpoint</code> stores model/optimizer states and configuration. Exact mid-epoch resumption also needs your data-order and all relevant RNG states; do not claim exact resume from this helper alone.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># STUDENT WORK: implement a bounded training loop. No training recipe is hidden in support.py.</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> train_model(config, train_loader, validation_loader, folder):</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">NotImplementedError</span>(<span class="st">'Implement training, validation selection, checkpoints and logging.'</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>VARIANT_CONFIG <span class="op">=</span> <span class="bu">dict</span>(BASE_CONFIG)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Change ONE justified factor here and add it to BASE_CONFIG too.</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Example structure only: VARIANT_CONFIG['chosen_factor'] = your_alternative</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> VARIANT_CONFIG <span class="op">!=</span> BASE_CONFIG, <span class="st">'Define your controlled variant before launching it.'</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>runs <span class="op">=</span> {}</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> label, config <span class="kw">in</span> [(<span class="st">'A'</span>, BASE_CONFIG), (<span class="st">'B'</span>, VARIANT_CONFIG)]:</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    seed_everything(config[<span class="st">'seed'</span>])</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    _, run_loaders <span class="op">=</span> make_loaders(DATA_ROOT, manifest, config[<span class="st">'batch_size'</span>], config[<span class="st">'data_order_seed'</span>])</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    runs[label] <span class="op">=</span> train_model(config, run_loaders[<span class="st">'train'</span>], run_loaders[<span class="st">'validation'</span>], OUTPUT<span class="op">/</span>label)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Record actual compute, stopped step, checkpoint selection and failures for each run.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>If the hardware cannot reach convincing faces within your declared budget, retain the results and analyze the failure. A smaller matched comparison with correct mechanics and honest evidence is acceptable. Do not extend only the better-looking run without reporting that the budget has changed. One run per configuration is exploratory evidence, not a statistically established improvement; a second seed is welcome if it fits the same budget.</p>
+</section>
+<section id="evaluate-without-selecting-only-attractive-samples" class="level2">
+<h2 class="anchored" data-anchor-id="evaluate-without-selecting-only-attractive-samples">5 · Evaluate without selecting only attractive samples</h2>
+<p>For A and B, show the same first 64 evaluation draws and fixed-code histories. If latent dimension is the changed factor, use seeded draws in each space and explain why columns are not the same codes. For final reporting, use a new draw seed and the untouched test reference <strong>after</strong> selecting your run using validation. Keep all generated samples, including failures. Mark any curated gallery separately.</p>
+<p>Required evidence:</p>
+<ol type="1">
+<li>Data preview and an architecture diagram with shapes/parameter counts.</li>
+<li>Loss curves with step axes, reductions and compute budgets.</li>
+<li>At least two fixed-code checkpoints and uncurated 64-sample grids for A/B.</li>
+<li>A metrics table with sample counts, resolution, preprocessing, reference selection and limitations.</li>
+<li>First eight query/nearest-training-image pairs; inspect failures and suspicious resemblance.</li>
+</ol>
+<p>The supplied numerical diagnostics use concepts already covered in the course: squared pixel distance, means, and nearest neighbors. <strong>They are not fidelity metrics or a GAN leaderboard.</strong></p>
+<p>For <span class="math inline">\(N\)</span> images with <span class="math inline">\(P=3HW\)</span> pixel values, mean pairwise MSE is</p>
+<p><span class="math display">\[D_{\mathrm{pixel}}=\frac{2}{N(N-1)}\sum_{i&lt;j}\frac{\|x_i-x_j\|_2^2}{P}.\]</span></p>
+<p>It detects literal repetition but ignores semantic quality; random noise can score highly. Nearest-image MSE can reveal suspicious copying but is sensitive to alignment and cannot prove memorization or novelty. Use equal-sized train and held-out reference pools to avoid a larger pool automatically having more opportunities for close matches. The search is exhaustive <strong>within the declared pools</strong>, not necessarily the whole dataset. Report their sizes. Increasing sample count changes the evidence, not just precision.</p>
+<p>FID/KID or other unfamiliar metrics are <strong>optional external analyses</strong>, not assessed requirements. If used, cite the implementation, feature extractor/domain, preprocessing, counts and limitations; do not compare scores obtained under different protocols. A generic photo feature space may poorly reflect anime-specific visual quality. No extra credit comes from an unexplained metric name.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="assets/preview/repeated.png" class="img-fluid figure-img"></p>
+<figcaption>Constructed control from a real dataset image: 12 exact repeats. This is not a trained model output or observed GAN collapse.</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="assets/preview/noise.png" class="img-fluid figure-img"></p>
+<figcaption>Constructed uniform-noise control: substantial pixel variation without faces. A larger diversity diagnostic is not automatically better.</figcaption>
+</figure>
+</div>
+<p><strong>Measured diagnostic sanity check</strong> on the provided 12-image preview at 64 × 64 RGB:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Input</th>
+<th style="text-align: right;">Mean pairwise pixel MSE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Actual file-list preview</td>
+<td style="text-align: right;">0.144963</td>
+</tr>
+<tr class="even">
+<td>Exact repeated-image control</td>
+<td style="text-align: right;">0.000000</td>
+</tr>
+<tr class="odd">
+<td>Seeded uniform-noise control</td>
+<td style="text-align: right;">0.166143</td>
+</tr>
+</tbody>
+</table>
+<p>These values validate the calculation and expose its limitations. They are <strong>not targets for student models</strong> and do not evaluate a trained anime generator. The preview is too small and non-random to be a dataset benchmark. Your reference pools must come from your saved split.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Provided evaluation infrastructure. Run only after completing your model/training cells.</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># These are DEVELOPMENT comparisons; test images remain unused here.</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>reference_n <span class="op">=</span> <span class="bu">min</span>(<span class="dv">512</span>, <span class="bu">len</span>(datasets[<span class="st">'train'</span>]), <span class="bu">len</span>(datasets[<span class="st">'validation'</span>]))</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>train_ref <span class="op">=</span> collect(datasets[<span class="st">'train'</span>], reference_n)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>validation_ref <span class="op">=</span> collect(datasets[<span class="st">'validation'</span>], reference_n)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>configs <span class="op">=</span> {<span class="st">'A'</span>: BASE_CONFIG, <span class="st">'B'</span>: VARIANT_CONFIG}</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> {}</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> label, model_dict <span class="kw">in</span> runs.items():</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    z <span class="op">=</span> torch.randn(<span class="dv">256</span>, configs[label][<span class="st">'latent_dim'</span>], generator<span class="op">=</span>torch.Generator().manual_seed(<span class="dv">125</span>))</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    generated <span class="op">=</span> checked_images(sample_from_codes(model_dict, z))</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    metrics[label], near_train, near_val <span class="op">=</span> evaluate_samples(generated, train_ref, validation_ref)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    save_grid(generated[:<span class="dv">64</span>], OUTPUT<span class="op">/</span>label<span class="op">/</span><span class="st">'fresh.png'</span>, <span class="ss">f'</span><span class="sc">{</span>label<span class="sc">}</span><span class="ss">: first 64 of 256 development draws'</span>)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    save_neighbors(generated[:<span class="dv">8</span>], train_ref,</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>                   {<span class="st">'mse'</span>:near_train[<span class="st">'mse'</span>][:<span class="dv">8</span>], <span class="st">'index'</span>:near_train[<span class="st">'index'</span>][:<span class="dv">8</span>]}, OUTPUT<span class="op">/</span>label<span class="op">/</span><span class="st">'nearest.png'</span>)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    (OUTPUT<span class="op">/</span>label<span class="op">/</span><span class="st">'evaluation.json'</span>).write_text(json.dumps(metrics[label], indent<span class="op">=</span><span class="dv">2</span>))</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(json.dumps(metrics, indent<span class="op">=</span><span class="dv">2</span>))</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Interpret the numbers together with the images. Do not select by maximizing pixel diversity.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># STUDENT DECISION: use your predeclared validation evidence and explain your choice.</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>SELECTED_RUN <span class="op">=</span> <span class="st">'[CHOOSE A or B]'</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>SELECTION_REASON <span class="op">=</span> <span class="st">'[WRITE the evidence and trade-off]'</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> SELECTED_RUN <span class="kw">in</span> runs <span class="kw">and</span> <span class="st">'[WRITE'</span> <span class="kw">not</span> <span class="kw">in</span> SELECTION_REASON</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="bu">min</span>(<span class="dv">512</span>, <span class="bu">len</span>(datasets[<span class="st">'train'</span>]), <span class="bu">len</span>(datasets[<span class="st">'test'</span>]))</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>final_z <span class="op">=</span> torch.randn(<span class="dv">256</span>, configs[SELECTED_RUN][<span class="st">'latent_dim'</span>], generator<span class="op">=</span>torch.Generator().manual_seed(<span class="dv">126</span>))</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>final_images <span class="op">=</span> checked_images(sample_from_codes(runs[SELECTED_RUN], final_z))</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>final_metrics, final_nn, _ <span class="op">=</span> evaluate_samples(final_images, collect(datasets[<span class="st">'train'</span>], n), collect(datasets[<span class="st">'test'</span>], n))</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>save_grid(final_images[:<span class="dv">64</span>], OUTPUT<span class="op">/</span><span class="st">'final_samples.png'</span>, <span class="st">'Selected model: first 64 fresh final draws'</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>(OUTPUT<span class="op">/</span><span class="st">'final_evaluation.json'</span>).write_text(json.dumps({<span class="st">'selected_run'</span>:SELECTED_RUN,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'reason'</span>:SELECTION_REASON,<span class="st">'seed'</span>:<span class="dv">126</span>,<span class="st">'metrics'</span>:final_metrics}, indent<span class="op">=</span><span class="dv">2</span>))</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Do not return to model tuning after viewing test results without disclosing that reuse.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="write-and-render-the-report" class="level2">
+<h2 class="anchored" data-anchor-id="write-and-render-the-report">6 · Write and render the report</h2>
+<p>The report must be readable without running the notebook. Use this structure:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Section</th>
+<th>Evidence and explanation expected</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Question</td>
+<td>Hypothesis, changed factor, reason for model family, and what would falsify the prediction</td>
+</tr>
+<tr class="even">
+<td>Dataset</td>
+<td>Kaggle source/version/date, attribution, measured counts, split, preprocessing, exclusions and biases</td>
+</tr>
+<tr class="odd">
+<td>Architecture</td>
+<td>Your diagram, tensor shapes, parameter counts, output range, objective formulas and reductions</td>
+</tr>
+<tr class="even">
+<td>Training</td>
+<td>Hardware/software, seeds, optimizer(s), learning rates, batch size, updates/epochs/time, modes, checkpoint selection and failures</td>
+</tr>
+<tr class="odd">
+<td>Results and metrics</td>
+<td>A/B evidence under the same protocol, sample counts, curves, uncurated images, nearest neighbors, and interpretation</td>
+</tr>
+<tr class="even">
+<td>Limitations and conclusion</td>
+<td>What changed, alternative explanations, missing evidence, compute limits and one justified next experiment</td>
+</tr>
+<tr class="odd">
+<td>References</td>
+<td>Dataset, papers, reused code, and disclosed external/AI assistance</td>
+</tr>
+</tbody>
+</table>
+<p>Captions should identify the run/checkpoint, sample-selection rule, and what a reader should inspect. Distinguish observations from explanations: “the mouths repeat in 20 of 64 draws” is different from “the discriminator is too strong.” What extra experiment would support the latter claim?</p>
+<p>Fill the report sections below in your own words. The renderer only formats your writing and embeds figures; it does not write the analysis. Add your architecture PNG and checkpoint-history figure to the figure list. <code>report.html</code> is self-contained and can be opened offline. Use your browser’s Print → Save as PDF if a PDF is requested; use a figure appendix if needed rather than shrinking the evidence.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>REPORT <span class="op">=</span> {</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Question'</span>: <span class="st">'[WRITE your question, hypothesis, family choice and controlled change]'</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Dataset'</span>: <span class="st">'[WRITE measured audit, source/date, split and preprocessing rationale]'</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Architecture'</span>: <span class="st">'[WRITE model structure, dimensions, objective and parameter counts]'</span>,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Training'</span>: <span class="st">'[WRITE actual configuration, hardware, timing, modes and checkpoint rule]'</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Results and metrics'</span>: <span class="st">'[WRITE quantitative and visual comparison, including failures]'</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Limitations and conclusion'</span>: <span class="st">'[WRITE supported conclusions, caveats and next experiment]'</span>,</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'References'</span>: <span class="st">'[WRITE dataset/papers/code URLs and assistance attribution]'</span>,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>FIGURES <span class="op">=</span> [</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    (OUTPUT<span class="op">/</span><span class="st">'dataset_preview.png'</span>, <span class="st">'Replace with your informative dataset caption.'</span>),</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    (OUTPUT<span class="op">/</span><span class="st">'architecture.png'</span>, <span class="st">'Your architecture, tensor dimensions and parameter counts.'</span>),</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    (OUTPUT<span class="op">/</span><span class="st">'A'</span><span class="op">/</span><span class="st">'curves.png'</span>, <span class="st">'Baseline loss curves: state units and reduction.'</span>),</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    (OUTPUT<span class="op">/</span><span class="st">'B'</span><span class="op">/</span><span class="st">'curves.png'</span>, <span class="st">'Variant loss curves under the declared matched budget.'</span>),</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    (OUTPUT<span class="op">/</span><span class="st">'fixed_history.png'</span>, <span class="st">'Your fixed-code checkpoint comparison and selection rule.'</span>),</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    (OUTPUT<span class="op">/</span><span class="st">'A'</span><span class="op">/</span><span class="st">'fresh.png'</span>, <span class="st">'Baseline: first 64 development draws, seed 125.'</span>),</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    (OUTPUT<span class="op">/</span><span class="st">'B'</span><span class="op">/</span><span class="st">'fresh.png'</span>, <span class="st">'Variant: first 64 development draws, seed 125.'</span>),</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    (OUTPUT<span class="op">/</span>SELECTED_RUN<span class="op">/</span><span class="st">'nearest.png'</span>, <span class="st">'First eight development queries and nearest training references; state pool size.'</span>),</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    (OUTPUT<span class="op">/</span><span class="st">'final_samples.png'</span>, <span class="st">'Selected model: first 64 final draws, seed 126; no quality filtering.'</span>),</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>report_path <span class="op">=</span> render_report(OUTPUT<span class="op">/</span><span class="st">'report.html'</span>, REPORT,</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    {<span class="st">'plan'</span>:PLAN,<span class="st">'environment'</span>:ENVIRONMENT,<span class="st">'A'</span>:BASE_CONFIG,<span class="st">'B'</span>:VARIANT_CONFIG},</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    {<span class="op">**</span>metrics,<span class="st">'selected_test'</span>:final_metrics}, FIGURES)</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Open:'</span>, report_path.resolve())</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="co"># In Colab: from google.colab import files; files.download(str(report_path))</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Other export routes.</strong> The ZIP also contains <code>report_template.qmd</code>. Fill it with the same evidence, then use <code>quarto render report_template.qmd --to html</code> (or <code>--to pdf</code> with a LaTeX installation). To export your executed notebook as a technical appendix, run <code>jupyter nbconvert --to html --embed-images anime_faces_homework.ipynb</code>. The notebook appendix does not replace the focused experimental report.</p>
+<p><strong>Submission check:</strong> restart and run your finished notebook in order, or clearly mark expensive training cells and provide checkpoint-loading cells for reproducing evaluation. Include exact preprocessing, architecture/config, model weights and a fixed-code sampling check. Open report.html in a fresh browser and verify every figure is embedded. Remove credentials and dataset files from the submission bundle. Do not claim that a blank starter notebook or a supplied diagnostic control is your model’s result.</p>
+</section>
+<section id="assessment-100-points" class="level2">
+<h2 class="anchored" data-anchor-id="assessment-100-points">Assessment (100 points)</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 42%">
+<col style="width: 57%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Criterion</th>
+<th style="text-align: right;">Points</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Dataset audit, split discipline and preprocessing justification</td>
+<td style="text-align: right;">15</td>
+</tr>
+<tr class="even">
+<td>Model/objective correctness and architecture explanation</td>
+<td style="text-align: right;">25</td>
+</tr>
+<tr class="odd">
+<td>Training implementation, bounded experiment, logs and reproducibility</td>
+<td style="text-align: right;">20</td>
+</tr>
+<tr class="even">
+<td>Controlled comparison, complementary evidence and metric interpretation</td>
+<td style="text-align: right;">25</td>
+</tr>
+<tr class="odd">
+<td>Clear report, limitations, citations and ownership of decisions</td>
+<td style="text-align: right;">15</td>
+</tr>
+</tbody>
+</table>
+<p>There is no required fidelity score. More GPU time, more epochs, a fancier model name, or a successful-looking single image does not substitute for the assessed evidence. Report failures honestly and diagnose them.</p>
+</section>
+<section id="reading-path" class="level2">
+<h2 class="anchored" data-anchor-id="reading-path">Reading path</h2>
+<ul>
+<li><a href="https://anassbelcaid.github.io/deeplearning-course/notes/11-variational-autoencoders/">Course VAE notes</a>: posterior, reparameterization, likelihood and KL.</li>
+<li><a href="https://anassbelcaid.github.io/deeplearning-course/notes/12-generative-adversarial-networks/">Course GAN notes</a>: logits, update ownership, convolutional shapes and evaluation.</li>
+<li><a href="https://arxiv.org/abs/1312.6114">Kingma &amp; Welling</a>: VAE objective and inference.</li>
+<li><a href="https://arxiv.org/abs/1406.2661">Goodfellow et al.</a>: adversarial objectives and alternating optimization.</li>
+<li><a href="https://arxiv.org/abs/1511.06434">Radford et al.</a>: convolutional GAN design choices.</li>
+<li><a href="https://arxiv.org/abs/1511.01844">Theis et al.</a>: evaluation depends on the claim and intended use.</li>
+<li><a href="https://www.kaggle.com/datasets/splcher/animefacedataset">Kaggle dataset</a>, <a href="https://github.com/Kaggle/kagglehub">KaggleHub</a>, and <a href="https://docs.pytorch.org/docs/stable/notes/randomness.html">PyTorch reproducibility</a>: source access and implementation contracts.</li>
+</ul>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/anassbelcaid\.github\.io\/deeplearning-course\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Deep Learning · ENSA Tétouan</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

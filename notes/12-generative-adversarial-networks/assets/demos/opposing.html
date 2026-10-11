@@ -1,0 +1,97 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="../../../../lectures/12-generative-adversarial-networks/"><title>GAN notes: opposing</title><link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-f3e585dc122d45960ea2c31f625881dd.css"><link rel="stylesheet" href="../01-what-is-learning/slides.css"><link rel="stylesheet" href="week12.css"><style>
+ html,body { margin:0; padding:0; background:#f5f1e8; overflow:hidden; }
+ #canvas { width:1280px; transform-origin:top left; }
+ .reveal { width:1280px; height:auto; font-size:28px; }
+ .reveal .slides { width:1280px!important; height:auto!important; position:relative; inset:auto; margin:0; transform:none!important; perspective:none; text-align:left; }
+ .reveal .slides>section { display:block; position:relative; top:auto; left:auto; padding:22px; width:100%; height:auto; box-sizing:border-box; transform:none; opacity:1; pointer-events:auto; }
+ .reveal .fragment { opacity:1; visibility:visible; }
+ .reveal section [hidden] { display:none!important; }
+ .reveal .gan-source,.reveal .slide-number { display:none; }
+ .reveal .gan-code-layout { margin:0; }
+ .reveal .gan-code-layout>div:empty { display:none; }
+ .reveal .gan-routing-solution { position:relative; top:auto; left:auto; right:auto; margin-top:12px; box-shadow:none; }
+ .reveal .gan-spatial-architecture svg { max-width:100%; }
+ </style></head><body><div id="canvas"><div class="reveal"><div class="slides"><section class="slide level2 gan-s3 present" id="gan-opposing-losses">
+
+<p class="gan-lead">
+Hold the image source fixed: <strong>generated</strong>. Move its hypothetical judge score.
+</p>
+<div class="gan-score-lab">
+<div class="gan-score-control">
+<label for="gan-fake-score">p(G(z))</label><input aria-label="Hypothetical discriminator score on a generated image" id="gan-fake-score" max="99" min="1" step="1" type="range" value="20"/>
+<output for="gan-fake-score" id="gan-fake-score-value">
+0.20
+</output>
+</div>
+<div class="gan-score-direction">
+<span>0 · classified as generated</span><span>1 · classified as dataset</span>
+</div>
+<div class="gan-loss-readouts">
+<div>
+<h3>
+D’s objective on this image
+</h3>
+<p>
+Target 0 · push p down ←
+</p>
+<div class="gan-loss-formula">
+−ln(1 − p)
+</div>
+<output id="gan-d-fake-loss">
+0.223
+</output>
+<div class="gan-loss-meter">
+<i id="gan-d-loss-bar"></i>
+</div>
+</div>
+<div class="" data-fragment-index="0">
+<h3>
+G’s objective on this image
+</h3>
+<p>
+Target 1 · push p up →
+</p>
+<div class="gan-loss-formula">
+−ln p
+</div>
+<output id="gan-g-fake-loss">
+1.609
+</output>
+<div class="gan-loss-meter">
+<i id="gan-g-loss-bar"></i>
+</div>
+</div>
+</div>
+</div>
+<div class="gan-loss-equation" data-fragment-index="0">
+L<sub>G</sub> = mean<sub>z</sub>[−ln p(G(z))] <span>non-saturating generator loss</span>
+</div>
+
+
+
+</section></div></div></div><script>window.Reveal={on:()=>{},layout:()=>{}};</script><script>
+(() => {
+ const slider=document.getElementById('gan-fake-score');
+ if(!slider)return;
+ function updateScore(){
+  const p=Number(slider.value)/100,d=-Math.log1p(-p),g=-Math.log(p),max=-Math.log(.01);
+  document.getElementById('gan-fake-score-value').textContent=p.toFixed(2);
+  document.getElementById('gan-d-fake-loss').textContent=d.toFixed(3);
+  document.getElementById('gan-g-fake-loss').textContent=g.toFixed(3);
+  document.getElementById('gan-d-loss-bar').style.width=(100*d/max)+'%';
+  document.getElementById('gan-g-loss-bar').style.width=(100*g/max)+'%';
+ }
+ slider.addEventListener('input',updateScore);updateScore();
+ document.querySelectorAll('[data-gradient-p]').forEach(button=>button.addEventListener('click',()=>{
+  const p=Number(button.dataset.gradientP),a=Math.log(p/(1-p)),x=90+(a+6)*80;
+  document.querySelectorAll('[data-gradient-p]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+  const cursor=document.getElementById('gradient-cursor');cursor.setAttribute('x1',x);cursor.setAttribute('x2',x);
+  for(const [id,v] of [['gradient-minimax',p],['gradient-nonsat',1-p]]){const dot=document.getElementById(id);dot.setAttribute('cx',x);dot.setAttribute('cy',390-v*300);}
+  document.getElementById('gan-gradient-values').textContent='|∂ℓ/∂a|: '+p.toFixed(2)+' vs '+(1-p).toFixed(2);
+ }));
+})();
+</script>
+<script>
+function resize(){const c=document.getElementById('canvas'),s=Math.min(1,innerWidth/1280);c.style.transform='scale('+s+')';const h=Math.ceil(c.getBoundingClientRect().height)+2;document.body.style.height=h+'px';parent.postMessage({type:'gan-notes-height',height:h},location.origin);}
+new ResizeObserver(resize).observe(document.querySelector('#canvas .slides'));addEventListener('resize',resize);addEventListener('load',resize);document.fonts.ready.then(resize);resize();
+</script></body></html>
