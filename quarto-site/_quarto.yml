@@ -19,6 +19,8 @@ project:
     - "labs/12-anime-generation/assets/anime-homework.zip"
     - "labs/12-anime-generation/assets/_report-template.qmd"
     - "labs/12-anime-generation/assets/preview/measurements.json"
+    - "student-projects/project-proposal.yml"
+    - "student-projects/images/**"
 
 website:
   title: "Deep Learning"
@@ -35,6 +37,8 @@ website:
         text: Notes
       - href: projects.qmd
         text: Projects
+      - href: student-projects/index.qmd
+        text: Student Projects
       - href: logistics.qmd
         text: Logistics
     right:

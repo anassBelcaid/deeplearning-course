@@ -364,12 +364,14 @@ Presentations of student projects across the final two weeks.
 :::
 :::{.material-cell}
 <span class="coming-soon">Presentation schedule to be announced</span>
+
+[Project gallery](student-projects/index.qmd){.material-pill .available}
 :::
 :::{.links-cell}
 Exact dates, times, and presentation order will be announced later.
 :::
 :::{.project-cell}
-<span class="project-label">Student projects</span><br>Project presentations.
+<a href="student-projects/index.qmd"><span class="project-label">Student projects</span><br>Explore proposals and prepare your submission.</a>
 :::
 :::
 :::

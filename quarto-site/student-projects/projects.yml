@@ -1,0 +1,20 @@
+# Instructor-maintained PUBLIC gallery. Add only approved public information.
+# Keep proposal review details outside the site repository.
+# Remove this fictional example when the first real project is ready.
+- title: "Leaves in the Wild"
+  students:
+    - "Lina El Mansouri"
+    - "Adam Rami"
+  description: >-
+    Can a leaf classifier keep working when the background changes?
+    We plan to compare a small CNN with a pretrained model, then investigate
+    errors under changes in lighting and background.
+  thumbnail: "images/leaves.svg"
+  thumbnail_alt: "Concept illustration of a leaf viewed through a patch grid, with three different backgrounds."
+  thumbnail_credit: "Course illustration · schematic, not experimental results"
+  status: "Proposal approved"
+  example: true
+  # Optional public links, added when ready (use full https:// URLs):
+  # report: "https://..."
+  # code: "https://..."
+  # demo: "https://..."

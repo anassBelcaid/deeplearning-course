@@ -1,0 +1,49 @@
+# PROJECT PROPOSAL — fill in this file and send it to your instructor.
+# Rename it to your-team-project.yml. Use spaces, not tabs.
+# Keep field names unchanged. Text after >- can span several indented lines.
+# The first block supplies your public card AFTER instructor approval.
+# Do not include student IDs, phone numbers, or other private information.
+
+title: "Your project title"
+students:
+  - "First student's full name"
+  - "Second student's full name" # Add or remove names as needed.
+description: >-
+  Write 40–70 words for the public gallery. What problem will you study,
+  what approach will you try, and what do you hope to learn?
+  Describe a plan, not results you have not measured.
+
+# Optional: send the image alongside this file; do not embed it in YAML.
+# Prefer a landscape PNG, JPG, or WebP (approximately 1200 × 750 pixels).
+# Leave thumbnail empty to use the course placeholder.
+thumbnail: ""
+thumbnail_alt: ""
+thumbnail_credit: "" # Creator/source URL or 'Original illustration by the team'.
+
+# FOR INSTRUCTOR REVIEW — these details do not belong on the public card.
+proposal:
+  question: >-
+    What precise research or engineering question will your experiment answer?
+  dataset:
+    name: "Dataset name"
+    source: "https://..."
+    access_and_terms: >-
+      Can you download and use it? Note the relevant usage terms.
+    scope: >-
+      Describe the inputs, labels (if relevant), and approximate usable size.
+  approach: >-
+    Describe your baseline and the model you intend to build or adapt.
+    State which components or pretrained weights you will reuse.
+  evaluation: >-
+    Describe your train/validation/test split, metrics, baseline comparison,
+    and the visual evidence that will help interpret success and failure.
+  experiment: >-
+    Name one design choice you will vary and what you predict will happen.
+  feasibility: >-
+    Describe your hardware, expected computation, main milestones,
+    and a smaller fallback if the initial plan is too ambitious.
+  team_roles: >-
+    Explain how the team will share implementation, experiments, and reporting.
+
+# Your instructor sets the public status after review.
+# Report, code, and demo links can be supplied later when ready.

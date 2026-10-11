@@ -1,0 +1,42 @@
+---
+title: "Student Projects"
+description: "Questions worth exploring. Experiments worth sharing."
+toc: false
+css: gallery.css
+listing:
+  id: project-gallery
+  contents: projects.yml
+  template: _cards.ejs.md
+  field-required: [title, students, description]
+---
+
+:::{.showcase-intro}
+From a first question to a working model: explore the problems our students choose, the ideas they test, and the evidence they build.
+:::
+
+:::{.showcase-toolbar}
+[Propose a project ↓](#submit-your-proposal){.showcase-action}
+
+Final presentations take place in the last two weeks. The exact schedule will be announced later.
+:::
+
+## The project gallery
+
+Approved proposals will appear here as teams begin their investigations.
+
+:::{#project-gallery}
+:::
+
+## Submit your proposal
+
+Start with a question you can investigate, a dataset you can access, and an experiment you can finish with your available time and hardware.
+
+1. **Download and fill in the YAML template.** Write a short public summary, list your teammates, and describe the dataset, approach, and evaluation plan.
+2. **Send your proposal to the instructor for review**, together with your thumbnail if you have one. A simple diagram is welcome; a thumbnail is optional at this stage.
+3. **Revise after feedback.** Once approved, your title, team, summary, and thumbnail can appear in this gallery. Reports and code can be linked later.
+
+<a class="showcase-action" href="project-proposal.yml" download="project-proposal.yml">Download proposal template · YAML</a>
+
+Use spaces for indentation and keep the field names unchanged. The comments in the template explain what to write. Choose an image you may share, include its source, and write a short description for readers who cannot see it.
+
+Looking for the course notebooks? [Browse coding assignments and homework](../projects.qmd).

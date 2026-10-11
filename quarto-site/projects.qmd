@@ -8,6 +8,8 @@ toc: false
 Projects turn each course idea into an experiment you can inspect. Every starter is self-contained, readable on the course site, and downloadable for local work or Google Colab.
 :::
 
+[Explore student projects and submit a proposal →](student-projects/index.qmd)
+
 ## Classical image classification
 
 :::{.chapter-list}
