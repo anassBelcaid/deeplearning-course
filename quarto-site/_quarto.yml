@@ -12,6 +12,13 @@ project:
     - "lectures/11-variational-autoencoders/assets/evidence/**"
     - "lectures/12-generative-adversarial-networks/assets/evidence/**"
     - "notes/11-variational-autoencoders/assets/demos/**"
+    - "notes/12-generative-adversarial-networks/assets/demos/**"
+    - "notes/12-generative-adversarial-networks/assets/build_notes_assets.py"
+    - "labs/11-variational-autoencoders/assets/checkpoints/**"
+    - "labs/11-variational-autoencoders/assets/vae-session.zip"
+    - "labs/12-anime-generation/assets/anime-homework.zip"
+    - "labs/12-anime-generation/assets/_report-template.qmd"
+    - "labs/12-anime-generation/assets/preview/measurements.json"
 
 website:
   title: "Deep Learning"

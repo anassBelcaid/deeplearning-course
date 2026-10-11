@@ -1,0 +1,141 @@
+## 1. Model, objectives, and local gradients
+
+**Contracts.** Let $Z\sim\mathcal N(0,I_d)$, $X_G=G_\theta(Z)$, and let $P_\theta$ be the induced image distribution. The generator is an implicit sampler; it need not provide a tractable likelihood or inverse. Our discriminator returns a **logit** $a_\phi(x)=D_\phi(x)$; its source score is $s_\phi(x)=\sigma(a_\phi(x))$. The original paper uses $D$ for the score [@goodfellow2014gan]. Source targets are real 1 and generated 0; garment categories are unused.
+
+**Stable binary cross-entropy.** For target $y\in\{0,1\}$,
+
+$$\ell(a,y)=\operatorname{softplus}(a)-ya,
+\qquad \partial_a\ell=\sigma(a)-y.$$
+
+`BCEWithLogitsLoss` takes raw logits and matching floating-point targets. Do not apply sigmoid first. All logarithms below are natural. The course adds the two source means:
+
+$$\boxed{L_D=-\mathbb E_{X\sim P_d}\log s_\phi(X)
+-\mathbb E_{Z}\log[1-s_\phi(G_\theta(Z))].}$$
+
+D minimizes $L_D$ with $\theta$ fixed. G minimizes the **non-saturating** objective with $\phi$ fixed:
+
+$$\boxed{L_G^{\mathrm{NS}}=-\mathbb E_Z\log s_\phi(G_\theta(Z)).}$$
+
+G's target 1 expresses a desired prediction, not a new source label for D. The real-image term is independent of $\theta$. For $s(x)=0.8$, $s(G(z))=0.2$, $L_D=2(-\log0.8)=0.4463$ and $L_G^{\mathrm{NS}}=-\log0.2=1.6094$. Averaging source means instead of adding them halves D's loss and gradients.
+
+**Minimax versus non-saturating.** The original game is $\min_\theta\max_\phi V$, with $V=-L_D$. The minimax G term is $\ell_{\mathrm{MM}}=\log(1-p)$ for $p=\sigma(a)$, $a=D_\phi(G_\theta(z))$. Since $dp/da=p(1-p)$,
+
+$$\partial_a\ell_{\mathrm{MM}}=-p,\qquad
+\partial_a\ell_{\mathrm{NS}}=p-1.$$
+
+Both favor increasing $a$. At $p=0.01$, magnitudes are $0.01$ and $0.99$. This 99-fold ratio concerns the **logit derivative**, not minibatch parameter-gradient norms:
+
+$$\nabla_\theta\ell_G
+=J_{G_\theta}(z)^\top\nabla_x a_\phi(G_\theta(z))\,\partial_a\ell_G.$$
+
+Non-saturating loss avoids one small scalar factor; it does not guarantee useful image derivatives, stable dynamics, or diversity.
+
+\newpage
+
+## 2. Optimal discriminator and the distributional ideal
+
+Fix G. Assume densities $p_d,p_g$ relative to a common dominating measure and an unrestricted discriminator score $s$. Maximizing the value function separates pointwise:
+
+$$f_x(s)=p_d(x)\log s+p_g(x)\log(1-s).$$
+
+Where both densities are positive,
+
+$$f_x'(s)=\frac{p_d(x)}s-\frac{p_g(x)}{1-s}=0,
+\qquad f_x''(s)=-\frac{p_d(x)}{s^2}-\frac{p_g(x)}{(1-s)^2}<0.$$
+
+Hence
+
+$$\boxed{s^*(x)=\frac{p_d(x)}{p_d(x)+p_g(x)}.}$$
+
+If only one density is positive, the optimum lies at 1 or 0 respectively; finite sigmoid logits approach these boundaries. Where both vanish, the score does not affect the expectation. Equal weighting of the two source expectations is part of this result. The discriminator measures relative source density, not a universal probability of realism.
+
+For the mixture $m=(p_d+p_g)/2$, substitution gives
+
+$$\begin{aligned}
+V(s^*,G)
+&=\int p_d\log\frac{p_d}{p_d+p_g}
++\int p_g\log\frac{p_g}{p_d+p_g}\\
+&=-2\log2+\int p_d\log\frac{p_d}{m}
++\int p_g\log\frac{p_g}{m}\\
+&=\boxed{-\log4+2\operatorname{JS}(P_d\|P_g)},
+\end{aligned}$$
+
+where $\operatorname{JS}(P\|Q)=\tfrac12D_{\mathrm{KL}}(P\|M)+\tfrac12D_{\mathrm{KL}}(Q\|M)$. Nonnegativity gives the ideal minimum at $P_g=P_d$, with $s^*=1/2$ almost everywhere under the common distribution [@goodfellow2014gan, §4].
+
+**Scope of the result.** This is an optimal-discriminator, distribution-space analysis of the minimax value. Finite neural networks, stochastic minibatches, alternating Adam updates, and the practical non-saturating G objective do not implement exact descent on this substituted value. The result supplies a target, not a convergence guarantee. Observing scores near 1/2 does not establish $P_g=P_d$: a weak or untrained D can produce them too.
+
+**Reduction check at the ideal.** With the course's sum-of-source-means convention,
+
+$$L_D=2\log2\approx1.3863,\qquad L_G^{\mathrm{NS}}=\log2\approx0.6931.$$
+
+These values are not quality thresholds. Low source-classification loss may merely indicate that D can easily reject G. G's loss depends on the current judge. Interpret the two losses together with sample evidence, not as comparable scores on a shared task.
+
+**Sampling versus inference.** Generation requires only $Z\to G_\theta(Z)$. Unlike the preceding VAE, this unconditional GAN supplies no required approximate posterior $q(z\mid x)$ and no reconstruction target for a draw. A learned sampler does not by itself solve image encoding.
+
+\newpage
+
+## 3. Alternating updates and convolutional contracts
+
+Let $\operatorname{sg}$ denote stop-gradient. One alternating iteration uses
+
+$$\begin{aligned}
+\phi_{t+1}&=\operatorname{Opt}_D\!\left(\phi_t,\nabla_\phi L_D\bigl(D_{\phi_t},\operatorname{sg}(G_{\theta_t}(Z))\bigr)\right),\\
+\theta_{t+1}&=\operatorname{Opt}_G\!\left(\theta_t,\nabla_\theta L_G^{\mathrm{NS}}(\theta_t;\phi_{t+1})\right).
+\end{aligned}$$
+
+Each optimizer owns separate parameters and state. Clear its gradient buffers before backward. G's turn requires a **fresh D forward after D's step**. Noise values may be reused; stale logits/computational graphs may not.
+
+| Turn | G connection | D parameters | Optimizer step |
+|---|---|---|---|
+| D | Detach fake, or generate under `no_grad` | Trainable | D only |
+| G | Preserve $z\to G\to D\to L_G$ | `requires_grad_(False)` | G only |
+
+Freezing D's weights preserves $\nabla_xD(x)$. Wrapping D's G-turn forward in `no_grad`, or detaching $G(z)$, destroys the required path. `eval()` changes mode-dependent layers, not gradient tracking. Frozen parameters do not automatically freeze BatchNorm buffers.
+
+**Measured ownership audit.** In one dense-model iteration, D's turn changed 6/6 D tensors and 0/6 G tensors; G's turn changed 6/6 G tensors and 0/6 D tensors. The broken `no_grad` G path produced a loss without a gradient function. These are correctness checks, not generative-quality evidence.
+
+**DCGAN-inspired course model** [@radford2015dcgan]. Spatial paths (batch axis omitted):
+
+$$G:\ 16\!\times\!1\!\times\!1\ \to\ 64\!\times\!7\!\times\!7\ \to\ 32\!\times\!14\!\times\!14\ \to\ 1\!\times\!28\!\times\!28,$$
+$$D:\ 1\!\times\!28\!\times\!28\ \to\ 32\!\times\!14\!\times\!14\ \to\ 64\!\times\!7\!\times\!7\ \to\ 1\!\times\!1\!\times\!1.$$
+
+G uses transposed convolutions $(k,s,p)=(7,1,0),(4,2,1),(4,2,1)$, hidden BatchNorm/ReLU, and final Tanh. D uses convolutions $(4,2,1),(4,2,1),(7,1,0)$, hidden LeakyReLU(0.2), no BatchNorm, and one raw logit. Weights are independent; D is not G's inverse.
+
+For one spatial axis, dilation $d$ and output padding $o$,
+
+$$H_{\mathrm{conv}}=\left\lfloor\frac{H+2p-d(k-1)-1}{s}+1\right\rfloor,\quad
+H_{\mathrm{trans}}=(H-1)s-2p+d(k-1)+o+1.$$
+
+With $d=1,o=0,k=4,s=2,p=1$, transposed convolution doubles 7 to 14 and 14 to 28. It places weighted kernel contributions and sums overlaps; it is a transpose operation, not an inverse. Example: $[1,2]$, kernel $[1,2,1]$, stride 2 gives $[1,2,3,4,2]$.
+
+**Range and state.** Scale real pixels by $x/127.5-1$ to match Tanh; display with $(G(z)+1)/2$. Our run sets G to eval mode on D turns and snapshots, train mode on G turns; G's running statistics update only on G turns. Sampling uses `G.eval()` and `no_grad`. This local policy is not an exact reproduction of original DCGAN.
+
+\newpage
+
+## 4. Evaluation, experimental scope, and reading
+
+**Separate the questions.** Fidelity asks whether individual images are plausible. Variety asks what possibilities appear across outputs. Coverage and their frequencies concern the generated distribution more broadly. Mode collapse maps many latent codes to a narrow output family; pixel-identical duplication is only an extreme case. A realistic single output cannot establish distributional adequacy [@theis2016evaluation].
+
+| Evidence | What to inspect | What it cannot certify |
+|---|---|---|
+| Fixed codes over checkpoints | Changes with learned model state | Coverage over the latent distribution |
+| Fresh uncurated batches | Visible variety, recurring failures | Population-level quality from a small gallery |
+| Training losses | Numerical behavior and moving objectives | Image quality or equilibrium alone |
+| Nearest training images | Suspicious resemblance or copying | Absence/presence of memorization by itself |
+
+**Nearest-neighbor contract.** For a generated image in $[0,1]$ and $N$ training images,
+
+$$j^*(\hat x)=\arg\min_{j\le N}\frac1{784}\|\hat x-x_j\|_2^2.$$
+
+Use original floating-point tensors; round only for display. Pixel MSE is alignment-sensitive, and legitimate samples may resemble training images. Compare uncurated queries and training versus held-out relationships under an appropriate similarity notion before making broader claims.
+
+**Course evidence.** The convolutional run used 12,000 Fashion-MNIST images, 60 epochs, batch 128 with the final 96 retained, and 94 iterations/epoch. Each iteration used one D and one non-saturating G step; independent Adam optimizers used learning rate $2\times10^{-4}$ and $\beta=(0.5,0.999)$. Six fixed codes supply checkpoint continuity; 36 separate fresh draws supply three unranked batches. Three exhaustive nearest-neighbor searches cover all 12,000 training images. No trained MLP baseline or population-level quality metric was measured.
+
+The visible repetition control is deliberately constructed, not observed collapse. The opening source-classifier experiment uses a frozen VAE and is not adversarial training. These distinctions are essential when reusing the figures or reporting conclusions.
+
+**Reporting discipline.** Preserve sample-selection rules, split/noise seeds, preprocessing, checkpoint identity, optimizer settings, normalization modes, and the loss reduction. State whether reported losses are recomputed evaluation values or averages collected during alternating training. Our epoch curves average minibatch means equally, including the smaller final batch. Neither a low loss nor an attractive gallery resolves all evaluation questions.
+
+**Primary reading.** Goodfellow et al.: §3 for objectives and alternating updates, §4 for the optimal discriminator and idealized game. Radford et al.: convolutional design choices and their experimental setting. Theis et al.: evaluation relative to the intended use. Full annotated links, executable sources, visual experiments, and worked exercises are in the HTML chapter.
+
+::: {#refs}
+:::

@@ -1,0 +1,9 @@
+```python
+latent_dim = 16
+G = nn.Sequential(
+    nn.Linear(latent_dim, 128), nn.ReLU(),
+    nn.Linear(128, 256), nn.ReLU(),
+    nn.Linear(256, 784), nn.Sigmoid(),
+    nn.Unflatten(1, (1, 28, 28)),
+)
+```

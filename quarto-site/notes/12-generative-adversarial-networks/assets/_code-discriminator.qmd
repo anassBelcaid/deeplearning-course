@@ -1,0 +1,8 @@
+```python
+D = nn.Sequential(
+    nn.Flatten(),
+    nn.Linear(784, 256), nn.LeakyReLU(0.2),
+    nn.Linear(256, 128), nn.LeakyReLU(0.2),
+    nn.Linear(128, 1),
+)
+```

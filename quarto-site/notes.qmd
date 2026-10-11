@@ -168,6 +168,20 @@ These notes are written as a connected textbook rather than lecture transcripts.
 :::
 :::
 
+:::{.chapter-list}
+:::{.chapter-entry .available .generative}
+<span class="chapter-number">12</span>
+
+:::{.chapter-copy}
+### [Generative Adversarial Networks](notes/12-generative-adversarial-networks/index.qmd)
+
+[![](notes/12-generative-adversarial-networks/assets/chapter-cover.svg){fig-alt="A generator expands random codes into garments; real and generated images meet a contracting discriminator, with feedback returning to the generator."}](notes/12-generative-adversarial-networks/index.qmd)
+:::
+
+<span class="chapter-state">Read chapter →</span>
+:::
+:::
+
 :::{.notes-coming}
 More chapters will appear here as the course develops.
 :::

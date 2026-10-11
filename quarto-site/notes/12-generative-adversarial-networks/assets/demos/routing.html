@@ -1,0 +1,78 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="../../../../lectures/12-generative-adversarial-networks/"><title>GAN notes: routing</title><link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-f3e585dc122d45960ea2c31f625881dd.css"><link rel="stylesheet" href="../01-what-is-learning/slides.css"><link rel="stylesheet" href="week12.css"><style>
+ html,body { margin:0; padding:0; background:#f5f1e8; overflow:hidden; }
+ #canvas { width:1280px; transform-origin:top left; }
+ .reveal { width:1280px; height:auto; font-size:28px; }
+ .reveal .slides { width:1280px!important; height:auto!important; position:relative; inset:auto; margin:0; transform:none!important; perspective:none; text-align:left; }
+ .reveal .slides>section { display:block; position:relative; top:auto; left:auto; padding:22px; width:100%; height:auto; box-sizing:border-box; transform:none; opacity:1; pointer-events:auto; }
+ .reveal .fragment { opacity:1; visibility:visible; }
+ .reveal section [hidden] { display:none!important; }
+ .reveal .gan-source,.reveal .slide-number { display:none; }
+ .reveal .gan-code-layout { margin:0; }
+ .reveal .gan-code-layout>div:empty { display:none; }
+ .reveal .gan-routing-solution { position:relative; top:auto; left:auto; right:auto; margin-top:12px; box-shadow:none; }
+ .reveal .gan-spatial-architecture svg { max-width:100%; }
+ </style></head><body><div id="canvas"><div class="reveal"><div class="slides"><section class="slide level2 gan-s2 present" id="gan-routing-exercise">
+
+<p class="gan-lead">
+Given: <strong>4 codes of length 16</strong>; grayscale images are <strong>28 × 28</strong>.<br/>Find both output shapes. Which modules are needed only to generate?
+</p>
+<div class="course-network-diagram gan-routing">
+<svg aria-labelledby="routing-title" role="img" viewbox="0 0 1280 410">
+<title id="routing-title">
+routing
+</title>
+<defs><marker id="routing-arrow" markerheight="6" markerwidth="6" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M1 1 9 5 1 9" fill="none" stroke="#526575" stroke-width="1.5"></path></marker></defs><g data-path="real"><rect class="network-node network-value" height="91" rx="15" width="205" x="35" y="52"></rect><text class="network-label" font-weight="700" text-anchor="middle" x="137.5" y="91.5">Real images</text><text class="network-detail" text-anchor="middle" x="137.5" y="124.5">(4, 1, 28, 28)</text></g><g data-path="generator"><rect class="network-node network-value" height="91" rx="15" width="205" x="35" y="246"></rect><text class="network-label" font-weight="700" text-anchor="middle" x="137.5" y="285.5">Random z</text><text class="network-detail" text-anchor="middle" x="137.5" y="318.5">(4, 16)</text></g><g data-path="generator"><rect class="network-node network-generator" height="91" rx="15" width="203" x="332" y="246"></rect><text class="network-label" font-weight="700" text-anchor="middle" x="433.5" y="299.5">G</text></g><g data-path="generator"><rect class="network-node network-value" height="91" rx="15" width="205" x="638" y="246"></rect><text class="network-label" font-weight="700" text-anchor="middle" x="740.5" y="299.5">Image batch</text></g><g data-path="judge"><rect class="network-node network-discriminator" height="108" rx="15" width="196" x="963" y="141"></rect><text class="network-label" font-weight="700" text-anchor="middle" x="1061.0" y="203.0">D</text></g><text class="network-label" data-path="judge" style="font-size:23px" text-anchor="middle" x="1061" y="297">One raw logit / image</text><path class="network-edge" d="M258 97H863Q887 97 887 120V175H945" data-path="real" marker-end="url(#routing-arrow)"></path><path class="network-edge" d="M258 291H314" data-path="generator" marker-end="url(#routing-arrow)"></path><path class="network-edge" d="M553 291H620" data-path="generator" marker-end="url(#routing-arrow)"></path><path class="network-edge" d="M861 291H883Q902 291 902 274V216H945" data-path="fake" marker-end="url(#routing-arrow)"></path><g class="" data-fragment-index="0"><text class="network-label" data-path="generator" style="font-size:25px" text-anchor="middle" x="740" y="373">(4, 1, 28, 28)</text><text class="network-label" data-path="judge" style="font-size:25px" text-anchor="middle" x="1061" y="335">(4, 1)</text></g>
+</svg>
+</div>
+
+<div class="exercise-solution gan-routing-solution" data-fragment-index="0">
+<span class="solution-label">WORKED SOLUTION</span>
+<p>
+G: 4 × 1 × 28 × 28 pixels. D: 4 × 1 logits. Generation uses G alone.
+</p>
+<div aria-label="Trace a network path" class="gan-judge-controls" role="group">
+<button aria-pressed="false" data-route="real" type="button">
+Score real
+</button>
+<button aria-pressed="false" data-route="fake" type="button">
+Score generated
+</button>
+<button aria-pressed="false" data-route="sample" type="button">
+Generate only
+</button>
+</div>
+<p aria-live="polite" id="gan-route-status">
+Trace a path: the same D accepts either image source.
+</p>
+</div>
+
+
+</section></div></div></div><script>window.Reveal={on:()=>{},layout:()=>{}};</script><script>
+(() => {
+  const slide = document.getElementById('gan-routing-exercise');
+  if (!slide) return;
+  const status = document.getElementById('gan-route-status');
+  const descriptions = {
+    real: 'Real batch → D → 4 logits. G is unused on this path.',
+    fake: '4 random codes → G → 4 images → the same D → 4 logits.',
+    sample: '4 random codes → G → 4 images. D is unused when sampling.'
+  };
+  const active = {real: ['real','judge'], fake: ['generator','fake','judge'], sample: ['generator']};
+  function route(value) {
+    slide.querySelectorAll('[data-route]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.route === value)));
+    slide.querySelectorAll('[data-path]').forEach(el => el.classList.toggle('route-inactive', Boolean(value) && !active[value].includes(el.dataset.path)));
+    status.textContent = descriptions[value] || 'Trace a path: the same D accepts either image source.';
+  }
+  slide.querySelectorAll('[data-route]').forEach(b => b.addEventListener('click', () => route(b.dataset.route)));
+  function hook() {
+    Reveal.on('fragmenthidden', e => { if (slide.contains(e.fragment)) route(null); });
+    Reveal.on('slidechanged', () => route(null));
+  }
+  if (typeof Reveal !== 'undefined') hook();
+  else window.addEventListener('load', hook, {once:true});
+})();
+</script>
+<script>
+function resize(){const c=document.getElementById('canvas'),s=Math.min(1,innerWidth/1280);c.style.transform='scale('+s+')';const h=Math.ceil(c.getBoundingClientRect().height)+2;document.body.style.height=h+'px';parent.postMessage({type:'gan-notes-height',height:h},location.origin);}
+new ResizeObserver(resize).observe(document.querySelector('#canvas .slides'));addEventListener('resize',resize);addEventListener('load',resize);document.fonts.ready.then(resize);resize();
+</script></body></html>

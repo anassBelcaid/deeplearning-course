@@ -1,0 +1,1 @@
+<div class="gan-demo"><iframe src="assets/demos/neighbors.html" title="GAN visual evidence: neighbors" loading="lazy"></iframe><a href="assets/demos/neighbors.html" target="_blank">Open this visual in a full window →</a></div>

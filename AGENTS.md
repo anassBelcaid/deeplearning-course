@@ -70,6 +70,10 @@ In HTML notes, use a prompt followed by a `<details>` solution so readers choose
 
 ## Project scope
 
+- For a final independent coding homework, preserve student ownership of the model, objective, training procedure, and controlled experiment. Provide data, visualization, evaluation, and report-formatting infrastructure without supplying a completed model solution; assess justified decisions and evidence rather than compute budget or a single quality score.
+
+- For time-boxed coding sessions, concentrate student implementation on the target mechanism. Provide unrelated data preparation, visualization, and training infrastructure; include measured reference outputs and a tested fallback so slow computation does not consume the interpretation time. Make the reading companion visually rich enough to show what each completed task enables.
+
 - Publish a readable Quarto companion to each new student notebook, including expected checks, measured example outputs, and interpretation guidance. Keep shared task content synchronized from one source when practical; clearly distinguish reference results from student submissions and keep site rendering independent of training.
 
 - Assess only concepts that students have already encountered in the course sequence. A project may use machinery from a future chapter, but that machinery must be provided as clearly labeled infrastructure, treated as a temporary black box, and revisited when it is formally taught. Do not turn an upcoming topic such as backpropagation or optimization into a student TODO merely because the project needs it to run.
@@ -114,6 +118,7 @@ In HTML notes, use a prompt followed by a `<details>` solution so readers choose
 - Provide a PDF-safe alternative for complex HTML-only grids when necessary.
 - After substantive note changes, render both HTML and PDF. Check for unresolved citations, warnings, malformed conditional blocks, missing images, and whitespace errors.
 - Visually inspect representative pages/slides rather than relying only on a successful render.
+- Verify interactive controls with actual browser pointer input (clicks and slider drags), including inside embedded notes panels. Programmatic `.click()` and dispatched events alone do not detect overlays or CSS that blocks user interaction.
 
 ## Synchronization workflow
 

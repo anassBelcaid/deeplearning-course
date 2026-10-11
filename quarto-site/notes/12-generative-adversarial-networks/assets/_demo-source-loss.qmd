@@ -1,0 +1,1 @@
+<div class="gan-demo"><iframe src="assets/demos/source-loss.html" title="GAN visual evidence: source loss" loading="lazy"></iframe><a href="assets/demos/source-loss.html" target="_blank">Open this visual in a full window →</a></div>

@@ -1,0 +1,12 @@
+```python
+D.requires_grad_(False)
+opt_G.zero_grad(set_to_none=True)
+fake = G(z)
+fake_logits = D(fake)
+loss_G = bce(
+    fake_logits, torch.ones_like(fake_logits)
+)
+loss_G.backward()
+opt_G.step()
+D.requires_grad_(True)
+```

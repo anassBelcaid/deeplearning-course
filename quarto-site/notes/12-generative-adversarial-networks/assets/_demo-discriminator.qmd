@@ -1,0 +1,1 @@
+<div class="gan-demo"><iframe src="assets/demos/discriminator.html" title="GAN visual evidence: discriminator" loading="lazy"></iframe><a href="assets/demos/discriminator.html" target="_blank">Open this visual in a full window →</a></div>

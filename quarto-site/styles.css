@@ -54,7 +54,7 @@
 .optimization { --part-color: var(--optimization); }
 .pytorch { --part-color: var(--pytorch); }
 .vision { --part-color: var(--vision); }
-.sequences { --part-color: var(--sequences); }
+.sequences, .presentations { --part-color: var(--sequences); }
 .generative { --part-color: var(--generative); }
 .dot { background: var(--part-color); }
 

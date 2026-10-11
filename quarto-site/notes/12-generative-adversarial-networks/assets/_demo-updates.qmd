@@ -1,0 +1,1 @@
+<div class="gan-demo"><iframe src="assets/demos/updates.html" title="GAN visual evidence: updates" loading="lazy"></iframe><a href="assets/demos/updates.html" target="_blank">Open this visual in a full window →</a></div>

@@ -1,0 +1,34 @@
+---
+title: "Generative Adversarial Networks"
+subtitle: "Chapter 12 · Learning an image distribution through a learned judge"
+author: "Dr. A. Belcaid"
+description: "Complete visual notes, recorded GAN experiments, mathematical derivations, and a four-page technical review."
+bibliography: ../../references.bib
+link-citations: true
+format:
+  html:
+    toc-depth: 2
+    css: assets/notes.css
+    include-after-body: assets/notes.html
+  pdf:
+    toc: false
+    number-sections: false
+    subtitle: "Chapter 12 · Technical review"
+    fontsize: 10pt
+    linestretch: 1.0
+    geometry:
+      - top=18mm
+      - bottom=20mm
+      - inner=21mm
+      - outer=19mm
+execute:
+  enabled: false
+---
+
+::: {.content-visible when-format="html"}
+{{< include _chapter.qmd >}}
+:::
+
+::: {.content-visible when-format="pdf"}
+{{< include _review.qmd >}}
+:::

@@ -1,0 +1,90 @@
+---
+title: "VAE Lab · From Reconstruction to Generation"
+subtitle: "A 90-minute coding homework after Chapter 11"
+description: "Implement the three VAE mechanisms, then inspect posterior draws, prior samples, and the KL trade-off using provided experiment infrastructure."
+toc: true
+bibliography: ../../references.bib
+format:
+  html:
+    include-in-header:
+      text: |
+        <style>#title-block-header.quarto-title-block { display: block; }</style>
+---
+
+:::{.project-brief}
+<span><strong>Time:</strong> 90 minutes</span>
+<span><strong>Prerequisite:</strong> Chapter 11</span>
+<span><strong>Dataset:</strong> Fashion-MNIST</span>
+<span><strong>Submit:</strong> Notebook, one figure, three answers</span>
+:::
+
+## The question
+
+**What must change so a decoder can generate images from fresh random codes?**
+
+The previous homework studied deterministic autoencoders. Here you implement a Gaussian encoder, reparameterization, and the reconstruction-plus-KL objective, then examine what each change makes possible [@kingma2014vae]. The data preparation and visual experiments are ready to use.
+
+[Read the notebook + visual results](reading.qmd){.btn .btn-primary}
+
+<a class="btn btn-secondary" href="starter/vae_lab.ipynb?download=1" download="vae_lab.ipynb">Download student notebook</a>
+
+[Open in Google Colab](https://colab.research.google.com/github/anassBelcaid/deeplearning-course/blob/main/quarto-site/labs/11-variational-autoencoders/starter/vae_lab.ipynb){.btn .btn-secondary}
+
+[Download session ZIP · notebook + trained models](assets/vae-session.zip){.btn .btn-secondary}
+
+![Actual reference outputs: originals, deterministic autoencoder reconstructions, and decoding fresh standard-normal codes. The last row uses independent draws, not the inputs above. Fashion-MNIST images [@xiao2017fashion]; models and figure created for this course.](assets/expected/opening.png){fig-alt="Ten Fashion-MNIST inputs with recognizable autoencoder reconstructions, followed by less coherent images decoded from random normal codes."}
+
+## What you implement
+
+| Student task | Provided infrastructure |
+|---|---|
+| **A:** independent mean and log-variance heads | Shared encoder features, decoder, and model assembly |
+| **B:** a differentiable latent draw | Fixed-noise arithmetic and gradient checks |
+| **C:** reconstruction and diagonal-Gaussian KL, with correct reductions | Optimizer loop, held-out evaluation, and a short timed run |
+| Interpret posterior/prior sampling and the KL trade-off | Dataset split, trained models, galleries, latent plots, curves, and controls |
+
+There are three coding tasks. No dataset class, plotting function, checkpoint loader, training loop, PCA, or interpolation implementation is required. The reading notebook embeds the same reference visuals as the downloadable notebook and keeps worked solutions folded until you choose to open them.
+
+## Your 90-minute path
+
+| Time | Activity |
+|---|---|
+| 0–10 min | Predict from the autoencoder's reconstruction/random-code comparison; run setup |
+| 10–20 min | Implement Task A: Gaussian encoder |
+| 20–30 min | Implement Task B: reparameterization; inspect repeated posterior draws |
+| 30–45 min | Implement Task C: reconstruction and KL; run the behavioral checks |
+| 45–60 min | Train a fresh model briefly and inspect separate metrics |
+| 60–80 min | Compare supplied β=0, 1, and 20 models using fixed inputs and latent draws |
+| 80–90 min | Export one comparison figure and answer three interpretation questions |
+
+**Prepare before class:** open the notebook and run the provided preparation cell once so Fashion-MNIST is cached. The session ZIP includes the trained models and embedded reference images. CPU is supported, widgets are optional, and equivalent static calls are provided. Training stops after two small epochs or roughly 60 seconds; the comparison never depends on finishing a long training run.
+
+## The evidence you will inspect
+
+![Reference KL experiment: the same ten prior codes decoded by β=0, 1, and 20 models. All three use the same architecture and 20-epoch training budget.](assets/expected/prior-comparison.png){fig-alt="Three rows of generated garment images, one for each KL weight, using identical standard-normal latent draws."}
+
+The companion includes the stochastic-encoder mechanism diagram, repeated outputs and their latent draws, early training results, fixed-input reconstructions, fresh samples, actual latent-coordinate maps, separate reconstruction/KL curves, and a matched-versus-shuffled code experiment.
+
+The measured results are guidance for interpretation, not scores you must match. β=0 is an unregularized **stochastic** autoencoder here; the opening deterministic AE is a separate model. Changing β changes the objective, so do not rank runs by their weighted total losses. Compare their evidence instead.
+
+## Submission
+
+Submit the completed notebook after **Restart & Run All**, one combined comparison figure exported by the provided cell, and three short answers inside the notebook:
+
+1. Explain posterior versus prior sampling, including the standard deviation computed from log variance.
+2. Explain the observed reconstruction/KL trade-off using specific images and separate metrics.
+3. Use the matched/shuffled code probe to assess image-specific latent use, then state one experimental limitation.
+
+No separate report or extended training is required. Disclose worked solutions or fallback evidence you used. Keep the dataset and model checkpoints out of your submission.
+
+| Assessment | Weight |
+|---|---:|
+| Three mechanisms and behavioral checks | 50% |
+| Controlled visual comparisons | 20% |
+| Explanations and experimental limitations | 30% |
+
+## References and reproducibility
+
+The [reading notebook](reading.qmd) explains the full experimental contract. [Recorded metrics](assets/expected/metrics.json) and the [checkpoint manifest](assets/checkpoints/manifest.json) record results, seeds, software, model hashes, and training history. Site rendering only reads these stored assets.
+
+Use the [Chapter 11 notes](../../notes/11-variational-autoencoders/index.qmd) for derivations and the [previous autoencoder homework](../../projects/06-latent-laboratory/index.qmd) for background. No files from that homework are required.

@@ -27,7 +27,7 @@ image: assets/course-thumbnail-candidate-01.png
 
 ## The learning journey
 
-<p class="section-intro">Seven thematic parts create a visible progression from learning fundamentals to generative models.</p>
+<p class="section-intro">The course progresses from learning fundamentals to generative models, followed by two weeks of student project presentations.</p>
 
 :::{.journey-strip}
 <span class="journey-step foundations"><b>01</b> Foundations</span>
@@ -35,8 +35,8 @@ image: assets/course-thumbnail-candidate-01.png
 <span class="journey-step optimization"><b>03</b> Optimization</span>
 <span class="journey-step pytorch"><b>04</b> PyTorch</span>
 <span class="journey-step vision"><b>05</b> Vision</span>
-<span class="journey-step sequences"><b>06</b> Sequences</span>
-<span class="journey-step generative"><b>07</b> Generative</span>
+<span class="journey-step generative"><b>06</b> Generative</span>
+<span class="journey-step presentations"><b>07</b> Presentations</span>
 :::
 
 [View the complete 14-week roadmap →](schedule.qmd){.journey-link}

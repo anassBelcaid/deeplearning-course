@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="510" viewBox="0 0 1200 510" role="img" aria-labelledby="title desc">
+<title id="title">The VAE object and its information flow</title><desc id="desc">One VAE owns an encoder and decoder. The encoder owns shared features and two independent linear heads. Mean and log variance produce a sampled two dimensional code which enters the decoder. Fresh prior codes can enter the same decoder directly.</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8" fill="none" stroke="#566879" stroke-width="1.2"/></marker></defs>
+<rect width="1200" height="510" rx="20" fill="#f4f0e7"/>
+<g font-family="sans-serif" fill="#203345"><text x="38" y="44" font-size="22" font-weight="bold">One VAE object owns both modules</text>
+<rect x="35" y="70" width="1130" height="355" rx="16" fill="none" stroke="#a6a99f" stroke-width="2"/>
+<rect x="65" y="110" width="500" height="260" rx="12" fill="#e2edf0" stroke="#80a6b6"/>
+<text x="90" y="143" font-size="21" font-weight="bold">encoder: GaussianEncoder</text>
+<rect x="90" y="205" width="215" height="95" rx="8" fill="white"/><text x="108" y="240" font-size="19">features (provided)</text><text x="108" y="270" font-size="18">784 → 128 → 64</text>
+<rect x="375" y="174" width="160" height="66" rx="8" fill="white"/><text x="396" y="201" font-size="18">mu: Linear</text><text x="417" y="224" font-size="16">64 → 2</text>
+<rect x="375" y="278" width="160" height="66" rx="8" fill="white"/><text x="391" y="305" font-size="18">logvar: Linear</text><text x="417" y="328" font-size="16">64 → 2</text>
+<rect x="650" y="218" width="168" height="86" rx="8" fill="#edd8cd"/><text x="667" y="250" font-size="19">sample z</text><text x="667" y="280" font-size="17">shape: B × 2</text>
+<rect x="900" y="187" width="230" height="144" rx="10" fill="#e6e0ed"/><text x="925" y="225" font-size="21" font-weight="bold">decoder</text><text x="925" y="256" font-size="18">2 → 64 → 128 → 784</text><text x="925" y="288" font-size="17">Sigmoid · reshape</text>
+<g fill="none" stroke="#566879" stroke-width="2" marker-end="url(#arrow)"><path d="M315 243 H340 V207 H363"/><path d="M315 260 H340 V311 H363"/><path d="M545 207 H600 V245 H638"/><path d="M545 311 H600 V275 H638"/><path d="M830 261 H888"/><path d="M1008 376 V345"/></g>
+<text x="661" y="175" font-size="18">ε ∼ N(0, I)</text><path d="M735 185 V207" fill="none" stroke="#566879" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="916" y="395" font-size="18">fresh prior z ∼ N(0, I)</text>
+<text x="65" y="465" font-size="19">Boxes show owned modules; arrows carry tensors. Each reference model has its own parameters.</text>
+<text x="65" y="492" font-size="17">models['beta1'] is a reference to one trained VAE, not a copy of its outputs.</text></g></svg>

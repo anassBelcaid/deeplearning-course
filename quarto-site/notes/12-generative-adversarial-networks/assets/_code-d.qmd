@@ -1,0 +1,8 @@
+```python
+D = nn.Sequential(
+    nn.Conv2d(1, 32, 4, 2, 1), nn.LeakyReLU(0.2),
+    nn.Conv2d(32, 64, 4, 2, 1), nn.LeakyReLU(0.2),
+    nn.Conv2d(64, 1, 7, 1, 0),
+    nn.Flatten(1),
+)
+```

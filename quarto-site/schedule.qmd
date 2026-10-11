@@ -18,7 +18,7 @@ The course moves from first principles to complete learning systems. Color marks
 <span class="legend-item"><i class="dot pytorch"></i> PyTorch</span>
 <span class="legend-item"><i class="dot vision"></i> Vision</span>
 <span class="legend-item"><i class="dot generative"></i> Generative models</span>
-<span class="legend-item"><i class="dot sequences"></i> Optional extension</span>
+<span class="legend-item"><i class="dot presentations"></i> Project presentations</span>
 :::
 
 :::{.schedule-table}
@@ -276,7 +276,7 @@ Dense prediction, U-Net, bounding boxes, IoU, NMS, and detectors.
 
 ## Generative Representation Learning
 
-Learn useful latent spaces, generate images, and compare generative mechanisms.
+Learn useful latent spaces and generate images, concluding with generative adversarial networks.
 :::
 
 :::{.week-row .generative}
@@ -311,7 +311,7 @@ Encoding, bottlenecks, reconstruction, denoising, and latent interpolation.
 Latent distributions, reparameterization, KL divergence, sampling, and interpolation.
 :::
 :::{.material-cell}
-[Notes](notes/11-variational-autoencoders/index.html){.material-pill .available}[PDF · technical review](notes/11-variational-autoencoders/index.pdf){.material-pill .available}[Slides](lectures/11-variational-autoencoders/index.html){.material-pill .available}<span class="material-pill muted">Notebook</span>
+[Notes](notes/11-variational-autoencoders/index.html){.material-pill .available}[PDF · technical review](notes/11-variational-autoencoders/index.pdf){.material-pill .available}[Slides](lectures/11-variational-autoencoders/index.html){.material-pill .available}[VAE Lab · 90 min](labs/11-variational-autoencoders/index.html){.material-pill .available}
 :::
 :::{.links-cell}
 [VAE · Kingma & Welling](https://arxiv.org/abs/1312.6114)<br>
@@ -320,7 +320,7 @@ Latent distributions, reparameterization, KL divergence, sampling, and interpola
 [Latent-use failure · Bowman et al.](https://aclanthology.org/K16-1002/)
 :::
 :::{.project-cell .track-middle}
-<a class="project-track-link" href="projects/06-latent-laboratory/index.html"><span class="project-label">Project 3 · Representations</span><br>Inspect actual codes, PCA views, and nearest neighbors.</a>
+<a class="project-track-link" href="labs/11-variational-autoencoders/index.html"><span class="project-label">VAE Homework · 90 minutes</span><br>Implement the VAE mechanisms and inspect reconstruction, sampling, and KL.</a>
 :::
 :::
 
@@ -333,7 +333,7 @@ Latent distributions, reparameterization, KL divergence, sampling, and interpola
 Generator–discriminator competition, adversarial objectives, DCGAN, mode collapse, and instability.
 :::
 :::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span>[Slides](lectures/12-generative-adversarial-networks/index.html){.material-pill .available}<span class="material-pill muted">Notebook</span>
+[Notes](notes/12-generative-adversarial-networks/index.html){.material-pill .available}[PDF · technical review](notes/12-generative-adversarial-networks/index.pdf){.material-pill .available}[Slides](lectures/12-generative-adversarial-networks/index.html){.material-pill .available}[Anime Faces · Homework](labs/12-anime-generation/index.html){.material-pill .available}
 :::
 :::{.links-cell}
 [GAN · Goodfellow et al.](https://arxiv.org/abs/1406.2661)<br>
@@ -341,54 +341,35 @@ Generator–discriminator competition, adversarial objectives, DCGAN, mode colla
 
 [Evaluation · Theis et al.](https://arxiv.org/abs/1511.01844)
 :::
-:::{.project-cell .track-middle}
-<a class="project-track-link" href="projects/06-latent-laboratory/index.html"><span class="project-label">Project 3 · Interpolation</span><br>Compare latent paths with pixel blending.</a>
-:::
-:::
-
-:::{.week-row .generative}
-:::{.week-topic}
-<span class="week-number">Week 13</span>
-
-### Comparing Generative Models
-
-Choose among autoencoders, VAEs, and GANs through samples, latent structure, evaluation, and failure analysis.
-:::
-:::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
-:::
-:::{.links-cell}
-<span class="coming-soon">Model-comparison gallery · Evaluation readings</span>
-:::
 :::{.project-cell .track-end}
-<a class="project-track-link" href="projects/06-latent-laboratory/index.html"><span class="project-label">Project 3 · Due</span><br>Executed notebook, visual report, and justified choice of d.</a>
+<a class="project-track-link" href="labs/12-anime-generation/index.html"><span class="project-label">Final Homework · Anime Faces</span><br>Design a generator, test one choice, and report the evidence.</a>
 :::
 :::
 
-:::{.part-banner .sequences}
-<span>Part VII · If time permits</span>
+:::{.part-banner .presentations}
+<span>Part VII</span>
 
-## Optional Extension: Learning from Sequences
+## Student Project Presentations
 
-A compact bridge to the dedicated NLP course: recurrence, memory, and gated state updates.
+The final two weeks are reserved for student project presentations. The exact presentation schedule will be announced later.
 :::
 
-:::{.week-row .sequences}
+:::{.week-row .presentations}
 :::{.week-topic}
-<span class="week-number">Week 14</span>
+<span class="week-number">Weeks 13–14</span>
 
-### Sequence Models: A First Look
+### Student Project Presentations
 
-Hidden states, unrolling, unstable gradients, and the motivation for GRU and LSTM gates.
+Presentations of student projects across the final two weeks.
 :::
 :::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+<span class="coming-soon">Presentation schedule to be announced</span>
 :::
 :::{.links-cell}
-<span class="coming-soon">Optional sequence visualizations · Follow-up NLP course</span>
+Exact dates, times, and presentation order will be announced later.
 :::
 :::{.project-cell}
-<span class="project-label">Optional extension</span><br>No new assessed project milestone.
+<span class="project-label">Student projects</span><br>Project presentations.
 :::
 :::
 :::

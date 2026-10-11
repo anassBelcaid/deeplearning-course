@@ -1,0 +1,144 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="../../../../lectures/12-generative-adversarial-networks/"><title>GAN notes: gradient</title><link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-f3e585dc122d45960ea2c31f625881dd.css"><link rel="stylesheet" href="../01-what-is-learning/slides.css"><link rel="stylesheet" href="week12.css"><style>
+ html,body { margin:0; padding:0; background:#f5f1e8; overflow:hidden; }
+ #canvas { width:1280px; transform-origin:top left; }
+ .reveal { width:1280px; height:auto; font-size:28px; }
+ .reveal .slides { width:1280px!important; height:auto!important; position:relative; inset:auto; margin:0; transform:none!important; perspective:none; text-align:left; }
+ .reveal .slides>section { display:block; position:relative; top:auto; left:auto; padding:22px; width:100%; height:auto; box-sizing:border-box; transform:none; opacity:1; pointer-events:auto; }
+ .reveal .fragment { opacity:1; visibility:visible; }
+ .reveal section [hidden] { display:none!important; }
+ .reveal .gan-source,.reveal .slide-number { display:none; }
+ .reveal .gan-code-layout { margin:0; }
+ .reveal .gan-code-layout>div:empty { display:none; }
+ .reveal .gan-routing-solution { position:relative; top:auto; left:auto; right:auto; margin-top:12px; box-shadow:none; }
+ .reveal .gan-spatial-architecture svg { max-width:100%; }
+ </style></head><body><div id="canvas"><div class="reveal"><div class="slides"><section class="slide level2 gan-s3 present" id="gan-gradient-loss">
+
+<div class="gan-gradient-layout">
+<div>
+<div class="course-network-diagram gan-gradient-plot">
+<svg aria-label="Gradient magnitude versus discriminator logit. Minimax has weak gradient for confidently rejected generated images; the non-saturating loss has a strong gradient there." role="img" viewbox="0 0 1120 490">
+<text class="network-label" style="font-size:27px" x="90" y="34">Gradient magnitude at the discriminator logit</text><path d="M90 390H1050" stroke="#d8dfe2"></path><text class="network-label" style="font-size:20px" text-anchor="end" x="70" y="397">0</text><path d="M90 315.0H1050" stroke="#d8dfe2"></path><text class="network-label" style="font-size:20px" text-anchor="end" x="70" y="322.0">0.25</text><path d="M90 240.0H1050" stroke="#d8dfe2"></path><text class="network-label" style="font-size:20px" text-anchor="end" x="70" y="247.0">0.5</text><path d="M90 165.0H1050" stroke="#d8dfe2"></path><text class="network-label" style="font-size:20px" text-anchor="end" x="70" y="172.0">0.75</text><path d="M90 90H1050" stroke="#d8dfe2"></path><text class="network-label" style="font-size:20px" text-anchor="end" x="70" y="97">1</text><text class="network-label" style="font-size:21px" text-anchor="middle" x="90" y="428">-6</text><text class="network-label" style="font-size:21px" text-anchor="middle" x="250" y="428">-4</text><text class="network-label" style="font-size:21px" text-anchor="middle" x="410" y="428">-2</text><text class="network-label" style="font-size:21px" text-anchor="middle" x="570" y="428">0</text><text class="network-label" style="font-size:21px" text-anchor="middle" x="730" y="428">2</text><text class="network-label" style="font-size:21px" text-anchor="middle" x="890" y="428">4</text><text class="network-label" style="font-size:21px" text-anchor="middle" x="1050" y="428">6</text><text class="network-label" style="font-size:24px" text-anchor="middle" x="570" y="475">Discriminator logit a on a generated image</text><polyline fill="none" points="90.00,389.26 94.00,389.22 98.00,389.18 102.00,389.14 106.00,389.09 110.00,389.05 114.00,389.00 118.00,388.95 122.00,388.89 126.00,388.84 130.00,388.78 134.00,388.72 138.00,388.65 142.00,388.58 146.00,388.51 150.00,388.43 154.00,388.35 158.00,388.27 162.00,388.18 166.00,388.09 170.00,387.99 174.00,387.89 178.00,387.78 182.00,387.67 186.00,387.55 190.00,387.43 194.00,387.30 198.00,387.16 202.00,387.01 206.00,386.86 210.00,386.70 214.00,386.54 218.00,386.36 222.00,386.18 226.00,385.98 230.00,385.78 234.00,385.57 238.00,385.34 242.00,385.11 246.00,384.86 250.00,384.60 254.00,384.33 258.00,384.05 262.00,383.75 266.00,383.44 270.00,383.11 274.00,382.76 278.00,382.40 282.00,382.02 286.00,381.62 290.00,381.21 294.00,380.77 298.00,380.31 302.00,379.83 306.00,379.33 310.00,378.80 314.00,378.25 318.00,377.67 322.00,377.07 326.00,376.43 330.00,375.77 334.00,375.08 338.00,374.35 342.00,373.60 346.00,372.80 350.00,371.97 354.00,371.11 358.00,370.20 362.00,369.26 366.00,368.27 370.00,367.24 374.00,366.17 378.00,365.05 382.00,363.88 386.00,362.66 390.00,361.40 394.00,360.07 398.00,358.70 402.00,357.27 406.00,355.78 410.00,354.24 414.00,352.63 418.00,350.97 422.00,349.24 426.00,347.44 430.00,345.59 434.00,343.66 438.00,341.67 442.00,339.61 446.00,337.47 450.00,335.27 454.00,333.00 458.00,330.66 462.00,328.24 466.00,325.75 470.00,323.19 474.00,320.56 478.00,317.85 482.00,315.08 486.00,312.23 490.00,309.32 494.00,306.33 498.00,303.28 502.00,300.17 506.00,296.99 510.00,293.75 514.00,290.46 518.00,287.10 522.00,283.70 526.00,280.24 530.00,276.74 534.00,273.19 538.00,269.61 542.00,265.99 546.00,262.33 550.00,258.65 554.00,254.95 558.00,251.23 562.00,247.49 566.00,243.75 570.00,240.00 574.00,236.25 578.00,232.51 582.00,228.77 586.00,225.05 590.00,221.35 594.00,217.67 598.00,214.01 602.00,210.39 606.00,206.81 610.00,203.26 614.00,199.76 618.00,196.30 622.00,192.90 626.00,189.54 630.00,186.25 634.00,183.01 638.00,179.83 642.00,176.72 646.00,173.67 650.00,170.68 654.00,167.77 658.00,164.92 662.00,162.15 666.00,159.44 670.00,156.81 674.00,154.25 678.00,151.76 682.00,149.34 686.00,147.00 690.00,144.73 694.00,142.53 698.00,140.39 702.00,138.33 706.00,136.34 710.00,134.41 714.00,132.56 718.00,130.76 722.00,129.03 726.00,127.37 730.00,125.76 734.00,124.22 738.00,122.73 742.00,121.30 746.00,119.93 750.00,118.60 754.00,117.34 758.00,116.12 762.00,114.95 766.00,113.83 770.00,112.76 774.00,111.73 778.00,110.74 782.00,109.80 786.00,108.89 790.00,108.03 794.00,107.20 798.00,106.40 802.00,105.65 806.00,104.92 810.00,104.23 814.00,103.57 818.00,102.93 822.00,102.33 826.00,101.75 830.00,101.20 834.00,100.67 838.00,100.17 842.00,99.69 846.00,99.23 850.00,98.79 854.00,98.38 858.00,97.98 862.00,97.60 866.00,97.24 870.00,96.89 874.00,96.56 878.00,96.25 882.00,95.95 886.00,95.67 890.00,95.40 894.00,95.14 898.00,94.89 902.00,94.66 906.00,94.43 910.00,94.22 914.00,94.02 918.00,93.82 922.00,93.64 926.00,93.46 930.00,93.30 934.00,93.14 938.00,92.99 942.00,92.84 946.00,92.70 950.00,92.57 954.00,92.45 958.00,92.33 962.00,92.22 966.00,92.11 970.00,92.01 974.00,91.91 978.00,91.82 982.00,91.73 986.00,91.65 990.00,91.57 994.00,91.49 998.00,91.42 1002.00,91.35 1006.00,91.28 1010.00,91.22 1014.00,91.16 1018.00,91.11 1022.00,91.05 1026.00,91.00 1030.00,90.95 1034.00,90.91 1038.00,90.86 1042.00,90.82 1046.00,90.78 1050.00,90.74" stroke="#c44834" stroke-width="5"></polyline><polyline fill="none" points="90.00,90.74 94.00,90.78 98.00,90.82 102.00,90.86 106.00,90.91 110.00,90.95 114.00,91.00 118.00,91.05 122.00,91.11 126.00,91.16 130.00,91.22 134.00,91.28 138.00,91.35 142.00,91.42 146.00,91.49 150.00,91.57 154.00,91.65 158.00,91.73 162.00,91.82 166.00,91.91 170.00,92.01 174.00,92.11 178.00,92.22 182.00,92.33 186.00,92.45 190.00,92.57 194.00,92.70 198.00,92.84 202.00,92.99 206.00,93.14 210.00,93.30 214.00,93.46 218.00,93.64 222.00,93.82 226.00,94.02 230.00,94.22 234.00,94.43 238.00,94.66 242.00,94.89 246.00,95.14 250.00,95.40 254.00,95.67 258.00,95.95 262.00,96.25 266.00,96.56 270.00,96.89 274.00,97.24 278.00,97.60 282.00,97.98 286.00,98.38 290.00,98.79 294.00,99.23 298.00,99.69 302.00,100.17 306.00,100.67 310.00,101.20 314.00,101.75 318.00,102.33 322.00,102.93 326.00,103.57 330.00,104.23 334.00,104.92 338.00,105.65 342.00,106.40 346.00,107.20 350.00,108.03 354.00,108.89 358.00,109.80 362.00,110.74 366.00,111.73 370.00,112.76 374.00,113.83 378.00,114.95 382.00,116.12 386.00,117.34 390.00,118.60 394.00,119.93 398.00,121.30 402.00,122.73 406.00,124.22 410.00,125.76 414.00,127.37 418.00,129.03 422.00,130.76 426.00,132.56 430.00,134.41 434.00,136.34 438.00,138.33 442.00,140.39 446.00,142.53 450.00,144.73 454.00,147.00 458.00,149.34 462.00,151.76 466.00,154.25 470.00,156.81 474.00,159.44 478.00,162.15 482.00,164.92 486.00,167.77 490.00,170.68 494.00,173.67 498.00,176.72 502.00,179.83 506.00,183.01 510.00,186.25 514.00,189.54 518.00,192.90 522.00,196.30 526.00,199.76 530.00,203.26 534.00,206.81 538.00,210.39 542.00,214.01 546.00,217.67 550.00,221.35 554.00,225.05 558.00,228.77 562.00,232.51 566.00,236.25 570.00,240.00 574.00,243.75 578.00,247.49 582.00,251.23 586.00,254.95 590.00,258.65 594.00,262.33 598.00,265.99 602.00,269.61 606.00,273.19 610.00,276.74 614.00,280.24 618.00,283.70 622.00,287.10 626.00,290.46 630.00,293.75 634.00,296.99 638.00,300.17 642.00,303.28 646.00,306.33 650.00,309.32 654.00,312.23 658.00,315.08 662.00,317.85 666.00,320.56 670.00,323.19 674.00,325.75 678.00,328.24 682.00,330.66 686.00,333.00 690.00,335.27 694.00,337.47 698.00,339.61 702.00,341.67 706.00,343.66 710.00,345.59 714.00,347.44 718.00,349.24 722.00,350.97 726.00,352.63 730.00,354.24 734.00,355.78 738.00,357.27 742.00,358.70 746.00,360.07 750.00,361.40 754.00,362.66 758.00,363.88 762.00,365.05 766.00,366.17 770.00,367.24 774.00,368.27 778.00,369.26 782.00,370.20 786.00,371.11 790.00,371.97 794.00,372.80 798.00,373.60 802.00,374.35 806.00,375.08 810.00,375.77 814.00,376.43 818.00,377.07 822.00,377.67 826.00,378.25 830.00,378.80 834.00,379.33 838.00,379.83 842.00,380.31 846.00,380.77 850.00,381.21 854.00,381.62 858.00,382.02 862.00,382.40 866.00,382.76 870.00,383.11 874.00,383.44 878.00,383.75 882.00,384.05 886.00,384.33 890.00,384.60 894.00,384.86 898.00,385.11 902.00,385.34 906.00,385.57 910.00,385.78 914.00,385.98 918.00,386.18 922.00,386.36 926.00,386.54 930.00,386.70 934.00,386.86 938.00,387.01 942.00,387.16 946.00,387.30 950.00,387.43 954.00,387.55 958.00,387.67 962.00,387.78 966.00,387.89 970.00,387.99 974.00,388.09 978.00,388.18 982.00,388.27 986.00,388.35 990.00,388.43 994.00,388.51 998.00,388.58 1002.00,388.65 1006.00,388.72 1010.00,388.78 1014.00,388.84 1018.00,388.89 1022.00,388.95 1026.00,389.00 1030.00,389.05 1034.00,389.09 1038.00,389.14 1042.00,389.18 1046.00,389.22 1050.00,389.26" stroke="#2878c8" stroke-width="5"></polyline><line id="gradient-cursor" stroke="#526575" stroke-dasharray="7 7" stroke-width="2" x1="202.39" x2="202.39" y1="80" y2="390"></line><circle cx="202.39" cy="387" fill="#c44834" id="gradient-minimax" r="8"></circle><circle cx="202.39" cy="93" fill="#2878c8" id="gradient-nonsat" r="8"></circle>
+</svg>
+</div>
+</div>
+<div class="gan-gradient-values">
+<p class="gan-minimax">
+<strong>Original minimax</strong><br/>ℓ = ln(1 − p)<br/>∂ℓ/∂a = −p
+</p>
+<p class="gan-nonsat">
+<strong>Non-saturating</strong><br/>ℓ = −ln p<br/>∂ℓ/∂a = p − 1
+</p>
+<p>
+a = D(G(z)); p = sigmoid(a)
+</p>
+</div>
+</div>
+<div aria-label="Inspect a generated-image score" class="gan-judge-controls" role="group">
+<span>Inspect p</span><button aria-pressed="true" data-gradient-p="0.01" type="button">0.01 · rejected</button><button aria-pressed="false" data-gradient-p="0.20" type="button">0.20</button><button aria-pressed="false" data-gradient-p="0.80" type="button">0.80</button><strong id="gan-gradient-values">|∂ℓ/∂a|: 0.01 vs 0.99</strong>
+</div>
+
+
+
+</section></div></div></div><div hidden><section class="slide level2 gan-s3" id="gan-opposing-losses">
+<h2>One generated image. Opposite desired scores.</h2>
+<p class="gan-lead">
+Hold the image source fixed: <strong>generated</strong>. Move its hypothetical judge score.
+</p>
+<div class="gan-score-lab">
+<div class="gan-score-control">
+<label for="gan-fake-score">p(G(z))</label><input aria-label="Hypothetical discriminator score on a generated image" id="gan-fake-score" max="99" min="1" step="1" type="range" value="20"/>
+<output for="gan-fake-score" id="gan-fake-score-value">
+0.20
+</output>
+</div>
+<div class="gan-score-direction">
+<span>0 · classified as generated</span><span>1 · classified as dataset</span>
+</div>
+<div class="gan-loss-readouts">
+<div>
+<h3>
+D’s objective on this image
+</h3>
+<p>
+Target 0 · push p down ←
+</p>
+<div class="gan-loss-formula">
+−ln(1 − p)
+</div>
+<output id="gan-d-fake-loss">
+0.223
+</output>
+<div class="gan-loss-meter">
+<i id="gan-d-loss-bar"></i>
+</div>
+</div>
+<div class="fragment" data-fragment-index="0">
+<h3>
+G’s objective on this image
+</h3>
+<p>
+Target 1 · push p up →
+</p>
+<div class="gan-loss-formula">
+−ln p
+</div>
+<output id="gan-g-fake-loss">
+1.609
+</output>
+<div class="gan-loss-meter">
+<i id="gan-g-loss-bar"></i>
+</div>
+</div>
+</div>
+</div>
+<div class="fragment gan-loss-equation" data-fragment-index="0">
+L<sub>G</sub> = mean<sub>z</sub>[−ln p(G(z))] <span>non-saturating generator loss</span>
+</div>
+<div class="fragment takeaway" data-fragment-index="1">
+<p>Target 1 expresses what G wants D to predict. The image is still generated.</p>
+</div>
+<p class="gan-source">
+Exact loss arithmetic for a hypothetical score; the slider does not train or alter an image · both loss bars use a common 0–4.61 scale · <a href="https://arxiv.org/abs/1406.2661">Goodfellow et al., 2014, §3</a>.
+</p>
+<aside class="notes">
+<p>Start with only D’s side visible. Move from 0.20 to 0.80: its fake-example cost rises from 0.223 to 1.609. Ask what would happen if the generator minimized this same target-zero cost: it would favor being identified as generated. Reveal G’s target-one loss and the mean-over-codes expression. Now repeat the movement: G’s cost falls from 1.609 to 0.223 while D’s fake-example cost rises. Show 0.50, where both per-example costs are ln 2, about 0.693. Equal costs at this hypothetical score do not certify a good generator.</p>
+<p>The slider is a scalar thought experiment. It changes a hypothetical p while holding source identity fixed; it is not an optimizer step or a measured change in an image. Bars use the same scale across both objectives, with a maximum of −ln(0.01), and outputs update immediately. It avoids comparing disconnected numerical scales.</p>
+<p>Target 1 in the generator objective means “make D classify this generated sample as coming from the dataset.” It does not relabel the sample as real for D’s own training. During the G objective D supplies a differentiable function, and the adjustable parameters are G’s. D’s real-image term has no dependence on G and is unnecessary here. Later we will make parameter ownership explicit in code.</p>
+<p>This is the non-saturating objective used in our implementation. It is not simply the negative of the entire discriminator loss. The original minimax generator minimizes mean ln(1−p); it also favors increasing p, but has different gradient behavior. The next slide gives the reason for choosing −ln p instead. Neither this target choice nor a low generator loss is by itself an evaluation of coverage, diversity, or sample quality.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></div><script>window.Reveal={on:()=>{},layout:()=>{}};</script><script>
+(() => {
+ const slider=document.getElementById('gan-fake-score');
+ if(!slider)return;
+ function updateScore(){
+  const p=Number(slider.value)/100,d=-Math.log1p(-p),g=-Math.log(p),max=-Math.log(.01);
+  document.getElementById('gan-fake-score-value').textContent=p.toFixed(2);
+  document.getElementById('gan-d-fake-loss').textContent=d.toFixed(3);
+  document.getElementById('gan-g-fake-loss').textContent=g.toFixed(3);
+  document.getElementById('gan-d-loss-bar').style.width=(100*d/max)+'%';
+  document.getElementById('gan-g-loss-bar').style.width=(100*g/max)+'%';
+ }
+ slider.addEventListener('input',updateScore);updateScore();
+ document.querySelectorAll('[data-gradient-p]').forEach(button=>button.addEventListener('click',()=>{
+  const p=Number(button.dataset.gradientP),a=Math.log(p/(1-p)),x=90+(a+6)*80;
+  document.querySelectorAll('[data-gradient-p]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+  const cursor=document.getElementById('gradient-cursor');cursor.setAttribute('x1',x);cursor.setAttribute('x2',x);
+  for(const [id,v] of [['gradient-minimax',p],['gradient-nonsat',1-p]]){const dot=document.getElementById(id);dot.setAttribute('cx',x);dot.setAttribute('cy',390-v*300);}
+  document.getElementById('gan-gradient-values').textContent='|∂ℓ/∂a|: '+p.toFixed(2)+' vs '+(1-p).toFixed(2);
+ }));
+})();
+</script>
+<script>
+function resize(){const c=document.getElementById('canvas'),s=Math.min(1,innerWidth/1280);c.style.transform='scale('+s+')';const h=Math.ceil(c.getBoundingClientRect().height)+2;document.body.style.height=h+'px';parent.postMessage({type:'gan-notes-height',height:h},location.origin);}
+new ResizeObserver(resize).observe(document.querySelector('#canvas .slides'));addEventListener('resize',resize);addEventListener('load',resize);document.fonts.ready.then(resize);resize();
+</script></body></html>

@@ -1,0 +1,1 @@
+<div class="gan-demo"><iframe src="assets/demos/spatial.html" title="GAN visual evidence: spatial" loading="lazy"></iframe><a href="assets/demos/spatial.html" target="_blank">Open this visual in a full window →</a></div>

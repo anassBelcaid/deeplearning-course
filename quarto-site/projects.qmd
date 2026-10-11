@@ -96,6 +96,44 @@ Grow a scalar `Value` class into reverse-mode autodiff, compose an MLP, and lear
 :::
 :::
 
+## Generative-model coding sessions
+
+:::{.chapter-list}
+:::{.chapter-entry .available .generative}
+<span class="chapter-number">VAE</span>
+
+:::{.chapter-copy}
+### [From Reconstruction to Generation](labs/11-variational-autoencoders/index.qmd)
+
+Implement a Gaussian encoder, reparameterization, and the VAE loss. Investigate posterior draws, prior samples, and the KL trade-off with provided trained models and visual experiments.
+
+`90 minutes`{.topic-tag} `Homework`{.topic-tag} `PyTorch`{.topic-tag} `Three coding tasks`{.topic-tag}
+:::
+
+:::{.chapter-state}
+[View assignment](labs/11-variational-autoencoders/index.qmd) · [Read notebook + visual results](labs/11-variational-autoencoders/reading.qmd) · <a href="labs/11-variational-autoencoders/starter/vae_lab.ipynb?download=1" download="vae_lab.ipynb">Download notebook</a>
+:::
+:::
+:::
+
+:::{.chapter-list}
+:::{.chapter-entry .available .generative}
+<span class="chapter-number">FINAL</span>
+
+:::{.chapter-copy}
+### [Anime Faces: Design, Train, Defend](labs/12-anime-generation/index.qmd)
+
+Choose a VAE or GAN, train on Kaggle anime faces, test one design decision, and write a reproducible experimental report. Model and training choices are yours; data and reporting infrastructure are provided.
+
+`Take-home`{.topic-tag} `Independent design`{.topic-tag} `Generative models`{.topic-tag} `Experimental report`{.topic-tag}
+:::
+
+:::{.chapter-state}
+[View assignment](labs/12-anime-generation/index.qmd) · [Read notebook](labs/12-anime-generation/reading.qmd) · <a href="labs/12-anime-generation/starter/anime_faces_homework.ipynb?download=1" download="anime_faces_homework.ipynb">Download notebook</a>
+:::
+:::
+:::
+
 ## PyTorch vision systems
 
 :::{.chapter-list}

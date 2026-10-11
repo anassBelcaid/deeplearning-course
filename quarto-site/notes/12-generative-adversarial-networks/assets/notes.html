@@ -1,0 +1,7 @@
+<script>
+window.addEventListener('message',event=>{
+ if(event.origin!==location.origin || event.data?.type!=='gan-notes-height')return;
+ const frame=[...document.querySelectorAll('.gan-demo iframe')].find(f=>f.contentWindow===event.source);
+ if(frame && Number.isFinite(event.data.height))frame.style.height=Math.min(4000,Math.max(80,event.data.height))+'px';
+});
+</script>

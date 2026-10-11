@@ -1,0 +1,1 @@
+<div class="gan-demo"><iframe src="assets/demos/conv-comparison.html" title="GAN visual evidence: conv comparison" loading="lazy"></iframe><a href="assets/demos/conv-comparison.html" target="_blank">Open this visual in a full window →</a></div>

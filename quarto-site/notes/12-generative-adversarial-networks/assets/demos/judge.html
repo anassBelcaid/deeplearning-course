@@ -1,0 +1,193 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="../../../../lectures/12-generative-adversarial-networks/"><title>GAN notes: judge</title><link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css"><link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-f3e585dc122d45960ea2c31f625881dd.css"><link rel="stylesheet" href="../01-what-is-learning/slides.css"><link rel="stylesheet" href="week12.css"><style>
+ html,body { margin:0; padding:0; background:#f5f1e8; overflow:hidden; }
+ #canvas { width:1280px; transform-origin:top left; }
+ .reveal { width:1280px; height:auto; font-size:28px; }
+ .reveal .slides { width:1280px!important; height:auto!important; position:relative; inset:auto; margin:0; transform:none!important; perspective:none; text-align:left; }
+ .reveal .slides>section { display:block; position:relative; top:auto; left:auto; padding:22px; width:100%; height:auto; box-sizing:border-box; transform:none; opacity:1; pointer-events:auto; }
+ .reveal .fragment { opacity:1; visibility:visible; }
+ .reveal section [hidden] { display:none!important; }
+ .reveal .gan-source,.reveal .slide-number { display:none; }
+ .reveal .gan-code-layout { margin:0; }
+ .reveal .gan-code-layout>div:empty { display:none; }
+ .reveal .gan-routing-solution { position:relative; top:auto; left:auto; right:auto; margin-top:12px; box-shadow:none; }
+ .reveal .gan-spatial-architecture svg { max-width:100%; }
+ </style></head><body><div id="canvas"><div class="reveal"><div class="slides"><section class="slide level2 present" id="gan-judge-experiment">
+
+<p class="gan-lead">
+Same six images. Same frozen VAE. Only the classifier learns.
+</p>
+<div aria-label="Choose a recorded classifier checkpoint" class="gan-judge-controls" role="group">
+<span>Classifier training</span><button aria-pressed="true" data-epoch="0" type="button">Before training</button><button aria-pressed="false" data-epoch="1" type="button">1 epoch</button><button aria-pressed="false" data-epoch="4" type="button">4 epochs</button><button aria-pressed="false" data-epoch="8" type="button">8 epochs</button>
+</div>
+<p class="gan-score-key">
+Score for “dataset source”: <strong>0 = generated</strong> · <strong>1 = dataset</strong>
+</p>
+<div class="gan-judge-gallery">
+<figure>
+<figcaption>
+A · Dataset
+</figcaption>
+<img alt="Same garment A from the earlier exercise; source: Dataset." src="assets/evidence/section1/gallery-0.png"/>
+<div class="gan-score-track">
+<i id="judge-bar-A"></i>
+</div>
+<strong id="judge-score-A">—</strong>
+</figure>
+<figure>
+<figcaption>
+B · VAE output
+</figcaption>
+<img alt="Same garment B from the earlier exercise; source: VAE output." src="assets/evidence/section1/gallery-1.png"/>
+<div class="gan-score-track">
+<i id="judge-bar-B"></i>
+</div>
+<strong id="judge-score-B">—</strong>
+</figure>
+<figure>
+<figcaption>
+C · VAE output
+</figcaption>
+<img alt="Same garment C from the earlier exercise; source: VAE output." src="assets/evidence/section1/gallery-2.png"/>
+<div class="gan-score-track">
+<i id="judge-bar-C"></i>
+</div>
+<strong id="judge-score-C">—</strong>
+</figure>
+<figure>
+<figcaption>
+D · Dataset
+</figcaption>
+<img alt="Same garment D from the earlier exercise; source: Dataset." src="assets/evidence/section1/gallery-3.png"/>
+<div class="gan-score-track">
+<i id="judge-bar-D"></i>
+</div>
+<strong id="judge-score-D">—</strong>
+</figure>
+<figure>
+<figcaption>
+E · VAE output
+</figcaption>
+<img alt="Same garment E from the earlier exercise; source: VAE output." src="assets/evidence/section1/gallery-4.png"/>
+<div class="gan-score-track">
+<i id="judge-bar-E"></i>
+</div>
+<strong id="judge-score-E">—</strong>
+</figure>
+<figure>
+<figcaption>
+F · Dataset
+</figcaption>
+<img alt="Same garment F from the earlier exercise; source: Dataset." src="assets/evidence/section1/gallery-5.png"/>
+<div class="gan-score-track">
+<i id="judge-bar-F"></i>
+</div>
+<strong id="judge-score-F">—</strong>
+</figure>
+</div>
+<div aria-live="polite" class="gan-heldout">
+<div>
+<span>Held-out source accuracy</span><strong id="judge-accuracy">—</strong>
+</div>
+<p>
+1,000 dataset images + 1,000 VAE outputs<br/><small>Threshold 0.5 · balanced set · 50% chance baseline</small>
+</p>
+</div>
+
+
+
+</section></div></div></div><div hidden><section class="slide level2" id="gan-target-experiment">
+<h2>Which real image should this draw match?</h2>
+<p class="gan-lead">
+Keep the generated image fixed. Change only the proposed target.
+</p>
+<div aria-label="Choose an unrelated real image as the proposed pixel target" class="gan-target-controls" role="group">
+<span>Proposed target</span><button aria-pressed="true" data-target="A" type="button">A · T-shirt</button><button aria-pressed="false" data-target="B" type="button">B · Boot</button><button aria-pressed="false" data-target="C" type="button">C · Bag</button>
+</div>
+<div class="gan-target-stage">
+<figure>
+<figcaption>
+One fixed VAE output
+</figcaption>
+<img alt="Fixed actual VAE decoder output from the first held-out latent draw." src="assets/evidence/section1/candidate.png"/><small id="gan-fixed-code">A fixed prior draw</small>
+</figure>
+<figure>
+<figcaption id="gan-target-title">
+Proposed target A
+</figcaption>
+<img alt="Unrelated real Fashion-MNIST T-shirt proposed as a target." id="gan-target-image" src="assets/evidence/section1/target-A.png"/><small>No pairing was supplied by the data.</small>
+</figure>
+<figure>
+<figcaption>
+Absolute pixel difference
+</figcaption>
+<img alt="Absolute pixel difference between the fixed generated image and proposed target A; black is zero, orange is one." id="gan-difference-image" src="assets/evidence/section1/difference-A.png"/><small>Same scale: black 0 → orange 1</small>
+</figure>
+</div>
+<div aria-live="polite" class="gan-target-measure">
+<span>Mean squared pixel error</span><strong id="gan-target-mse">—</strong><span>The output did not change.</span>
+</div>
+<div class="fragment takeaway">
+<p>The dataset gives us examples—not a target image for each random code.</p>
+</div>
+<p class="gan-source">
+Course experiment · actual frozen VAE output and unrelated Fashion-MNIST validation images · pixel errors computed from the original floating-point tensors.
+</p>
+<aside class="notes">
+<p>Retrieve only the part of autoencoder training that matters: when x is encoded, x is the reconstruction target. Now point to the generated image. It was decoded from a fresh normal draw; no input was encoded. There is no paired target x attached to that draw.</p>
+<p>Ask students to nominate a target before using the three buttons. Each button changes the observed target, the difference heatmap, and measured mean squared pixel error. The generated output and its latent coordinates remain fixed. Choose A, B, then C and ask: did the generator improve when the displayed error decreased? No; only our chosen comparison changed.</p>
+<p>The experiment does not claim that pixel error is meaningless, that generative learning without pairing is impossible, or that VAEs lack a valid objective. It shows why arbitrarily pairing each unconditional draw with one unrelated training image does not specify the desired task. Different legitimate garments can be far apart in pixels. Training against independent random targets with MSE tends toward an average; do not derive that result here or present the three displayed comparisons as its proof.</p>
+<p>Reveal the takeaway only after students have interpreted the changing cost. We want the generated collection to resemble the data distribution. A learned discriminator is one way to obtain feedback about the difference; it is not the only possible distributional training method.</p>
+<p>The candidate is the same output as B in the first exercise. Targets are the first validation example in each of three predefined classes, T-shirt, ankle boot, and bag. They were not selected to force an ordering of the MSE values. The heatmap is absolute difference with a common linear color scale; the scalar metric squares those differences before averaging over all 784 pixels. Minor visible quantization comes from PNG display; metrics use original tensors.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></div><script>window.Reveal={on:()=>{},layout:()=>{}};</script><script>
+(async function () {
+  const root = 'assets/evidence/section1/';
+  const response = await fetch(root + 'manifest.json');
+  if (!response.ok) throw new Error('Unable to load recorded GAN section 1 evidence');
+  const data = await response.json();
+  const names = {A: 'T-shirt', B: 'Boot', C: 'Bag'};
+  function target(letter) {
+    const item = data.targets.find(x => x.letter === letter);
+    document.querySelectorAll('[data-target]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.target === letter)));
+    document.getElementById('gan-target-title').textContent = 'Proposed target ' + letter + ' · ' + names[letter];
+    const image = document.getElementById('gan-target-image');
+    image.src = root + item.file; image.alt = 'Unrelated real Fashion-MNIST ' + names[letter] + ' proposed as target ' + letter + '.';
+    const difference = document.getElementById('gan-difference-image');
+    difference.src = root + item.difference; difference.alt = 'Absolute pixel difference for target ' + letter + '; black is zero, orange is one.';
+    document.getElementById('gan-target-mse').textContent = item.mse.toFixed(4);
+  }
+  function checkpoint(epoch) {
+    const row = data.history.find(x => x.epoch === epoch);
+    document.querySelectorAll('[data-epoch]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.epoch) === epoch)));
+    data.gallery.forEach((item, i) => {
+      const score = row.gallery_scores[i];
+      document.getElementById('judge-score-' + item.letter).textContent = score < .001 ? '<0.001' : score > .999 ? '>0.999' : score.toFixed(3);
+      document.getElementById('judge-bar-' + item.letter).style.width = (100 * score) + '%';
+    });
+    document.getElementById('judge-accuracy').textContent = (100 * row.accuracy).toFixed(1) + '%';
+  }
+  document.querySelectorAll('[data-target]').forEach(button => button.addEventListener('click', () => target(button.dataset.target)));
+  document.querySelectorAll('[data-epoch]').forEach(button => button.addEventListener('click', () => checkpoint(Number(button.dataset.epoch))));
+  document.getElementById('gan-fixed-code').textContent = 'z = (' + data.candidate_z.map(x => x.toFixed(2)).join(', ') + ') · fixed decoder';
+  target('A'); checkpoint(0);
+})().catch(error => {
+  console.error(error);
+  for (const id of ['gan-target-mse', 'judge-accuracy']) {
+    const element = document.getElementById(id); if (element) element.textContent = 'Evidence unavailable';
+  }
+});
+</script>
+<script>
+function resize(){const c=document.getElementById('canvas'),s=Math.min(1,innerWidth/1280);c.style.transform='scale('+s+')';const h=Math.ceil(c.getBoundingClientRect().height)+2;document.body.style.height=h+'px';parent.postMessage({type:'gan-notes-height',height:h},location.origin);}
+new ResizeObserver(resize).observe(document.querySelector('#canvas .slides'));addEventListener('resize',resize);addEventListener('load',resize);document.fonts.ready.then(resize);resize();
+</script></body></html>
