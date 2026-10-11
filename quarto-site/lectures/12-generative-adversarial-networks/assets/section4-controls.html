@@ -1,0 +1,13 @@
+<script>
+(() => {
+ const slide=document.getElementById('gan-alternating-paths');if(!slide)return;
+ function update(turn){
+  slide.querySelectorAll('[data-update-turn]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.updateTurn===turn)));
+  slide.querySelectorAll('[data-turn-only]').forEach(el=>{if(el.dataset.turnOnly===turn)el.removeAttribute('hidden');else el.setAttribute('hidden','');});
+  document.getElementById('turn-g-label').textContent=turn==='G'?'G updates':'G fixed';
+  document.getElementById('turn-d-label').textContent=turn==='D'?'D updates':'D fixed';
+  document.getElementById('gan-turn-status').textContent=turn==='D'?"D's turn: classify both sources. Stop the generated-image path before G.":"G's turn: target 1. Differentiate through D; update only G.";
+ }
+ slide.querySelectorAll('[data-update-turn]').forEach(b=>b.addEventListener('click',()=>update(b.dataset.updateTurn)));update('D');
+})();
+</script>

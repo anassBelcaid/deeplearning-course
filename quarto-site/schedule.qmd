@@ -333,10 +333,13 @@ Latent distributions, reparameterization, KL divergence, sampling, and interpola
 Generator–discriminator competition, adversarial objectives, DCGAN, mode collapse, and instability.
 :::
 :::{.material-cell}
-<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span><span class="material-pill muted">Slides</span><span class="material-pill muted">Notebook</span>
+<span class="material-pill muted">Notes</span><span class="material-pill muted">PDF</span>[Slides](lectures/12-generative-adversarial-networks/index.html){.material-pill .available}<span class="material-pill muted">Notebook</span>
 :::
 :::{.links-cell}
-<span class="coming-soon">GAN paper · Pretrained generator explorer</span>
+[GAN · Goodfellow et al.](https://arxiv.org/abs/1406.2661)<br>
+[DCGAN · Radford et al.](https://arxiv.org/abs/1511.06434)
+
+[Evaluation · Theis et al.](https://arxiv.org/abs/1511.01844)
 :::
 :::{.project-cell .track-middle}
 <a class="project-track-link" href="projects/06-latent-laboratory/index.html"><span class="project-label">Project 3 · Interpolation</span><br>Compare latent paths with pixel blending.</a>

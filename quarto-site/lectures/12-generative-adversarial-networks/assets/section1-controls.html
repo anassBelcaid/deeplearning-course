@@ -1,0 +1,38 @@
+<script>
+(async function () {
+  const root = 'assets/evidence/section1/';
+  const response = await fetch(root + 'manifest.json');
+  if (!response.ok) throw new Error('Unable to load recorded GAN section 1 evidence');
+  const data = await response.json();
+  const names = {A: 'T-shirt', B: 'Boot', C: 'Bag'};
+  function target(letter) {
+    const item = data.targets.find(x => x.letter === letter);
+    document.querySelectorAll('[data-target]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.target === letter)));
+    document.getElementById('gan-target-title').textContent = 'Proposed target ' + letter + ' · ' + names[letter];
+    const image = document.getElementById('gan-target-image');
+    image.src = root + item.file; image.alt = 'Unrelated real Fashion-MNIST ' + names[letter] + ' proposed as target ' + letter + '.';
+    const difference = document.getElementById('gan-difference-image');
+    difference.src = root + item.difference; difference.alt = 'Absolute pixel difference for target ' + letter + '; black is zero, orange is one.';
+    document.getElementById('gan-target-mse').textContent = item.mse.toFixed(4);
+  }
+  function checkpoint(epoch) {
+    const row = data.history.find(x => x.epoch === epoch);
+    document.querySelectorAll('[data-epoch]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.epoch) === epoch)));
+    data.gallery.forEach((item, i) => {
+      const score = row.gallery_scores[i];
+      document.getElementById('judge-score-' + item.letter).textContent = score < .001 ? '<0.001' : score > .999 ? '>0.999' : score.toFixed(3);
+      document.getElementById('judge-bar-' + item.letter).style.width = (100 * score) + '%';
+    });
+    document.getElementById('judge-accuracy').textContent = (100 * row.accuracy).toFixed(1) + '%';
+  }
+  document.querySelectorAll('[data-target]').forEach(button => button.addEventListener('click', () => target(button.dataset.target)));
+  document.querySelectorAll('[data-epoch]').forEach(button => button.addEventListener('click', () => checkpoint(Number(button.dataset.epoch))));
+  document.getElementById('gan-fixed-code').textContent = 'z = (' + data.candidate_z.map(x => x.toFixed(2)).join(', ') + ') · fixed decoder';
+  target('A'); checkpoint(0);
+})().catch(error => {
+  console.error(error);
+  for (const id of ['gan-target-mse', 'judge-accuracy']) {
+    const element = document.getElementById(id); if (element) element.textContent = 'Evidence unavailable';
+  }
+});
+</script>

@@ -1,0 +1,22 @@
+<script>
+(() => {
+ const slider=document.getElementById('gan-fake-score');
+ if(!slider)return;
+ function updateScore(){
+  const p=Number(slider.value)/100,d=-Math.log1p(-p),g=-Math.log(p),max=-Math.log(.01);
+  document.getElementById('gan-fake-score-value').textContent=p.toFixed(2);
+  document.getElementById('gan-d-fake-loss').textContent=d.toFixed(3);
+  document.getElementById('gan-g-fake-loss').textContent=g.toFixed(3);
+  document.getElementById('gan-d-loss-bar').style.width=(100*d/max)+'%';
+  document.getElementById('gan-g-loss-bar').style.width=(100*g/max)+'%';
+ }
+ slider.addEventListener('input',updateScore);updateScore();
+ document.querySelectorAll('[data-gradient-p]').forEach(button=>button.addEventListener('click',()=>{
+  const p=Number(button.dataset.gradientP),a=Math.log(p/(1-p)),x=90+(a+6)*80;
+  document.querySelectorAll('[data-gradient-p]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+  const cursor=document.getElementById('gradient-cursor');cursor.setAttribute('x1',x);cursor.setAttribute('x2',x);
+  for(const [id,v] of [['gradient-minimax',p],['gradient-nonsat',1-p]]){const dot=document.getElementById(id);dot.setAttribute('cx',x);dot.setAttribute('cy',390-v*300);}
+  document.getElementById('gan-gradient-values').textContent='|∂ℓ/∂a|: '+p.toFixed(2)+' vs '+(1-p).toFixed(2);
+ }));
+})();
+</script>

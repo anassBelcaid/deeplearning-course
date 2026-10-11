@@ -1,0 +1,15 @@
+<div class="light-code-editor"><div class="editor-bar"><span>PYTORCH · GENERATOR</span><strong>untrained module contract</strong></div><pre><code><span class="py-kw">import</span> torch
+<span class="py-kw">from</span> torch <span class="py-kw">import</span> nn
+
+latent_dim = 16
+G = nn.Sequential(
+    nn.Linear(latent_dim, 128), nn.ReLU(),
+    nn.Linear(128, 256), nn.ReLU(),
+    nn.Linear(256, 784), nn.Sigmoid(),
+    nn.Unflatten(1, (1, 28, 28)),
+)
+
+<span class="fragment" data-fragment-index="0">z = torch.randn(4, latent_dim)
+fake = G(z)
+print(fake.shape)
+# torch.Size([4, 1, 28, 28])</span></code></pre></div>

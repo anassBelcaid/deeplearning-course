@@ -1,0 +1,25 @@
+<script>
+(() => {
+  const slide = document.getElementById('gan-routing-exercise');
+  if (!slide) return;
+  const status = document.getElementById('gan-route-status');
+  const descriptions = {
+    real: 'Real batch → D → 4 logits. G is unused on this path.',
+    fake: '4 random codes → G → 4 images → the same D → 4 logits.',
+    sample: '4 random codes → G → 4 images. D is unused when sampling.'
+  };
+  const active = {real: ['real','judge'], fake: ['generator','fake','judge'], sample: ['generator']};
+  function route(value) {
+    slide.querySelectorAll('[data-route]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.route === value)));
+    slide.querySelectorAll('[data-path]').forEach(el => el.classList.toggle('route-inactive', Boolean(value) && !active[value].includes(el.dataset.path)));
+    status.textContent = descriptions[value] || 'Trace a path: the same D accepts either image source.';
+  }
+  slide.querySelectorAll('[data-route]').forEach(b => b.addEventListener('click', () => route(b.dataset.route)));
+  function hook() {
+    Reveal.on('fragmenthidden', e => { if (slide.contains(e.fragment)) route(null); });
+    Reveal.on('slidechanged', () => route(null));
+  }
+  if (typeof Reveal !== 'undefined') hook();
+  else window.addEventListener('load', hook, {once:true});
+})();
+</script>

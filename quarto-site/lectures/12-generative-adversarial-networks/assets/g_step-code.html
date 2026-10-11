@@ -1,0 +1,10 @@
+<div class="light-code-editor"><div class="editor-bar"><span>PYTORCH · GENERATOR TURN</span><strong>one optimizer step</strong></div><pre><code>D.requires_grad_(False)
+opt_G.zero_grad(set_to_none=True)
+fake = G(z)
+fake_logits = D(fake)
+loss_G = bce(
+    fake_logits, torch.ones_like(fake_logits)
+)
+<span class="fragment" data-fragment-index="0">loss_G.backward()
+opt_G.step()
+D.requires_grad_(True)</span></code></pre></div>

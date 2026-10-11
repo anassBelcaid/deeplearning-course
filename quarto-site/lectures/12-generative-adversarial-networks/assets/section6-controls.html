@@ -1,0 +1,28 @@
+<script>
+(() => {
+ let batch=0,repeated=false;
+ const repeat=document.getElementById('gan-repeat-control');if(!repeat)return;
+ function showBatch(){
+  document.querySelectorAll('[data-eval-batch]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.evalBatch)===batch)));
+  repeat.setAttribute('aria-pressed',String(repeated));repeat.textContent=repeated?'Return to actual outputs':'Show repetition control';
+  const real=document.getElementById('gan-eval-real'),generated=document.getElementById('gan-eval-generated');
+  real.src='assets/evidence/section6/real-'+batch+'.png';real.alt='Held-out Fashion-MNIST reference batch '+(batch+1);
+  generated.src='assets/evidence/section6/'+(repeated?'repeated':'generated')+'-'+batch+'.png';
+  generated.alt=repeated?'Constructed control: one output repeated twelve times':'Twelve actual fresh generated outputs, batch '+(batch+1);
+  document.getElementById('gan-eval-generated-label').textContent=repeated?'Constructed control · one image repeated':'Actual G · 12 fresh latent draws';
+  document.getElementById('gan-eval-status').textContent=repeated?'CONTROL: duplicated display, not observed model collapse':'Recorded outputs · batch '+(batch+1)+' of 3 · no selection by quality';
+ }
+ document.querySelectorAll('[data-eval-batch]').forEach(b=>b.addEventListener('click',()=>{batch=Number(b.dataset.evalBatch);showBatch();}));
+ repeat.addEventListener('click',()=>{repeated=!repeated;showBatch();});showBatch();
+ fetch('assets/evidence/section6/losses.json').then(r=>{if(!r.ok)throw Error('Loss record unavailable');return r.json();}).then(history=>{
+  function select(epoch){
+   const row=history.find(r=>r.epoch===epoch),x=70+(epoch-1)*780/59;
+   document.querySelectorAll('[data-loss-checkpoint]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.lossCheckpoint)===epoch)));
+   const marker=document.getElementById('gan-loss-epoch-marker');marker.setAttribute('x1',x);marker.setAttribute('x2',x);
+   for(const [id,i] of [['gan-loss-sample-a',0],['gan-loss-sample-b',4]]){const im=document.getElementById(id);im.src='assets/evidence/section5/epoch-'+epoch+'-sample-'+i+'.png';im.alt='Fixed draw '+(i+1)+', recorded epoch '+epoch;}
+   document.getElementById('gan-loss-checkpoint-values').textContent='Epoch '+epoch+' · D: '+row.loss_D.toFixed(3)+' · G: '+row.loss_G.toFixed(3);
+  }
+  document.querySelectorAll('[data-loss-checkpoint]').forEach(b=>b.addEventListener('click',()=>select(Number(b.dataset.lossCheckpoint))));select(20);
+ }).catch(()=>{document.getElementById('gan-loss-checkpoint-values').textContent='Recorded values could not be loaded.';});
+})();
+</script>

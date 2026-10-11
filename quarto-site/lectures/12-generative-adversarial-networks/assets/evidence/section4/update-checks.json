@@ -1,0 +1,33 @@
+{
+  "seed": 1204,
+  "real_dataset_ids": [
+    48736,
+    6322,
+    46644,
+    19144
+  ],
+  "batch_size": 4,
+  "optimizer": "Adam, lr=0.001; independent optimizer state",
+  "D_turn": {
+    "G_changed": 0,
+    "D_changed": 6,
+    "G_grad_tensors": 0,
+    "D_grad_tensors": 6,
+    "loss": 1.3945207595825195
+  },
+  "G_turn": {
+    "G_changed": 6,
+    "D_changed": 0,
+    "G_grad_tensors": 6,
+    "D_grad_tensors": 0,
+    "loss": 0.7981603145599365
+  },
+  "bug": {
+    "loss_requires_grad": false,
+    "G_grad_tensors": 0,
+    "error": "element 0 of tensors does not require grad and does not have a grad_fn"
+  },
+  "parameter_tensors_per_model": 6,
+  "purpose": "One alternating update verifies ownership and gradient flow, not image quality",
+  "torch": "2.13.0+cu130"
+}

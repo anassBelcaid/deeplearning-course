@@ -1,0 +1,9 @@
+<div class="light-code-editor"><div class="editor-bar"><span>PYTORCH · D</span><strong>kernel, stride, padding</strong></div><pre><code>D = nn.Sequential(
+    nn.Conv2d(1, 32, 4, 2, 1), nn.LeakyReLU(0.2),
+    nn.Conv2d(32, 64, 4, 2, 1), nn.LeakyReLU(0.2),
+    nn.Conv2d(64, 1, 7, 1, 0),
+    nn.Flatten(1),
+)
+
+<span class="fragment" data-fragment-index="0">logits = D(fake)  # (4, 1)
+# raw logits for BCEWithLogitsLoss</span></code></pre></div>

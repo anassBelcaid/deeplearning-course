@@ -1,0 +1,20 @@
+<script>
+(() => {
+ const moduleButtons=document.querySelectorAll('[data-conv-module]');
+ moduleButtons.forEach(b=>b.addEventListener('click',()=>{
+  moduleButtons.forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+  document.querySelectorAll('[data-conv-panel]').forEach(p=>{p.hidden=p.dataset.convPanel!==b.dataset.convModule;});
+  if(typeof Reveal!=='undefined')Reveal.layout();
+ }));
+ const epochButtons=document.querySelectorAll('[data-gan-epoch]');
+ epochButtons.forEach(b=>b.addEventListener('click',()=>{
+  const epoch=b.dataset.ganEpoch;
+  epochButtons.forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+  document.querySelectorAll('[data-gan-sample]').forEach(im=>{
+   im.src='assets/evidence/section5/epoch-'+epoch+'-sample-'+im.dataset.ganSample+'.png';
+   im.alt='Actual generated image from fixed latent draw '+(Number(im.dataset.ganSample)+1)+', recorded epoch '+epoch;
+  });
+  document.getElementById('gan-training-status').textContent='Epoch '+epoch+' · '+(epoch==='0'?'untrained initialization':(Number(epoch)*94)+' alternating updates')+' · fixed draws 1–6';
+ }));
+})();
+</script>

@@ -1,0 +1,12 @@
+<div class="light-code-editor"><div class="editor-bar"><span>PYTORCH · DISCRIMINATOR</span><strong>untrained module contract</strong></div><pre><code>D = nn.Sequential(
+    nn.Flatten(),
+    nn.Linear(784, 256), nn.LeakyReLU(0.2),
+    nn.Linear(256, 128), nn.LeakyReLU(0.2),
+    nn.Linear(128, 1),
+)
+
+<span class="fragment" data-fragment-index="0">real_logits = D(real)
+fake_logits = D(fake)
+print(fake_logits.shape)
+display_scores = fake_logits.sigmoid()
+# torch.Size([4, 1])</span></code></pre></div>

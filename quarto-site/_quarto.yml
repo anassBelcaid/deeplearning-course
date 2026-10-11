@@ -10,6 +10,7 @@ project:
     - "lectures/**/assets/useful-reconstruction/**"
     - "lectures/**/assets/sampling-failure/**"
     - "lectures/11-variational-autoencoders/assets/evidence/**"
+    - "lectures/12-generative-adversarial-networks/assets/evidence/**"
     - "notes/11-variational-autoencoders/assets/demos/**"
 
 website:

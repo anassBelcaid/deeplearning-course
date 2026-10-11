@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="560" viewBox="0 0 960 560" role="img" aria-labelledby="title desc">
+<title id="title">Generating images with feedback from a learned judge</title>
+<desc id="desc">Noise enters expanding generator layers and becomes a garment. An observed garment and the generated garment feed the same shrinking discriminator layers. A dashed return path previews training feedback. Conceptual illustration, not measured outputs.</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M1 1 9 5 1 9" fill="none" stroke="#bfd4e4" stroke-width="1.5"/></marker>
+<marker id="feedback" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M1 1 9 5 1 9" fill="none" stroke="#f0b57c" stroke-width="1.5"/></marker>
+<path id="shirt" d="M-30-43-64-20-47 7-30-4V49H30V-4L47 7 64-20 30-43 15-35Q0-20-15-35Z"/>
+</defs>
+<rect width="960" height="560" fill="#071525"/>
+<g fill="#83cbd1"><circle cx="64" cy="342" r="5"/><circle cx="90" cy="368" r="6"/><circle cx="71" cy="392" r="4"/><circle cx="116" cy="339" r="4"/><circle cx="121" cy="391" r="5"/><circle cx="103" cy="415" r="3"/></g>
+<g fill="#6585be"><rect x="192" y="340" width="18" height="54" rx="6"/><rect x="224" y="318" width="21" height="98" rx="7"/><rect x="259" y="293" width="24" height="148" rx="8"/></g>
+<g fill="#142c40" stroke="#31566b" stroke-width="2"><rect x="365" y="90" width="155" height="136" rx="17"/><rect x="365" y="299" width="155" height="136" rx="17"/></g>
+<use href="#shirt" transform="translate(442 157)" fill="#81c9cb"/>
+<use href="#shirt" transform="translate(442 366)" fill="#efb378"/>
+<g fill="#c47991"><rect x="655" y="215" width="25" height="143" rx="8"/><rect x="695" y="241" width="22" height="91" rx="7"/><rect x="732" y="260" width="19" height="53" rx="6"/></g>
+<g fill="none" stroke="#bfd4e4" stroke-width="3" marker-end="url(#arrow)"><path d="M135 367H174"/><path d="M300 367H349"/><path d="M536 158H587Q604 158 604 176V264H637"/><path d="M536 367H587Q604 367 604 349V309H637"/><path d="M770 287H820"/></g>
+<circle cx="865" cy="287" r="28" fill="#172f41" stroke="#8db5c5" stroke-width="3"/>
+<path d="M865 287L877 273" stroke="#efb378" stroke-width="4" stroke-linecap="round"/><circle cx="865" cy="287" r="4" fill="#efb378"/>
+<path d="M704 377V480Q704 494 689 494H246Q234 494 234 481V447" fill="none" stroke="#efb378" stroke-width="3" stroke-dasharray="9 8" marker-end="url(#feedback)"/>
+</svg>
