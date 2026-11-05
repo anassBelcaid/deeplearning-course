@@ -24,7 +24,7 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */
   vertical-align: middle;
 }
 </style>
@@ -81,13 +81,13 @@ ul.task-list li input[type="checkbox"] {
     const listingTargetEl = window.document.querySelector('#listing-project-gallery .list');
     if (!listingTargetEl) {
       // No listing discovered, do not attach.
-      return; 
+      return;
     }
 
     const options = {
-      valueNames: ['listing-title','listing-students','listing-description','listing-thumbnail','listing-thumbnail_alt','listing-thumbnail_credit','listing-status','listing-example',{ data: ['index'] },{ data: ['categories'] }],
-      
-      searchColumns: ["listing-title","listing-students","listing-description","listing-thumbnail","listing-thumbnail_alt","listing-thumbnail_credit","listing-status","listing-example"],
+      valueNames: ['listing-title','listing-students','listing-description','listing-thumbnail','listing-thumbnail_alt','listing-thumbnail_credit','listing-status',{ data: ['index'] },{ data: ['categories'] }],
+
+      searchColumns: ["listing-title","listing-students","listing-description","listing-thumbnail","listing-thumbnail_alt","listing-thumbnail_credit","listing-status"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -162,40 +162,40 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html"> 
+    <a class="nav-link" href="../index.html">
 <span class="menu-text">Home</span></a>
-  </li>  
+  </li>
   <li class="nav-item">
-    <a class="nav-link" href="../schedule.html"> 
+    <a class="nav-link" href="../schedule.html">
 <span class="menu-text">Schedule</span></a>
-  </li>  
+  </li>
   <li class="nav-item">
-    <a class="nav-link" href="../notes.html"> 
+    <a class="nav-link" href="../notes.html">
 <span class="menu-text">Notes</span></a>
-  </li>  
+  </li>
   <li class="nav-item">
-    <a class="nav-link" href="../projects.html"> 
+    <a class="nav-link" href="../projects.html">
 <span class="menu-text">Projects</span></a>
-  </li>  
+  </li>
   <li class="nav-item">
-    <a class="nav-link active" href="../student-projects/index.html" aria-current="page"> 
+    <a class="nav-link active" href="../student-projects/index.html" aria-current="page">
 <span class="menu-text">Student Projects</span></a>
-  </li>  
+  </li>
   <li class="nav-item">
-    <a class="nav-link" href="../logistics.html"> 
+    <a class="nav-link" href="../logistics.html">
 <span class="menu-text">Logistics</span></a>
-  </li>  
+  </li>
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="https://edstem.org/us/courses/102787/"> 
+    <a class="nav-link" href="https://edstem.org/us/courses/102787/">
 <span class="menu-text">ED</span></a>
-  </li>  
+  </li>
   <li class="nav-item compact">
     <a class="nav-link" href="https://github.com/anassBelcaid/deeplearning-course"> <i class="bi bi-github" role="img" aria-label="Course repository">
-</i> 
+</i>
 <span class="menu-text"></span></a>
-  </li>  
+  </li>
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
@@ -207,11 +207,11 @@ window.Quarto = {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    
+
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    
+
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
@@ -229,11 +229,11 @@ window.Quarto = {
 
 <div class="quarto-title-meta">
 
-    
-  
-    
+
+
+
   </div>
-  
+
 
 
 </header>
@@ -248,22 +248,25 @@ window.Quarto = {
 </div>
 <section id="the-project-gallery" class="level2">
 <h2 class="anchored" data-anchor-id="the-project-gallery">The project gallery</h2>
-<p>Approved proposals will appear here as teams begin their investigations.</p>
+<p>Explore approved proposals as teams begin their investigations.</p>
 <div id="listing-project-gallery" class="quarto-listing quarto-listing-container-custom">
 <div class="student-project-grid">
 
 <article class="student-project-card">
   <figure class="student-project-visual figure">
-    <img src="images/leaves.svg" alt="Concept illustration of a leaf viewed through a patch grid, with three different backgrounds." width="1200" height="750" loading="lazy" class="figure-img">
-    <figcaption>Course illustration · schematic, not experimental results</figcaption>
+    <img src="images/forgetful-explorer.png" alt="A small robot follows a glowing path through a dark maze toward a bright exit." width="1200" height="750" loading="lazy" class="figure-img">
+    <figcaption>AI-generated illustration created for the project</figcaption>
   </figure>
   <div class="student-project-copy">
-    <span class="student-project-status">Fictional example</span>
-    <h3 class="anchored">Leaves in the Wild</h3>
-    <p class="student-project-team">Lina El Mansouri · Adam Rami</p>
-    <p class="student-project-description">Can a leaf classifier keep working when the background changes? We plan to compare a small CNN with a pretrained model, then investigate errors under changes in lighting and background.</p>
-    <p class="student-project-example">Sample proposal with fictional names. This is a layout preview, not a student submission.</p>
-    
+    <span class="student-project-status">Proposal approved</span>
+    <h3 class="anchored">The Forgetful Explorer — Can an AI Escape a Maze It Cannot Fully See?</h3>
+    <p class="student-project-team">Ouazzaba El Mehdi · Ibnsalah Dirar · Ilyas Merouane · Louragli Mohamed Ali</p>
+    <details class="student-project-details">
+      <summary>Project description</summary>
+      <p class="student-project-description">Imagine escaping a maze while seeing only a few tiles around you. We will train reinforcement-learning agents in randomly generated mazes with a small field of view, comparing a forgetful agent that reacts only to what it sees now with agents that carry a memory. We hope to learn when memory helps most, and how it changes the way an agent explores.</p>
+    </details>
+
+
   </div>
 </article>
 
@@ -300,7 +303,7 @@ window.Quarto = {
     anchorJS.add('.anchored');
     const isCodeAnnotation = (el) => {
       for (const clz of el.classList) {
-        if (clz.startsWith('code-annotation-')) {                     
+        if (clz.startsWith('code-annotation-')) {
           return true;
         }
       }
@@ -320,11 +323,11 @@ window.Quarto = {
         button.setAttribute("data-bs-toggle", "tooltip");
         button.setAttribute("data-bs-placement", "left");
         button.setAttribute("data-bs-title", "Copied!");
-        tooltip = new bootstrap.Tooltip(button, 
-          { trigger: "manual", 
+        tooltip = new bootstrap.Tooltip(button,
+          { trigger: "manual",
             customClass: "code-copy-button-tooltip",
             offset: [0, -8]});
-        tooltip.show();    
+        tooltip.show();
       }
       setTimeout(function() {
         if (tooltip) {
@@ -406,7 +409,7 @@ window.Quarto = {
       if (onUntriggerFn) {
         config.onUntrigger = onUntriggerFn;
       }
-      window.tippy(el, config); 
+      window.tippy(el, config);
     }
     const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
     for (var i=0; i<noterefs.length; i++) {
@@ -481,7 +484,7 @@ window.Quarto = {
       tippyHover(xref, undefined, function(instance) {
         instance.disable();
         let url = xref.getAttribute('href');
-        let hash = undefined; 
+        let hash = undefined;
         if (url.startsWith('#')) {
           hash = url;
         } else {
@@ -509,7 +512,7 @@ window.Quarto = {
               if (note !== null) {
                 const html = processXRef(id, note);
                 instance.setContent(html);
-              } 
+              }
             }).finally(() => {
               instance.enable();
               instance.show();
@@ -533,7 +536,7 @@ window.Quarto = {
               }
               const html = processXRef(null, note);
               instance.setContent(html);
-            } 
+            }
           }).finally(() => {
             instance.enable();
             instance.show();
@@ -573,7 +576,7 @@ window.Quarto = {
               height = bottom - top;
             }
             if (top !== null && height !== null && parent !== null) {
-              // cook up a div (if necessary) and position it 
+              // cook up a div (if necessary) and position it
               let div = window.document.getElementById("code-annotation-line-highlight");
               if (div === null) {
                 div = window.document.createElement("div");
@@ -699,7 +702,7 @@ window.Quarto = {
   <div class="nav-footer">
     <div class="nav-footer-left">
 <p>Deep Learning · ENSA Tétouan</p>
-</div>   
+</div>
     <div class="nav-footer-center">
       &nbsp;
     </div>

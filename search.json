@@ -1,26 +1,5 @@
 [
   {
-    "objectID": "student-projects/index.html",
-    "href": "student-projects/index.html",
-    "title": "Student Projects",
-    "section": "",
-    "text": "From a first question to a working model: explore the problems our students choose, the ideas they test, and the evidence they build."
-  },
-  {
-    "objectID": "student-projects/index.html#the-project-gallery",
-    "href": "student-projects/index.html#the-project-gallery",
-    "title": "Student Projects",
-    "section": "The project gallery",
-    "text": "The project gallery\nApproved proposals will appear here as teams begin their investigations.\n\n\n\n\n  \n    \n    Course illustration · schematic, not experimental results\n  \n  \n    Fictional example\n    Leaves in the Wild\n    Lina El Mansouri · Adam Rami\n    Can a leaf classifier keep working when the background changes? We plan to compare a small CNN with a pretrained model, then investigate errors under changes in lighting and background.\n    Sample proposal with fictional names. This is a layout preview, not a student submission.\n    \n  \n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "student-projects/index.html#submit-your-proposal",
-    "href": "student-projects/index.html#submit-your-proposal",
-    "title": "Student Projects",
-    "section": "Submit your proposal",
-    "text": "Submit your proposal\nStart with a question you can investigate, a dataset you can access, and an experiment you can finish with your available time and hardware.\n\nDownload and fill in the YAML template. Write a short public summary, list your teammates, and describe the dataset, approach, and evaluation plan.\nSend your proposal to the instructor for review, together with your thumbnail if you have one. A simple diagram is welcome; a thumbnail is optional at this stage.\nRevise after feedback. Once approved, your title, team, summary, and thumbnail can appear in this gallery. Reports and code can be linked later.\n\nDownload proposal template · YAML\nUse spaces for indentation and keep the field names unchanged. The comments in the template explain what to write. Choose an image you may share, include its source, and write a short description for readers who cannot see it.\nLooking for the course notebooks? Browse coding assignments and homework."
-  },
-  {
     "objectID": "labs/12-anime-generation/index.html",
     "href": "labs/12-anime-generation/index.html",
     "title": "Anime Faces: Design, Train, Defend",
@@ -6858,5 +6837,26 @@
     "title": "Anime Faces · Reading Notebook",
     "section": "Reading path",
     "text": "Reading path\n\nCourse VAE notes: posterior, reparameterization, likelihood and KL.\nCourse GAN notes: logits, update ownership, convolutional shapes and evaluation.\nKingma & Welling: VAE objective and inference.\nGoodfellow et al.: adversarial objectives and alternating optimization.\nRadford et al.: convolutional GAN design choices.\nTheis et al.: evaluation depends on the claim and intended use.\nKaggle dataset, KaggleHub, and PyTorch reproducibility: source access and implementation contracts."
+  },
+  {
+    "objectID": "student-projects/index.html",
+    "href": "student-projects/index.html",
+    "title": "Student Projects",
+    "section": "",
+    "text": "From a first question to a working model: explore the problems our students choose, the ideas they test, and the evidence they build."
+  },
+  {
+    "objectID": "student-projects/index.html#the-project-gallery",
+    "href": "student-projects/index.html#the-project-gallery",
+    "title": "Student Projects",
+    "section": "The project gallery",
+    "text": "The project gallery\nExplore approved proposals as teams begin their investigations.\n\n\n\n\n  \n    \n    AI-generated illustration created for the project\n  \n  \n    Proposal approved\n    The Forgetful Explorer — Can an AI Escape a Maze It Cannot Fully See?\n    Ouazzaba El Mehdi · Ibnsalah Dirar · Ilyas Merouane · Louragli Mohamed Ali\n    \n      Project description\n      Imagine escaping a maze while seeing only a few tiles around you. We will train reinforcement-learning agents in randomly generated mazes with a small field of view, comparing a forgetful agent that reacts only to what it sees now with agents that carry a memory. We hope to learn when memory helps most, and how it changes the way an agent explores.\n    \n    \n    \n  \n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "student-projects/index.html#submit-your-proposal",
+    "href": "student-projects/index.html#submit-your-proposal",
+    "title": "Student Projects",
+    "section": "Submit your proposal",
+    "text": "Submit your proposal\nStart with a question you can investigate, a dataset you can access, and an experiment you can finish with your available time and hardware.\n\nDownload and fill in the YAML template. Write a short public summary, list your teammates, and describe the dataset, approach, and evaluation plan.\nSend your proposal to the instructor for review, together with your thumbnail if you have one. A simple diagram is welcome; a thumbnail is optional at this stage.\nRevise after feedback. Once approved, your title, team, summary, and thumbnail can appear in this gallery. Reports and code can be linked later.\n\nDownload proposal template · YAML\nUse spaces for indentation and keep the field names unchanged. The comments in the template explain what to write. Choose an image you may share, include its source, and write a short description for readers who cannot see it.\nLooking for the course notebooks? Browse coding assignments and homework."
   }
 ]
