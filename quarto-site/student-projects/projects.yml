@@ -20,3 +20,22 @@
   # report: "https://..."
   # code: "https://..."
   # demo: "https://..."
+
+- title: "Urban Change Detection using Deep Learning and Multitemporal Remote Sensing Images"
+  students:
+    - "Nouhaila Ghoulam"
+    - "Meryem Nounah"
+    - "Sara Hadi"
+    - "Insaf Fergani"
+  description: >-
+    Rapid and sometimes unplanned urban expansion is hard to monitor by hand.
+    Using the LEVIR-CD dataset of multitemporal aerial images, we build a
+    pixel-difference baseline, a siamese CNN and a siamese U-Net in PyTorch to
+    map building changes. We vary the loss function to cope with rare changed
+    pixels, aiming to produce maps that could support sustainable urban
+    planning.
+
+  thumbnail: "images/urban-change-detection.png"
+  thumbnail_alt: "Illustrative aerial views of the same neighborhood before and after construction, with new buildings outlined in amber."
+  thumbnail_credit: "AI-generated course illustration · not dataset imagery or model results"
+  status: "Proposal approved"
