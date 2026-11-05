@@ -80,6 +80,11 @@ In HTML notes, use a prompt followed by a `<details>` solution so readers choose
 - When a project introduces a nontrivial class, object hierarchy, or hidden data structure, precede the implementation task with a diagram that makes object ownership, stored state, graph relationships, and information flow concrete. In particular, distinguish references to other objects from copied numerical values.
 - When a lab, project, or homework becomes available, link it in both places on the schedule: the course-material button and the corresponding fourth-column project-track entry. The fourth-column title and description should form one clear clickable target; never leave available work represented there as plain text.
 
+## Student project gallery
+
+- Use compact titles on student project cards (1.3rem with a 1.25 line height), including future submissions, so long project names do not dominate the gallery.
+- Keep student project cards in a three-column grid on wide screens, including when only one project is listed; adapt to two columns on tablets and one on phones. Hide each description by default behind an accessible triangle disclosure so the gallery remains compact.
+
 ## Publishing course material
 
 - When a lecture, notes chapter, PDF, code session, project, or homework becomes available, update the corresponding schedule material button in the same change. Replace the muted placeholder with a working link, render the schedule, and verify that the generated HTML points to the rendered resource. Do not consider the material published or the task complete while its schedule entry still says that it is unavailable.

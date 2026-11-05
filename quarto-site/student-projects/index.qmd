@@ -22,7 +22,7 @@ Final presentations take place in the last two weeks. The exact schedule will be
 
 ## The project gallery
 
-Approved proposals will appear here as teams begin their investigations.
+Explore approved proposals as teams begin their investigations.
 
 :::{#project-gallery}
 :::

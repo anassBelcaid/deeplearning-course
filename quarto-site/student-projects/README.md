@@ -26,8 +26,9 @@ The template is a single YAML mapping; `projects.yml` is a list of public cards.
    Check the page, then publish through the normal site workflow when ready.
    The gallery updates automatically on every site build.
 
-One project gets a spacious horizontal card; multiple projects use three
-columns on wide screens, two on tablets, and one on phones. Card text is escaped;
+Projects use three columns on wide screens, two on tablets, and one on phones,
+even when only one project is listed. Descriptions start collapsed and open with
+the triangle beside “Project description”. Card text is escaped;
 names must be a nonempty YAML list. The renderer checks status, thumbnail path,
 alt text, and link schemes. An empty collection can be represented by `[]`.
 

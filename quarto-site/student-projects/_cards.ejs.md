@@ -17,7 +17,10 @@
     <span class="student-project-status"><%- item.example ? 'Fictional example' : status %></span>
     <h3><%- item.title %></h3>
     <p class="student-project-team"><%- item.students.join(' · ') %></p>
-    <p class="student-project-description"><%- item.description %></p>
+    <details class="student-project-details">
+      <summary>Project description</summary>
+      <p class="student-project-description"><%- item.description %></p>
+    </details>
     <% if (item.example) { %><p class="student-project-example">Sample proposal with fictional names. This is a layout preview, not a student submission.</p><% } %>
     <% const links = ['report', 'code', 'demo'].filter(key => item[key]); if (links.length) { %>
     <nav class="student-project-links" aria-label="Resources for <%- item.title %>">
