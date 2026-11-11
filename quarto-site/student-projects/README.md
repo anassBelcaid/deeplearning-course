@@ -14,9 +14,14 @@ The template is a single YAML mapping; `projects.yml` is a list of public cards.
 1. Review submissions outside this public repository. Copy only `title`,
    `students`, `description`, and the three thumbnail fields into a new list item
    in `projects.yml`. Do not copy the `proposal` review block.
+   Archive original submissions and supplied assets in
+   `/home/anass/.local/share/deeplearning-private/proposals/` with owner-only
+   access. Verify the archive before removing the intake copies from `tmp/`;
+   this ignored intake directory is not permanent storage.
 2. Put the image in `images/` and set `thumbnail: "images/your-project.webp"`.
    Use a landscape image, ideally 1200 × 750, with meaningful `thumbnail_alt`
-   and attribution in `thumbnail_credit`. Omit or leave `thumbnail` empty for
+   and attribution in `thumbnail_credit` (retained as source metadata, without a
+   visible thumbnail title or credit caption). Omit or leave `thumbnail` empty for
    the supplied placeholder. Both SVGs shipped here are original course artwork.
 3. Set `status` to `Proposal approved`, `In progress`, or `Completed`.
    Remove the fictional example when adding the first real project; omit

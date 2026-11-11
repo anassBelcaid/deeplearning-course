@@ -1,4 +1,5 @@
 .sass-cache
+tmp/
 _site
 .jekyll-cache
 _quarto_internal_scss_error.scss

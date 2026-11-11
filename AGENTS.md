@@ -82,6 +82,10 @@ In HTML notes, use a prompt followed by a `<details>` solution so readers choose
 
 ## Student project gallery
 
+- Treat `tmp/` as a proposal intake area only. After adding a proposal's public fields to the gallery, archive the original submission and its supplied assets in `/home/anass/.local/share/deeplearning-private/proposals/` outside the repository with owner-only access. Verify the archived copies before removing intake copies; never publish the private `proposal` review block.
+
+- Show thumbnails without visible image titles or credit captions. Preserve alt text and attribution in the source metadata; keep the project title in the card body. Apply this gallery-specific convention to existing and future proposals.
+
 - Use compact titles on student project cards (1.3rem with a 1.25 line height), including future submissions, so long project names do not dominate the gallery.
 - Keep student project cards in a three-column grid on wide screens, including when only one project is listed; adapt to two columns on tablets and one on phones. Hide each description by default behind an accessible triangle disclosure so the gallery remains compact.
 

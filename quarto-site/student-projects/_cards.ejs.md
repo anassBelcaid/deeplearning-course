@@ -11,7 +11,6 @@
 <article class="student-project-card">
   <figure class="student-project-visual">
     <img src="<%- thumbnail %>" alt="<%- item.thumbnail_alt || 'Abstract network illustration; project thumbnail forthcoming.' %>" width="1200" height="750" loading="lazy">
-    <% if (item.thumbnail_credit) { %><figcaption><%- item.thumbnail_credit %></figcaption><% } %>
   </figure>
   <div class="student-project-copy">
     <span class="student-project-status"><%- item.example ? 'Fictional example' : status %></span>
