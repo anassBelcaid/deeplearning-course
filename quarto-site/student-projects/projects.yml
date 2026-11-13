@@ -88,4 +88,24 @@
     annotation, with pseudo-labeling, where a second network helps identify reliable
     model-generated labels. We will evaluate whether combining both strategies improves
     classification performance while using fewer human labels.
+  thumbnail: "images/learning-to-learn.jpeg"
+  thumbnail_alt: "Illustration of image examples feeding a neural network, with a cycle of selecting uncertain images, human annotation, and model improvement."
+  thumbnail_credit: "Thumbnail supplied by the project team"
+  status: Proposal approved
+
+- title: 'DeepSea Vision: Where Does Knowledge Help Most in Underwater Debris Segmentation?'
+  students:
+  - Khaoula Anjroum
+  - Khadija Elouarad
+  - Loubna Souali
+  description: 'Marine debris is hard to spot in underwater images because of poor
+    light, blur, and color loss. Using the TrashCan dataset, we will train U-Net
+    models to find debris pixels, and test two sources of knowledge: ImageNet pretraining
+    and augmentation based on how water absorbs light. We will check which helps
+    more, and how well each model holds up as visibility drops, to inform underwater
+    robot vision.'
+  thumbnail: images/deepsea-vision.png
+  thumbnail_alt: 'Side by side: an underwater robot image with debris, and the same
+    image with the debris highlighted by a segmentation mask.'
+  thumbnail_credit: AI-generated illustration, prompt by the team
   status: Proposal approved
