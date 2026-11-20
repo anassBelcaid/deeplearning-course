@@ -158,3 +158,22 @@
   thumbnail_alt: "A green leaf covered in water droplets rests on a mossy rock in sunlight."
   thumbnail_credit: "Thumbnail supplied by the project team"
   status: "Proposal approved"
+
+- title: "The Invisible Defect: Beyond Reconstruction"
+
+  students:
+    - "Youssef Bouzine"
+    - "Omar Jebbari"
+    - "Rime Khazraoui"
+    - "Houssam El Mezgueldi"
+
+  description: >-
+    Industrial defects can be rare, so collecting enough faulty examples
+    for training is not always possible. We will compare CAE, VAE, and
+    PatchCore using the MVTec AD dataset. We want to find out how well
+    each method detects defective products, shows where the defects are,
+    and how much time it needs to process an image.
+  thumbnail: "images/the-invisible-defect.png"
+  thumbnail_alt: "Illustration of industrial images passing through a deep learning model to produce defect heatmaps on a metal component and a cracked tile."
+  thumbnail_credit: "Thumbnail supplied by the project team"
+  status: "Proposal approved"
