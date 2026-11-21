@@ -177,3 +177,19 @@
   thumbnail_alt: "Illustration of industrial images passing through a deep learning model to produce defect heatmaps on a metal component and a cracked tile."
   thumbnail_credit: "Thumbnail supplied by the project team"
   status: "Proposal approved"
+
+- title: "Image Manipulation Localization Using Deep Learning"
+  students:
+    - "Hicham Laiymani"
+    - "Hajji Mohammed"
+    - "Safa Moussamir"
+  description: >-
+    We will investigate pixel-level localization of manipulated regions in digital images,
+    rather than only classifying images as authentic or fake. We plan to compare a U-Net
+    baseline, a multi-scale CNN with an SRM noise branch, and, if resources allow, a
+    pretrained Vision Transformer-based segmentation model. We will study cross-dataset
+    generalization and robustness to compression, blur, and noise.
+  thumbnail: "images/image-manipulation-localization.png"
+  thumbnail_alt: "Side-by-side original and altered street images, with manipulated regions highlighted in magenta on the altered image."
+  thumbnail_credit: "Original AI-generated illustration created for the team."
+  status: "Proposal approved"
