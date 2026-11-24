@@ -193,3 +193,21 @@
   thumbnail_alt: "Side-by-side original and altered street images, with manipulated regions highlighted in magenta on the altered image."
   thumbnail_credit: "Original AI-generated illustration created for the team."
   status: "Proposal approved"
+
+- title: "NetGuard AI: Network Intrusion and Anomaly Detection"
+  students:
+    - "Hazem Douzi"
+    - "Al Baaza Adnan"
+    - "Errahmouni Mohamed"
+    - "El-Moujahid Ayoub"
+  description: >-
+    Network intrusions are difficult to detect reliably because normal traffic is
+    diverse and labeled attacks may be imperfect. We will build NetGuard AI,
+    comparing supervised XGBoost with two deep-learning approaches:
+    a benign-only autoencoder and a generative adversarial network (GAN).
+    We will evaluate detection quality, false alarms, and generalization,
+    then demonstrate predictions in an interactive dashboard.
+  thumbnail: "images/netguard-ai.png"
+  thumbnail_alt: "NetGuard AI cybersecurity network monitoring and anomaly detection"
+  thumbnail_credit: "Original illustration by the team using AI"
+  status: "Proposal approved"

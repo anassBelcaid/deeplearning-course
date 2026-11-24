@@ -82,6 +82,8 @@ In HTML notes, use a prompt followed by a `<details>` solution so readers choose
 
 ## Student project gallery
 
+- Preserve the existing submission order in the project gallery. Append newly approved projects to the end of the list.
+
 - Treat `tmp/` as a proposal intake area only. After adding a proposal's public fields to the gallery, archive the original submission and its supplied assets in `/home/anass/.local/share/deeplearning-private/proposals/` outside the repository with owner-only access. Verify the archived copies before removing intake copies; never publish the private `proposal` review block.
 
 - Show thumbnails without visible image titles or credit captions. Preserve alt text and attribution in the source metadata; keep the project title in the card body. Apply this gallery-specific convention to existing and future proposals.
